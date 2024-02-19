@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ThemeProvider, useTheme } from "next-themes";
 import { Toaster } from "react-hot-toast";
 import { SessionProvider } from "next-auth/react";
+import AOS from "aos";
 
 export default function Providers({ children }) {
   const [UIstate, setUIstate] = useState("loading");
@@ -18,6 +19,7 @@ export default function Providers({ children }) {
     //   // You can switch to the light theme here if you want
     //   setTheme("light");
     // }
+    AOS.init();
     setUIstate("OK");
   }, []);
   //Render

@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import "aos/dist/aos.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,7 +12,7 @@ export const metadata = {
     follow: true,
   },
   openGraph: {
-    title: "LOCi - Security portal",
+    title: "loci - Security portal",
     description: "Security portal & dashboard",
     url: "https://loci.goweki.com",
     siteName: "loci",

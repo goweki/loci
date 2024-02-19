@@ -1,10 +1,10 @@
 /* base layer */
 @tailwind base;
 @layer base {
-  /* html,
+  html,
   body {
-    @apply text-slate-900 dark:text-slate-100 bg-neutral-50 dark:bg-slate-900;
-  } */
+    @apply text-slate-900  bg-gray-50;
+  }
   h1 {
     @apply text-2xl md:text-4xl lg:text-6xl;
   }

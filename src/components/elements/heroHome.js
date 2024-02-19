@@ -53,7 +53,9 @@ export default function HeroHome() {
                   LOCi
                 </span>
               </h1>
-              <h2 className="text-5xl md:text-6xl">the security portal</h2>
+              <h2 className="text-5xl md:text-6xl" data-aos="zoom-y-out">
+                the security portal
+              </h2>
             </div>
             <div className="max-w-3xl mx-auto">
               <p
