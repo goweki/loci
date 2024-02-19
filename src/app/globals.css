@@ -1,33 +1,36 @@
+/* base layer */
 @tailwind base;
+@layer base {
+  /* html,
+  body {
+    @apply text-slate-900 dark:text-slate-100 bg-neutral-50 dark:bg-slate-900;
+  } */
+  h1 {
+    @apply text-2xl md:text-4xl lg:text-6xl;
+  }
+  h2 {
+    @apply text-xl md:text-2xl lg:text-4xl;
+  }
+}
+
+/* components layer */
 @tailwind components;
+@layer components {
+  .btn {
+    @apply flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-slate-100 py-2 px-4 m-2 rounded-lg transition-all duration-150 ease-in-out;
+  }
+  .btn-sec {
+    @apply flex items-center justify-center bg-transparent hover:bg-blue-600 hover:text-slate-100 py-2 px-4 m-2 rounded-lg transition-all duration-150 ease-in-out;
+  }
+}
+
+/* utilities */
 @tailwind utilities;
-
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+/* @layer utilities {
+  .animation-delay-200 {
+    animation-delay: 0.2s;
   }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .animation-delay-400 {
+    animation-delay: 0.4s;
   }
-}
+} */
