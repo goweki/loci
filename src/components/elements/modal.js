@@ -40,7 +40,6 @@ export default function Modal({ children, id, ariaLabel, show, handleClose }) {
         leaveEnd="opacity-0"
         aria-hidden="true"
       />
-
       {/* Modal dialog */}
       <Transition
         id={id}

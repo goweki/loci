@@ -11,17 +11,14 @@ export default function Home() {
     <div className="flex flex-col min-h-screen overflow-hidden">
       {/*  Site header */}
       <Header />
-
       {/*  Page content */}
       <main className="flex-grow">
-        {/*  Page sections */}
         <HeroHome />
         <Features />
         <FeaturesBlocks />
         <Testimonials />
         <Newsletter />
       </main>
-
       {/*  Site footer */}
       <Footer />
     </div>

@@ -2,12 +2,13 @@
 import { useState } from "react";
 import Modal from "./modal";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function HeroHome() {
   const [videoModalOpen, setVideoModalOpen] = useState(false);
 
   return (
-    <section className="relative">
+    <section className="relative" id="heroHome">
       {/* Illustration behind hero content */}
       <div
         className="absolute left-1/2 transform -translate-x-1/2 bottom-0 pointer-events-none"
@@ -96,14 +97,14 @@ export default function HeroHome() {
               data-aos-delay="450"
             >
               <div className="flex flex-col justify-center">
-                <img
+                <Image
                   className="mx-auto"
-                  src="/images/hero-image.png"
+                  src="/images/illustration-B.jpg"
                   width="768"
                   height="432"
-                  alt="Hero"
+                  alt="Hero image"
                 />
-                <svg
+                {/* <svg
                   className="absolute inset-0 max-w-full mx-auto md:max-w-none h-auto"
                   width="768"
                   height="432"
@@ -168,7 +169,7 @@ export default function HeroHome() {
                       <use fill="url(#hero-ill-e)" xlinkHref="#hero-ill-d" />
                     </g>
                   </g>
-                </svg>
+                </svg> */}
               </div>
               <button
                 className="absolute top-full flex items-center transform -translate-y-1/2 bg-white rounded-full font-medium group p-4 shadow-lg"

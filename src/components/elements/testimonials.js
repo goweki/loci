@@ -5,6 +5,7 @@ export default function Testimonials() {
       <div
         className="absolute left-1/2 transform -translate-x-1/2 bottom-0 pointer-events-none -mb-32"
         aria-hidden="true"
+        id="testimonials"
       >
         <svg
           width="1760"

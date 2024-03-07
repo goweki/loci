@@ -1,6 +1,6 @@
 export default function Newsletter() {
   return (
-    <section>
+    <section id="newsletter">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="pb-12 md:pb-20">
           {/* CTA box */}
@@ -106,6 +106,7 @@ export default function Newsletter() {
                   <div className="flex flex-col sm:flex-row justify-center max-w-xs mx-auto sm:max-w-md lg:mx-0">
                     <input
                       type="email"
+                      id="email-CTA"
                       className="w-full appearance-none bg-gray-800 border border-gray-700 focus:border-gray-600 rounded-sm px-4 py-3 mb-2 sm:mb-0 sm:mr-2 text-white placeholder-gray-500"
                       placeholder="Your email…"
                       aria-label="Your email…"
