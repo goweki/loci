@@ -78,7 +78,7 @@ export default function SigninPage(params) {
           </div>
 
           <div class="mt-3 text-xs flex justify-between items-center text-[#002D74]">
-            <p>Don't have an account?</p>
+            <p>Don&apos;t have an account?</p>
             <button class="py-2 px-5 bg-white border rounded-xl hover:scale-110 duration-300">
               Register
             </button>
