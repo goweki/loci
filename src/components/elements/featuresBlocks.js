@@ -137,7 +137,7 @@ export default function FeaturesBlocks() {
                 Demo Use
               </h4>
               <p className="text-gray-600 text-center">
-                Get a free month's use as you view LOCi capabilities
+                Get a free month&apos;s use as you view LOCi capabilities
               </p>
             </div>
 
