@@ -6,13 +6,13 @@
     @apply text-slate-800  bg-gray-50 min-h-screen flex flex-col;
   }
   h1 {
-    @apply text-5xl mb-8 md:text-6xl font-bold;
+    @apply text-5xl mb-4 md:text-6xl font-bold;
   }
   h2 {
-    @apply text-3xl mb-8 md:text-4xl font-semibold;
+    @apply text-3xl mb-4 md:text-4xl font-semibold;
   }
   h3 {
-    @apply text-xl mb-8 text-gray-600;
+    @apply text-xl mb-4 text-gray-600;
   }
 }
 

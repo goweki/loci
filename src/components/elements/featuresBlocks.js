@@ -12,12 +12,12 @@ export default function FeaturesBlocks() {
         <div className="py-12 md:py-20">
           {/* Section header */}
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
-            <h2 className="h2 mb-4">How LOCi works</h2>
-            <p className="text-xl text-gray-600">
-              LOCI is user-centred with curated experiences suited for specific
+            <h2>How LOCi works</h2>
+            <h3>
+              LOCi is user-centred with curated experiences suited for specific
               deployments. Here is how the product plugs into your security
               needs
-            </p>
+            </h3>
           </div>
 
           {/* Items */}

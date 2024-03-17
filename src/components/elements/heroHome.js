@@ -62,7 +62,7 @@ export default function HeroHome() {
               </h2>
             </div>
             <div className="max-w-3xl mx-auto">
-              <h3 className="mb-4" data-aos="zoom-y-out" data-aos-delay="150">
+              <h3 data-aos="zoom-y-out" data-aos-delay="150">
                 Unifying your security installations so you get all the
                 notifications and analytics at your fingertip
               </h3>

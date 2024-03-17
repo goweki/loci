@@ -31,7 +31,7 @@ export default function Features() {
         <div className="pt-12 md:pt-20">
           {/* Section header */}
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
-            <h2 className="mb-4">Explore the product features</h2>
+            <h2>Explore the product features</h2>
             <h3>
               A robust security portal that integrates with the common security
               hardware to organize your security operations and manage data
