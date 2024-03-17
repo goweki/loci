@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import Transition from "../mols/transition";
+import Transition from "./transition";
 
 export default function Modal({ children, id, ariaLabel, show, handleClose }) {
   const modalContent = useRef(null);

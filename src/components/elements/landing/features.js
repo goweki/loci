@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import Transition from "../mols/transition";
+import Transition from "@/components/mols/transition";
 import Link from "next/link";
 
 export default function Features() {
