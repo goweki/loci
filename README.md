@@ -2,7 +2,7 @@
 
 Source code for LOCi security portal webapp.
 
-## Live site
+## Live link to webapp
 
 - LOCi: [`loci.goweki.com`](https://loci.goweki.com).
 
