@@ -5,9 +5,8 @@ export default function UserSummary() {
     <div className="w-full grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
       <CardDataStats
         title="All installations"
-        total={0}
-        rate="0.43%"
-        notifications={0}
+        total={Object.values(data.installations).reduce((acc, v) => acc + v, 0)}
+        notifications={null}
       >
         <svg
           viewBox="0 0 24 24"
@@ -20,7 +19,11 @@ export default function UserSummary() {
           />
         </svg>
       </CardDataStats>
-      <CardDataStats title="Cameras" total={0} rate="4.35%" notifications={1}>
+      <CardDataStats
+        title="Cameras"
+        total={data.installations.cameras}
+        notifications={data.notifications.cameras}
+      >
         <svg
           viewBox="0 0 24 24"
           className="w-6 h-6 fill-none text-sky-500 stroke-current stroke-1"
@@ -33,7 +36,11 @@ export default function UserSummary() {
         </svg>
       </CardDataStats>
 
-      <CardDataStats title="Fences" total={0} rate="2.59%" levelUp>
+      <CardDataStats
+        title="Fences"
+        total={data.installations.fences}
+        notifications={data.notifications.fences}
+      >
         <svg
           viewBox="0 0 24 24"
           className="w-6 h-6 fill-none text-sky-500 stroke-current stroke-1"
@@ -46,7 +53,11 @@ export default function UserSummary() {
         </svg>
       </CardDataStats>
 
-      <CardDataStats title="Access Controls" total={0} rate="0.95%" levelDown>
+      <CardDataStats
+        title="Access Controls"
+        total={data.installations.accessControls}
+        notifications={data.notifications.accessControls}
+      >
         <svg
           viewBox="0 0 24 24"
           className="w-6 h-6 fill-none text-sky-500 stroke-current stroke-1"
@@ -61,3 +72,8 @@ export default function UserSummary() {
     </div>
   );
 }
+
+const data = {
+  installations: { cameras: 1, fences: 2, accessControls: 5 },
+  notifications: { cameras: 1, fences: 0, accessControls: 6 },
+};

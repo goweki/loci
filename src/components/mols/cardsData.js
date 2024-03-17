@@ -16,12 +16,12 @@ export function CardDataStats({ title, total, notifications, children }) {
             notifications > 0 ? "text-red-500" : "text-green-500"
           }`}
         >
-          {notifications > 0 && notifications + " notifications"}
+          {notifications > 0 &&
+            notifications + ` notification${notifications === 1 ? "" : "s"}`}
 
           {notifications === 0 && (
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              fill="none"
               viewBox="0 0 24 24"
               className="w-6 h-6 stroke-1 stroke-current fill-none"
             >
