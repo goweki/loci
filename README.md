@@ -34,7 +34,7 @@ Source code for LOCi security portal webapp.
 Clone this repo in your local directory:
 
 ```bash
-git clone https://github.com/goweki/defi-web
+git clone https://github.com/goweki/loci.git
 ```
 
 Navigate into the local repo and install dependencies:
