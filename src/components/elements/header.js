@@ -367,6 +367,6 @@ const menuItems = {
   ],
   loggedIn: [
     { name: "home", link: "/user" },
-    { name: "blog", link: "/blog" },
+    { name: "blog", link: "/user/blog" },
   ],
 };

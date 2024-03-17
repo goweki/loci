@@ -28,7 +28,13 @@ export default function Providers({ children }) {
     <ThemeProvider enableSystem={true} attribute="class">
       <React.StrictMode>
         <SessionProvider>
-          {UIstate === "loading" ? <Loading classname="w-12 h-12" /> : children}
+          {UIstate === "loading" ? (
+            <div className="w-full h-full">
+              <Loading classname="w-12 h-12 m-auto" />{" "}
+            </div>
+          ) : (
+            children
+          )}
           <Toaster />
         </SessionProvider>
       </React.StrictMode>
