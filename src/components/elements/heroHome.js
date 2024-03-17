@@ -46,27 +46,26 @@ export default function HeroHome() {
           {/* Section header */}
           <div className="text-center pb-12 md:pb-16">
             <div
-              className="leading-tighter tracking-tighter mb-4"
+              className="leading-tighter tracking-tighter"
               data-aos="zoom-y-out"
             >
-              <h1>
-                <span className="font-extrabold text-5xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
+              <h1 className="mb-6">
+                <span className="font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
                   LOCi
                 </span>
               </h1>
-              <h2 className="text-5xl md:text-6xl" data-aos="zoom-y-out">
+              <h2
+                className="text-5xl md:text-6xl font-normal mb-2"
+                data-aos="zoom-y-out"
+              >
                 the security portal
               </h2>
             </div>
             <div className="max-w-3xl mx-auto">
-              <p
-                className="text-xl mb-8 text-gray-600"
-                data-aos="zoom-y-out"
-                data-aos-delay="150"
-              >
+              <h3 className="mb-4" data-aos="zoom-y-out" data-aos-delay="150">
                 Unifying your security installations so you get all the
                 notifications and analytics at your fingertip
-              </p>
+              </h3>
               <div
                 className="max-w-xs mx-auto sm:max-w-none sm:flex sm:justify-center"
                 data-aos="zoom-y-out"
