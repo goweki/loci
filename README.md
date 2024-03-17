@@ -1,6 +1,6 @@
-# DEFI Motors and Auto-works - website
+# LOCi security portal - webapp
 
-Source code for LOCi security portal website.
+Source code for LOCi security portal webapp.
 
 ## Live site
 
