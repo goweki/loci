@@ -73,10 +73,7 @@ export default function HeroHome() {
                 data-aos-delay="300"
               >
                 <div className="m-4">
-                  <Link
-                    className="btn-sec border border-slate-300 hover:border-transparent"
-                    href="#0"
-                  >
+                  <Link className="btn-sec" href="#0">
                     Integrations
                   </Link>
                 </div>
@@ -180,7 +177,7 @@ export default function HeroHome() {
                 aria-controls="modal"
               >
                 <svg
-                  className="w-6 h-6 fill-current text-gray-400 group-hover:text-blue-600 flex-shrink-0"
+                  className="w-6 h-6 fill-current text-gray-400 group-hover:text-sky-600 flex-shrink-0"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
                 >

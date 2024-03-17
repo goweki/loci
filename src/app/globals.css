@@ -16,11 +16,14 @@
 /* components layer */
 @tailwind components;
 @layer components {
+  .btn-template {
+    @apply flex w-full items-center justify-center hover:bg-sky-700 hover:scale-105 py-2 px-4 rounded-lg outline-none focus:ring-2 focus:ring-sky-500 transition-all ease-in-out;
+  }
   .btn {
-    @apply flex w-full items-center justify-center bg-blue-600 hover:bg-blue-700 hover:scale-105 text-slate-100 py-2 px-4 rounded-lg transition-all duration-150 ease-in-out;
+    @apply btn-template bg-sky-600  text-slate-100 border-none;
   }
   .btn-sec {
-    @apply flex w-full items-center justify-center bg-transparent hover:bg-blue-600 hover:scale-105 hover:text-slate-100 py-2 px-4 rounded-lg transition-all duration-150 ease-in-out;
+    @apply btn-template bg-transparent  hover:text-slate-100 border border-sky-700 hover:border-transparent;
   }
   .card {
     @apply bg-gray-100 shadow-lg rounded-2xl;

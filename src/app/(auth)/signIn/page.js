@@ -83,7 +83,7 @@ export default function SigninPage(params) {
       <div className="card grid grid-cols-1 md:grid-cols-2 max-w-3xl p-5 items-center">
         {/* form */}
         <div className="px-8 md:px-16 pt-4 pb-10">
-          <h2 className="font-bold text-2xl text-blue-500">Login</h2>
+          <h2 className="font-bold text-2xl text-sky-500">Login</h2>
           <p className="text-xs mt-2 text-slate-500">
             If you are already have an account, log in
           </p>
@@ -162,10 +162,22 @@ export default function SigninPage(params) {
             Login with Google
           </button> */}
 
-          <div className="text-xs italic">
-            <a className="flex justify-center" href="#">
+          <div className="flex justify-between items-center">
+            <Link href="/">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-6 h-6 text-sky-500"
+              >
+                <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
+                <path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
+              </svg>
+            </Link>
+
+            {/* <Link className="italic text-xs" href="/forgotPassword">
               Forgot your password?
-            </a>
+            </Link> */}
           </div>
 
           {/* <div className="mt-3 text-xs flex justify-between items-center text-[#002D74]">

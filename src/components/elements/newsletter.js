@@ -112,7 +112,7 @@ export default function Newsletter() {
                       aria-label="Your email…"
                     />
                     <a
-                      className="btn text-white bg-blue-600 hover:bg-blue-700 shadow"
+                      className="btn text-white bg-sky-600 hover:bg-sky-700 shadow"
                       href="#0"
                     >
                       Subscribe

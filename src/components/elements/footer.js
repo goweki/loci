@@ -301,12 +301,12 @@ export default function Footer() {
           {/* Copyrights note */}
           <div className="text-sm text-gray-600 mr-4">
             Powered by{" "}
-            <a
-              className="text-blue-600 hover:underline"
+            <Link
+              className="text-sky-600 hover:underline"
               href="https://goweki.com/"
             >
               GOWEKI
-            </a>
+            </Link>
             . All rights reserved.
           </div>
         </div>
