@@ -253,7 +253,7 @@ export default function Footer() {
           <ul className="flex mb-4 md:order-1 md:ml-4 md:mb-0">
             <li>
               <Link
-                href="#"
+                href="https://www.twitter.com/goweki_"
                 className="flex justify-center items-center text-gray-600 hover:text-gray-900 bg-white hover:bg-white-100 rounded-full shadow transition duration-150 ease-in-out"
                 aria-label="Twitter"
               >
@@ -268,7 +268,7 @@ export default function Footer() {
             </li>
             <li className="ml-4">
               <Link
-                href="#"
+                href="https://www.github.com/goweki"
                 className="flex justify-center items-center text-gray-600 hover:text-gray-900 bg-white hover:bg-white-100 rounded-full shadow transition duration-150 ease-in-out"
                 aria-label="Github"
               >
@@ -283,7 +283,7 @@ export default function Footer() {
             </li>
             <li className="ml-4">
               <Link
-                href="#"
+                href="https://www.facebook.com/goweki"
                 className="flex justify-center items-center text-gray-600 hover:text-gray-900 bg-white hover:bg-white-100 rounded-full shadow transition duration-150 ease-in-out"
                 aria-label="Facebook"
               >
@@ -300,12 +300,12 @@ export default function Footer() {
 
           {/* Copyrights note */}
           <div className="text-sm text-gray-600 mr-4">
-            Made by{" "}
+            Powered by{" "}
             <a
               className="text-blue-600 hover:underline"
-              href="https://cruip.com/"
+              href="https://goweki.com/"
             >
-              Cruip
+              GOWEKI
             </a>
             . All rights reserved.
           </div>

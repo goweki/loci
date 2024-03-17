@@ -72,7 +72,7 @@ export default function HeroHome() {
                 data-aos="zoom-y-out"
                 data-aos-delay="300"
               >
-                <div>
+                <div className="m-4">
                   <Link
                     className="btn-sec border border-slate-300 hover:border-transparent"
                     href="#0"
@@ -80,7 +80,7 @@ export default function HeroHome() {
                     Integrations
                   </Link>
                 </div>
-                <div>
+                <div className="m-4">
                   <a className="btn" href="#0">
                     Learn more
                   </a>

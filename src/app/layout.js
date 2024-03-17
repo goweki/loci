@@ -6,6 +6,11 @@ import "aos/dist/aos.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
+  metadataBase: new URL(
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3000"
+      : process.env.NEXTAUTH_URL
+  ),
   keywords: ["security", "CCTV", "technology", "monitoring", "alerts"],
   robots: {
     index: true,
@@ -15,7 +20,7 @@ export const metadata = {
     title: "loci - Security portal",
     description: "Security portal & dashboard",
     url: "https://loci.goweki.com",
-    siteName: "loci",
+    siteName: "loci website",
     images: ["https://i.postimg.cc/nrV7ytdv/og-image.jpg"],
     // locale: 'en_US',
     type: "website",

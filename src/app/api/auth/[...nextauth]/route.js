@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import db_cluster from "@/lib/mongodb";
+import clientPromise from "@/lib/mongodb";
 import { compareHash } from "@/helpers/bycryptHandlers";
 
 export const authOptions = {
@@ -39,9 +39,11 @@ export const authOptions = {
         //        */
 
         // run query on db
-        const clientResolved = await clientPromise; // resolve MongoClient promise
-        const db_cluster = clientResolved.db(process.env.ATLAS_DB); //target DB
-        const collection = db_cluster.collection("users");
+        console.log("then there....1");
+        const mongodbClient = await clientPromise; // resolve MongoClient promise
+        console.log("then there....2");
+        const db = mongodbClient.db(process.env.ATLAS_DB); //target DB
+        const collection = db.collection("users");
         //check if user exists
         let user = null;
         user = await collection.findOne({
