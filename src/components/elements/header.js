@@ -90,7 +90,7 @@ export default function Header({ user }) {
 
   return (
     <nav
-      className={`sticky w-full z-30 md:bg-opacity-90 transition duration-150 ease-in-out shadow ${
+      className={`fixed w-full z-30 md:bg-opacity-90 transition duration-150 ease-in-out shadow ${
         !top && "bg-white/90 backdrop-blur-sm shadow-lg"
       }`}
       id="header"

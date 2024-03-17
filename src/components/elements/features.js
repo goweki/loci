@@ -175,14 +175,14 @@ export default function Features() {
                   <div className="relative inline-flex flex-col">
                     <img
                       className="md:max-w-none mx-auto rounded"
-                      src="/images/features-bg.png"
+                      src="/images/security-landscape.jpeg"
                       width="500"
                       height="462"
                       alt="Features bg"
                     />
                     <img
                       className="md:max-w-none absolute w-full left-0 transform animate-float"
-                      src="/images/features-element.png"
+                      src="/images/security-landscape.jpeg"
                       width="500"
                       height="44"
                       alt="Element"
@@ -205,14 +205,14 @@ export default function Features() {
                   <div className="relative inline-flex flex-col">
                     <img
                       className="md:max-w-none mx-auto rounded"
-                      src="/images/features-bg.png"
+                      src="/images/security-data-unification.jpeg"
                       width="500"
                       height="462"
                       alt="Features bg"
                     />
                     <img
                       className="md:max-w-none absolute w-full left-0 transform animate-float"
-                      src="/images/features-element.png"
+                      src="/images/security-data-unification.jpeg"
                       width="500"
                       height="44"
                       alt="Element"
@@ -235,14 +235,14 @@ export default function Features() {
                   <div className="relative inline-flex flex-col">
                     <img
                       className="md:max-w-none mx-auto rounded"
-                      src="/images/features-bg.png"
+                      src="/images/security-alerts.jpeg"
                       width="500"
                       height="462"
                       alt="Features bg"
                     />
                     <img
                       className="md:max-w-none absolute w-full left-0 transform animate-float"
-                      src="/images/features-element.png"
+                      src="/images/security-alerts.jpeg"
                       width="500"
                       height="44"
                       alt="Element"
