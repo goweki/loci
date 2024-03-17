@@ -1,3 +1,4 @@
+"use client";
 export function InputField({
   label,
   name = "inputField",
