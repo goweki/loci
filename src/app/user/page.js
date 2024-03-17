@@ -1,4 +1,8 @@
 export default function UserPage() {
   //render
-  return <p className="text-center">You are logged in: User Page</p>;
+  return (
+    <main className="container pt-20 min-h-80">
+      You are logged in: User Page
+    </main>
+  );
 }
