@@ -3,7 +3,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { LogoSymbol } from "../atoms/svgs";
 import { InputField } from "../atoms/inputs";
-import { ButtonPrimary } from "../atoms/buttons";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -70,7 +69,12 @@ export default function Footer() {
             <form>
               <div className="grid grid-cols-4 space-x-2 ">
                 <div className="col-span-3">
-                  <InputField name="email" />
+                  <InputField
+                    name="email"
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                    }}
+                  />
                 </div>
                 <div className="col-span-1">
                   <button

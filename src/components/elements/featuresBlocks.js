@@ -6,17 +6,17 @@ export default function FeaturesBlocks() {
         className="absolute inset-0 top-1/2 md:mt-24 lg:mt-0 bg-gray-900 pointer-events-none"
         aria-hidden="true"
       ></div>
-      <div className="absolute left-0 right-0 bottom-0 m-auto w-px p-px h-20 bg-gray-200 transform translate-y-1/2"></div>
+      {/* <div className="absolute left-0 right-0 bottom-0 m-auto w-px p-px h-20 bg-gray-200 transform translate-y-1/2"></div> */}
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         <div className="py-12 md:py-20">
           {/* Section header */}
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
-            <h2 className="h2 mb-4">How Simple works</h2>
+            <h2 className="h2 mb-4">How LOCi works</h2>
             <p className="text-xl text-gray-600">
-              Duis aute irure dolor in reprehenderit in voluptate velit esse
-              cillum dolore eu fugiat nulla pariatur excepteur sint occaecat
-              cupidatat.
+              LOCI is user-centred with curated experiences suited for specific
+              deployments. Here is how the product plugs into your security
+              needs
             </p>
           </div>
 
@@ -59,10 +59,10 @@ export default function FeaturesBlocks() {
                 </g>
               </svg>
               <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
-                Initial Contact
+                Hardware installation
               </h4>
               <p className="text-gray-600 text-center">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Install cameras, electric fenses or other sensors
               </p>
             </div>
 
@@ -100,10 +100,10 @@ export default function FeaturesBlocks() {
                 </g>
               </svg>
               <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
-                Discovery Session
+                Configure hardware
               </h4>
               <p className="text-gray-600 text-center">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Set up your installations to communicate with LOCi servers
               </p>
             </div>
 
@@ -134,10 +134,10 @@ export default function FeaturesBlocks() {
                 </g>
               </svg>
               <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
-                Contracting
+                Demo Use
               </h4>
               <p className="text-gray-600 text-center">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Get a free month's use as you view LOCi capabilities
               </p>
             </div>
 
@@ -181,10 +181,11 @@ export default function FeaturesBlocks() {
                 </g>
               </svg>
               <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
-                Fast Prototyping
+                Feature Requests
               </h4>
               <p className="text-gray-600 text-center">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Request custom features and curation of alerts for your specific
+                case
               </p>
             </div>
 
@@ -215,10 +216,11 @@ export default function FeaturesBlocks() {
                 </g>
               </svg>
               <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
-                Design Phase
+                Technical Support
               </h4>
               <p className="text-gray-600 text-center">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Get complementary support and assistance in managing security
+                operations
               </p>
             </div>
 
@@ -258,10 +260,10 @@ export default function FeaturesBlocks() {
                 </g>
               </svg>
               <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
-                Develop & Launch
+                Review and Updates
               </h4>
               <p className="text-gray-600 text-center">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Get customized updates and annual reviews to ensure product fir
               </p>
             </div>
           </div>

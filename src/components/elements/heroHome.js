@@ -73,14 +73,14 @@ export default function HeroHome() {
                 data-aos-delay="300"
               >
                 <div className="m-4">
-                  <Link className="btn-sec" href="#0">
-                    Integrations
+                  <Link className="btn-sec" href="#features">
+                    Learn more
                   </Link>
                 </div>
                 <div className="m-4">
-                  <a className="btn" href="#0">
-                    Learn more
-                  </a>
+                  <Link className="btn" href="/signIn">
+                    Sign In
+                  </Link>
                 </div>
               </div>
             </div>

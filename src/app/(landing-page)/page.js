@@ -21,8 +21,8 @@ export default async function Home() {
         <HeroHome />
         <Features />
         <FeaturesBlocks />
-        <Testimonials />
-        <Newsletter />
+        {/* <Testimonials /> */}
+        {/* <Newsletter /> */}
       </main>
       {/*  Site footer */}
       <Footer />
