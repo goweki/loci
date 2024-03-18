@@ -124,10 +124,10 @@ export default function ChartOne({ data }) {
   useEffect(() => {
     setSeries(data[filter]);
   }, [filter, data]);
-  //on change
-  useEffect(() => {
-    setSeries(data[filter]);
-  }, [filter, data]);
+  // //on change
+  // useEffect(() => {
+  //   setSeries(data[filter]);
+  // }, [filter, data]);
 
   return (
     <div className="card col-span-12 xl:col-span-8">
