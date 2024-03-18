@@ -2,7 +2,7 @@
 import { CardDataStats } from "@/components/mols/cardsData";
 export default function UserSummary() {
   return (
-    <div className="w-full grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+    <div className="w-full grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 xl:grid-cols-4">
       <CardDataStats
         title="All installations"
         total={Object.values(data.installations).reduce((acc, v) => acc + v, 0)}

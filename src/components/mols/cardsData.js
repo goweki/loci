@@ -1,14 +1,18 @@
 export function CardDataStats({ title, total, notifications, children }) {
   return (
-    <div className="card px-8 py-6">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-100">
+    <div className={`card px-8 py-6 ${notifications > 0 ? "bg-red-50" : ""}`}>
+      <div
+        className={`flex h-12 w-12 items-center justify-center rounded-full bg-sky-100`}
+      >
         {children}
       </div>
 
       <div className="mt-4 flex items-end justify-between">
         <div>
           <h4>{total}</h4>
-          <span className="text-sm font-medium text-slate-500">{title}</span>
+          <span className="text-sm font-medium text-slate-500 md:text-base">
+            {title}
+          </span>
         </div>
 
         <span
@@ -16,8 +20,11 @@ export function CardDataStats({ title, total, notifications, children }) {
             notifications > 0 ? "text-red-500" : "text-green-500"
           }`}
         >
-          {notifications > 0 &&
-            notifications + ` notification${notifications === 1 ? "" : "s"}`}
+          {notifications > 0 && (
+            <span className="relative z-1 h-2 w-2 rounded-full bg-red-500 inline">
+              <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
+            </span>
+          )}
 
           {notifications === 0 && (
             <svg

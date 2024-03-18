@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { signIn, signOut } from "next-auth/react";
-
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { LogoSymbol } from "../atoms/svgs";
@@ -360,7 +359,6 @@ const menuItems = {
     { name: "home", link: "/" },
     { name: "blog", link: "/blog" },
     { name: "contacts", link: "/contacts" },
-    { name: "sign-in", link: "#" },
   ],
   loggedIn: [
     { name: "home", link: "/user" },

@@ -1,100 +1,104 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LogoSymbol } from "../atoms/svgs";
 import { InputField } from "../atoms/inputs";
 
 export default function Footer() {
+  const pathname = usePathname();
   const [email, setEmail] = useState("");
   return (
     <footer className="border-gray-200 border-y-2 bg-slate-100" id="footer">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Top area: Blocks */}
-        <div className="grid sm:grid-cols-6 gap-8 py-8 md:py-12">
-          {/* 1st block */}
-          <div className="sm:col-span-6">
-            <div className="mb-2">
-              {/* Logo */}
-              <Link
-                href="/"
-                className="group inline-flex items-center border-b pb-3 border-slate-200"
-              >
-                <LogoSymbol classname="w-10 h-10 group-hover:scale-110 transition-all" />
-
-                <span className="md:inline-block mx-2 font-semibold text-sky-700">
-                  LOCi
-                </span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Quick links block */}
-          <div className="sm:col-span-6 md:col-span-3 ">
-            <h6 className="text-gray-800 font-medium mb-2">Quick links</h6>
-            <ul className="text-sm">
-              <li className="mb-2">
+        {!pathname.includes("/user") && (
+          <div className="grid sm:grid-cols-6 gap-8 py-8 md:py-12">
+            {/* 1st block */}
+            <div className="sm:col-span-6">
+              <div className="mb-2">
+                {/* Logo */}
                 <Link
                   href="/"
-                  className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
+                  className="group inline-flex items-center border-b pb-3 border-slate-200"
                 >
-                  Home
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link
-                  href="/blog"
-                  className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
-                >
-                  Blog
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link
-                  href="/contacts"
-                  className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
-                >
-                  Contacts
-                </Link>
-              </li>
-            </ul>
-          </div>
+                  <LogoSymbol classname="w-10 h-10 group-hover:scale-110 transition-all" />
 
-          {/* Request demo block */}
-          <div className="sm:col-span-6 md:col-span-3">
-            <h6 className="text-gray-800 font-medium mb-2">Request Demo</h6>
-            <p className="text-sm text-gray-600 mb-4">
-              Leave us with your email and we will be in touch within a week to
-              set up a demo
-            </p>
-            <form>
-              <div className="grid grid-cols-4 space-x-2 ">
-                <div className="col-span-3">
-                  <InputField
-                    name="email"
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                    }}
-                  />
-                </div>
-                <div className="col-span-1">
-                  <button
-                    className="rounded-lg w-full h-full bg-sky-600 disabled:opacity-25 enabled:hover:bg-sky-700"
-                    disabled={!!email}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="w-6 h-6 m-auto text-white"
-                    >
-                      <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
-                    </svg>
-                  </button>
-                </div>
+                  <span className="md:inline-block mx-2 font-semibold text-sky-700">
+                    LOCi
+                  </span>
+                </Link>
               </div>
-            </form>
+            </div>
+
+            {/* Quick links block */}
+            <div className="sm:col-span-6 md:col-span-3 ">
+              <h6 className="text-gray-800 font-medium mb-2">Quick links</h6>
+              <ul className="text-sm">
+                <li className="mb-2">
+                  <Link
+                    href="/"
+                    className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
+                  >
+                    Home
+                  </Link>
+                </li>
+                <li className="mb-2">
+                  <Link
+                    href="/blog"
+                    className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
+                  >
+                    Blog
+                  </Link>
+                </li>
+                <li className="mb-2">
+                  <Link
+                    href="/contacts"
+                    className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
+                  >
+                    Contacts
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Request demo block */}
+            <div className="sm:col-span-6 md:col-span-3">
+              <h6 className="text-gray-800 font-medium mb-2">Request Demo</h6>
+              <p className="text-sm text-gray-600 mb-4">
+                Leave us with your email and we will be in touch within a week
+                to set up a demo
+              </p>
+              <form>
+                <div className="grid grid-cols-4 space-x-2 ">
+                  <div className="col-span-3">
+                    <InputField
+                      name="email"
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="col-span-1">
+                    <button
+                      className="rounded-lg w-full h-full bg-sky-600 disabled:opacity-25 enabled:hover:bg-sky-700"
+                      disabled={!!email}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="w-6 h-6 m-auto text-white"
+                      >
+                        <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Bottom area */}
         <div className="md:flex md:items-center md:justify-between py-4 md:py-8 border-t border-gray-200">

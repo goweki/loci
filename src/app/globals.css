@@ -32,7 +32,7 @@
     @apply btn-template bg-transparent  hover:text-slate-100 border-sky-700 hover:border-transparent;
   }
   .card {
-    @apply bg-gray-50 shadow-lg rounded-2xl;
+    @apply bg-gray-50 shadow-lg rounded-2xl p-4 md:p-8 lg:p-10;
   }
 }
 
