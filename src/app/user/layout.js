@@ -7,7 +7,7 @@ import Providers from "./providers";
 
 export default async function UserLayout({ children }) {
   const session = await getServerSession(authOptions);
-  if (!session) redirect("/signin");
+  if (!session) redirect("/signIn");
   else
     return (
       <Providers>

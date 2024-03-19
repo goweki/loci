@@ -75,7 +75,7 @@ export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt(params) {
-      // Persist role to the token right after signin
+      // Persist role to the token right after signIn
       if (params.user?.role) {
         params.token.role = params.user.role;
       }
