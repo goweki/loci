@@ -22,7 +22,7 @@ export function hoursDifference(date1, date2) {
   return (date1 - date2) / 3600000;
 }
 
-var months = [
+export const months = [
   "JAN",
   "FEB",
   "MAR",
@@ -44,7 +44,7 @@ export function monthInitToNum(monthname) {
   return months.indexOf(monthname) + 1 || "";
 }
 
-var days = ["SUN", "MON", "TUE", "WED", "THUR", "FRI", "SAT"];
+export const days = ["SUN", "MON", "TUE", "WED", "THUR", "FRI", "SAT"];
 
 export function dayNumToInit(daynum) {
   return days[daynum - 1] || "";

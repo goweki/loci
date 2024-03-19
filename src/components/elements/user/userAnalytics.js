@@ -23,10 +23,7 @@ export default function UserAnalytics() {
     const year = calculateMonthlyTotals(dummyYearNotifData);
     const month = calculateWeeklyTotals(12, dummyYearNotifData);
     setData({
-      year: [
-        { name: "Notifications", data: year.map((v) => v.notifications) },
-        { name: "Red Alerts", data: year.map((v) => v.redAlerts) },
-      ],
+      year,
       month,
     });
   }, []);
@@ -34,7 +31,7 @@ export default function UserAnalytics() {
   return (
     <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
       <ChartOne data={data} />
-      {/* <ChartTwo data={data2} /> */}
+      <ChartTwo data={data2} />
       {/* <ChartThree /> */}
     </div>
   );

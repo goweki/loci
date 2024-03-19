@@ -1,5 +1,5 @@
 import Loader from "@/components/atoms/loader";
-import { pascalCase } from "@/helpers/formatters";
+import { months, pascalCase } from "@/helpers/formatters";
 import { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 
@@ -8,127 +8,119 @@ const colours_ = ["#0ea5e9", "#991b1b"];
 export default function ChartOne({ data }) {
   const [series, setSeries] = useState("");
   const [filter, setFilter] = useState("year");
-  const [chartOptions, setChartOptions] = useState({
-    legend: {
-      show: false,
-      position: "top",
-      horizontalAlign: "left",
-    },
-    colors: colours_,
-    chart: {
-      fontFamily: "Satoshi, sans-serif",
-      height: 335,
-      type: "area",
-      dropShadow: {
-        enabled: true,
-        color: "#623CEA14",
-        top: 10,
-        blur: 4,
-        left: 0,
-        opacity: 0.1,
-      },
-
-      toolbar: {
-        show: false,
-      },
-    },
-    responsive: [
-      {
-        breakpoint: 1024,
-        options: {
-          chart: {
-            height: 300,
-          },
-        },
-      },
-      {
-        breakpoint: 1366,
-        options: {
-          chart: {
-            height: 350,
-          },
-        },
-      },
-    ],
-    stroke: {
-      width: [2, 2],
-      curve: "straight",
-    },
-    // labels: {
-    //   show: false,
-    //   position: "top",
-    // },
-    grid: {
-      xaxis: {
-        lines: {
-          show: true,
-        },
-      },
-      yaxis: {
-        lines: {
-          show: true,
-        },
-      },
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    markers: {
-      size: 4,
-      colors: "#fff",
-      strokeColors: colours_,
-      strokeWidth: 3,
-      strokeOpacity: 0.9,
-      strokeDashArray: 0,
-      fillOpacity: 1,
-      discrete: [],
-      hover: {
-        size: undefined,
-        sizeOffset: 5,
-      },
-    },
-    xaxis: {
-      type: "category",
-      categories: [
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-      ],
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
-    },
-    yaxis: {
-      title: {
-        style: {
-          fontSize: "0px",
-        },
-      },
-      min: 0,
-      max: 400,
-    },
-  });
+  const [chartOptions, setChartOptions] = useState("");
   //onFilter change
   useEffect(() => {
-    setSeries(data[filter]);
-  }, [filter, data]);
-  // //on change
-  // useEffect(() => {
-  //   setSeries(data[filter]);
-  // }, [filter, data]);
+    if (data) {
+      setSeries(parseData(filter, data));
+      setChartOptions({
+        legend: {
+          show: false,
+          position: "top",
+          horizontalAlign: "left",
+        },
+        colors: colours_,
+        chart: {
+          fontFamily: "Satoshi, sans-serif",
+          height: 335,
+          type: "area",
+          dropShadow: {
+            enabled: true,
+            color: "#623CEA14",
+            top: 10,
+            blur: 4,
+            left: 0,
+            opacity: 0.1,
+          },
 
+          toolbar: {
+            show: false,
+          },
+        },
+        responsive: [
+          {
+            breakpoint: 1024,
+            options: {
+              chart: {
+                height: 300,
+              },
+            },
+          },
+          {
+            breakpoint: 1366,
+            options: {
+              chart: {
+                height: 350,
+              },
+            },
+          },
+        ],
+        stroke: {
+          width: [2, 2],
+          curve: "straight",
+        },
+        // labels: {
+        //   show: false,
+        //   position: "top",
+        // },
+        grid: {
+          xaxis: {
+            lines: {
+              show: true,
+            },
+          },
+          yaxis: {
+            lines: {
+              show: true,
+            },
+          },
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        markers: {
+          size: 4,
+          colors: "#fff",
+          strokeColors: colours_,
+          strokeWidth: 3,
+          strokeOpacity: 0.9,
+          strokeDashArray: 0,
+          fillOpacity: 1,
+          discrete: [],
+          hover: {
+            size: undefined,
+            sizeOffset: 5,
+          },
+        },
+        xaxis: {
+          type: "category",
+          categories: filter === "year" ? data.year.map((v) => v.month) : [],
+          axisBorder: {
+            show: false,
+          },
+          axisTicks: {
+            show: false,
+          },
+        },
+        yaxis: {
+          title: {
+            style: {
+              fontSize: "0px",
+            },
+          },
+          min: 0,
+          max:
+            Math.max(
+              ...[
+                ...data.year.map((v) => v.notifications),
+                ...data.year.map((v) => v.redAlerts),
+              ]
+            ) * 1.2,
+        },
+      });
+    }
+  }, [filter, data]);
+  //render
   return (
     <div className="card col-span-12 xl:col-span-8">
       <div className="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
@@ -193,4 +185,24 @@ export default function ChartOne({ data }) {
       </div>
     </div>
   );
+}
+
+function parseData(filt, objArray) {
+  if (filt === "year")
+    return [
+      {
+        name: "Notifications",
+        data: objArray.year.map((v) => v.notifications),
+      },
+      { name: "Red Alerts", data: objArray.year.map((v) => v.redAlerts) },
+    ];
+  else if (filt === "month")
+    return [
+      {
+        name: "Notifications",
+        data: objArray.month.map((v) => v.notifications),
+      },
+      { name: "Red Alerts", data: objArray.month.map((v) => v.redAlerts) },
+    ];
+  else return "";
 }
