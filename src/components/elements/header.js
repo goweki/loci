@@ -225,7 +225,7 @@ export default function Header({ user }) {
                     type="button"
                     className={`btn-sec relative flex text-sm ${
                       openItem === "user-dropdown"
-                        ? "bg-gray-800 text-white"
+                        ? "bg-gray-700 text-white"
                         : ""
                     }`}
                     id="user-menu-button"
@@ -261,33 +261,25 @@ export default function Header({ user }) {
                 <div
                   className={`${
                     openItem === "user-dropdown" ? "" : "hidden"
-                  } absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-sky-100 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none`}
+                  } absolute right-0 mt-2 z-10 w-48 origin-top-right rounded-md bg-gray-700 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden`}
                   role="menu"
                   aria-orientation="vertical"
                   // aria-labelledby="user-menu-button"
                   tabIndex="-1"
                 >
                   <Link
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700"
+                    href="/user/settings"
+                    className="block px-4 py-2 text-sm text-white hover:bg-gray-500"
                     role="menuitem"
                     tabIndex="-1"
                     id="user-menu-item-0"
                   >
-                    Your Profile
-                  </Link>
-                  <Link
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700"
-                    role="menuitem"
-                    tabIndex="-1"
-                    id="user-menu-item-1"
-                  >
                     Settings
                   </Link>
+
                   <Link
                     href="#"
-                    className="block px-4 py-2 text-sm text-gray-700"
+                    className="block px-4 py-2 text-sm text-white hover:bg-gray-500"
                     role="menuitem"
                     tabIndex="-1"
                     id="user-menu-item-2"
@@ -362,6 +354,13 @@ const menuItems = {
   ],
   loggedIn: [
     { name: "home", link: "/user" },
+    { name: "dashboard", link: "/user/dashboard" },
+    { name: "forum", link: "/user/forum" },
     { name: "blog", link: "/user/blog" },
   ],
 };
+
+const profileMenuItems = [
+  { name: "settings", link: "/user/settings" },
+  { name: "Sign Out", link: "" },
+];
