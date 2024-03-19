@@ -39,9 +39,7 @@ export const authOptions = {
         //        */
 
         // run query on db
-        console.log("then there....1");
         const mongodbClient = await clientPromise; // resolve MongoClient promise
-        console.log("then there....2");
         const db = mongodbClient.db(process.env.ATLAS_DB); //target DB
         const collection = db.collection("users");
         //check if user exists
