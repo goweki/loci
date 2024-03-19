@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { createContext, useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { Loader1 } from "@/components/atoms/loader";
 import Loader from "@/components/atoms/loader";
 export const DataContext = createContext();
 

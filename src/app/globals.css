@@ -3,7 +3,7 @@
 @layer base {
   html,
   body {
-    @apply text-slate-800  bg-gray-200 min-h-screen flex flex-col;
+    @apply text-slate-800 w-full overflow-x-hidden bg-gray-200 min-h-screen flex flex-col;
   }
   h1 {
     @apply text-5xl mb-4 md:text-6xl font-bold text-center;
