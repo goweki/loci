@@ -62,7 +62,7 @@ export default function FeaturesBlocks() {
                 Hardware installation
               </h4>
               <p className="text-gray-600 text-center">
-                Install cameras, electric fenses or other sensors
+                Install cameras, electric fences or other sensors
               </p>
             </div>
 
@@ -263,7 +263,7 @@ export default function FeaturesBlocks() {
                 Review and Updates
               </h4>
               <p className="text-gray-600 text-center">
-                Get customized updates and annual reviews to ensure product fir
+                Get customized updates and annual reviews to ensure product fit
               </p>
             </div>
           </div>
