@@ -9,7 +9,6 @@ import {
   calculateWeeklyTotals,
   toMonthlyTotals,
 } from "@/helpers/dataHandlers";
-import { dummyYearNotifData } from "@/lib/configs";
 import { DataContext } from "@/app/user/providers";
 
 export default function UserAnalytics() {
@@ -23,22 +22,27 @@ export default function UserAnalytics() {
     if (data.length === 1) year_ = toMonthlyTotals(data[0].devices[0].notifications);
     //to store totals
     let yearMap = {
-      green: {
-        name: "green",
-        data: []
-      },
-      amber: {
-        name: "amber",
-        data: []
-      },
-      red: {
-        name: "red",
-        data: []
-      },
+      // green: {
+      //   name: "green",
+      //   data: []
+      // },
+      // gray: {
+      //   name: "amber",
+      //   data: []
+      // },
+      // red: {
+      //   name: "red",
+      //   data: []
+      // },
     }
     // map totals
     for (const [key, value] of Object.entries(year_)) {
       for (const [key_, value_] of Object.entries(value)) {
+        if (!yearMap[key_]) {
+          yearMap[key_] = {}
+          yearMap[key_].name = key_
+          yearMap[key_].data = []
+        }
         yearMap[key_].data[key - 1] = value_
       }
     }
@@ -51,26 +55,11 @@ export default function UserAnalytics() {
   return (
     <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
       <ChartOne data={dataParsed} />
-      {/* <ChartTwo data={data2} /> */}
+      <ChartTwo data={data2} />
       {/* <ChartThree /> */}
     </div>
   );
 }
-
-const data1 = {
-  year: [
-    {
-      name: "Notifications",
-      data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30, 45],
-    },
-
-    {
-      name: "Red Alerts",
-      data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39, 51],
-    },
-  ],
-  month: [],
-};
 
 const data2 = [
   {
