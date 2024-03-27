@@ -1,6 +1,9 @@
 import UserSummary from "@/components/elements/user/userSummary";
 import UserAnalytics from "@/components/elements/user/userAnalytics";
-import BreadCrumb from "@/components/mols/Breadcrumb";
+
+export const metadata = {
+  title: "Home",
+};
 
 export default function UserPage() {
   //render

@@ -7,57 +7,46 @@ export const DataContext = createContext();
 
 export default function Providers({ children }) {
   const { data: session, status } = useSession();
-  const [data, setData] = useState(null);
+  const [data, setData] = useState("loading");
   // func update UI data
-  //   const fetchUIuserData = useCallback(async () => {
-  //     try {
-  //       const fetchOptions = {
-  //         method: "GET",
-  //       };
+  const fetchUIuserData = useCallback(async () => {
+    if (!session?.user) return;
+    try {
+      const response = await fetch(
+        `/api/user/data?inst=${Object.keys(session?.user?.role)[0]}`
+      );
 
-  //       const response = await fetch(
-  //         `/api/user/data?institution=${Object.keys(session.user.role)[0]}`,
-  //         fetchOptions
-  //       );
-
-  //       if (!response.ok) {
-  //         throw new Error(`Failed to fetch data. Status: ${response.status}`);
-  //       }
-
-  //       const json_ = await response.json();
-
-  //       if (json_.success) {
-  //         setData(json_.success);
-  //       } else {
-  //         console.error(
-  //           "FAILED: could not fetch data\n > " +
-  //             JSON.stringify(json_.error ?? "....")
-  //         );
-  //         setData("failed");
-  //       }
-  //     } catch (err) {
-  //       setData("failed");
-  //       console.error("ERROR: caught error\n > " + err);
-  //     }
-  //   }, [session?.user?.role]);
-
-  // onMount
-  useEffect(() => {
-    if (session) {
-      //   fetchUIuserData();
+      if (response.status !== 200) {
+        throw new Error(`Failed to fetch data. Status: ${response.status}`);
+      }
+      const json_ = await response.json();
+      if (json_.success) {
+        setData(json_.success);
+      } else {
+        console.error(
+          "FAILED: could not fetch data\n > " +
+          JSON.stringify(json_.error ?? "....")
+        );
+        setData("failed");
+      }
+    } catch (err) {
+      setData("failed");
+      console.error("ERROR: caught error\n > " + err);
     }
-  }, [
-    session,
-    // , fetchUIuserData
-  ]);
+  }, [session?.user?.role]);
+
+  // fetch UI data
+  useEffect(() => {
+    fetchUIuserData();
+  }, [fetchUIuserData]);
 
   //render
-  return !session ||
-    //   || !data
-    status === "loading" ? (
-    <Loader />
+  return data === "loading" || status === "loading" ? (
+    <div className="flex items-center justify-center m-auto">
+      <Loader />
+    </div>
   ) : data === "failed" ? (
-    <div>
+    <div className="flex flex-col flex-grow items-center justify-center">
       <p className="text-center">
         There was an error loading the contents of this page. Check internet
         connectivity
@@ -71,10 +60,7 @@ export default function Providers({ children }) {
     </div>
   ) : (
     <DataContext.Provider
-      value={{
-        data,
-        // refreshData: fetchUIuserData
-      }}
+      value={{ data, refreshData: fetchUIuserData }}
     >
       {children}
     </DataContext.Provider>

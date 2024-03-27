@@ -1,11 +1,14 @@
 "use client";
+import { DataContext } from "@/app/user/providers";
 import { CardDataStats } from "@/components/mols/cardsData";
+import { useContext } from "react";
 export default function UserSummary() {
+  const data = useContext(DataContext)
   return (
     <div className="w-full grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 xl:grid-cols-4">
       <CardDataStats
         title="All installations"
-        total={Object.values(data.installations).reduce((acc, v) => acc + v, 0)}
+        total={Object.values(data_.installations).reduce((acc, v) => acc + v, 0)}
         notifications={null}
       >
         <svg
@@ -21,8 +24,8 @@ export default function UserSummary() {
       </CardDataStats>
       <CardDataStats
         title="Cameras"
-        total={data.installations.cameras}
-        notifications={data.notifications.cameras}
+        total={data_.installations.cameras}
+        notifications={data_.notifications.cameras}
       >
         <svg
           viewBox="0 0 24 24"
@@ -38,8 +41,8 @@ export default function UserSummary() {
 
       <CardDataStats
         title="Fences"
-        total={data.installations.fences}
-        notifications={data.notifications.fences}
+        total={data_.installations.fences}
+        notifications={data_.notifications.fences}
       >
         <svg
           viewBox="0 0 24 24"
@@ -55,8 +58,8 @@ export default function UserSummary() {
 
       <CardDataStats
         title="Access Controls"
-        total={data.installations.accessControls}
-        notifications={data.notifications.accessControls}
+        total={data_.installations.accessControls}
+        notifications={data_.notifications.accessControls}
       >
         <svg
           viewBox="0 0 24 24"
@@ -73,7 +76,7 @@ export default function UserSummary() {
   );
 }
 
-const data = {
+const data_ = {
   installations: { cameras: 1, fences: 2, accessControls: 5 },
   notifications: { cameras: 1, fences: 0, accessControls: 6 },
 };

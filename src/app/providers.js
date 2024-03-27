@@ -8,17 +8,11 @@ import Loader from "@/components/atoms/loader";
 
 export default function Providers({ children }) {
   const [UIstate, setUIstate] = useState("loading");
-  const { systemTheme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
 
   // onMount
   useEffect(() => {
-    if (systemTheme === "dark") {
-      // If system's preferred theme is dark
-      setTheme("dark");
-    } else {
-      // If system's preferred theme is light
-      setTheme("light");
-    }
+    setTheme(resolvedTheme);
     AOS.init();
     setUIstate("OK");
   }, []);

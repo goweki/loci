@@ -1,11 +1,9 @@
-import { Inter } from "next/font/google";
-import "./globals.css";
-import Providers from "./providers";
-import "aos/dist/aos.css";
-
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata = {
+  title: {
+    template: "%s | loci Security Portal ",
+    default: "loci - Security portal", // a default is required when creating a template
+  },
+  description: "Cars, parts and services that go beyond urban trails",
   metadataBase: new URL(
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
@@ -13,19 +11,17 @@ export const metadata = {
   ),
   keywords: ["security", "CCTV", "technology", "monitoring", "alerts"],
   robots: {
-    index: true,
-    follow: true,
-  },
-  openGraph: {
-    title: "loci - Security portal",
-    description: "Security portal & dashboard",
-    url: "https://loci.goweki.com",
-    siteName: "loci website",
-    images: ["https://i.postimg.cc/nrV7ytdv/og-image.jpg"],
-    // locale: 'en_US',
-    type: "website",
+    index: false,
+    follow: false,
   },
 };
+
+import { Inter } from "next/font/google";
+import "./globals.css";
+import "aos/dist/aos.css";
+import Providers from "./providers";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
   return (

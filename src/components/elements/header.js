@@ -1,104 +1,71 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { signIn, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import Image from "next/image";
 import { LogoSymbol } from "../atoms/svgs";
 import { pascalCase } from "@/helpers/formatters";
-
-// export default function Header() {
-//   const [top, setTop] = useState(true);
-
-//   // detect whether user has scrolled the page down by 10px
-//   useEffect(() => {
-//     const scrollHandler = () => {
-//       window.scrollY > 10 ? setTop(false) : setTop(true);
-//     };
-//     window.addEventListener("scroll", scrollHandler);
-//     return () => window.removeEventListener("scroll", scrollHandler);
-//   }, [top]);
-
-//   return (
-//     <header
-//       className={`fixed w-full z-30 md:bg-opacity-90 transition duration-150 ease-in-out ${
-//         !top && "bg-white/90 backdrop-blur-sm shadow-lg"
-//       }`}
-//       id="header"
-//     >
-//       <div className="max-w-screen-xl mx-auto px-5 sm:px-6">
-//         <div className="flex items-center justify-between h-16 md:h-20">
-//           {/* Site branding */}
-//           <div className="flex-shrink-0 mr-4">
-//             {/* Logo */}
-//             <Link href="/" className="block" aria-label="LOCi">
-//               {/* <Image
-//                 className="hover:shadow-md"
-//                 src={`/logos/symbol.svg`}
-//                 alt="logo"
-//                 width="32"
-//                 height="32"
-//               /> */}
-//               <LogoSymbol classname="w-12 h-12 hover:scale-110 transition-all" />
-//             </Link>
-//           </div>
-//           {/* Site navigation */}
-//           <nav className="flex flex-grow">
-//             <ul className="flex flex-grow justify-end flex-wrap items-center">
-//               <li className="my-4">
-//                 <Link href="/signIn" className="btn-sec my-0">
-//                   Sign in
-//                 </Link>
-//               </li>
-//               <li className="mx-4">
-//                 <Link href="/signUp" className="btn flex flex-nowrap my-0">
-//                   <span>Sign up</span>
-//                   <svg
-//                     className="w-3 h-3 fill-current flex-shrink-0 ml-2 -mr-1"
-//                     viewBox="0 0 12 12"
-//                     xmlns="http://www.w3.org/2000/svg"
-//                   >
-//                     <path
-//                       d="M11.707 5.293L7 .586 5.586 2l3 3H0v2h8.586l-3 3L7 11.414l4.707-4.707a1 1 0 000-1.414z"
-//                       fillRule="nonzero"
-//                     />
-//                   </svg>
-//                 </Link>
-//               </li>
-//             </ul>
-//           </nav>
-//         </div>
-//       </div>
-//     </header>
-//   );
-// }
 
 export default function Header({ user }) {
   const pathname = usePathname();
   const [top, setTop] = useState(true);
   const [openItem, setOpenItem] = useState("");
 
+  const mobileMenuTrigger = useRef(null);
+  const mobileMenu = useRef(null);
+
   // detect whether user has scrolled the page down by 10px
   useEffect(() => {
-    const scrollHandler = () => {
+    //FUNC executed onScroll
+    function scrollHandler() {
       window.scrollY > 10 ? setTop(false) : setTop(true);
-    };
+    }
+    //eventListener - scroll
     window.addEventListener("scroll", scrollHandler);
     return () => window.removeEventListener("scroll", scrollHandler);
   }, [top]);
+  // close the {{openMenu}} onClick
+  useEffect(() => {
+    function clickHandler({ target }) {
+      // if (!mobileMenu.current || !mobileMenuTrigger.current) return;
+      if (
+        !openItem
+        // ||
+        // mobileMenu.current.contains(target) ||
+        // mobileMenuTrigger.current.contains(target)
+      )
+        return;
+      setOpenItem("");
+    }
+    document.addEventListener("click", clickHandler);
+    return () => document.removeEventListener("click", clickHandler);
+  });
+
+  // close the {{openMenu}} if the esc key is pressed
+  useEffect(() => {
+    const keyHandler = ({ keyCode }) => {
+      if (!openItem || keyCode !== 27) return;
+      setOpenItem("");
+    };
+    document.addEventListener("keydown", keyHandler);
+    return () => document.removeEventListener("keydown", keyHandler);
+  });
 
   return (
-    <nav
-      className={`fixed w-full z-30 md:bg-opacity-90 transition duration-150 ease-in-out shadow ${
-        !top && "bg-white/90 backdrop-blur-sm shadow-lg"
+    <header
+      className={`fixed w-full z-30 bg-white/90 md:bg-opacity-90 transition-all ease-in-out shadow ${
+        !top && "backdrop-blur-sm shadow-lg"
       }`}
       id="header"
     >
       <div className="mx-auto max-w-screen-xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
+          {/**********
+           * HAMBURGER MENU - Mobile menu button
+           * ************/}
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-            {/* HAMBURGER MENU - Mobile menu button */}
             <button
+              ref={mobileMenuTrigger}
               type="button"
               className={`${
                 openItem === "mobile-menu" ? "bg-sky-700 text-white" : ""
@@ -154,8 +121,11 @@ export default function Header({ user }) {
               </svg>
             </button>
           </div>
-
+          {/**********
+           * BRANDING and MENU ITEMS
+           * ************/}
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+            {/* Branding: LOGO & Name*/}
             <div>
               <Link
                 href="/"
@@ -169,32 +139,33 @@ export default function Header({ user }) {
                 )}
               </Link>
             </div>
-            <div className="hidden sm:ml-6 sm:block">
-              <div className="flex space-x-4">
-                {/**********
-                 * MENU ITEMS
-                 * ************/}
+            {/* Menu Items*/}
+            <nav className="hidden sm:ml-6 sm:flex sm:items-center sm:justify-center">
+              <ul className="flex space-x-4">
+                {/* Menu Items: elements*/}
                 {menuItems[user ? "loggedIn" : "loggedOut"].map((v) => (
-                  <Link
-                    key={v.name}
-                    href={v.link}
-                    className={`${
-                      pathname.includes(v.name) ||
-                      (pathname === "/" && v.name === "home") ||
-                      (pathname === "/user" && v.name === "home")
-                        ? "bg-gray-700 text-white"
-                        : ""
-                    } hover:bg-sky-700 hover:text-white rounded-md px-3 py-2 font-medium`}
-                  >
-                    {pascalCase(v.name)}
-                  </Link>
+                  <li key={v.name}>
+                    <Link
+                      href={v.link}
+                      className={`${
+                        pathname.includes(v.name) ||
+                        (pathname === "/" && v.name === "home") ||
+                        (pathname === "/user" && v.name === "home")
+                          ? "bg-gray-700 text-white"
+                          : ""
+                      } hover:bg-sky-700 hover:text-white rounded-md px-3 py-2 font-medium`}
+                    >
+                      {pascalCase(v.name)}
+                    </Link>
+                  </li>
                 ))}
-              </div>
-            </div>
+              </ul>
+            </nav>
           </div>
-          {/********************************
-           * USER dropdown button & menu - when logged in
-           * *******************************/}
+          {/**********
+           * USER LoggedIn - DROPDOWN button and MENU
+           * USER NOT LoggedIn - signIn button
+           * ************/}
           {user ? (
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               <button
@@ -225,7 +196,7 @@ export default function Header({ user }) {
                     type="button"
                     className={`btn-sec relative flex text-sm ${
                       openItem === "user-dropdown"
-                        ? "bg-gray-700 text-white"
+                        ? "bg-sky-700 text-white"
                         : ""
                     }`}
                     id="user-menu-button"
@@ -258,10 +229,12 @@ export default function Header({ user }) {
               From: "transform opacity-100 scale-100"
               To: "transform opacity-0 scale-95"
               */}
-                <div
+                <nav
                   className={`${
-                    openItem === "user-dropdown" ? "" : "hidden"
-                  } absolute right-0 mt-2 z-10 w-48 origin-top-right rounded-md bg-gray-700 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden`}
+                    openItem === "user-dropdown"
+                      ? "bg-sky-300/50 backdrop-blur-sm shadow-xl absolute right-0 mt-2 z-10 w-48 origin-top-right rounded-md bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none"
+                      : "hidden max-h-0"
+                  } overflow-hidden`}
                   role="menu"
                   aria-orientation="vertical"
                   // aria-labelledby="user-menu-button"
@@ -269,20 +242,20 @@ export default function Header({ user }) {
                 >
                   <Link
                     href="/user/settings"
-                    className="block px-4 py-2 text-sm text-white hover:bg-gray-500"
+                    className="block px-4 py-2 text-sm hover:bg-sky-600 hover:text-white"
                     role="menuitem"
                     tabIndex="-1"
-                    id="user-menu-item-0"
+                    id="menu-settings"
                   >
                     Settings
                   </Link>
 
                   <Link
                     href="#"
-                    className="block px-4 py-2 text-sm text-white hover:bg-gray-500"
+                    className="block px-4 py-2 text-sm hover:bg-sky-600 hover:text-white"
                     role="menuitem"
                     tabIndex="-1"
-                    id="user-menu-item-2"
+                    id="btn-logout"
                     onClick={(e) => {
                       e.preventDefault();
                       signOut();
@@ -290,16 +263,12 @@ export default function Header({ user }) {
                   >
                     Sign Out
                   </Link>
-                </div>
+                </nav>
               </div>
             </div>
           ) : (
             <div className="absolute right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-              <Link
-                href="/signIn"
-                className="btn text-sm md:text-base"
-                aria-current="page"
-              >
+              <Link href="/signIn" className="btn text-sm md:text-base">
                 Sign In
               </Link>
             </div>
@@ -309,20 +278,20 @@ export default function Header({ user }) {
 
       {/* MOBILE MENU, show/hide based on 'openItem==="mobile-menu"' state. */}
       <div
+        ref={mobileMenu}
         className={
           openItem === "mobile-menu"
-            ? "sm:hidden bg-sky-100/80 backdrop-blur-sm"
-            : "hidden"
+            ? "sm:hidden bg-sky-300/50 backdrop-blur-sm shadow-xl"
+            : "hidden max-h-0"
         }
         id="mobile-menu"
       >
-        <div className="space-y-1 px-2 pb-3 pt-2">
+        <div className="space-y-1 p-3">
           {menuItems[user ? "loggedIn" : "loggedOut"].map((v) => (
             <Link
               key={v.name}
               href={v.link}
               onClick={(e) => {
-                setOpenItem("");
                 if (v.name === "sign-in") {
                   signIn();
                 } else if (v.name === "sign-out") {
@@ -342,7 +311,7 @@ export default function Header({ user }) {
           ))}
         </div>
       </div>
-    </nav>
+    </header>
   );
 }
 

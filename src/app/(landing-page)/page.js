@@ -1,6 +1,19 @@
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+export const metadata = {
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: "loci - Security portal",
+    description: "Security portal & dashboard",
+    url: "https://loci.goweki.com",
+    siteName: "loci website",
+    // images: ["https://i.postimg.cc/nrV7ytdv/og-image.jpg"],
+    // locale: 'en_US',
+    type: "website",
+  },
+};
+
 import HeroHome from "@/components/elements/landing/heroHome";
 import Features from "@/components/elements/landing/features";
 import FeaturesBlocks from "@/components/elements/landing/featuresBlocks";

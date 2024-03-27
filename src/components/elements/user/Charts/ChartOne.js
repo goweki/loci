@@ -3,7 +3,7 @@ import { months, pascalCase } from "@/helpers/formatters";
 import { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 
-const colours_ = ["#0ea5e9", "#991b1b"];
+const colours_ = ["#6ee7b7", "#fde68a", "#f87171"];
 
 export default function ChartOne({ data }) {
   const [series, setSeries] = useState("");
@@ -12,7 +12,14 @@ export default function ChartOne({ data }) {
   //onFilter change
   useEffect(() => {
     if (data) {
-      setSeries(parseData(filter, data));
+      console.log("HERE")
+      setSeries(data[filter]);
+    }
+  }, [data, filter]);
+
+  //on series change 
+  useEffect(() => {
+    if (series) {
       setChartOptions({
         legend: {
           show: false,
@@ -94,7 +101,7 @@ export default function ChartOne({ data }) {
         },
         xaxis: {
           type: "category",
-          categories: filter === "year" ? data.year.map((v) => v.month) : [],
+          categories: filter === "year" ? months : [],
           axisBorder: {
             show: false,
           },
@@ -109,17 +116,11 @@ export default function ChartOne({ data }) {
             },
           },
           min: 0,
-          max:
-            Math.max(
-              ...[
-                ...data.year.map((v) => v.notifications),
-                ...data.year.map((v) => v.redAlerts),
-              ]
-            ) * 1.2,
+          max: Math.max(...series.flatMap(v => v.data)) * 1.2,
         },
-      });
+      })
     }
-  }, [filter, data]);
+  }, [series])
   //render
   return (
     <div className="card col-span-12 xl:col-span-8">
@@ -146,63 +147,36 @@ export default function ChartOne({ data }) {
         </div>
         <div className="flex w-full max-w-44 justify-end">
           <div className="inline-flex items-center rounded-md bg-gray-300 p-2">
-            {Object.keys(data).map((v) => (
+            {data && Object.keys(data).map((v) => (
               <button
                 key={v}
-                className={`rounded px-3 py-1 text-xs font-medium hover:shadow-lg ${
-                  filter === v
-                    ? "text-white bg-gray-800"
-                    : "hover:bg-blue-500 hover:text-white"
-                }`}
+                className={`rounded px-3 py-1 text-xs font-medium hover:shadow-lg ${filter === v
+                  ? "text-white bg-gray-800"
+                  : "hover:bg-blue-500 hover:text-white"
+                  }`}
               >
                 {pascalCase(v)}
               </button>
             ))}
-
-            <button className="rounded px-3 py-1 text-xs font-medium hover:bg-blue-500 hover:text-white hover:shadow-lg">
-              Year
-            </button>
           </div>
         </div>
       </div>
 
-      <div>
-        <div id="chartOne" className="-ml-5">
-          {series ? (
-            <ReactApexChart
-              options={chartOptions}
-              series={series}
-              type="area"
-              height={"100%"}
-              width={"100%"}
-            />
-          ) : (
-            <div className="flex items-center justify-center m-auto">
-              <Loader />
-            </div>
-          )}
-        </div>
+      <div id="chartOne" className="-ml-5">
+        {series && chartOptions ? (
+          <ReactApexChart
+            options={chartOptions}
+            series={series}
+            type="area"
+            height={"100%"}
+            width={"100%"}
+          />
+        ) : (
+          <div className="flex items-center justify-center m-auto">
+            <Loader />
+          </div>
+        )}
       </div>
     </div>
   );
-}
-
-function parseData(filt, objArray) {
-  if (filt === "year")
-    return [
-      {
-        name: "Notifications",
-        data: objArray.year.map((v) => v.notifications),
-      },
-      { name: "Red Alerts", data: objArray.year.map((v) => v.redAlerts) },
-    ];
-  else if (filt === "month")
-    return [
-      {
-        name: "Notifications",
-        data: objArray.month.map((v) => v.notifications),
-      },
-      { name: "Red Alerts", data: objArray.month.map((v) => v.redAlerts) },
-    ];
-  else return "";
 }

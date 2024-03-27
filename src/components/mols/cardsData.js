@@ -1,6 +1,8 @@
 export function CardDataStats({ title, total, notifications, children }) {
   return (
-    <div className={`card px-8 py-6 ${notifications > 0 ? "bg-red-50" : ""}`}>
+    <div
+      className={`card px-8 py-6 m-2 ${notifications > 0 ? "bg-red-50" : ""}`}
+    >
       <div
         className={`flex h-12 w-12 items-center justify-center rounded-full bg-sky-100`}
       >
