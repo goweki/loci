@@ -1,7 +1,8 @@
-export function CardDataStats({ title, total, notifications, children }) {
+export function CardDataStats({ title, total, notifications, className, onclick = () => '', children }) {
   return (
     <div
-      className={`card px-8 py-6 m-2 ${notifications > 0 ? "bg-red-50" : ""}`}
+      className={`card px-8 py-6 m-2 ${notifications > 0 ? "bg-red-50" : ""} ${className} transition-all`}
+      onClick={onclick}
     >
       <div
         className={`flex h-12 w-12 items-center justify-center rounded-full bg-sky-100`}
@@ -18,9 +19,8 @@ export function CardDataStats({ title, total, notifications, children }) {
         </div>
 
         <span
-          className={`flex items-center gap-1 text-sm font-medium ${
-            notifications > 0 ? "text-red-500" : "text-green-500"
-          }`}
+          className={`flex items-center gap-1 text-sm font-medium ${notifications > 0 ? "text-red-500" : "text-green-500"
+            }`}
         >
           {notifications > 0 && (
             <span className="relative z-1 h-2 w-2 rounded-full bg-red-500 inline">

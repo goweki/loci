@@ -1,11 +1,14 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
+import { useRouter } from 'next/navigation'
 import { DataContext } from "@/app/user/providers";
 import { CardDataStats } from "@/components/mols/cardsData";
 
 export default function UserSummary() {
   const { data, refreshData } = useContext(DataContext);
   const [parsedData, setData] = useState("");
+  const router = useRouter()
+
   useEffect(() => {
     if (data.length === 1) {
       const devices = data[0].devices;
@@ -51,12 +54,14 @@ export default function UserSummary() {
     return (
       <div className="w-full grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 xl:grid-cols-4">
         <CardDataStats
+          className={`hover:scale-105 hover:shadow-lg cursor-pointer hover:bg-sky-100`}
           title="All installations"
           total={Object.values(parsedData.installations).reduce(
             (acc, v) => acc + v,
             0
           )}
           notifications={null}
+          onclick={() => router.push('/user/devices')}
         >
           <svg
             viewBox="0 0 24 24"
@@ -70,9 +75,11 @@ export default function UserSummary() {
           </svg>
         </CardDataStats>
         <CardDataStats
+          className={`hover:scale-105 hover:shadow-lg cursor-pointer hover:bg-sky-100`}
           title="Cameras"
           total={parsedData.installations.cameras}
           notifications={parsedData.notifications.cameras}
+          onclick={() => router.push('/user/devices/cameras')}
         >
           <svg
             viewBox="0 0 24 24"
@@ -87,9 +94,11 @@ export default function UserSummary() {
         </CardDataStats>
 
         <CardDataStats
+          className={`hover:scale-105 hover:shadow-lg cursor-pointer hover:bg-sky-100`}
           title="Fences"
           total={parsedData.installations.fences}
           notifications={parsedData.notifications.fences}
+          onclick={() => router.push('/user/devices/fences')}
         >
           <svg
             viewBox="0 0 24 24"
@@ -104,9 +113,11 @@ export default function UserSummary() {
         </CardDataStats>
 
         <CardDataStats
+          className={`hover:scale-105 hover:shadow-lg cursor-pointer hover:bg-sky-100`}
           title="Access Controls"
           total={parsedData.installations.accesscontrols}
           notifications={parsedData.notifications.accessControls}
+          onclick={() => router.push('/user/devices/access-controls')}
         >
           <svg
             viewBox="0 0 24 24"

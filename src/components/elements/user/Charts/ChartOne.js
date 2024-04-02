@@ -94,7 +94,12 @@ export default function ChartOne({ data }) {
     return (
       <div className="card min-h-96 col-span-12 xl:col-span-8">
 
-        <div className="flex justify-end">
+        <div className="flex justify-between">
+          <div>
+            <h4 className="text-xl font-semibold">
+              Monthly Notifications
+            </h4>
+          </div>
           <div className="inline-flex items-center rounded-md bg-gray-300 p-2">
             {data &&
               Object.keys(data).map((v) => (

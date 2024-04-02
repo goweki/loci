@@ -81,7 +81,7 @@ function ChartTwo({ data }) {
       <div className="justify-between gap-4 sm:flex">
         <div>
           <h4 className="text-xl font-semibold">
-            Trend this week
+            Notifications this week
           </h4>
         </div>
         {/* <div>
