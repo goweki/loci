@@ -53,9 +53,8 @@ export default function Header({ user }) {
 
   return (
     <header
-      className={`fixed w-full z-30 bg-white/90 md:bg-opacity-90 transition-all ease-in-out shadow ${
-        !top && "backdrop-blur-sm shadow-lg"
-      }`}
+      className={`fixed w-full z-30 bg-white/90 md:bg-opacity-90 transition-all ease-in-out shadow ${!top && "backdrop-blur-sm shadow-lg"
+        }`}
       id="header"
     >
       <div className="mx-auto max-w-screen-xl px-2 sm:px-6 lg:px-8">
@@ -67,9 +66,8 @@ export default function Header({ user }) {
             <button
               ref={mobileMenuTrigger}
               type="button"
-              className={`${
-                openItem === "mobile-menu" ? "bg-sky-700 text-white" : ""
-              } relative inline-flex items-center justify-center rounded-md p-2 hover:bg-sky-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sky-500`}
+              className={`${openItem === "mobile-menu" ? "bg-sky-700 text-white" : ""
+                } relative inline-flex items-center justify-center rounded-md p-2 hover:bg-sky-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sky-500`}
               aria-controls="mobile-menu"
               aria-expanded="false"
               onClick={() =>
@@ -147,13 +145,12 @@ export default function Header({ user }) {
                   <li key={v.name}>
                     <Link
                       href={v.link}
-                      className={`${
-                        pathname.includes(v.name) ||
+                      className={`${pathname.includes(v.name) ||
                         (pathname === "/" && v.name === "home") ||
                         (pathname === "/user" && v.name === "home")
-                          ? "bg-gray-700 text-white"
-                          : ""
-                      } hover:bg-sky-700 hover:text-white rounded-md px-3 py-2 font-medium`}
+                        ? "bg-gray-700 text-white"
+                        : ""
+                        } hover:bg-sky-700 hover:text-white rounded-md px-3 py-2 font-medium`}
                     >
                       {pascalCase(v.name)}
                     </Link>
@@ -194,11 +191,10 @@ export default function Header({ user }) {
                 <div>
                   <button
                     type="button"
-                    className={`btn-sec relative flex text-sm ${
-                      openItem === "user-dropdown"
-                        ? "bg-sky-700 text-white"
-                        : ""
-                    }`}
+                    className={`btn-sec relative flex text-sm ${openItem === "user-dropdown"
+                      ? "bg-sky-700 text-white"
+                      : ""
+                      }`}
                     id="user-menu-button"
                     aria-haspopup="true"
                     onClick={() =>
@@ -230,11 +226,10 @@ export default function Header({ user }) {
               To: "transform opacity-0 scale-95"
               */}
                 <nav
-                  className={`${
-                    openItem === "user-dropdown"
-                      ? "bg-sky-300/50 backdrop-blur-sm shadow-xl absolute right-0 mt-2 z-10 w-48 origin-top-right rounded-md bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none"
-                      : "hidden max-h-0"
-                  } overflow-hidden`}
+                  className={`${openItem === "user-dropdown"
+                    ? "bg-sky-300/50 backdrop-blur-sm shadow-xl absolute right-0 mt-2 z-10 w-48 origin-top-right rounded-md bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none"
+                    : "hidden max-h-0"
+                    } overflow-hidden`}
                   role="menu"
                   aria-orientation="vertical"
                   // aria-labelledby="user-menu-button"
@@ -298,13 +293,12 @@ export default function Header({ user }) {
                   signOut();
                 }
               }}
-              className={`${
-                pathname.includes(v.name) ||
+              className={`${pathname.includes(v.name) ||
                 (pathname === "/" && v.name === "home") ||
                 (pathname === "/user" && v.name === "home")
-                  ? "bg-gray-800 text-white"
-                  : ""
-              } block hover:bg-sky-700 hover:text-white rounded-md px-3 py-2 font-medium`}
+                ? "bg-gray-800 text-white"
+                : ""
+                } block hover:bg-sky-700 hover:text-white rounded-md px-3 py-2 font-medium`}
             >
               {pascalCase(v.name)}
             </Link>
@@ -323,7 +317,7 @@ const menuItems = {
   ],
   loggedIn: [
     { name: "home", link: "/user" },
-    { name: "dashboard", link: "/user/dashboard" },
+    { name: "devices", link: "/user/devices" },
     { name: "forum", link: "/user/forum" },
     { name: "blog", link: "/user/blog" },
   ],

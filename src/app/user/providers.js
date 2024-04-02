@@ -25,7 +25,7 @@ export default function Providers({ children }) {
       } else {
         console.error(
           "FAILED: could not fetch data\n > " +
-          JSON.stringify(json_.error ?? "....")
+            JSON.stringify(json_.error ?? "....")
         );
         setData("failed");
       }
@@ -59,9 +59,7 @@ export default function Providers({ children }) {
       </p>
     </div>
   ) : (
-    <DataContext.Provider
-      value={{ data, refreshData: fetchUIuserData }}
-    >
+    <DataContext.Provider value={{ data, refreshData: fetchUIuserData }}>
       {children}
     </DataContext.Provider>
   );

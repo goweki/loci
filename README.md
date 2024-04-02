@@ -15,7 +15,7 @@ Source code for LOCi security portal webapp.
 #### User Pages
 
 - User Home: [`/user`](https://loci.goweki.com/user)
-- User Dashboard: [`/user/dashboard`](https://loci.goweki.com/user/dashboard)
+- User Devices: [`/user/devices`](https://loci.goweki.com/user/devices)
 - User Forum: [`/user/forum`](https://loci.goweki.com/user/forum)
 - User Blog: [`/user/blog`](https://loci.goweki.com/blog)
 

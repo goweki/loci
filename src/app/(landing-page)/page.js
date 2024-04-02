@@ -14,18 +14,18 @@ export const metadata = {
   },
 };
 
-import HeroHome from "@/components/elements/landing/heroHome";
+import Hero from "@/components/elements/landing/hero";
 import Features from "@/components/elements/landing/features";
-import FeaturesBlocks from "@/components/elements/landing/featuresBlocks";
+import HowBlocks from "@/components/elements/landing/howBlocks";
 import Testimonials from "@/components/elements/landing/testimonials";
 import Newsletter from "@/components/elements/landing/newsletter";
 
 export default async function Home() {
   return (
     <main>
-      <HeroHome />
+      <Hero />
       <Features />
-      <FeaturesBlocks />
+      <HowBlocks />
       {/* <Testimonials /> */}
       {/* <Newsletter /> */}
     </main>

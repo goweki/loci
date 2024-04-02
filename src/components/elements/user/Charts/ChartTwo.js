@@ -1,71 +1,73 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
-const colours_ = ["#0ea5e9", "#991b1b"];
-const options = {
-  colors: colours_,
-  chart: {
-    fontFamily: "Satoshi, sans-serif",
-    type: "bar",
-    height: 335,
-    stacked: true,
-    toolbar: {
-      show: false,
-    },
-    zoom: {
-      enabled: false,
-    },
-  },
-
-  responsive: [
-    {
-      breakpoint: 1536,
-      options: {
-        plotOptions: {
-          bar: {
-            borderRadius: 0,
-            columnWidth: "25%",
-          },
-        },
-      },
-    },
-  ],
-  plotOptions: {
-    bar: {
-      horizontal: false,
-      borderRadius: 0,
-      columnWidth: "25%",
-      borderRadiusApplication: "end",
-      borderRadiusWhenStacked: "last",
-    },
-  },
-  dataLabels: {
-    enabled: false,
-  },
-
-  xaxis: {
-    categories: ["M", "T", "W", "T", "F", "S", "S"],
-  },
-  legend: {
-    position: "top",
-    horizontalAlign: "left",
-    fontFamily: "Satoshi",
-    fontWeight: 500,
-    fontSize: "14px",
-
-    markers: {
-      radius: 99,
-    },
-  },
-  fill: {
-    opacity: 1,
-  },
-};
+const colours_ = { green: "#6ee7b7", gray: "#71717a", red: "#f87171" };
+// const colours_ = ["#0ea5e9", "#991b1b"];
 
 function ChartTwo({ data }) {
-  const [state, setState] = useState({
-    series: data,
-  });
+  const [series, setState] = useState(data.data);
+  const [chartOptions, setChartOptions] = useState('')
+
+  useEffect(() => {
+    setChartOptions({
+      colors: series.map(({ name }) => colours_[name]),
+      chart: {
+        fontFamily: "Satoshi, sans-serif",
+        // type: "bar",
+        // height: 335,
+        // stacked: true,
+        toolbar: {
+          show: false,
+        },
+        zoom: {
+          enabled: false,
+        },
+      },
+
+      // responsive: [
+      //   {
+      //     breakpoint: 1536,
+      //     options: {
+      //       plotOptions: {
+      //         bar: {
+      //           borderRadius: 0,
+      //           columnWidth: "25%",
+      //         },
+      //       },
+      //     },
+      //   },
+      // ],
+      // plotOptions: {
+      //   bar: {
+      //     horizontal: false,
+      //     borderRadius: 0,
+      //     columnWidth: "25%",
+      //     borderRadiusApplication: "end",
+      //     borderRadiusWhenStacked: "last",
+      //   },
+      // },
+      dataLabels: {
+        enabled: false,
+      },
+
+      xaxis: {
+        categories: data.labels,
+      },
+      legend: {
+        position: "top",
+        horizontalAlign: "left",
+        fontFamily: "Satoshi",
+        // fontWeight: 500,
+        fontSize: "14px",
+        // markers: {
+        //   radius: 99,
+        // },
+      },
+      // fill: {
+      //   opacity: 1,
+      // },
+    })
+  }, [])
 
   const handleReset = () => {
     setState((prevState) => ({
@@ -74,15 +76,15 @@ function ChartTwo({ data }) {
   };
   handleReset;
 
-  return (
+  if (series && chartOptions) return (
     <div className="card col-span-12 xl:col-span-4">
       <div className="justify-between gap-4 sm:flex">
         <div>
-          <h4 className="text-xl font-semibold text-black dark:text-white">
-            Profit this week
+          <h4 className="text-xl font-semibold">
+            Trend this week
           </h4>
         </div>
-        <div>
+        {/* <div>
           <div className="relative z-20 inline-block">
             <select
               name="#"
@@ -117,14 +119,14 @@ function ChartTwo({ data }) {
               </svg>
             </span>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className="mt-2">
         <div id="chartTwo" className="-mb-9 -ml-5">
           <ReactApexChart
-            options={options}
-            series={state.series}
+            options={chartOptions}
+            series={series}
             type="bar"
             height={350}
             width={"100%"}

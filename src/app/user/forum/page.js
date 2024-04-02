@@ -3,7 +3,7 @@ import BreadCrumb from "@/components/mols/Breadcrumb";
 export default function UserForumPage() {
   //render
   return (
-    <main className="w-full flex-col md:min-h-[512px] pt-20 pb-6 px-2 sm:px-6 md:px-12 max-w-screen-xl mx-auto">
+    <main className="w-full flex-col pt-20 pb-6 px-2 sm:px-6 md:px-12 max-w-screen-xl mx-auto">
       <BreadCrumb pageName="Forum" />
       <div>
         <h3>Internal discussions forum</h3>

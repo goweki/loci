@@ -1,84 +1,107 @@
-const { monthNumToInit } = require("./formatters");
-
+const { monthNumToInit, monthsToNowArray, weeklyDatesToNowArray, dateShort } = require("./formatters");
+const maxHistory = process.env.NEXT_PUBLIC_MAX_HISTORY
 /**
- * Parse notificationsArray to object with monthly fields
- * @param {Object[]} data - array input
- * @returns {Object} - Object with month-number fields
+ * Return monthly total for each notification category
+ * @param {Object[]} data - array of dated notifications
+ * @return {Object} - Return object with monthly notification totals
  */
-export function toMonthly(data) {
-  // Initialize an empty object to store monthly totals
-  const monthlyArrays = {};
+// export function toMonthlyTotals(data) {
+//   // Initialize an empty object to store monthly totals
+//   const monthlyTotals = {};
 
-  // Iterate through each data entry
-  for (const entry of data) {
-    const { date, type, message } = entry;
-    const month = new Date(date).getMonth() + 1; // Extract the month part from the date (e.g., "1" for January)
-    // console.log("Month ", month, " Condition ", !monthlyArrays[month]);
-    if (!monthlyArrays[month]) monthlyArrays[month] = [];
-    monthlyArrays[month].push({ date, type, message }); //push item into the {{month}} field
-  }
+//   // Iterate through each data entry
+//   for (const entry of data) {
+//     const { date, type } = entry;
+//     const month = new Date(date).getMonth() + 1; // Extract the month part from the date (e.g., "1" for January)
+//     if (!monthlyTotals[month]) monthlyTotals[month] = {};
+//     const val = monthlyTotals[month][type] ? monthlyTotals[month][type] : 0;
+//     monthlyTotals[month][type] = val + 1;
+//   }
+//   // return
+//   return monthlyTotals;
+// }
 
-  // return
-  return monthlyArrays;
-}
 /**
-* Return monthly total for each notification category
-* @param {Object[]} data - array of dated notifications
-* @return {Object} - Return object with monthly notification totals
-*/
-export function toMonthlyTotals(data) {
+ * Return monthly data: [{green,data:[]},...]
+ * @param {Object[]} data - array of dated notifications
+ * @return {Object} - Return object with monthly notification totals
+ */
+export function toMonthlySeries(data) {
   // Initialize an empty object to store monthly totals
-  const monthlyTotals = {};
+  const byTypeMonthlyObjs = {};
+  const monthsArray = monthsToNowArray(maxHistory)
+  // console.log('months: ', monthsArray)
+  // const monthNow = new Date().getMonth();
+  // console.log('maxhistory: ', maxHistory)
 
   // Iterate through each data entry
   for (const entry of data) {
     const { date, type } = entry;
     const month = new Date(date).getMonth() + 1; // Extract the month part from the date (e.g., "1" for January)
-    if (!monthlyTotals[month]) monthlyTotals[month] = {};
-    const val = monthlyTotals[month][type] ? monthlyTotals[month][type] : 0
-    monthlyTotals[month][type] = val + 1;
+    if (!byTypeMonthlyObjs[type])
+      byTypeMonthlyObjs[type] = { name: type, data: new Array(monthsArray.length).fill(0) };
+    if (monthsArray.indexOf(monthNumToInit(month)) >= 0) {
+      byTypeMonthlyObjs[type].data[monthsArray.indexOf(monthNumToInit(month))] += 1;
+    }
   }
-  // return 
-  return monthlyTotals;
+  // console.log("final: ", byTypeMonthlyObjs);
+  return { labels: monthsArray, data: Object.values(byTypeMonthlyObjs) };
 }
 
-// function weekName(dayNum) {
-//   if (dayNum <= 7) return "week1";
-//   else if (dayNum <= 14) return "week2";
-//   else if (dayNum <= 21) return "week3";
-//   else if (dayNum <= 31) return "week4";
-//   else "";
-// }
+/**
+ * Return monthly data: [{green,data:[]},...]
+ * @param {Object[]} data - array of dated notifications
+ * @return {Object} - Return object with monthly notification totals
+ */
+export function toWeeklySeries(data) {
+  // Initialize an empty object to store monthly totals
+  const byTypeWeeklyObjs = {};
+  const weeksArray = weeksToNowArray()
+  console.log('weeks: ', weeksArray)
+  // const monthNow = new Date().getMonth();
+  console.log('maxhistory: ', maxHistory)
 
-// export function calculateWeeklyTotals(monthNum, dailyDataArray) {
-//   // Initialize an empty object to store monthly totals
-//   let weeklyTotals = {};
-//   // Iterate through each data entry
-//   for (const entry of dailyDataArray) {
-//     const { date, notifications, redAlerts } = entry;
-//     //Extract the month part from the date (e.g., "JAN" for '01')
-//     //   const month = monthNumToInit(Number(date.slice(3, 5)));
+  // Iterate through each data entry
+  for (const entry of data) {
+    const { date, type } = entry;
+    const month = new Date(date).getMonth() + 1; // Extract the month part from the date (e.g., "1" for January)
+    if (!byTypeWeeklyObjs[type])
+      byTypeWeeklyObjs[type] = { name: type, data: new Array(weeksArray.length).fill(0) };
+    if (weeksArray.indexOf(monthNumToInit(month)) >= 0) {
+      console.log('There: ', weeksArray.indexOf(monthNumToInit(month)))
+      byTypeWeeklyObjs[type].data[weeksArray.indexOf(monthNumToInit(month))] += 1;
+    }
+  }
+  // console.log("final: ", byTypeMonthlyObjs);
+  return { labels: weeksArray, data: Object.values(byTypeWeeklyObjs) };
+}
 
-//     if (
-//       monthNum === Number(date.slice(3, 5))
-//       //   || monthNum === Number(date.slice(3, 5)) + 1
-//     ) {
-//       //create emptty nested obj
-//       if (!weeklyTotals[weekName(Number(date.slice(0, 2)))]?.week) {
-//         weeklyTotals[weekName(Number(date.slice(0, 2)))] = {
-//           week: weekName(Number(date.slice(0, 2))),
-//         };
-//       }
-//       // Accumulate notifications and redAlerts for the month
-//       weeklyTotals[weekName(Number(date.slice(0, 2)))].notifications =
-//         (weeklyTotals[weekName(Number(date.slice(0, 2)))].notifications || 0) +
-//         notifications;
-//       weeklyTotals[weekName(Number(date.slice(0, 2)))].redAlerts =
-//         (weeklyTotals[weekName(Number(date.slice(0, 2)))].redAlerts || 0) +
-//         redAlerts;
-//     }
-//   }
-//   // Convert the object into an array of month objects
-//   const result = Object.values(weeklyTotals);
-//   return result;
-// }
+export function accumulateDataSeries(data, timelinesArray) {
+  // Initialize an empty object to store totals
+  const byTypeObjs = {};
+  // console.log('timelines: ', timelinesArray)
+  timelinesArray.forEach((v, i, arr) => {
+    // Iterate through each data entry
+    for (const entry of data) {
+      const { date, type } = entry;
+      const theDate = new Date(date) // Convert date to Date type
+      if (!byTypeObjs[type])
+        byTypeObjs[type] = { name: type, data: new Array(timelinesArray.length - 1).fill(0) };
+      if (!!arr[i + 1] && theDate > new Date(arr[i])
+        && theDate <= new Date(arr[i + 1])) {
+        // console.log('date: ', theDate)
+        byTypeObjs[type].data[i] += 1;
+      }
+    }
+  });
+  let labels = timelinesArray.map((v, i) => `${dateShort(new Date(v))}`)
+  labels.pop()
+  // console.log("final: ", byTypeMonthlyObjs);
+  return { labels, data: Object.values(byTypeObjs) };
+}
+
+export function addSubTime(regime, val, d = new Date()) {
+  if (regime === "years") return new Date(d.setFullYear(d.getFullYear() + val));
+  if (regime === "months") return new Date(d.setMonth(d.getMonth() + val));
+  if (regime === "days") return new Date(d.setDate(d.getDate() + val));
+}
