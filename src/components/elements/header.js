@@ -227,7 +227,7 @@ export default function Header({ user }) {
               */}
                 <nav
                   className={`${openItem === "user-dropdown"
-                    ? "bg-sky-300/50 backdrop-blur-sm shadow-xl absolute right-0 mt-2 z-10 w-48 origin-top-right rounded-md bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none"
+                    ? "bg-sky-200/90 backdrop-blur-sm shadow-xl absolute right-0 mt-2 z-10 w-48 origin-top-right rounded-md ring-1 ring-black ring-opacity-5 focus:outline-none"
                     : "hidden max-h-0"
                     } overflow-hidden`}
                   role="menu"
@@ -322,8 +322,3 @@ const menuItems = {
     { name: "blog", link: "/user/blog" },
   ],
 };
-
-const profileMenuItems = [
-  { name: "settings", link: "/user/settings" },
-  { name: "Sign Out", link: "" },
-];
