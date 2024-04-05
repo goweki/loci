@@ -1,5 +1,5 @@
-import { sendEmail } from "@/lib/sendEmail";
-import { sendSMS } from "@/lib/sendSMS";
+import sendEmail from "@/lib/sendEmail";
+import sendSMS from "@/lib/sendSMS";
 
 export async function POST(request) {
   if (!process.env.NOTIFY_CHANNELS)
@@ -40,8 +40,8 @@ export async function POST(request) {
     else {
       console.error(
         " > Failure in route /mailer POST: " +
-          JSON.stringify(mailerRes) +
-          `\n.........................`
+        JSON.stringify(mailerRes) +
+        `\n.........................`
       );
       return Response.json({ error: mailerRes });
     }

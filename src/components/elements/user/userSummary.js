@@ -10,7 +10,7 @@ export default function UserSummary() {
   const router = useRouter()
 
   useEffect(() => {
-    if (data.length === 1) {
+    if (data.length > 0) {
       const devices = data[0].devices;
       // device types
       const cameras = devices.filter(
@@ -48,7 +48,7 @@ export default function UserSummary() {
         },
       });
     }
-  }, []);
+  }, [data]);
 
   if (parsedData)
     return (

@@ -17,7 +17,7 @@ export default function UserAnalytics() {
     let year = null;
     let month = null;
     let week = null;
-    if (data.length === 1) {
+    if (data.length > 0) {
       year = toMonthlySeries(data[0].devices[0].notifications);
       const weeks = weeksToNowArray(8)
       const days7 = daysToNowArray(7)
@@ -30,7 +30,7 @@ export default function UserAnalytics() {
       month,
       week
     });
-  }, []);
+  }, [data]);
 
   if (dataParsed) return (
     <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
