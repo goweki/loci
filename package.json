@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "node --env-file=.env.local scripts/seed.mjs"
   },
   "dependencies": {
     "africastalking": "^0.6.6",
@@ -24,6 +25,8 @@
     "react-transition-group": "^4.4.5"
   },
   "devDependencies": {
+    "@types/node": "22.13.5",
+    "@types/react": "19.0.10",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",

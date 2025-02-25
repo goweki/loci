@@ -1,5 +1,5 @@
 import { addSubTime } from "@/helpers/dataHandlers";
-import clientPromise from "@/lib/mongodb";
+import clientPromise from "@/lib/mongodb.mjs";
 
 export const revalidate = 0; // false | 'force-cache' | 0 | number
 

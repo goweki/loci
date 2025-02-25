@@ -1,6 +1,6 @@
 # LOCi security portal - webapp
 
-Source code for LOCi security portal webapp.
+LOCi security portal webapp.
 
 ## Live link to webapp
 
@@ -34,25 +34,33 @@ Source code for LOCi security portal webapp.
 
 ### Running App
 
-Clone this repo in your local directory:
+1. Clone this repo in your local directory:
 
-```bash
-git clone https://github.com/goweki/loci.git
-```
+   ```bash
+   git clone https://github.com/goweki/loci.git
+   ```
 
-Navigate into the local repo and install dependencies:
+2. Populate the environment variables as detailed in the `.env.template` file.
 
-```bash
-npm i
-```
+3. Navigate into the local repo and install dependencies:
 
-To run the development server, within the cloned repo:
+   ```bash
+   npm i
+   ```
 
-```bash
-npm run dev
-```
+4. To seed data, run the `scripts/seed.mjs` script:
 
-- Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   ```bash
+   npm run seed
+   ```
+
+5. To run the development server, within the cloned repo:
+
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ### To build the production-ready optimized build.
 
@@ -60,9 +68,9 @@ npm run dev
 npm run build
 ```
 
-- The output of the build process is stored in the .next directory by default.
+- The output of the build process is stored in the `/.next` directory by default.
 
-To start the server in production mode
+To start the server in production mode:
 
 ```bash
 npm run start

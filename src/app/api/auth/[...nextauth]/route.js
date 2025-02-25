@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import clientPromise from "@/lib/mongodb";
+import clientPromise from "@/lib/mongodb.mjs";
 import { compareHash } from "@/helpers/bycryptHandlers";
 
 export const authOptions = {
@@ -74,9 +74,7 @@ export const authOptions = {
   callbacks: {
     async jwt(params) {
       // Persist role to the token right after signIn
-      if (params.user?.role) {
-        params.token.role = params.user.role;
-      }
+      params.token.role = params.user.role;
       return params.token;
     },
     async session({ session, token }) {

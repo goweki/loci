@@ -7,10 +7,13 @@ let client = null;
 let clientPromise = null;
 
 if (!process.env.MONGODB_URI) {
-  throw new Error("Add Mongo URI to .env.local");
+  throw new Error("Add Mongo URI to environment variables");
 }
 
-if (process.env.NODE_ENV === "development") {
+if (
+  process.env.NODE_ENV === "development" ||
+  process.env.VERCEL_ENV === "development"
+) {
   if (!global._mongoClientPromise) {
     client = new MongoClient(uri, options);
     global._mongoClientPromise = client.connect();

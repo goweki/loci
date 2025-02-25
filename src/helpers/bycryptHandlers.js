@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 const saltRounds = Number(process.env.BCRYPT_SALTROUNDS);
 
 // To hash a password
-export async function hash(plaintext, saltRounds) {
+export async function hash(plaintext) {
   const hash = await bcrypt.hash(plaintext, saltRounds);
   return hash;
 }
