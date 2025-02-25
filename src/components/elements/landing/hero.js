@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 export default function Hero() {
-  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  // const [videoModalOpen, setVideoModalOpen] = useState(false);
 
   return (
     <section className="relative" id="hero">
@@ -120,9 +120,7 @@ export default function Hero() {
                 <span className="ml-3">Watch the full video (2 min)</span>
               </button> */}
             </div>
-
-            {/* Modal */}
-            <Modal
+            {/* <Modal
               id="modal"
               ariaLabel="modal-headline"
               show={videoModalOpen}
@@ -131,12 +129,12 @@ export default function Hero() {
               <div className="relative pb-9/16">
                 <iframe
                   className="absolute w-full h-full"
-                  src="https://player.vimeo.com/video/174002812"
+                  src="movie.ogg"
                   title="Video"
                   allowFullScreen
                 ></iframe>
               </div>
-            </Modal>
+            </Modal> */}
           </div>
         </div>
       </div>

@@ -3,7 +3,15 @@ import Link from "next/link";
 import { createContext, useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import Loader from "@/components/atoms/loader";
-export const DataContext = createContext();
+import toast from "react-hot-toast";
+import { httpStatusCodes } from "@/lib/configs";
+export const DataContext = createContext<{
+  data: Record<string, any>;
+  refreshData: () => void;
+}>({
+  data: {},
+  refreshData: () => {},
+});
 
 export default function Providers({ children }) {
   const { data: session, status } = useSession();
@@ -12,28 +20,33 @@ export default function Providers({ children }) {
   const fetchUIuserData = useCallback(async () => {
     if (!session?.user) return;
     try {
-      const response = await fetch(
-        `/api/user/data?inst=${Object.keys(session?.user?.role)[0]}`
-      );
+      const response = await fetch(`/api/user/data`).then(async (res_) => {
+        if (res_.ok) {
+          return await res_.json();
+        } else {
+          console.error(
+            "failed to fetch data - ",
+            res_.status,
+            "\n >> ",
+            await res_.json()
+          );
+          toast.error(httpStatusCodes[res_?.status] ?? "Unknown error");
+        }
+      });
 
-      if (response.status !== 200) {
-        throw new Error(`Failed to fetch data. Status: ${response.status}`);
-      }
-      const json_ = await response.json();
-      if (json_.success) {
-        setData(json_.success);
+      if (response.success) {
+        console.log("RESPONSE - ", response.success);
+        setData(response.success);
       } else {
-        console.error(
-          "FAILED: could not fetch data\n > " +
-            JSON.stringify(json_.error ?? "....")
-        );
+        console.error("bad response - ", response);
         setData("failed");
+        return;
       }
     } catch (err) {
       setData("failed");
       console.error("ERROR: caught error\n > " + err);
     }
-  }, [session?.user?.role]);
+  }, [session?.user]);
 
   // fetch UI data
   useEffect(() => {
@@ -49,7 +62,7 @@ export default function Providers({ children }) {
     <div className="flex flex-col flex-grow items-center justify-center">
       <p className="text-center">
         There was an error loading the contents of this page. Check internet
-        connectivity
+        connectivity or try again later.
       </p>
       <p className="text-center">
         <Link href="/" className="text-red-800 dark:text-red-400 underline">
@@ -59,7 +72,12 @@ export default function Providers({ children }) {
       </p>
     </div>
   ) : (
-    <DataContext.Provider value={{ data, refreshData: fetchUIuserData }}>
+    <DataContext.Provider
+      value={{
+        data: typeof data === "object" ? data : {},
+        refreshData: fetchUIuserData,
+      }}
+    >
       {children}
     </DataContext.Provider>
   );

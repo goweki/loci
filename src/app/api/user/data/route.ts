@@ -1,62 +1,37 @@
 import { addSubTime } from "@/helpers/dataHandlers";
-import clientPromise from "@/lib/mongodb.mjs";
+import prisma from "@/lib/prisma/prisma";
+import { withAuthGeneral } from "@/lib/authRouteWrappers";
+import { ObjectId } from "mongodb";
 
 export const revalidate = 0; // false | 'force-cache' | 0 | number
 
 const maxHistory = process.env.NEXT_PUBLIC_MAX_HISTORY;
+const dbName = process.env.ATLAS_DB;
 
-export async function GET(req) {
+async function getHandler(req, user) {
   const url = new URL(req.url);
-  const inst = url.searchParams.get("inst");
-
-  const mongodbClient = await clientPromise; // resolve MongoClient promise
-  const db = mongodbClient.db(process.env.ATLAS_DB); //target DB
 
   try {
-    console.log(`GET REQUEST /api/user/data\n > institution: ${inst}`);
-    // target COLLECTION
-    const collection = db.collection("data");
-    // FIND Docs
-    const data_ = await collection
-      .aggregate([
-        {
-          $project: {
-            _id: 1,
-            devices: {
-              $map: {
-                input: "$devices",
-                as: "device",
-                in: {
-                  deviceID: "$$device.deviceID",
-                  deviceSN: "$$device.deviceSN",
-                  notifications: {
-                    $filter: {
-                      input: "$$device.notifications",
-                      as: "notification",
-                      cond: {
-                        $gte: [
-                          "$$notification.date",
-                          addSubTime("months", -maxHistory),
-                        ],
-                      },
-                    },
-                  },
-                  deviceType: "$$device.deviceType",
-                },
-              },
-            },
-            interfaces: 1,
-            institution: 1,
-          },
-        },
-      ])
-      .toArray();
-    return Response.json({ success: data_ });
+    console.log(`GET REQUEST /api/user/data\n > by user : `, user);
+    // user UUID
+    const user_ = await prisma.user.findUnique({
+      where: { email: user.email },
+    });
+    const userID = user_.id;
+    // Fetch user devices by ownerId
+    const devices_ = await prisma.device.findMany({
+      where: { ownerId: userID },
+    });
+
+    return Response.json({ success: { devices: devices_ } });
   } catch (error) {
     // handle ERROR if caught
-    console.log(` > Error caught at api/user/data GET \n >> ${error}\n`);
+    console.log(` > Error caught at api/user/data GET \n >> `, error);
     return Response.json({
-      error: "Could not fetch data",
+      status: 500,
+      message: error.message || "Unknown error",
     });
   }
 }
+
+export const GET = withAuthGeneral(getHandler);

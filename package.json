@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "node --env-file=.env.local scripts/seed.mjs"
+    "seed": "node src/scripts/seed.js",
+    "postinstall": "prisma generate --schema=./src/lib/prisma/schema.prisma"
   },
   "dependencies": {
+    "@prisma/client": "^6.4.1",
     "africastalking": "^0.6.6",
     "aos": "^2.3.4",
     "bcrypt": "^5.1.1",
@@ -31,6 +33,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
     "postcss": "^8",
+    "prisma": "^6.4.1",
     "tailwindcss": "^3.4.1"
   }
 }

@@ -5,8 +5,9 @@ const colours_ = { green: "#6ee7b7", gray: "#71717a", red: "#f87171" };
 // const colours_ = ["#0ea5e9", "#991b1b"];
 
 function ChartTwo({ data }) {
+  console.log("data", data);
   const [series, setState] = useState(data.data);
-  const [chartOptions, setChartOptions] = useState('')
+  const [chartOptions, setChartOptions] = useState("");
 
   useEffect(() => {
     setChartOptions({
@@ -66,8 +67,8 @@ function ChartTwo({ data }) {
       // fill: {
       //   opacity: 1,
       // },
-    })
-  }, [])
+    });
+  }, []);
 
   const handleReset = () => {
     setState((prevState) => ({
@@ -76,15 +77,14 @@ function ChartTwo({ data }) {
   };
   handleReset;
 
-  if (series && chartOptions) return (
-    <div className="card col-span-12 xl:col-span-4">
-      <div className="justify-between gap-4 sm:flex">
-        <div>
-          <h4 className="text-xl font-semibold">
-            Notifications this week
-          </h4>
-        </div>
-        {/* <div>
+  if (series && chartOptions)
+    return (
+      <div className="card col-span-12 xl:col-span-4">
+        <div className="justify-between gap-4 sm:flex">
+          <div>
+            <h4 className="text-xl font-semibold">Notifications this week</h4>
+          </div>
+          {/* <div>
           <div className="relative z-20 inline-block">
             <select
               name="#"
@@ -120,21 +120,21 @@ function ChartTwo({ data }) {
             </span>
           </div>
         </div> */}
-      </div>
+        </div>
 
-      <div className="mt-2">
-        <div id="chartTwo" className="-mb-9 -ml-5">
-          <ReactApexChart
-            options={chartOptions}
-            series={series}
-            type="bar"
-            height={350}
-            width={"100%"}
-          />
+        <div className="mt-2">
+          <div id="chartTwo" className="-mb-9 -ml-5">
+            <ReactApexChart
+              options={chartOptions}
+              series={series}
+              type="bar"
+              height={350}
+              width={"100%"}
+            />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
 }
 
 export default ChartTwo;
