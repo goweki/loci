@@ -2,7 +2,7 @@
 
 LOCi security portal webapp.
 
-## Live link to webapp
+## Preview link to webapp
 
 - LOCi: [`loci.goweki.com`](https://loci.goweki.com).
 
