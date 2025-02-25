@@ -21,12 +21,13 @@ LOCi security portal webapp.
 
 #### Backend routes
 
-- Authentication: [`/api/auth`]
-- Mailing: [`/api/mailer`]
+- Authentication: [`/api/auth`] - authentication
+- Mailing: [`/api/mailer`] - emailing function using nodemailer
+- etc
 
 ## Toolchain
 
-- Next js 13: bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+- Next js 14: bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 - css: [`Tailwind`](https://tailwindcss.com/) v3.
 - Hosting: [`Vercel`](https://vercel.com/).
 - Mail: [`nodemailer`](https://nodemailer.com/).
@@ -77,4 +78,4 @@ npm run start
 ```
 
 - serves the previously built and optimized version of your application.
-- Next js runs the server on port 3000 by default
+- Next js runs the server on port `3000` by default
