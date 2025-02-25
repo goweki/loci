@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URL")
+}
+
+enum NotificationType {
+  info
+  warning
+  critical
+}
+
+type DevicesNotification {
+  date    DateTime          @db.Date
+  type    NotificationType?
+  message String
+}
+
+model Device {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  deviceID   String @unique
+  deviceSN   String @unique
+  deviceType String
+
+  ownerId String @db.ObjectId
+  Owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  notifications DevicesNotification[]
+
+  @@map("devices")
+}
+
+enum UserRole {
+  admin
+  client
+}
+
+model User {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  email    String   @unique
+  name     String
+  password String
+  role     UserRole
+  tel      String?  @unique
+
+  Devices Device[]
+
+  @@map("users")
+}
