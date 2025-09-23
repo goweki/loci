@@ -1,52 +1,202 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("MONGODB_URL")
-}
-
-enum NotificationType {
-  info
-  warning
-  critical
-}
-
-type DevicesNotification {
-  date    DateTime          @db.Date
-  type    NotificationType?
-  message String
-}
-
-model Device {
-  id         String @id @default(auto()) @map("_id") @db.ObjectId
-  deviceID   String @unique
-  deviceSN   String @unique
-  deviceType String
-
-  ownerId String @db.ObjectId
-  Owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  notifications DevicesNotification[]
-
-  @@map("devices")
-}
-
-enum UserRole {
-  admin
-  client
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  email    String   @unique
-  name     String
-  password String
-  role     UserRole
-  tel      String?  @unique
+  id        String     @id @default(cuid())
+  email     String     @unique
+  phone     String?    @unique
+  name      String?
+  password  String
+  avatar    String?
+  role      UserRole   @default(USER)
+  status    UserStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
-  Devices Device[]
+  // Relations
+  subscription Subscription?
+  phoneNumbers PhoneNumber[]
+  messages     Message[]
+  contacts     Contact[]
+  sessions     Session[]
 
   @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  planId               String
+  status               SubscriptionStatus
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id])
+
+  @@map("subscriptions")
+}
+
+model Plan {
+  id                  String       @id @default(cuid())
+  name                String
+  description         String?
+  price               Int // in cents
+  interval            PlanInterval
+  features            Json
+  maxPhoneNumbers     Int
+  maxMessagesPerMonth Int
+  active              Boolean      @default(true)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model PhoneNumber {
+  id            String            @id @default(cuid())
+  userId        String
+  phoneNumber   String            @unique
+  displayName   String?
+  wabaId        String? // WhatsApp Business Account ID
+  phoneNumberId String? // WhatsApp Phone Number ID
+  status        PhoneNumberStatus @default(PENDING)
+  verifiedAt    DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@map("phone_numbers")
+}
+
+model Contact {
+  id            String    @id @default(cuid())
+  userId        String
+  phoneNumber   String
+  name          String?
+  avatar        String?
+  lastMessageAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([userId, phoneNumber])
+  @@map("contacts")
+}
+
+model Message {
+  id            String           @id @default(cuid())
+  userId        String
+  contactId     String
+  phoneNumberId String
+  waMessageId   String? // WhatsApp Message ID
+  type          MessageType
+  content       Json // Flexible content structure
+  direction     MessageDirection
+  status        MessageStatus    @default(SENT)
+  timestamp     DateTime
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contact     Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  phoneNumber PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  type      String
+  payload   Json
+  processed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("webhook_events")
+}
+
+// Enums
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  UNPAID
+}
+
+enum PlanInterval {
+  MONTHLY
+  YEARLY
+}
+
+enum PhoneNumberStatus {
+  PENDING
+  VERIFIED
+  FAILED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  DOCUMENT
+  AUDIO
+  VIDEO
+  LOCATION
+  CONTACT
+  TEMPLATE
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+  FAILED
 }
