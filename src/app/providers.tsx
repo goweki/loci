@@ -1,25 +1,23 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { ThemeProvider, useTheme } from "next-themes";
+import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
 import AOS from "aos";
-import Loader from "@/components/atoms/loader";
+import Loader from "@/components/ui/loaders";
 
 export default function Providers({ children }) {
   const [UIstate, setUIstate] = useState("loading");
-  const { resolvedTheme, setTheme } = useTheme();
 
   // onMount
   useEffect(() => {
-    setTheme(resolvedTheme);
     AOS.init();
     setUIstate("OK");
   }, []);
 
   //Render
   return (
-    <ThemeProvider enableSystem={true} attribute="class">
+    <ThemeProvider enableSystem={true} attribute="class" defaultTheme="system">
       <React.StrictMode>
         <SessionProvider>
           {UIstate === "loading" ? (

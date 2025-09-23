@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { db } from "@/lib/db";
+import db from "@/lib/prisma";
 import { WhatsAppClient } from "@/lib/whatsapp";
 
 export async function GET(request: NextRequest) {

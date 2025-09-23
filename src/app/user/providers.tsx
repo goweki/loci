@@ -2,9 +2,8 @@
 import Link from "next/link";
 import { createContext, useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import Loader from "@/components/atoms/loader";
+import Loader from "@/components/ui/loaders";
 import toast from "react-hot-toast";
-import { httpStatusCodes } from "@/lib/configs";
 export const DataContext = createContext<{
   data: Record<string, any>;
   refreshData: () => void;
@@ -20,31 +19,28 @@ export default function Providers({ children }) {
   const fetchUIuserData = useCallback(async () => {
     if (!session?.user) return;
     try {
-      const response = await fetch(`/api/user/data`).then(async (res_) => {
-        if (res_.ok) {
-          return await res_.json();
-        } else {
-          console.error(
-            "failed to fetch data - ",
-            res_.status,
-            "\n >> ",
-            await res_.json()
-          );
-          toast.error(httpStatusCodes[res_?.status] ?? "Unknown error");
-        }
+      const res = await fetch("/api/user/data", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store", // avoid stale data, adjust depending on use case
       });
 
-      if (response.success) {
-        console.log("RESPONSE - ", response.success);
-        setData(response.success);
-      } else {
-        console.error("bad response - ", response);
+      const json = await res.json();
+
+      if (!res.ok) {
+        console.error("API Error:", json.error || "Unknown error");
+        toast.error(json.error || "Failed to fetch user data");
         setData("failed");
         return;
       }
+
+      setData(json.data); // ✅ access parsed body, not `res.data`
     } catch (err) {
+      console.error("ERROR: caught error\n >", err);
+      toast.error("Something went wrong while fetching user data");
       setData("failed");
-      console.error("ERROR: caught error\n > " + err);
     }
   }, [session?.user]);
 
