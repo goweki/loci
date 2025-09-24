@@ -67,10 +67,17 @@ A SaaS platform that enables clients to integrate WhatsApp messaging capabilitie
 ```
 ├── app/
 │   ├── (auth)/
-│   │   ├── login/
-│   │   ├── register/
+│   │   ├── sign-in/
+│   │   ├── sign-up/
+│   │   ├── reset-password/
 │   │   └── layout.tsx
-│   ├── (dashboard)/
+│   ├── (public)/
+│   │   ├── blog/
+│   │   ├── contact-us/
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── (protected)/
+│   │   ├── sign-out/
 │   │   ├── dashboard/
 │   │   ├── messages/
 │   │   ├── contacts/
@@ -95,16 +102,12 @@ A SaaS platform that enables clients to integrate WhatsApp messaging capabilitie
 │   ├── messages/
 │   └── shared/
 ├── lib/
-│   ├── auth.ts
-│   ├── db.ts
+│   ├── auth/
+│   ├── prisma/
 │   ├── whatsapp.ts
 │   ├── payments.ts
-│   ├── utils.ts
+│   ├── utils
 │   └── validations.ts
-├── prisma/
-│   ├── schema.prisma
-│   ├── migrations/
-│   └── seed.ts
 ├── types/
 └── hooks/
 ```
@@ -137,6 +140,13 @@ A SaaS platform that enables clients to integrate WhatsApp messaging capabilitie
 ### Prisma Schema
 
 ```prisma
+// lib/prisma/schema.prisma
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -147,48 +157,59 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  password  String
-  avatar    String?
-  role      Role     @default(USER)
-  status    UserStatus @default(ACTIVE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String     @id @default(cuid())
+  name          String?
+  email         String     @unique
+  emailVerified DateTime?
+  image         String?
+  password      String // Keep for credentials provider
+  role          UserRole   @default(USER)
+  status        UserStatus @default(ACTIVE)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
-  // Relations
-  subscription Subscription?
-  phoneNumbers PhoneNumber[]
-  messages     Message[]
-  contacts     Contact[]
-  sessions     Session[]
+  accounts      Account[]
+  sessions      Session[]
+  subscription  Subscription?
+  phoneNumbers  PhoneNumber[]
+  messages      Message[]
+  contacts      Contact[]
+  AutoReplyRule AutoReplyRule[]
 
   @@map("users")
 }
 
 model Session {
-  id        String   @id @default(cuid())
-  sessionToken String @unique
-  userId    String
-  expires   DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
 
+// model VerificationToken {
+//   identifier String
+//   token      String   @unique
+//   expires    DateTime
+
+//   @@unique([identifier, token])
+//   @@map("verificationtokens")
+// }
+
 model Subscription {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  planId    String
-  status    SubscriptionStatus
-  currentPeriodStart DateTime
-  currentPeriodEnd   DateTime
-  cancelAtPeriodEnd  Boolean @default(false)
-  stripeCustomerId   String?
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  planId               String
+  status               SubscriptionStatus
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+  stripeCustomerId     String?
   stripeSubscriptionId String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan Plan @relation(fields: [planId], references: [id])
@@ -197,17 +218,17 @@ model Subscription {
 }
 
 model Plan {
-  id          String @id @default(cuid())
-  name        String
-  description String?
-  price       Int    // in cents
-  interval    PlanInterval
-  features    Json
-  maxPhoneNumbers Int
+  id                  String       @id @default(cuid())
+  name                String
+  description         String?
+  price               Int // in cents
+  interval            PlanInterval
+  features            Json
+  maxPhoneNumbers     Int
   maxMessagesPerMonth Int
-  active      Boolean @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  active              Boolean      @default(true)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
 
   subscriptions Subscription[]
 
@@ -215,16 +236,16 @@ model Plan {
 }
 
 model PhoneNumber {
-  id          String   @id @default(cuid())
-  userId      String
-  phoneNumber String   @unique
-  displayName String?
-  wabaId      String?  // WhatsApp Business Account ID
+  id            String            @id @default(cuid())
+  userId        String
+  phoneNumber   String            @unique
+  displayName   String?
+  wabaId        String? // WhatsApp Business Account ID
   phoneNumberId String? // WhatsApp Phone Number ID
-  status      PhoneNumberStatus @default(PENDING)
-  verifiedAt  DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status        PhoneNumberStatus @default(PENDING)
+  verifiedAt    DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages Message[]
@@ -233,14 +254,14 @@ model PhoneNumber {
 }
 
 model Contact {
-  id          String   @id @default(cuid())
-  userId      String
-  phoneNumber String
-  name        String?
-  avatar      String?
+  id            String    @id @default(cuid())
+  userId        String
+  phoneNumber   String
+  name          String?
+  avatar        String?
   lastMessageAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages Message[]
@@ -250,24 +271,58 @@ model Contact {
 }
 
 model Message {
-  id            String   @id @default(cuid())
+  id            String           @id @default(cuid())
   userId        String
   contactId     String
   phoneNumberId String
-  waMessageId   String?  // WhatsApp Message ID
+  waMessageId   String? // WhatsApp Message ID
   type          MessageType
-  content       Json     // Flexible content structure
+  content       Json // Flexible content structure
   direction     MessageDirection
-  status        MessageStatus @default(SENT)
+  status        MessageStatus    @default(SENT)
   timestamp     DateTime
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   contact     Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
   phoneNumber PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
 
   @@map("messages")
+}
+
+model MessageUnprocessed {
+  id          String   @id @default(cuid())
+  waMessageId String // WhatsApp message ID
+  payload     Json // Full WhatsApp payload
+  error       String // Error message
+  retryCount  Int      @default(0)
+  nextRetry   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum TriggerType {
+  KEYWORD // Match specific keywords in message
+  MESSAGE_TYPE // Match by WhatsApp message type (text, image, video, etc.)
+  DEFAULT // Fallback when no rule matches
+  TIME_BASED // (Optional) Trigger during specific time windows
+}
+
+model AutoReplyRule {
+  id           String      @id @default(cuid())
+  userId       String
+  name         String
+  active       Boolean     @default(true)
+  triggerType  TriggerType
+  triggerValue String? // Keyword or type (depends on triggerType)
+  replyMessage String
+  isActive     Boolean     @default(true)
+  priority     Int         @default(0)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model WebhookEvent {
@@ -281,7 +336,7 @@ model WebhookEvent {
 }
 
 // Enums
-enum Role {
+enum UserRole {
   USER
   ADMIN
 }
@@ -332,6 +387,29 @@ enum MessageStatus {
   READ
   FAILED
 }
+
+// If using NextAuth.js, add these models:
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
 ```
 
 ## Authentication & Authorization
@@ -339,7 +417,7 @@ enum MessageStatus {
 ### NextAuth.js Configuration
 
 ```typescript
-// lib/auth.ts
+// lib/auth/index.ts
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
@@ -402,33 +480,64 @@ export const authOptions: NextAuthOptions = {
 
 ```typescript
 // middleware.ts
-import { withAuth } from "next-auth/middleware";
+import { NextRequest, NextResponse } from "next/server";
+import { verifyJWT } from "@/lib/auth/jwt";
 
-export default withAuth(
-  function middleware(req) {
-    // Additional middleware logic
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        const { pathname } = req.nextUrl;
+const PUBLIC_ROUTES = ["/", "/login", "/register", "/forgot-password"];
 
-        if (pathname.startsWith("/dashboard")) {
-          return !!token;
-        }
+const PUBLIC_API_PREFIXES = ["/api/auth", "/api/webhooks"];
 
-        if (pathname.startsWith("/admin")) {
-          return token?.role === "ADMIN";
-        }
+// static assets / special paths to skip middleware
+const IGNORE_PATHS = [
+  "/_next", // Next.js build files
+  "/favicon.ico", // Favicon
+  "/assets", // Public assets
+  "/images", // Public images
+];
 
-        return true;
-      },
-    },
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // 1. Ignore Next.js internals & static files
+  if (IGNORE_PATHS.some((prefix) => pathname.startsWith(prefix))) {
+    return NextResponse.next();
   }
-);
 
+  // 2. Public routes (exact match)
+  if (PUBLIC_ROUTES.includes(pathname)) {
+    return NextResponse.next();
+  }
+
+  // 3. Public API routes (prefix match)
+  if (PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
+    return NextResponse.next();
+  }
+
+  // 4. Get token from cookies
+  const token = request.cookies.get("auth-token")?.value;
+  if (!token) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // 5. Verify token
+  const payload = verifyJWT(token);
+  if (!payload) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // 6. Attach user info to headers for API routes
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-user-id", payload.userId);
+  requestHeaders.set("x-user-role", payload.role);
+
+  return NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+}
+
+// Matcher: apply middleware only to certain routes
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/api/protected/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|assets|images).*)"],
 };
 ```
 
@@ -438,6 +547,7 @@ export const config = {
 
 ```typescript
 // lib/whatsapp.ts
+
 interface WhatsAppConfig {
   accessToken: string;
   phoneNumberId: string;
@@ -543,8 +653,8 @@ interface MessagePayload {
 ```typescript
 // app/api/webhooks/whatsapp/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { processIncomingMessage } from "@/lib/message-processor";
+import db from "@/lib/prisma";
+import { processIncomingMessage } from "@/lib/waMessageProcessor";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -592,83 +702,6 @@ async function processWebhookEvent(body: any) {
     for (const message of messages) {
       await processIncomingMessage(message, contacts);
     }
-  }
-}
-```
-
-## Payment System
-
-### Stripe Integration
-
-```typescript
-// lib/payments.ts
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
-});
-
-export async function createSubscription(userId: string, priceId: string) {
-  const user = await db.user.findUnique({
-    where: { id: userId },
-    include: { subscription: true },
-  });
-
-  if (!user) throw new Error("User not found");
-
-  let customerId = user.subscription?.stripeCustomerId;
-
-  if (!customerId) {
-    const customer = await stripe.customers.create({
-      email: user.email,
-      name: user.name || undefined,
-      metadata: { userId },
-    });
-    customerId = customer.id;
-  }
-
-  const subscription = await stripe.subscriptions.create({
-    customer: customerId,
-    items: [{ price: priceId }],
-    payment_behavior: "default_incomplete",
-    payment_settings: { save_default_payment_method: "on_subscription" },
-    expand: ["latest_invoice.payment_intent"],
-  });
-
-  await db.subscription.upsert({
-    where: { userId },
-    create: {
-      userId,
-      planId: priceId,
-      status: "UNPAID",
-      stripeCustomerId: customerId,
-      stripeSubscriptionId: subscription.id,
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-    },
-    update: {
-      planId: priceId,
-      status: "UNPAID",
-      stripeSubscriptionId: subscription.id,
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-    },
-  });
-
-  return subscription;
-}
-
-export async function handleStripeWebhook(event: Stripe.Event) {
-  switch (event.type) {
-    case "invoice.payment_succeeded":
-      await handlePaymentSucceeded(event.data.object as Stripe.Invoice);
-      break;
-    case "invoice.payment_failed":
-      await handlePaymentFailed(event.data.object as Stripe.Invoice);
-      break;
-    case "customer.subscription.deleted":
-      await handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
-      break;
   }
 }
 ```
@@ -991,7 +1024,7 @@ export function MessageInterface({
 ### Dashboard Layout
 
 ```typescript
-// app/(dashboard)/layout.tsx
+// app/dashboard/layout.tsx
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
 
