@@ -25,12 +25,13 @@ model User {
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
-  accounts     Account[]
-  sessions     Session[]
-  subscription Subscription?
-  phoneNumbers PhoneNumber[]
-  messages     Message[]
-  contacts     Contact[]
+  accounts      Account[]
+  sessions      Session[]
+  subscription  Subscription?
+  phoneNumbers  PhoneNumber[]
+  messages      Message[]
+  contacts      Contact[]
+  AutoReplyRule AutoReplyRule[]
 
   @@map("users")
 }
@@ -145,6 +146,40 @@ model Message {
   phoneNumber PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
 
   @@map("messages")
+}
+
+model MessageUnprocessed {
+  id          String   @id @default(cuid())
+  waMessageId String // WhatsApp message ID
+  payload     Json // Full WhatsApp payload
+  error       String // Error message
+  retryCount  Int      @default(0)
+  nextRetry   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum TriggerType {
+  KEYWORD // Match specific keywords in message
+  MESSAGE_TYPE // Match by WhatsApp message type (text, image, video, etc.)
+  DEFAULT // Fallback when no rule matches
+  TIME_BASED // (Optional) Trigger during specific time windows
+}
+
+model AutoReplyRule {
+  id           String      @id @default(cuid())
+  userId       String
+  name         String
+  active       Boolean     @default(true)
+  triggerType  TriggerType
+  triggerValue String? // Keyword or type (depends on triggerType)
+  replyMessage String
+  isActive     Boolean     @default(true)
+  priority     Int         @default(0)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model WebhookEvent {

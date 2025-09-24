@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Recursively excludes specified fields from an object or array of objects.
  * @template T - The input type.

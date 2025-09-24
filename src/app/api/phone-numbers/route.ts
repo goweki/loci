@@ -1,3 +1,8 @@
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import db from "@/lib/prisma";
+
 // app/api/phone-numbers/route.ts
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);

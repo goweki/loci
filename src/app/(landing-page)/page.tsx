@@ -14,11 +14,9 @@ export const metadata = {
   },
 };
 
-import Hero from "@/components/elements/landing/hero";
-import Features from "@/components/elements/landing/features";
-import HowBlocks from "@/components/elements/landing/howBlocks";
-import Testimonials from "@/components/elements/landing/testimonials";
-import Newsletter from "@/components/elements/landing/newsletter";
+import Hero from "@/components/landing-page/hero";
+import Features from "@/components/landing-page/features";
+import HowBlocks from "@/components/landing-page/how-blocks";
 
 export default async function Home() {
   return (

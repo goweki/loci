@@ -6,6 +6,11 @@ import GoogleProvider from "next-auth/providers/google";
 import db from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
+// lib/auth.ts - Add validation at the top
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error("NEXTAUTH_SECRET is not set in environment variables");
+}
+
 // Extend NextAuth types
 declare module "next-auth" {
   interface Session extends DefaultSession {
