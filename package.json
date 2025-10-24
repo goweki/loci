@@ -9,10 +9,10 @@
     "docker:build": "docker build -t ghcr.io/goweki/loci:latest .",
     "start": "next start -p ${PORT:-3000}",
     "postinstall": "prisma generate",
-    "db:launch": "docker run --name loci-postgres -e POSTGRES_PASSWORD=loci -p 5432:5432 -d postgres",
+    "db:launch": "docker run --name loci-postgres -e POSTGRES_USER=loci -e POSTGRES_PASSWORD=loci-pass -e POSTGRES_DB=loci-db -p 5432:5432 -v loci-data:/var/lib/postgresql/data -d postgres:17",
     "db:start": "docker start loci-postgres",
     "db:stop": "docker stop loci-postgres",
-    "db:rm": "docker rm loci-postgres",
+    "db:rm": "docker rm loci-postgres && docker volume rm loci-data",
     "db:restart": "npm run db:stop && npm run db:start",
     "test": "vitest",
     "test:ci": "vitest run",
@@ -24,7 +24,10 @@
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
     "type-check": "tsc --noEmit",
-    "pre-commit": "lint-staged",
+    "pre-commit": "lint-staged"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
     "seed:clean": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed-clean.ts"
   },
   "dependencies": {
