@@ -6,6 +6,8 @@ export default defineConfig({
   migrations: {
     path: "src/lib/prisma/migrations",
     seed: 'ts-node --compiler-options {"module":"CommonJS"} src/lib/prisma/seed.ts',
+    "seed:clean":
+      'ts-node --compiler-options {"module":"CommonJS"} src/lib/prisma/seed-clean.ts',
   },
   views: {
     path: "src/lib/prisma/views",
