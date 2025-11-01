@@ -9,8 +9,8 @@ import Loader from "@/components/ui/loaders";
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [UIstate, setUIstate] = useState("loading");
 
+  // Import AOS
   useEffect(() => {
-    // Import AOS only on client side
     import("aos").then((AOS) => {
       AOS.init();
       setUIstate("OK");

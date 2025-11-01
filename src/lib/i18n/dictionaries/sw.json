@@ -1,0 +1,63 @@
+{
+  "auth": {
+    "signin": {
+      "title": "Karibu Tena",
+      "subtitle": "Ingia ili kuendelea",
+      "emailLabel": "Anwani ya Barua Pepe",
+      "passwordLabel": "Nenosiri",
+      "button": "Ingia",
+      "google": "Endelea na Google",
+      "forgotPassword": "Umesahau nenosiri?",
+      "noAccount": "Huna akaunti?",
+      "signupLink": "Unda Akaunti"
+    },
+    "signup": {
+      "title": "Unda Akaunti Yako",
+      "subtitle": "Jiunge nasi leo uanze",
+      "nameLabel": "Jina Kamili",
+      "emailLabel": "Anwani ya Barua Pepe",
+      "passwordLabel": "Nenosiri",
+      "confirmPasswordLabel": "Thibitisha Nenosiri",
+      "button": "Jisajili",
+      "alreadyHaveAccount": "Tayari una akaunti?",
+      "signinLink": "Ingia"
+    },
+    "forgotPassword": {
+      "title": "Umesahau Nenosiri?",
+      "subtitle": "Weka barua pepe yako ili upokee kiungo cha kuweka upya",
+      "emailLabel": "Anwani ya Barua Pepe",
+      "button": "Tuma Kiungo",
+      "backToSignIn": "Rudi kwenye ukurasa wa kuingia"
+    },
+    "resetPassword": {
+      "title": "Weka Upya Nenosiri",
+      "subtitle": "Weka nenosiri jipya hapa chini",
+      "passwordLabel": "Nenosiri Jipya",
+      "confirmPasswordLabel": "Thibitisha Nenosiri Jipya",
+      "button": "Weka Upya Nenosiri",
+      "success": "Umefanikiwa kuweka upya nenosiri. Sasa unaweza kuingia."
+    },
+    "contactUs": {
+      "title": "Wasiliana Nasi",
+      "subtitle": "Tunafurahia kusikia kutoka kwako!",
+      "nameLabel": "Jina Lako",
+      "emailLabel": "Barua Pepe Yako",
+      "messageLabel": "Ujumbe Wako",
+      "button": "Tuma Ujumbe",
+      "success": "Ujumbe umetumwa kwa mafanikio!",
+      "error": "Imeshindikana kutuma ujumbe. Tafadhali jaribu tena baadaye."
+    },
+    "common": {
+      "logout": "Toka",
+      "successLogin": "Umeingia kwa mafanikio.",
+      "successLogout": "Umetoka kwa mafanikio.",
+      "errors": {
+        "invalidEmail": "Tafadhali weka anwani halali ya barua pepe.",
+        "requiredField": "Sehemu hii inahitajika.",
+        "passwordMismatch": "Manenosiri hayafanani.",
+        "incorrectCredentials": "Barua pepe au nenosiri si sahihi.",
+        "network": "Hitilafu ya mtandao. Tafadhali jaribu tena baadaye."
+      }
+    }
+  }
+}

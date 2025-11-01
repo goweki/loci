@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowRight,
@@ -12,8 +12,13 @@ import {
   CheckCircle,
   Star,
 } from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 export default function HeroSection() {
+  const pathname = usePathname();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       {/* Animated background elements */}
@@ -74,7 +79,7 @@ export default function HeroSection() {
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
             <span className="inline-block">Supercharge</span>
             <br />
-            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent animate-gradient">
+            <span className="bg-gradient-to-r from-cyan-600 via-purple-600 to-cyan-800 bg-clip-text text-transparent animate-gradient">
               customer engagement
             </span>
           </h1>
@@ -88,19 +93,18 @@ export default function HeroSection() {
 
           {/* CTA Buttons */}
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button
-              size="lg"
-              className="px-8 py-4 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl group"
+            <Link
+              href={`${pathname}/sign-in`}
+              className={cn(
+                buttonVariants({ variant: "default", size: "lg" }),
+                "text-lg bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-800 hover:to-cyan-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl group"
+              )}
             >
               Start Free Trial
               <Zap className="ml-2 w-5 h-5 group-hover:animate-pulse" />
-            </Button>
+            </Link>
 
-            <Button
-              variant="outline"
-              size="lg"
-              className="px-8 py-4 text-lg border-2 hover:bg-gray-50 dark:hover:bg-gray-800 group"
-            >
+            <Button variant="secondary" className="hover:scale-105" size="lg">
               <Play className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform" />
               Watch Demo
             </Button>

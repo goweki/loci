@@ -1,5 +1,4 @@
-export function LogoSymbol(props: React.SVGAttributes<SVGElement>) {
-  //render
+export function BrandSymbol(props: React.SVGAttributes<SVGElement>) {
   return (
     <svg x="0px" y="0px" viewBox="0 0 131.2 90" {...props}>
       <g id="symbol">

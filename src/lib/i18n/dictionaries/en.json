@@ -1,0 +1,63 @@
+{
+  "auth": {
+    "signin": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to continue",
+      "emailLabel": "Email Address",
+      "passwordLabel": "Password",
+      "button": "Sign In",
+      "google": "Continue with Google",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Create Account"
+    },
+    "signup": {
+      "title": "Create Your Account",
+      "subtitle": "Join us today and get started",
+      "nameLabel": "Full Name",
+      "emailLabel": "Email Address",
+      "passwordLabel": "Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "button": "Sign Up",
+      "alreadyHaveAccount": "Already have an account?",
+      "signinLink": "Sign In"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password?",
+      "subtitle": "Enter your email to receive a reset link",
+      "emailLabel": "Email Address",
+      "button": "Send Reset Link",
+      "backToSignIn": "Back to Sign In"
+    },
+    "resetPassword": {
+      "title": "Reset Your Password",
+      "subtitle": "Enter a new password below",
+      "passwordLabel": "New Password",
+      "confirmPasswordLabel": "Confirm New Password",
+      "button": "Reset Password",
+      "success": "Password reset successful. You can now sign in."
+    },
+    "contactUs": {
+      "title": "Contact Us",
+      "subtitle": "We’d love to hear from you!",
+      "nameLabel": "Your Name",
+      "emailLabel": "Your Email",
+      "messageLabel": "Your Message",
+      "button": "Send Message",
+      "success": "Message sent successfully!",
+      "error": "Failed to send message. Please try again later."
+    },
+    "common": {
+      "logout": "Log Out",
+      "successLogin": "Successfully signed in.",
+      "successLogout": "Successfully logged out.",
+      "errors": {
+        "invalidEmail": "Please enter a valid email address.",
+        "requiredField": "This field is required.",
+        "passwordMismatch": "Passwords do not match.",
+        "incorrectCredentials": "Incorrect email or password.",
+        "network": "Network error. Please try again later."
+      }
+    }
+  }
+}

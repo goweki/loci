@@ -19,7 +19,7 @@ model User {
   email         String     @unique
   emailVerified DateTime?
   image         String?
-  password      String // Keep for credentials provider
+  password      String?
   role          UserRole   @default(USER)
   status        UserStatus @default(ACTIVE)
   createdAt     DateTime   @default(now())
@@ -27,7 +27,7 @@ model User {
 
   accounts      Account[]
   sessions      Session[]
-  subscription  Subscription?
+  subscriptions Subscription[]
   phoneNumbers  PhoneNumber[]
   messages      Message[]
   contacts      Contact[]
@@ -36,6 +36,7 @@ model User {
   @@map("users")
 }
 
+// only used when session is database, not jwt
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -43,44 +44,50 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("sessions")
+  @@map("user_sessions")
 }
 
-// model VerificationToken {
-//   identifier String
-//   token      String   @unique
-//   expires    DateTime
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-//   @@unique([identifier, token])
-//   @@map("verificationtokens")
-// }
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
 
 model Subscription {
-  id                   String             @id @default(cuid())
-  userId               String             @unique
-  planId               String
-  status               SubscriptionStatus
-  currentPeriodStart   DateTime
-  currentPeriodEnd     DateTime
-  cancelAtPeriodEnd    Boolean            @default(false)
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  id         String    @id @default(cuid())
+  userId     String
+  planId     String
+  startDate  DateTime
+  cancelDate DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan Plan @relation(fields: [planId], references: [id])
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan     Plan      @relation(fields: [planId], references: [id])
+  payments Payment[]
 
+  @@index([userId])
   @@map("subscriptions")
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  reference     String
+  paymentMethod PaymentMethod @default(ONLINE)
+
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
 }
 
 model Plan {
   id                  String       @id @default(cuid())
-  name                String
-  description         String?
-  price               Int // in cents
+  name                PlanName
   interval            PlanInterval
-  features            Json
+  description         String?
+  price               Int
   maxPhoneNumbers     Int
   maxMessagesPerMonth Int
   active              Boolean      @default(true)
@@ -88,8 +95,35 @@ model Plan {
   updatedAt           DateTime     @updatedAt
 
   subscriptions Subscription[]
+  features      PlanFeature[]
 
   @@map("plans")
+}
+
+model Feature {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  useMetric   String //eg: queries,messages,calls,..
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  plans PlanFeature[]
+}
+
+model PlanFeature {
+  planId      String
+  featureId   String
+  enabled     Boolean  @default(true)
+  limitUse    Int? // numeric limit, e.g. "1000 messages"
+  configValue String? // text config, e.g. "high" or "enterprise-only"
+  createdAt   DateTime @default(now())
+
+  plan    Plan    @relation(fields: [planId], references: [id], onDelete: Cascade)
+  feature Feature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+
+  @@id([planId, featureId])
+  @@map("plan_features")
 }
 
 model PhoneNumber {
@@ -193,6 +227,13 @@ model WebhookEvent {
 }
 
 // Enums
+
+enum PlanName {
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
 enum UserRole {
   USER
   ADMIN
@@ -202,13 +243,6 @@ enum UserStatus {
   ACTIVE
   SUSPENDED
   INACTIVE
-}
-
-enum SubscriptionStatus {
-  ACTIVE
-  CANCELED
-  PAST_DUE
-  UNPAID
 }
 
 enum PlanInterval {
@@ -243,6 +277,13 @@ enum MessageStatus {
   DELIVERED
   READ
   FAILED
+}
+
+enum PaymentMethod {
+  ONLINE
+  MPESA
+  CASH
+  OTHER
 }
 
 // If using NextAuth.js, add these models:

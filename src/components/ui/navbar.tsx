@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useEffect, useState, useRef } from "react";
 import {
   NavigationMenu,
@@ -15,11 +15,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { LogoSymbol } from "./logo";
+import { BrandSymbol } from "./brand";
 import { MenuIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import ThemeToggle from "./themeToggle";
+import LanguageToggle from "./language-toggle";
+import { usePathname } from "next/navigation";
+import { languages } from "@/lib/i18n";
 
 // Types
 export interface NavbarNavLink {
@@ -42,17 +45,17 @@ export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
 
 // Default navigation links
 const defaultNavigationLinks: NavbarNavLink[] = [
-  { href: "#", label: "Home", active: true },
-  { href: "#features", label: "Features" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#about", label: "About" },
+  { href: "/", label: "Home" },
+  { href: "/features", label: "Features" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/about", label: "About" },
 ];
 
 export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
   (
     {
       className,
-      logo = <LogoSymbol />,
+      logo = <BrandSymbol />,
       logoHref = "#",
       navigationLinks = defaultNavigationLinks,
       signInText = "Sign In",
@@ -67,6 +70,31 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
   ) => {
     const [isMobile, setIsMobile] = useState(false);
     const containerRef = useRef<HTMLElement>(null);
+    const pathname = usePathname();
+
+    const i18nPrefixes = languages.map((lang) => `/${lang}`);
+    console.log("i18nPrefixes - ", i18nPrefixes);
+
+    const isActive = (href: string): boolean => {
+      if (href === "/") {
+        return pathname === "/" || i18nPrefixes.includes(pathname);
+      }
+
+      if (pathname.endsWith(href)) {
+        return true;
+      }
+
+      for (const prefix of i18nPrefixes) {
+        if (
+          pathname.startsWith(prefix) &&
+          pathname.substring(prefix.length).startsWith(href)
+        ) {
+          return true;
+        }
+      }
+
+      return false;
+    };
 
     useEffect(() => {
       const checkWidth = () => {
@@ -105,7 +133,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       <header
         ref={combinedRef}
         className={cn(
-          "sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6 [&_*]:no-underline",
+          "sticky top-0 z-50 w-full border-b bg-popover/50 text-popover-foreground backdrop-blur px-4 md:px-6 [&_*]:no-underline",
           className
         )}
         {...props}
@@ -130,17 +158,18 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                     <NavigationMenuList className="flex-col items-start gap-1">
                       {navigationLinks.map((link, index) => (
                         <NavigationMenuItem key={index} className="w-full">
-                          <button
+                          <Link
+                            href={link.href}
                             onClick={(e) => e.preventDefault()}
                             className={cn(
-                              "flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer no-underline",
-                              link.active
+                              buttonVariants({ variant: "ghost" }),
+                              isActive(link.href)
                                 ? "bg-accent text-accent-foreground"
                                 : "text-foreground/80"
                             )}
                           >
                             {link.label}
-                          </button>
+                          </Link>
                         </NavigationMenuItem>
                       ))}
                     </NavigationMenuList>
@@ -170,17 +199,18 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                   <NavigationMenuList className="gap-1">
                     {navigationLinks.map((link, index) => (
                       <NavigationMenuItem key={index}>
-                        <button
+                        <Link
+                          href={link.href}
                           onClick={(e) => e.preventDefault()}
                           className={cn(
-                            "group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 cursor-pointer no-underline",
-                            link.active
+                            buttonVariants({ variant: "ghost" }),
+                            isActive(link.href)
                               ? "bg-accent text-accent-foreground"
-                              : "text-foreground/80 hover:text-foreground"
+                              : ""
                           )}
                         >
                           {link.label}
-                        </button>
+                        </Link>
                       </NavigationMenuItem>
                     ))}
                   </NavigationMenuList>
@@ -190,6 +220,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
           </div>
           {/* Right side */}
           <div className="flex items-center gap-3">
+            <LanguageToggle />
             <ThemeToggle variant="outline" />
             <Button
               variant="outline"
