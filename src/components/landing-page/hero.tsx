@@ -94,7 +94,7 @@ export default function HeroSection() {
           {/* CTA Buttons */}
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href={`${pathname}/sign-in`}
+              href={`/sign-in`}
               className={cn(
                 buttonVariants({ variant: "default", size: "lg" }),
                 "text-lg bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-800 hover:to-cyan-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl group"
