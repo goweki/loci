@@ -54,19 +54,21 @@ export default async function AuthLayout({
           <SideBanner />
         </div>
       </div>
-      <div className="lg:w-1/2 w-full flex items-center justify-center text-center md:px-16 px-0 z-0">
-        <div className="w-full py-6 z-20">
-          <div>
-            <div className="bg-gray-900 rounded w-fit py-1 m-auto">
-              <BrandSymbol />
-            </div>
-            <span className="font-sonsie">rabee</span>
+      <div className="lg:w-1/2 w-full flex items-center justify-center text-center px-4 sm:px-8 md:px-16 z-0">
+        <div className="w-full py-6 z-20 space-y-2">
+          <div className="flex flex-row items-center">
+            <BrandSymbol height={24} />
+            <span className="ml-2 font-bold font-sans hidden lg:flex">
+              LOCi
+            </span>
           </div>
-          <div className="lg:hidden text-center">
-            <h1 className="text-xl font-light tracking-wide my-6 sr-only">
+          <div className="pb-4">
+            <h1 className="text-xl font-light tracking-wide m-0 text-start sr-only">
               {title}
             </h1>
-            <p className="italic max-w-md px-8 m-auto">{subtitle}</p>
+            <p className="text-xl italic max-w-md text-start text-primary">
+              {subtitle}
+            </p>
           </div>
           {children}
         </div>

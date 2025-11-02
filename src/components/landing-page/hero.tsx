@@ -81,7 +81,7 @@ export default function HeroSection(props: HeroProps) {
         ))}
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-8 md:my-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-12 md:my-20">
         <div className="text-center">
           {/* Trust indicators */}
           {/* <div className="flex items-center justify-center gap-4 mb-8">

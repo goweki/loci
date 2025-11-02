@@ -1,15 +1,21 @@
 export const metadata = {
   title: {
-    template: "%s | loci Security Portal ",
-    default: "loci - Security portal", // a default is required when creating a template
+    template: "%s | loci ",
+    default: "loci",
   },
-  description: "Cars, parts and services that go beyond urban trails",
+  description: "Supercharging Business Communications",
   metadataBase: new URL(
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
       : process.env.NEXTAUTH_URL
   ),
-  keywords: ["security", "CCTV", "technology", "monitoring", "alerts"],
+  keywords: [
+    "Communication",
+    "WhatsApp",
+    "Technology",
+    "Customer",
+    "Relations",
+  ],
   robots: {
     index: false,
     follow: false,

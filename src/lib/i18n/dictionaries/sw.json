@@ -119,5 +119,10 @@
       "text": "Unahitaji mpango maalum kwa shirika lako?",
       "contactLink": "Wasiliana na timu yetu ya mauzo"
     }
+  },
+  "navbar": {
+    "home": "Mwanzo",
+    "pricing": "Bei",
+    "cta": "Anza Kutumia"
   }
 }

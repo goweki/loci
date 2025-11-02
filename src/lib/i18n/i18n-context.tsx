@@ -88,7 +88,11 @@ export function I18nProvider({
     if (storedLang && isValidLanguage(storedLang)) {
       if (!isValidLanguage(_lang)) {
         router.replace(`/${storedLang}${pathname}`);
-      } else setCurrentLang(storedLang);
+      } else if (_lang === storedLang) setCurrentLang(storedLang);
+      else {
+        localStorage.setItem(LS_KEY, _lang);
+        setCurrentLang(_lang);
+      }
     } else if (isValidLanguage(_lang)) {
       setCurrentLang(_lang);
       localStorage.setItem(LS_KEY, _lang);
@@ -103,7 +107,7 @@ export function I18nProvider({
   const setLanguage = (newLang: Language) => {
     setCurrentLang(newLang);
     localStorage.setItem(LS_KEY, newLang);
-    // toggle language
+
     const newPath = pathname.replace(`/${currentLang}`, `/${newLang}`);
     router.push(newPath);
   };

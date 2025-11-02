@@ -119,5 +119,10 @@
       "text": "Need a custom plan for your organization?",
       "contactLink": "Contact our sales team"
     }
+  },
+  "navbar": {
+    "home": "Home",
+    "pricing": "Pricing",
+    "cta": "Get Started"
   }
 }

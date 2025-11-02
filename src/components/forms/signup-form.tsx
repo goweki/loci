@@ -23,13 +23,13 @@ const formSchema = z.object({
   password: z.string().min(2).max(50),
 });
 
-interface SignInProps {
+interface SignUpProps {
   emailLabel: string;
   passwordLabel: string;
   submitLabel: string;
 }
 
-export function SignInForm(copy: SignInProps) {
+export function SignUpForm(copy: SignUpProps) {
   const { emailLabel, passwordLabel, submitLabel } = copy;
 
   const form = useForm<z.infer<typeof formSchema>>({

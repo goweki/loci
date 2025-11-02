@@ -6,7 +6,7 @@ export function SideBanner() {
   const sm_links: string[] = ["https://www.linkedin.com/in/nlm-tech"];
 
   return (
-    <div className="flex flex-row space-x-2 space-y-2">
+    <div className="flex flex-row space-x-4 items-center">
       <div className="pt-1 text-sm">
         Powered by{" "}
         <a
@@ -19,10 +19,10 @@ export function SideBanner() {
         </a>
       </div>
       {sm_links.map((link, i) => (
-        <span key={i}>
+        <span key={i} className="h-6 w-6">
           <SocialIcon
             url={link}
-            style={{ height: 25, width: 25 }}
+            style={{ height: "100%", width: "100%" }}
             target="_blank"
             rel="noopener noreferrer"
           />

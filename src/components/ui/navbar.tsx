@@ -57,9 +57,9 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       logoHref = "#",
       navigationLinks = defaultNavigationLinks,
       signInText = "Sign In",
-      signInHref = "#signin",
+      signInHref = "/sign-in",
       ctaText = "Get Started",
-      ctaHref = "#get-started",
+      ctaHref = "/sign-up",
       onSignInClick,
       onCtaClick,
       ...props
@@ -239,23 +239,18 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
           <div className="flex items-center gap-3">
             <LanguageToggle />
             <ThemeToggle variant="outline" />
-            <Button
-              variant="outline"
-              onClick={(e) => {
-                e.preventDefault();
-                if (onSignInClick) onSignInClick();
-              }}
+            <Link
+              href={signInHref}
+              className={cn(buttonVariants({ variant: "outline" }))}
             >
               {signInText}
-            </Button>
-            <Button
-              onClick={(e) => {
-                e.preventDefault();
-                if (onCtaClick) onCtaClick();
-              }}
+            </Link>
+            <Link
+              href={ctaHref}
+              className={cn(buttonVariants({ variant: "default" }))}
             >
               {ctaText}
-            </Button>
+            </Link>
           </div>
         </div>
       </header>
