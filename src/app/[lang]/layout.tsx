@@ -8,6 +8,7 @@ export default async function LanguageLayout({
   children: React.ReactNode;
 }) {
   const { lang } = await params;
+  console.log("lang", lang);
 
-  return <I18nProvider lang={lang}>{children}</I18nProvider>;
+  return <I18nProvider _lang={lang}>{children}</I18nProvider>;
 }

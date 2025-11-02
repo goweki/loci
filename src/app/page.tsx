@@ -2,24 +2,23 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
-import { Language } from "@/lib/i18n";
+import { Language, languages } from "@/lib/i18n";
 
 export default function LanguageRedirector() {
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
-    let preferredLanguage: Language = "en";
-
     if (typeof window === "undefined") {
       return;
     }
 
+    let preferredLanguage: Language | null = null;
+
     try {
       let storedLanguage = localStorage.getItem("language_preference");
 
-      if (storedLanguage) {
-        preferredLanguage = (storedLanguage as Language) || "en";
+      if (languages.includes(storedLanguage as Language)) {
+        preferredLanguage = (storedLanguage as Language) || null;
       } else {
         localStorage.setItem("language_preference", "en");
         preferredLanguage = "en";
@@ -30,14 +29,9 @@ export default function LanguageRedirector() {
       preferredLanguage = "en";
     }
 
-    const targetPath = `/${preferredLanguage}${pathname}`;
-    const preferredPathStart = `/${preferredLanguage}`;
-
-    if (!pathname.startsWith(preferredPathStart)) {
-      console.log(`Redirecting from ${pathname} to ${targetPath}`);
-      router.replace(targetPath);
-    }
-  }, [pathname, router]);
+    const preferredPath = `/${preferredLanguage}`;
+    router.replace(preferredPath);
+  }, [router]);
 
   // This component doesn't render anything visible
   return null;

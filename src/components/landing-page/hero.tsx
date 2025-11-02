@@ -16,8 +16,35 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 
-export default function HeroSection() {
+export interface HeroProps {
+  supercharge: string;
+  customerEngagement: string;
+  description: string;
+  startTrial: string;
+  watchDemo: string;
+  unifiedMessaging: string;
+  unifiedMessagingDescription: string;
+  crm: string;
+  crmDescription: string;
+  fast: string;
+  fastDescription: string;
+}
+
+export default function HeroSection(props: HeroProps) {
   const pathname = usePathname();
+  const {
+    supercharge,
+    customerEngagement,
+    description,
+    startTrial,
+    watchDemo,
+    unifiedMessaging,
+    unifiedMessagingDescription,
+    crm,
+    crmDescription,
+    fast,
+    fastDescription,
+  } = props;
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
@@ -77,18 +104,16 @@ export default function HeroSection() {
 
           {/* Main headline */}
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
-            <span className="inline-block">Supercharge</span>
+            <span className="inline-block">{supercharge}</span>
             <br />
             <span className="bg-gradient-to-r from-cyan-600 via-purple-600 to-cyan-800 bg-clip-text text-transparent animate-gradient">
-              customer engagement
+              {customerEngagement}
             </span>
           </h1>
 
           {/* Subtitle */}
           <p className="mt-6 max-w-3xl mx-auto text-xl sm:text-2xl leading-relaxed text-gray-600 dark:text-gray-300 font-light">
-            Seamlessly manage WhatsApp communications and CRM in one powerful
-            platform — simplify workflows, build stronger relationships, and
-            scale with ease.
+            {description}
           </p>
 
           {/* CTA Buttons */}
@@ -100,13 +125,13 @@ export default function HeroSection() {
                 "text-lg bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-800 hover:to-cyan-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl group"
               )}
             >
-              Start Free Trial
+              {startTrial}
               <Zap className="ml-2 w-5 h-5 group-hover:animate-pulse" />
             </Link>
 
             <Button variant="secondary" className="hover:scale-105" size="lg">
               <Play className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform" />
-              Watch Demo
+              {watchDemo}
             </Button>
           </div>
 
@@ -115,18 +140,18 @@ export default function HeroSection() {
             {[
               {
                 icon: MessageCircle,
-                title: "Unified Messaging",
-                desc: "All WhatsApp chats in one dashboard",
+                title: unifiedMessaging,
+                desc: unifiedMessagingDescription,
               },
               {
                 icon: Users,
-                title: "Smart CRM",
-                desc: "Customer insights & automation",
+                title: crm,
+                desc: crmDescription,
               },
               {
                 icon: Zap,
-                title: "Lightning Fast",
-                desc: "Instant message delivery & responses",
+                title: fast,
+                desc: fastDescription,
               },
             ].map((feature, index) => (
               <div
@@ -143,30 +168,11 @@ export default function HeroSection() {
               </div>
             ))}
           </div>
-
-          {/* Social proof */}
-          <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Trusted by leading companies worldwide
-            </p>
-            <div className="flex items-center justify-center gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-              {["TechCorp", "StartupXYZ", "MegaBrand", "InnovateInc"].map(
-                (company, i) => (
-                  <div
-                    key={i}
-                    className="px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm font-medium"
-                  >
-                    {company}
-                  </div>
-                )
-              )}
-            </div>
-          </div>
         </div>
       </div>
 
       {/* Bottom fade effect */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-slate-900 to-transparent pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-bacground to-transparent pointer-events-none"></div>
 
       <style jsx>{`
         @keyframes float {

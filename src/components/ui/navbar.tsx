@@ -22,7 +22,7 @@ import Link from "next/link";
 import ThemeToggle from "./themeToggle";
 import LanguageToggle from "./language-toggle";
 import { usePathname } from "next/navigation";
-import { languages } from "@/lib/i18n";
+import { homePages, languages } from "@/lib/i18n";
 
 // Types
 export interface NavbarNavLink {
@@ -46,9 +46,7 @@ export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
 // Default navigation links
 const defaultNavigationLinks: NavbarNavLink[] = [
   { href: "/", label: "Home" },
-  { href: "/features", label: "Features" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/about", label: "About" },
 ];
 
 export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
@@ -69,22 +67,20 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     ref
   ) => {
     const [isMobile, setIsMobile] = useState(false);
+    const [isVisible, setIsVisible] = useState<boolean>(true);
     const containerRef = useRef<HTMLElement>(null);
     const pathname = usePathname();
 
-    const i18nPrefixes = languages.map((lang) => `/${lang}`);
-    console.log("i18nPrefixes - ", i18nPrefixes);
-
     const isActive = (href: string): boolean => {
       if (href === "/") {
-        return pathname === "/" || i18nPrefixes.includes(pathname);
+        return pathname === "/" || homePages.includes(pathname);
       }
 
       if (pathname.endsWith(href)) {
         return true;
       }
 
-      for (const prefix of i18nPrefixes) {
+      for (const prefix of homePages) {
         if (
           pathname.startsWith(prefix) &&
           pathname.substring(prefix.length).startsWith(href)
@@ -116,6 +112,27 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       };
     }, []);
 
+    useEffect(() => {
+      let lastScrollY = window.scrollY;
+
+      function controllNavBar() {
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY > lastScrollY && currentScrollY > 100) {
+          setIsVisible(false);
+        } else {
+          setIsVisible(true);
+        }
+        lastScrollY = currentScrollY;
+      }
+
+      window.addEventListener("scroll", controllNavBar);
+
+      return () => {
+        window.removeEventListener("scroll", controllNavBar);
+      };
+    }, []);
+
     // Combine refs
     const combinedRef = React.useCallback(
       (node: HTMLElement | null) => {
@@ -133,8 +150,9 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       <header
         ref={combinedRef}
         className={cn(
-          "sticky top-0 z-50 w-full border-b bg-popover/50 text-popover-foreground backdrop-blur px-4 md:px-6 [&_*]:no-underline",
-          className
+          "fixed top-0 z-50 w-full border-b bg-popover/50 text-popover-foreground backdrop-blur px-4 md:px-6 [&_*]:no-underline transition-transform duration-300",
+          className,
+          isVisible ? "translate-y-0" : "-translate-y-full"
         )}
         {...props}
       >
@@ -189,8 +207,8 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                   height={24}
                   width={24}
                 />
-                <span className="hidden font-bold text-xl sm:inline-block">
-                  loci
+                <span className="hidden font-bold text-xl md:inline-block">
+                  LOCi
                 </span>
               </Link>
               {/* Navigation menu */}
@@ -201,7 +219,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                       <NavigationMenuItem key={index}>
                         <Link
                           href={link.href}
-                          onClick={(e) => e.preventDefault()}
                           className={cn(
                             buttonVariants({ variant: "ghost" }),
                             isActive(link.href)

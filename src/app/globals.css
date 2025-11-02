@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 
-  Global theme variables use HSL so they integrate cleanly 
-  with Tailwind’s `hsl(var(--token))` syntax.
-*/
 :root {
   /* Light Theme */
   --background: 0 0% 100%;
@@ -23,8 +19,8 @@
   --secondary: 222.2 47.4% 11.2%;
   --secondary-foreground: 210 40% 98%;
 
-  --muted: 215 20.2% 65.1%;
-  --muted-foreground: 215 25% 95%;
+  --muted: 214, 32%, 91%;
+  --muted-foreground: 215, 25%, 27%;
 
   --accent: 190 90% 70%;
   --accent-foreground: 222.2 47.4% 11.2%;
@@ -64,8 +60,8 @@ html.dark {
   --secondary: 217 33% 17%;
   --secondary-foreground: 210 40% 98%;
 
-  --muted: 217 15% 35%;
-  --muted-foreground: 210 40% 80%;
+  --muted: 215, 25%, 27%;
+  --muted-foreground: 214, 32%, 91%;
 
   --accent: 190 90% 70%;
   --accent-foreground: 222.2 47.4% 11.2%;
@@ -106,7 +102,7 @@ html.dark {
   }
 
   h3 {
-    @apply text-xl mb-4 text-muted-foreground text-center;
+    @apply text-xl mb-4 opacity-80 text-center;
   }
 
   h4 {

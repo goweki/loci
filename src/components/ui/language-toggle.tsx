@@ -1,49 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useI18n } from "@/lib/i18n";
+import { languages, type Language } from "@/lib/i18n/i18n-settings"; // Adjust path
 import { Button } from "./button";
 import { Languages } from "lucide-react";
-import { Language } from "@/lib/i18n";
-import { useI18n } from "@/lib/i18n";
 
-export default function LanguageToggle() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [language, setLanguage] = useState<string>("en");
-  const [loading, setLoading] = useState<boolean>(true);
-  const lng: Language = useI18n();
+export default function LanguageSwitcher() {
+  const { language, setLanguage } = useI18n();
 
-  useEffect(() => {
-    const stored = localStorage.getItem("preferred-language");
-    const currentFromPath = pathname?.match(/^\/([a-z]{2})(?=\/|$)/)?.[1];
-    const currentLang = stored || currentFromPath || "en";
-    setLanguage(currentLang);
-    setLoading(false);
-  }, [pathname]);
+  const otherLang = languages.find((lang) => lang !== language) as Language;
 
-  const changeLanguage = (newLang: Language) => {
-    if (newLang === language) return;
-
-    // Update localStorage
-    localStorage.setItem("preferred-language", newLang);
-
-    // Replace locale prefix in URL
-    const newPath = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
-    router.push(`/${newLang}${newPath}`);
-
-    setLanguage(newLang);
+  const handleToggle = () => {
+    setLanguage(otherLang);
   };
 
-  const toggleLanguage = () => {
-    const nextLang: Language = language === "en" ? "sw" : "en";
-    changeLanguage(nextLang);
-  };
-
-  return !loading ? (
-    <Button onClick={toggleLanguage} variant="ghost" title="Toggle language">
+  return (
+    <Button variant="outline" onClick={handleToggle}>
       <Languages />
-      <span className="ml-2 uppercase">{language}</span>
     </Button>
-  ) : null;
+  );
 }

@@ -59,5 +59,65 @@
         "network": "Network error. Please try again later."
       }
     }
+  },
+  "landing": {
+    "hero": {
+      "supercharge": "Supercharge",
+      "customerEngagement": "Customer Engagement",
+      "description": "Seamlessly manage WhatsApp communications and CRM in one powerful platform — simplify workflows, build stronger relationships, and scale with ease.",
+      "startTrial": "Start free trial",
+      "watchDemo": "Watch Demo",
+      "features": {
+        "unifiedMessaging": "Unified Messaging",
+        "unifiedMessagingDescription": "All WhatsApp chats in one dashboard",
+        "crm": "Smart CRM",
+        "crmDescription": "Customer insights & automation",
+        "fast": "Lightning Fast",
+        "fastDescription": "Instant message delivery & responses"
+      }
+    }
+  },
+  "pricing": {
+    "title": "Simple, Transparent Pricing",
+    "subtitle": "Choose the perfect plan for your business needs. Upgrade, downgrade, or cancel anytime.",
+    "popular": "Most Popular",
+    "unlimited": "Unlimited",
+    "cta": "Get Started",
+    "billing": {
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "month": "month",
+      "year": "year",
+      "save": "Save",
+      "saveUp": "Save up to 17%"
+    },
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "description": "Perfect for small businesses just getting started with WhatsApp"
+      },
+      "standard": {
+        "name": "Standard",
+        "description": "Ideal for growing businesses with multiple customer touchpoints"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Advanced features for large organizations with high volume needs"
+      }
+    },
+    "features": {
+      "phoneNumbers": "Phone Numbers",
+      "messages": "Messages per Month",
+      "basicTemplates": "Message Templates",
+      "emailSupport": "Email Support",
+      "analytics": "Advanced Analytics",
+      "automation": "Automation & Chatbots",
+      "prioritySupport": "Priority Support",
+      "customIntegrations": "Custom API Integrations"
+    },
+    "footer": {
+      "text": "Need a custom plan for your organization?",
+      "contactLink": "Contact our sales team"
+    }
   }
 }

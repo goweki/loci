@@ -14,18 +14,38 @@ export const metadata = {
   },
 };
 
-import Hero from "@/components/landing-page/hero";
+import Hero, { HeroProps } from "@/components/landing-page/hero";
 import Features from "@/components/landing-page/features";
 import HowBlocks from "@/components/landing-page/how-blocks";
+import { getDictionary, Language } from "@/lib/i18n";
 
-export default async function Home() {
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ lang: Language }>;
+}) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
+
+  const heroProps: HeroProps = {
+    supercharge: dict.landing.hero.supercharge,
+    customerEngagement: dict.landing.hero.customerEngagement,
+    description: dict.landing.hero.description,
+    startTrial: dict.landing.hero.startTrial,
+    watchDemo: dict.landing.hero.watchDemo,
+    unifiedMessaging: dict.landing.hero.features.unifiedMessaging,
+    unifiedMessagingDescription:
+      dict.landing.hero.features.unifiedMessagingDescription,
+    crm: dict.landing.hero.features.crm,
+    crmDescription: dict.landing.hero.features.crmDescription,
+    fast: dict.landing.hero.features.fast,
+    fastDescription: dict.landing.hero.features.fastDescription,
+  };
+
   return (
     <main>
-      <Hero />
-      <Features />
+      <Hero {...heroProps} />
       <HowBlocks />
-      {/* <Testimonials /> */}
-      {/* <Newsletter /> */}
     </main>
   );
 }

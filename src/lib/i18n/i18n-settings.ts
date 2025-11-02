@@ -2,3 +2,5 @@
 export const languages = ["en", "sw"] as const;
 export type Language = (typeof languages)[number];
 export const defaultLng: Language = "en";
+
+export const LS_KEY = "preferred_language";

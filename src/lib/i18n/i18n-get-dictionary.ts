@@ -7,4 +7,4 @@ const dictionaries = {
   sw: () => import("./dictionaries/sw.json").then((module) => module.default),
 };
 
-export const getDictionary = async (locale: Language) => dictionaries[locale]();
+export const getDictionary = async (lang: Language) => dictionaries[lang]();
