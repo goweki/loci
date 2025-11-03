@@ -3,7 +3,7 @@
     "signin": {
       "title": "Karibu Tena",
       "subtitle": "Ingia ili kuendelea",
-      "emailLabel": "Anwani ya Barua Pepe",
+      "emailLabel": "Barua Pepe",
       "passwordLabel": "Nenosiri",
       "button": "Ingia",
       "google": "Endelea na Google",
@@ -15,7 +15,7 @@
       "title": "Unda Akaunti Yako",
       "subtitle": "Jiunge nasi leo uanze",
       "nameLabel": "Jina Kamili",
-      "emailLabel": "Anwani ya Barua Pepe",
+      "emailLabel": "Barua Pepe",
       "passwordLabel": "Nenosiri",
       "confirmPasswordLabel": "Thibitisha Nenosiri",
       "button": "Jisajili",
@@ -25,7 +25,7 @@
     "forgotPassword": {
       "title": "Umesahau Nenosiri?",
       "subtitle": "Weka barua pepe yako ili upokee kiungo cha kuweka upya",
-      "emailLabel": "Anwani ya Barua Pepe",
+      "emailLabel": "Barua Pepe",
       "button": "Tuma Kiungo",
       "backToSignIn": "Rudi kwenye ukurasa wa kuingia"
     },
@@ -41,7 +41,7 @@
       "title": "Wasiliana Nasi",
       "subtitle": "Tunafurahia kusikia kutoka kwako!",
       "nameLabel": "Jina Lako",
-      "emailLabel": "Barua Pepe Yako",
+      "emailLabel": "Barua Pepe",
       "messageLabel": "Ujumbe Wako",
       "button": "Tuma Ujumbe",
       "success": "Ujumbe umetumwa kwa mafanikio!",

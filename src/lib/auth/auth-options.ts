@@ -4,10 +4,11 @@ import GoogleProvider from "next-auth/providers/google";
 import db from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { NextAuthOptions } from "next-auth";
-import { createUser, getUserByEmail } from "@/data/user";
+import { createUser, getUserByEmail, getUserByKey } from "@/data/user";
 import { UserStatus } from "@prisma/client";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
 import { Status as SubscriptionStatus } from "@/data/subscription";
+import { createAccount, upsertAccount } from "@/data/account";
 
 if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("NEXTAUTH_SECRET is not set in environment variables");
@@ -20,15 +21,15 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        username: { label: "Username", type: "email" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password)
+        if (!credentials?.username || !credentials?.password)
           throw new Error("Missing credentials");
 
-        const user = await getUserByEmail(credentials.email);
-        if (!user) throw new Error("User not found");
+        const user = await getUserByKey(credentials.username);
+        if (!user) throw new Error("Invalid credentials"); //User not found
 
         if (user.status === UserStatus.SUSPENDED)
           throw new Error("Account suspended");
@@ -67,9 +68,8 @@ export const authOptions: NextAuthOptions = {
 
   // --- Page routes ---
   pages: {
-    signIn: "/auth/signin",
-    signOut: "/auth/signout",
-    error: "/auth/error",
+    signIn: "/sign-in",
+    signOut: "/sign-out",
     verifyRequest: "/auth/verify-request",
     newUser: "/auth/new-user",
   },
@@ -140,8 +140,16 @@ export const authOptions: NextAuthOptions = {
      * Sign-in callback: ensure Google users exist and are initialized.
      */
     async signIn({ user, account, profile }) {
+      console.log(
+        "SIGN IN ATTEMPT",
+        `user-${JSON.stringify(user)}`,
+        `account-${JSON.stringify(account)}`,
+        `profile-${JSON.stringify(profile)}`
+      );
+
       try {
         if (account?.provider === "google" && profile?.email) {
+          // 1️⃣ Find or create local user
           let localUser = await getUserByEmail(profile.email);
 
           if (!localUser) {
@@ -152,7 +160,21 @@ export const authOptions: NextAuthOptions = {
             });
           }
 
-          // Ensure Google user has subscription defaults
+          // Ensure linkage
+          await upsertAccount(localUser.id, {
+            user: { connect: { id: localUser.id } },
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+            type: account.type,
+            access_token: account.access_token,
+            token_type: account.token_type,
+            scope: account.scope,
+            id_token: account.id_token,
+            expires_at: account.expires_at,
+            refresh_token: account.refresh_token,
+          });
+
+          // 3️⃣ Load subscription details and attach to session user
           const subscription = await getSubscriptionStatusByUserId(
             localUser.id
           );

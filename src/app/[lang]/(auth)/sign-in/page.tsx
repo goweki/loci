@@ -1,5 +1,5 @@
 import AuthLayout, { AuthLayoutCopy } from "@/components/layouts/authLayout";
-import { SignInForm } from "@/components/forms/signin-form";
+import { SignInForm } from "@/components/forms/auth/signin-form";
 import { Language } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n";
 

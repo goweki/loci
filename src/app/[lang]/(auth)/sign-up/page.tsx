@@ -1,8 +1,8 @@
 import AuthLayout, { AuthLayoutCopy } from "@/components/layouts/authLayout";
-import { SignInForm } from "@/components/forms/signin-form";
+import { SignInForm } from "@/components/forms/auth/signin-form";
 import { Language } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n";
-import { SignUpForm } from "@/components/forms/signup-form";
+import { SignUpForm } from "@/components/forms/auth/signup-form";
 
 export default async function SignInPage({
   params,

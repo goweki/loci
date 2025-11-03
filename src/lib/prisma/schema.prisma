@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,29 +8,27 @@ datasource db {
 }
 
 model User {
-  id            String     @id @default(cuid())
+  id            String          @id @default(cuid())
   name          String?
-  email         String     @unique
+  email         String          @unique
   emailVerified DateTime?
   image         String?
   password      String?
-  role          UserRole   @default(USER)
-  status        UserStatus @default(ACTIVE)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-
-  accounts      Account[]
-  sessions      Session[]
-  subscriptions Subscription[]
-  phoneNumbers  PhoneNumber[]
-  messages      Message[]
-  contacts      Contact[]
+  role          UserRole        @default(USER)
+  status        UserStatus      @default(ACTIVE)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
   AutoReplyRule AutoReplyRule[]
+  accounts      Account[]
+  contacts      Contact[]
+  messages      Message[]
+  phoneNumbers  PhoneNumber[]
+  subscriptions Subscription[]
+  sessions      Session[]
 
   @@map("users")
 }
 
-// only used when session is database, not jwt
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -60,67 +52,62 @@ model Subscription {
   id         String    @id @default(cuid())
   userId     String
   planId     String
-  startDate  DateTime
-  cancelDate DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
-
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan     Plan      @relation(fields: [planId], references: [id])
-  payments Payment[]
+  cancelDate DateTime?
+  startDate  DateTime
+  payments   Payment[]
+  plan       Plan      @relation(fields: [planId], references: [id])
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("subscriptions")
 }
 
 model Payment {
-  id            String        @id @default(cuid())
-  reference     String
-  paymentMethod PaymentMethod @default(ONLINE)
-
+  id             String        @id @default(cuid())
+  reference      String
+  paymentMethod  PaymentMethod @default(ONLINE)
   subscriptionId String
-  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  subscription   Subscription  @relation(fields: [subscriptionId], references: [id])
 }
 
 model Plan {
-  id                  String       @id @default(cuid())
-  name                PlanName
-  interval            PlanInterval
+  id                  String         @id @default(cuid())
   description         String?
   price               Int
+  interval            PlanInterval
   maxPhoneNumbers     Int
   maxMessagesPerMonth Int
-  active              Boolean      @default(true)
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
-
-  subscriptions Subscription[]
-  features      PlanFeature[]
+  active              Boolean        @default(true)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  name                PlanName
+  features            PlanFeature[]
+  subscriptions       Subscription[]
 
   @@map("plans")
 }
 
 model Feature {
-  id          String   @id @default(cuid())
-  name        String   @unique
+  id          String        @id @default(cuid())
+  name        String        @unique
   description String
-  useMetric   String //eg: queries,messages,calls,..
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  plans PlanFeature[]
+  useMetric   String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  plans       PlanFeature[]
 }
 
 model PlanFeature {
   planId      String
   featureId   String
   enabled     Boolean  @default(true)
-  limitUse    Int? // numeric limit, e.g. "1000 messages"
-  configValue String? // text config, e.g. "high" or "enterprise-only"
+  limitUse    Int?
+  configValue String?
   createdAt   DateTime @default(now())
-
-  plan    Plan    @relation(fields: [planId], references: [id], onDelete: Cascade)
-  feature Feature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  feature     Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  plan        Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
 
   @@id([planId, featureId])
   @@map("plan_features")
@@ -131,15 +118,14 @@ model PhoneNumber {
   userId        String
   phoneNumber   String            @unique
   displayName   String?
-  wabaId        String? // WhatsApp Business Account ID
-  phoneNumberId String? // WhatsApp Phone Number ID
+  wabaId        String?
+  phoneNumberId String?
   status        PhoneNumberStatus @default(PENDING)
   verifiedAt    DateTime?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
-
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages Message[]
+  messages      Message[]
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("phone_numbers")
 }
@@ -153,9 +139,8 @@ model Contact {
   lastMessageAt DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages Message[]
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages      Message[]
 
   @@unique([userId, phoneNumber])
   @@map("contacts")
@@ -166,54 +151,45 @@ model Message {
   userId        String
   contactId     String
   phoneNumberId String
-  waMessageId   String? // WhatsApp Message ID
+  waMessageId   String?
   type          MessageType
-  content       Json // Flexible content structure
+  content       Json
   direction     MessageDirection
   status        MessageStatus    @default(SENT)
   timestamp     DateTime
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
-
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  contact     Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  phoneNumber PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+  contact       Contact          @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  phoneNumber   PhoneNumber      @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("messages")
 }
 
 model MessageUnprocessed {
   id          String   @id @default(cuid())
-  waMessageId String // WhatsApp message ID
-  payload     Json // Full WhatsApp payload
-  error       String // Error message
+  waMessageId String
+  payload     Json
+  error       String
   retryCount  Int      @default(0)
   nextRetry   DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-enum TriggerType {
-  KEYWORD // Match specific keywords in message
-  MESSAGE_TYPE // Match by WhatsApp message type (text, image, video, etc.)
-  DEFAULT // Fallback when no rule matches
-  TIME_BASED // (Optional) Trigger during specific time windows
-}
-
 model AutoReplyRule {
   id           String      @id @default(cuid())
   userId       String
   name         String
-  active       Boolean     @default(true)
   triggerType  TriggerType
-  triggerValue String? // Keyword or type (depends on triggerType)
+  triggerValue String?
   replyMessage String
   isActive     Boolean     @default(true)
   priority     Int         @default(0)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  active       Boolean     @default(true)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model WebhookEvent {
@@ -226,7 +202,31 @@ model WebhookEvent {
   @@map("webhook_events")
 }
 
-// Enums
+model Account {
+  id                String      @id @default(cuid())
+  userId            String
+  type              AccountType
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+enum TriggerType {
+  KEYWORD
+  MESSAGE_TYPE
+  DEFAULT
+  TIME_BASED
+}
 
 enum PlanName {
   BASIC
@@ -243,6 +243,13 @@ enum UserStatus {
   ACTIVE
   SUSPENDED
   INACTIVE
+}
+
+enum AccountType {
+  oauth
+  oidc
+  email
+  credentials
 }
 
 enum PlanInterval {
@@ -281,29 +288,7 @@ enum MessageStatus {
 
 enum PaymentMethod {
   ONLINE
+  OTHER
   MPESA
   CASH
-  OTHER
-}
-
-// If using NextAuth.js, add these models:
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@map("accounts")
 }

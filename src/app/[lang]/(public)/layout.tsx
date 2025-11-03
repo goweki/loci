@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import Footer from "@/components/ui/footer";
 import { Navbar, NavbarNavLink } from "@/components/ui/navbar";
-import { getDictionary, Language } from "@/lib/i18n";
+import { getDictionary, isValidLanguage, Language } from "@/lib/i18n";
 
 export default async function UnAuthLayout({
   params,
@@ -19,6 +19,9 @@ export default async function UnAuthLayout({
   }
 
   const { lang } = await params;
+
+  if (!isValidLanguage(lang)) return null;
+
   const dict = await getDictionary(lang);
 
   const navigationLinks: NavbarNavLink[] = [

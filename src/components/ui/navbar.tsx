@@ -22,7 +22,7 @@ import Link from "next/link";
 import ThemeToggle from "./themeToggle";
 import LanguageToggle from "./language-toggle";
 import { usePathname } from "next/navigation";
-import { homePages, languages } from "@/lib/i18n";
+import { homePages, languages, useI18n } from "@/lib/i18n";
 
 // Types
 export interface NavbarNavLink {
@@ -70,6 +70,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     const [isVisible, setIsVisible] = useState<boolean>(true);
     const containerRef = useRef<HTMLElement>(null);
     const pathname = usePathname();
+    const { language } = useI18n();
 
     const isActive = (href: string): boolean => {
       if (href === "/") {
@@ -202,7 +203,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                 className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer"
               >
                 <Image
-                  src="/images/logo_symbol.svg"
+                  src="/brand/logo_symbol.svg"
                   alt="logo"
                   height={24}
                   width={24}
@@ -240,13 +241,13 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
             <LanguageToggle />
             <ThemeToggle variant="outline" />
             <Link
-              href={signInHref}
+              href={"/" + language + signInHref}
               className={cn(buttonVariants({ variant: "outline" }))}
             >
               {signInText}
             </Link>
             <Link
-              href={ctaHref}
+              href={"/" + language + ctaHref}
               className={cn(buttonVariants({ variant: "default" }))}
             >
               {ctaText}

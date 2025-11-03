@@ -4,9 +4,9 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { SideBanner } from "./banner";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { SideBanner } from "./_banner";
 import {
   emailValidator,
   institutionNameValidator,
@@ -14,7 +14,7 @@ import {
   nameValidator,
 } from "@/lib/utils/inputValidators";
 import Link from "next/link";
-import Loader from "../ui/loaders";
+import Loader from "@/components/ui/loaders";
 
 export default function RegisterForm() {
   const router = useRouter();

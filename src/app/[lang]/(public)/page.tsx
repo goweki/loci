@@ -19,12 +19,13 @@ import Features from "@/components/landing-page/features";
 import HowBlocks from "@/components/landing-page/how-blocks";
 import { getDictionary, Language } from "@/lib/i18n";
 
-export default async function Home({
+export default async function Landing({
   params,
 }: {
   params: Promise<{ lang: Language }>;
 }) {
   const { lang } = await params;
+  console.log("lang-", lang);
   const dict = await getDictionary(lang);
 
   const heroProps: HeroProps = {

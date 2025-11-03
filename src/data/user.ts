@@ -54,6 +54,17 @@ export async function getUserByEmail(email: string): Promise<User | null> {
 }
 
 /**
+ * Find a user by key attribute.
+ */
+export async function getUserByKey(key: string): Promise<User | null> {
+  return db.user.findFirst({
+    where: {
+      OR: [{ email: key }, { id: key }],
+    },
+  });
+}
+
+/**
  * Get all users (paginated).
  */
 export async function getAllUsers(skip = 0, take = 20): Promise<User[]> {

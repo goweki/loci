@@ -1,4 +1,4 @@
-import { SideBanner } from "../forms/banner";
+import { SideBanner } from "../forms/auth/_banner";
 import { BrandSymbol } from "../ui/brand";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -29,7 +29,7 @@ export default async function AuthLayout({
   }
 
   return (
-    <section className="min-h-screen flex items-stretch">
+    <section className="min-h-screen flex items-stretch bg-popover">
       <Link
         href="/"
         className={cn(
