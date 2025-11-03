@@ -2,18 +2,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import db from "@/lib/prisma";
-import { signJWT } from "@/lib/auth/jwt";
 import { registerSchema } from "@/lib/validations";
+import { createUser, getUserByEmail } from "@/data/user";
+
+const SALT_ROUNDS_string = process.env.BCRYPT_SALT_ROUNDS || "10";
 
 export async function POST(request: NextRequest) {
+  const SALT_ROUNDS = parseInt(SALT_ROUNDS_string);
+
   try {
     const body = await request.json();
     const { email, password, name } = registerSchema.parse(body);
 
     // Check if user exists
-    const existingUser = await db.user.findUnique({
-      where: { email },
-    });
+    const existingUser = await getUserByEmail(email);
 
     if (existingUser) {
       return NextResponse.json(
@@ -23,27 +25,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     // Create user
-    const user = await db.user.create({
-      data: {
-        email,
-        name,
-        password: hashedPassword,
-        role: "USER",
-        status: "ACTIVE",
-      },
+    const user = await createUser({
+      email,
+      name,
+      password: hashedPassword,
     });
 
-    // Generate JWT
-    const token = signJWT({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    });
-
-    const response = NextResponse.json({
+    return NextResponse.json({
       user: {
         id: user.id,
         email: user.email,
@@ -51,17 +42,6 @@ export async function POST(request: NextRequest) {
         role: user.role,
       },
     });
-
-    response.cookies.set({
-      name: "auth-token",
-      value: token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60,
-    });
-
-    return response;
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(

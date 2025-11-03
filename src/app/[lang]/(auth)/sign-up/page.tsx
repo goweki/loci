@@ -4,7 +4,7 @@ import { Language } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n";
 import { SignUpForm } from "@/components/forms/auth/signup-form";
 
-export default async function SignInPage({
+export default async function SignUpPage({
   params,
 }: {
   params: Promise<{ lang: Language }>;
@@ -19,7 +19,11 @@ export default async function SignInPage({
         subtitle: dict.auth.signin.subtitle,
       }}
     >
-      <SignUpForm />
+      <SignUpForm
+        emailLabel={dict.auth.signin.emailLabel}
+        passwordLabel={dict.auth.signin.passwordLabel}
+        submitLabel={dict.auth.signin.button}
+      />
     </AuthLayout>
   );
 }

@@ -3,7 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import db from "@/lib/prisma";
-import { WhatsAppClient } from "@/lib/whatsapp";
+import { whatsapp } from "@/lib/whatsapp";
+import { getSubscriptionStatusByUserId } from "@/data/subscription";
+import { countMessagesThisMonth } from "@/data/message";
+import { validatePhoneNumberOwnership } from "@/data/phoneNumber";
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -41,42 +44,56 @@ export async function POST(request: NextRequest) {
   const { phoneNumberId, to, type, content } = body;
 
   // Validate phone number ownership
-  const phoneNumber = await db.phoneNumber.findFirst({
-    where: {
-      id: phoneNumberId,
-      userId: session.user.id,
-      status: "VERIFIED",
-    },
-  });
+  const phoneNumber = await validatePhoneNumberOwnership(
+    phoneNumberId,
+    session.user.id
+  );
 
   if (!phoneNumber) {
     return new NextResponse("Phone number not found", { status: 404 });
   }
 
   // Check subscription limits
-  const subscription = await db.subscription.findUnique({
-    where: { userId: session.user.id },
-    include: { plan: true },
-  });
+  let messageLimit = 0;
 
-  if (!subscription || subscription.status !== "ACTIVE") {
-    return new NextResponse("Active subscription required", { status: 402 });
+  const subscriptionStatus = await getSubscriptionStatusByUserId(
+    session.user.id
+  );
+
+  if (!subscriptionStatus.plan) {
+    if (subscriptionStatus.status === "TRIALING") {
+      messageLimit = 10;
+    } else
+      return NextResponse.json(
+        { error: "No active subscription found" },
+        { status: 402 }
+      );
+  } else {
+    const { plan } = subscriptionStatus;
+    messageLimit = plan.maxMessagesPerMonth;
+  }
+
+  // check against limit
+  const sentMessages = await countMessagesThisMonth(session.user.id);
+  if (sentMessages > messageLimit) {
+    return NextResponse.json(
+      {
+        error: "Message limit exceeded for your current plan.",
+        limit: messageLimit,
+        used: sentMessages,
+      },
+      { status: 403 }
+    );
   }
 
   // Send message via WhatsApp API
-  const whatsappClient = new WhatsAppClient({
-    accessToken: process.env.WHATSAPP_ACCESS_TOKEN!,
-    phoneNumberId: phoneNumber.phoneNumberId!,
-    wabaId: phoneNumber.wabaId!,
-    verifyToken: process.env.WEBHOOK_VERIFY_TOKEN!,
-  });
 
   try {
     let waResponse;
     if (type === "text") {
-      waResponse = await whatsappClient.sendTextMessage(to, content.text);
+      waResponse = await whatsapp.sendTextMessage(to, content.text);
     } else if (type === "image") {
-      waResponse = await whatsappClient.sendMediaMessage(
+      waResponse = await whatsapp.sendMediaMessage(
         to,
         "image",
         content.url,

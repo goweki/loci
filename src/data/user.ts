@@ -17,6 +17,7 @@ export async function createUser(data: {
   name?: string;
   email: string;
   role?: UserRole;
+  password?: string;
   status?: UserStatus;
   image?: string;
 }): Promise<User> {
@@ -24,6 +25,7 @@ export async function createUser(data: {
     data: {
       name: data.name ?? null,
       email: data.email,
+      password: data.password ?? null,
       image: data.image ?? null,
       role: data.role ?? UserRole.USER,
       status: data.status ?? UserStatus.ACTIVE,

@@ -1,8 +1,10 @@
 // app/api/webhooks/whatsapp/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
 import { processIncomingMessage } from "@/lib/waMessageProcessor";
 
+// Verification
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const mode = searchParams.get("hub.mode");

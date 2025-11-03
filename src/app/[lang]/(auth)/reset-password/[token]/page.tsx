@@ -1,37 +1,30 @@
-import AuthLayout from "@/components/layouts/authLayout";
-import SetPasswordForm from "@/components/forms/set-password-form";
-import { redirect } from "next/navigation";
+import AuthLayout, { AuthLayoutCopy } from "@/components/layouts/authLayout";
+import { SignInForm } from "@/components/forms/auth/signin-form";
+import { Language } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n";
+import { ForgotPasswordForm } from "@/components/forms/auth/forgot-password";
+import { SetPasswordForm } from "@/components/forms/auth/set-password-form";
 
-export default async function ResetPasswordPage({
+export default async function ForgotPasswordPage({
   params,
-  searchParams,
 }: {
-  params: Promise<{ token: string }>;
-  searchParams: Promise<{ [key: string]: string }>;
+  params: Promise<{ lang: Language }>;
 }) {
-  const { token: _token } = await params;
-  const { error: _qp_error, _email } = await searchParams;
-
-  if (!_token || !_email) {
-    console.log(
-      `Missing auth values - ${!_token ? "token," : ""} ${
-        !_email ? "email" : ""
-      }`
-    );
-    redirect(`/reset-password`);
-  }
-
-  const paramsObj = await searchParams;
-  const error_ =
-    typeof paramsObj?.error === "string" ? paramsObj?.error : undefined;
-  const qParamsErrors: Record<string, string> = qParamsErrorsJson;
-  const errorMessage = error_
-    ? qParamsErrors[error_ as keyof typeof qParamsErrors] ?? undefined
-    : undefined;
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
 
   return (
-    <AuthLayout copy={authCopy.setPassword}>
-      <SetPasswordForm email={email_} token={token} error={errorMessage} />
+    <AuthLayout
+      copy={{
+        title: dict.auth.signin.title,
+        subtitle: dict.auth.signin.subtitle,
+      }}
+    >
+      <SetPasswordForm
+        emailLabel={dict.auth.signin.emailLabel}
+        passwordLabel={dict.auth.signin.passwordLabel}
+        submitLabel={dict.auth.signin.button}
+      />
     </AuthLayout>
   );
 }

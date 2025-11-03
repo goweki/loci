@@ -22,7 +22,14 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/ui/loaders";
 import AuthErrorHandler, { ERROR_MESSAGES } from "./_errorHandler";
-import { loginSchema } from "@/lib/validations";
+
+const formSchema = z.object({
+  username: z.email({ message: "Please enter a valid email address" }),
+  password: z
+    .string()
+    .min(5, { message: "Password must be at least 5 characters" })
+    .max(16, { message: "Password must be less than 16 characters" }),
+});
 
 interface SignInProps {
   emailLabel: string;
@@ -30,23 +37,19 @@ interface SignInProps {
   submitLabel: string;
 }
 
-export function SignInForm(copy: SignInProps) {
+export function ForgotPasswordForm(copy: SignInProps) {
   const { emailLabel, passwordLabel, submitLabel } = copy;
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-    },
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { username: "", password: "" },
   });
 
-  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
-
     const { username, password } = values;
 
     const result = await signIn("credentials", {
@@ -60,9 +63,10 @@ export function SignInForm(copy: SignInProps) {
     if (result?.error) {
       const error_ =
         typeof result.error === "string" ? result.error : undefined;
-      const errorMessage = error_
-        ? ERROR_MESSAGES[error_ as keyof typeof ERROR_MESSAGES] ?? error_
-        : "Failed to sign in. Try again later";
+      const errorMessage =
+        error_ && ERROR_MESSAGES[error_ as keyof typeof ERROR_MESSAGES]
+          ? ERROR_MESSAGES[error_ as keyof typeof ERROR_MESSAGES]
+          : "Failed to sign in. Try again later";
       toast.error(errorMessage);
     } else {
       router.push("/dashboard");
@@ -88,6 +92,8 @@ export function SignInForm(copy: SignInProps) {
           </div>
           <p className="text-mute-foreground">or use your credentials:</p>
         </div>
+
+        {/* Username */}
         <FormField
           control={form.control}
           name="username"
@@ -105,52 +111,53 @@ export function SignInForm(copy: SignInProps) {
             </FormItem>
           )}
         />
+
+        {/* Password */}
         <FormField
           control={form.control}
           name="password"
-          render={({ field }) => {
-            return (
-              <FormItem>
-                <div className="relative">
-                  <FormControl>
-                    <InputWithIcon
-                      icon={Lock}
-                      type={showPassword ? "text" : "password"}
-                      {...field}
-                      className="pr-10"
-                    />
-                  </FormControl>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-0 top-0 h-full px-3"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                <FormMessage />
-              </FormItem>
-            );
-          }}
+          render={({ field }) => (
+            <FormItem>
+              <div className="relative">
+                <FormControl>
+                  <InputWithIcon
+                    icon={Lock}
+                    type={showPassword ? "text" : "password"}
+                    {...field}
+                    className="pr-10"
+                  />
+                </FormControl>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-0 top-0 h-full px-3"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
         />
+
         <div className="py-4">
           <Button type="submit" className="w-full" disabled={loading}>
             {!loading ? submitLabel : <Loader />}
           </Button>
         </div>
+
         <hr className="my-6 border-t" />
         <div className="flex flex-row justify-between italic text-xs">
-          <Link href="/register" className="flex w-fit hover:underline">
+          <Link href="/register" className="hover:underline">
             No account? Register
           </Link>
-
-          <Link href="/reset-password" className="flex w-fit hover:underline">
+          <Link href="/reset-password" className="hover:underline">
             Forgot Password? Reset
           </Link>
         </div>
