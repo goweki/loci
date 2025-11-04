@@ -1,0 +1,128 @@
+{
+  "auth": {
+    "signin": {
+      "title": "Karibu Tena",
+      "subtitle": "Ingia ili kuendelea",
+      "emailLabel": "Barua Pepe",
+      "passwordLabel": "Nenosiri",
+      "button": "Ingia",
+      "google": "Endelea na Google",
+      "forgotPassword": "Umesahau nenosiri?",
+      "noAccount": "Huna akaunti?",
+      "signupLink": "Unda Akaunti"
+    },
+    "signup": {
+      "title": "Unda Akaunti Yako",
+      "subtitle": "Jiunge nasi leo uanze",
+      "nameLabel": "Jina Kamili",
+      "emailLabel": "Barua Pepe",
+      "passwordLabel": "Nenosiri",
+      "confirmPasswordLabel": "Thibitisha Nenosiri",
+      "button": "Jisajili",
+      "alreadyHaveAccount": "Tayari una akaunti?",
+      "signinLink": "Ingia"
+    },
+    "forgotPassword": {
+      "title": "Umesahau Nenosiri?",
+      "subtitle": "Weka barua pepe yako ili upokee kiungo cha kuweka upya",
+      "emailLabel": "Barua Pepe",
+      "button": "Tuma Kiungo",
+      "backToSignIn": "Rudi kwenye ukurasa wa kuingia"
+    },
+    "resetPassword": {
+      "title": "Weka Upya Nenosiri",
+      "subtitle": "Weka nenosiri jipya hapa chini",
+      "passwordLabel": "Nenosiri Jipya",
+      "confirmPasswordLabel": "Thibitisha Nenosiri Jipya",
+      "button": "Weka Upya Nenosiri",
+      "success": "Umefanikiwa kuweka upya nenosiri. Sasa unaweza kuingia."
+    },
+    "contactUs": {
+      "title": "Wasiliana Nasi",
+      "subtitle": "Tunafurahia kusikia kutoka kwako!",
+      "nameLabel": "Jina Lako",
+      "emailLabel": "Barua Pepe",
+      "messageLabel": "Ujumbe Wako",
+      "button": "Tuma Ujumbe",
+      "success": "Ujumbe umetumwa kwa mafanikio!",
+      "error": "Imeshindikana kutuma ujumbe. Tafadhali jaribu tena baadaye."
+    },
+    "common": {
+      "logout": "Toka",
+      "successLogin": "Umeingia kwa mafanikio.",
+      "successLogout": "Umetoka kwa mafanikio.",
+      "errors": {
+        "invalidEmail": "Tafadhali weka anwani halali ya barua pepe.",
+        "requiredField": "Sehemu hii inahitajika.",
+        "passwordMismatch": "Manenosiri hayafanani.",
+        "incorrectCredentials": "Barua pepe au nenosiri si sahihi.",
+        "network": "Hitilafu ya mtandao. Tafadhali jaribu tena baadaye."
+      }
+    }
+  },
+  "landing": {
+    "hero": {
+      "supercharge": "Boresha",
+      "customerEngagement": "Mwingiliano na wateja",
+      "description": "Simamia mawasiliano ya WhatsApp na CRM kwa urahisi katika jukwaa moja lenye nguvu — rahisisha kazi zako, jenga uhusiano imara zaidi, na kukuza biashara yako kwa urahisi.",
+      "startTrial": "Anza Jaribio la Bure",
+      "watchDemo": "Mfano wa Matumizi",
+      "features": {
+        "unifiedMessaging": "Ujumbe Uliounganishwa",
+        "unifiedMessagingDescription": "Gumzo zote za Kibiashara katika jukwaa moja",
+        "crm": "CRM Mahiri",
+        "crmDescription": "Uelewa wa wateja na uendeshaji wa kiotomatiki",
+        "fast": "Haraka Kama Umeme",
+        "fastDescription": "Ufikishaji na majibu ya ujumbe papo hapo"
+      }
+    }
+  },
+  "pricing": {
+    "title": "Bei Rahisi na Wazi",
+    "subtitle": "Chagua mpango kamili kwa mahitaji ya biashara yako. Ongeza daraja, punguza, au ghairi wakati wowote.",
+    "popular": "Inayopendelewa",
+    "unlimited": "Bila Kikomo",
+    "cta": "Anza Sasa",
+    "billing": {
+      "monthly": "Kila Mwezi",
+      "annual": "Kila Mwaka",
+      "month": "mwezi",
+      "year": "mwaka",
+      "save": "Okoa",
+      "saveUp": "Okoa hadi 17%"
+    },
+    "plans": {
+      "starter": {
+        "name": "Mwanzo",
+        "description": "Kamili kwa biashara ndogo zinazoanza na WhatsApp"
+      },
+      "standard": {
+        "name": "Wastani",
+        "description": "Bora kwa biashara zinazokua na mahali pa kuwasiliana na wateja wengi"
+      },
+      "enterprise": {
+        "name": "Makampuni",
+        "description": "Vipengele vya juu kwa mashirika makubwa yenye mahitaji ya kiasi kikubwa"
+      }
+    },
+    "features": {
+      "phoneNumbers": "Namba za Simu",
+      "messages": "Ujumbe Kwa Mwezi",
+      "basicTemplates": "Violezo vya Ujumbe",
+      "emailSupport": "Msaada wa Barua Pepe",
+      "analytics": "Takwimu za Hali ya Juu",
+      "automation": "Otomatiki na Chatbots",
+      "prioritySupport": "Msaada wa Kipaumbele",
+      "customIntegrations": "Uunganisho wa API Maalum"
+    },
+    "footer": {
+      "text": "Unahitaji mpango maalum kwa shirika lako?",
+      "contactLink": "Wasiliana na timu yetu ya mauzo"
+    }
+  },
+  "navbar": {
+    "home": "Mwanzo",
+    "pricing": "Bei",
+    "cta": "Anza Kutumia"
+  }
+}

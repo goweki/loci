@@ -1,0 +1,128 @@
+{
+  "auth": {
+    "signin": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to continue",
+      "emailLabel": "Email Address",
+      "passwordLabel": "Password",
+      "button": "Sign In",
+      "google": "Continue with Google",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Create Account"
+    },
+    "signup": {
+      "title": "Create Your Account",
+      "subtitle": "Join us today and get started",
+      "nameLabel": "Full Name",
+      "emailLabel": "Email Address",
+      "passwordLabel": "Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "button": "Sign Up",
+      "alreadyHaveAccount": "Already have an account?",
+      "signinLink": "Sign In"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password?",
+      "subtitle": "Enter your email to receive a reset link",
+      "emailLabel": "Email Address",
+      "button": "Send Reset Link",
+      "backToSignIn": "Back to Sign In"
+    },
+    "resetPassword": {
+      "title": "Reset Your Password",
+      "subtitle": "Enter a new password below",
+      "passwordLabel": "New Password",
+      "confirmPasswordLabel": "Confirm New Password",
+      "button": "Reset Password",
+      "success": "Password reset successful. You can now sign in."
+    },
+    "contactUs": {
+      "title": "Contact Us",
+      "subtitle": "We’d love to hear from you!",
+      "nameLabel": "Your Name",
+      "emailLabel": "Your Email",
+      "messageLabel": "Your Message",
+      "button": "Send Message",
+      "success": "Message sent successfully!",
+      "error": "Failed to send message. Please try again later."
+    },
+    "common": {
+      "logout": "Log Out",
+      "successLogin": "Successfully signed in.",
+      "successLogout": "Successfully logged out.",
+      "errors": {
+        "invalidEmail": "Please enter a valid email address.",
+        "requiredField": "This field is required.",
+        "passwordMismatch": "Passwords do not match.",
+        "incorrectCredentials": "Incorrect email or password.",
+        "network": "Network error. Please try again later."
+      }
+    }
+  },
+  "landing": {
+    "hero": {
+      "supercharge": "Supercharge",
+      "customerEngagement": "Customer Engagement",
+      "description": "Seamlessly manage WhatsApp communications and CRM in one powerful platform — simplify workflows, build stronger relationships, and scale with ease.",
+      "startTrial": "Start free trial",
+      "watchDemo": "Watch Demo",
+      "features": {
+        "unifiedMessaging": "Unified Messaging",
+        "unifiedMessagingDescription": "All WhatsApp chats in one dashboard",
+        "crm": "Smart CRM",
+        "crmDescription": "Customer insights & automation",
+        "fast": "Lightning Fast",
+        "fastDescription": "Instant message delivery & responses"
+      }
+    }
+  },
+  "pricing": {
+    "title": "Simple, Transparent Pricing",
+    "subtitle": "Choose the perfect plan for your business needs. Upgrade, downgrade, or cancel anytime.",
+    "popular": "Most Popular",
+    "unlimited": "Unlimited",
+    "cta": "Get Started",
+    "billing": {
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "month": "month",
+      "year": "year",
+      "save": "Save",
+      "saveUp": "Save up to 17%"
+    },
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "description": "Perfect for small businesses just getting started with WhatsApp"
+      },
+      "standard": {
+        "name": "Standard",
+        "description": "Ideal for growing businesses with multiple customer touchpoints"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Advanced features for large organizations with high volume needs"
+      }
+    },
+    "features": {
+      "phoneNumbers": "Phone Numbers",
+      "messages": "Messages per Month",
+      "basicTemplates": "Message Templates",
+      "emailSupport": "Email Support",
+      "analytics": "Advanced Analytics",
+      "automation": "Automation & Chatbots",
+      "prioritySupport": "Priority Support",
+      "customIntegrations": "Custom API Integrations"
+    },
+    "footer": {
+      "text": "Need a custom plan for your organization?",
+      "contactLink": "Contact our sales team"
+    }
+  },
+  "navbar": {
+    "home": "Home",
+    "pricing": "Pricing",
+    "cta": "Get Started"
+  }
+}

@@ -1,0 +1,313 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          UserRole        @default(USER)
+  status        UserStatus      @default(ACTIVE)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  AutoReplyRule AutoReplyRule[]
+  accounts      Account[]
+  contacts      Contact[]
+  messages      Message[]
+  phoneNumbers  PhoneNumber[]
+  subscriptions Subscription[]
+  sessions      Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Subscription {
+  id         String    @id @default(cuid())
+  userId     String
+  planId     String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  cancelDate DateTime?
+  startDate  DateTime
+  payments   Payment[]
+  plan       Plan      @relation(fields: [planId], references: [id])
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("subscriptions")
+}
+
+model Payment {
+  id             String        @id @default(cuid())
+  reference      String        @unique
+  paymentMethod  PaymentMethod @default(ONLINE)
+  amount         Int
+  currency       Currency      @default(KSH)
+  status         PaymentStatus @default(PENDING)
+  subscriptionId String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REVERSED
+}
+
+enum Currency {
+  KSH
+  US
+}
+
+model Plan {
+  id                  String         @id @default(cuid())
+  description         String?
+  price               Int
+  interval            PlanInterval
+  maxPhoneNumbers     Int
+  maxMessagesPerMonth Int
+  active              Boolean        @default(true)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  name                PlanName
+  features            PlanFeature[]
+  subscriptions       Subscription[]
+
+  @@map("plans")
+}
+
+model Feature {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  description String
+  useMetric   String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  plans       PlanFeature[]
+}
+
+model PlanFeature {
+  planId      String
+  featureId   String
+  enabled     Boolean  @default(true)
+  limitUse    Int?
+  configValue String?
+  createdAt   DateTime @default(now())
+  feature     Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  plan        Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@id([planId, featureId])
+  @@map("plan_features")
+}
+
+model PhoneNumber {
+  id            String            @id @default(cuid())
+  userId        String
+  phoneNumber   String            @unique
+  displayName   String?
+  wabaId        String?
+  phoneNumberId String?
+  status        PhoneNumberStatus @default(PENDING)
+  verifiedAt    DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  messages      Message[]
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("phone_numbers")
+}
+
+model Contact {
+  id            String    @id @default(cuid())
+  userId        String
+  phoneNumber   String
+  name          String?
+  avatar        String?
+  lastMessageAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages      Message[]
+
+  @@unique([userId, phoneNumber])
+  @@map("contacts")
+}
+
+model Message {
+  id            String           @id @default(cuid())
+  userId        String
+  contactId     String
+  phoneNumberId String
+  waMessageId   String?
+  type          MessageType      @default(TEXT)
+  content       Json
+  direction     MessageDirection
+  status        MessageStatus    @default(SENT)
+  timestamp     DateTime
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  contact       Contact          @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  phoneNumber   PhoneNumber      @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model MessageUnprocessed {
+  id          String   @id @default(cuid())
+  waMessageId String
+  payload     Json
+  error       String
+  retryCount  Int      @default(0)
+  nextRetry   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AutoReplyRule {
+  id           String      @id @default(cuid())
+  userId       String
+  name         String
+  triggerType  TriggerType
+  triggerValue String?
+  replyMessage String
+  isActive     Boolean     @default(true)
+  priority     Int         @default(0)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  active       Boolean     @default(true)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  type      String
+  payload   Json
+  processed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("webhook_events")
+}
+
+model Account {
+  id                String      @id @default(cuid())
+  userId            String
+  type              AccountType
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+enum TriggerType {
+  KEYWORD
+  MESSAGE_TYPE
+  DEFAULT
+  TIME_BASED
+}
+
+enum PlanName {
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+enum AccountType {
+  oauth
+  oidc
+  email
+  credentials
+}
+
+enum PlanInterval {
+  MONTHLY
+  YEARLY
+}
+
+enum PhoneNumberStatus {
+  PENDING
+  VERIFIED
+  FAILED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  DOCUMENT
+  AUDIO
+  VIDEO
+  LOCATION
+  CONTACT
+  TEMPLATE
+  OTHER
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+enum PaymentMethod {
+  ONLINE
+  OTHER
+  MPESA
+  CASH
+}
