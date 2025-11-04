@@ -2,6 +2,9 @@
   "name": "loci",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "npx prisma migrate dev && prisma generate && next dev",
     "build": "NODE_ENV=production next build",
