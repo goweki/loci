@@ -1,9 +1,12 @@
+// app/api/phone-numbers/route.ts
+
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
+import { getSubscriptionStatusByUserId } from "@/data/subscription";
+import { createPhoneNumber, getPhoneNumbersByUser } from "@/data/phoneNumber";
 
-// app/api/phone-numbers/route.ts
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return new NextResponse("Unauthorized", { status: 401 });
@@ -11,34 +14,39 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { phoneNumber, displayName } = body;
 
-  // Check subscription limits
-  const user = await db.user.findUnique({
-    where: { id: session.user.id },
-    include: {
-      subscription: { include: { plan: true } },
-      phoneNumbers: true,
-    },
-  });
+  const subscriptionStatus = await getSubscriptionStatusByUserId(
+    session.user.id
+  );
 
-  if (!user?.subscription || user.subscription.status !== "ACTIVE") {
-    return new NextResponse("Active subscription required", { status: 402 });
+  if (!subscriptionStatus.plan) {
+    return NextResponse.json(
+      { error: "Get a plan to add a phone number" },
+      { status: 402 }
+    );
   }
 
-  if (user.phoneNumbers.length >= user.subscription.plan.maxPhoneNumbers) {
-    return new NextResponse("Phone number limit reached", { status: 400 });
+  const maxPhoneNumbers = subscriptionStatus.plan.maxPhoneNumbers;
+  const phoneNumbers = await getPhoneNumbersByUser(session.user.id);
+
+  // check against limit
+  if (phoneNumbers.length > maxPhoneNumbers) {
+    return NextResponse.json(
+      {
+        error: "Message limit exceeded for your current plan.",
+        limit: maxPhoneNumbers,
+        used: phoneNumbers.length,
+      },
+      { status: 403 }
+    );
   }
 
   // Create phone number record
-  const newPhoneNumber = await db.phoneNumber.create({
-    data: {
-      userId: session.user.id,
-      phoneNumber,
-      displayName,
-      status: "PENDING",
-    },
+  const newPhoneNumber = await createPhoneNumber({
+    userId: session.user.id,
+    phoneNumber,
+    displayName,
+    status: "PENDING",
   });
-
-  // TODO: Implement WhatsApp Business API registration flow
 
   return NextResponse.json({ phoneNumber: newPhoneNumber });
 }
