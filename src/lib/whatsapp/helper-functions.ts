@@ -1,5 +1,5 @@
 // lib/message-processor.ts
-import db from "./prisma";
+import prisma from "@/lib/prisma";
 import {
   MessageType,
   MessageDirection,
@@ -122,7 +122,7 @@ export async function processIncomingMessage(
     const content = await processMessageContent(message);
 
     // Store message in database
-    await db.message.create({
+    await prisma.message.create({
       data: {
         userId: phoneNumber.userId,
         contactId: contact.id,
@@ -137,7 +137,7 @@ export async function processIncomingMessage(
     });
 
     // Update contact's last message time
-    await db.contact.update({
+    await prisma.contact.update({
       where: { id: contact.id },
       data: { lastMessageAt: new Date() },
     });
@@ -170,7 +170,7 @@ export async function processStatusUpdate(
     );
 
     // Find the message by WhatsApp message ID
-    const message = await db.message.findFirst({
+    const message = await prisma.message.findFirst({
       where: {
         waMessageId: statusUpdate.id,
         direction: MessageDirection.OUTBOUND,
@@ -186,7 +186,7 @@ export async function processStatusUpdate(
     const newStatus: MessageStatus = mapWhatsAppStatusToMessageStatus(
       statusUpdate.status
     );
-    await db.message.update({
+    await prisma.message.update({
       where: { id: message.id },
       data: {
         status: newStatus,
@@ -220,7 +220,7 @@ async function findPhoneNumberByWebhook(message: WhatsAppMessage) {
   // For now, we'll find the first active phone number for the user
   // In production, you'd have better identification logic
 
-  return await db.phoneNumber.findFirst({
+  return await prisma.phoneNumber.findFirst({
     where: {
       status: "VERIFIED",
       // Add more specific matching logic here
@@ -239,7 +239,7 @@ async function findOrCreateContact(
   phoneNumber: string,
   name?: string
 ) {
-  const contact = await db.contact.findFirst({
+  const contact = await prisma.contact.findFirst({
     where: {
       userId,
       phoneNumber,
@@ -249,7 +249,7 @@ async function findOrCreateContact(
   if (contact) {
     // Update name if provided and not already set
     if (name && !contact.name) {
-      return await db.contact.update({
+      return await prisma.contact.update({
         where: { id: contact.id },
         data: { name },
       });
@@ -258,7 +258,7 @@ async function findOrCreateContact(
   }
 
   // Create new contact
-  return await db.contact.create({
+  return await prisma.contact.create({
     data: {
       userId,
       phoneNumber,
@@ -555,7 +555,7 @@ async function processAutoReplies(
 ): Promise<void> {
   try {
     // Check if user has auto-reply rules configured
-    const autoReplyRules = await db.autoReplyRule?.findMany?.({
+    const autoReplyRules = await prisma.autoReplyRule?.findMany?.({
       where: {
         userId,
         active: true,
@@ -615,7 +615,7 @@ async function storeFailedMessage(
   error: any
 ): Promise<void> {
   try {
-    await db.messageUnprocessed?.create?.({
+    await prisma.messageUnprocessed?.create?.({
       data: {
         waMessageId: message.id,
         payload: message as unknown as Prisma.InputJsonValue, // 👈 cast here,

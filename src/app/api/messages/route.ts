@@ -3,10 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import db from "@/lib/prisma";
-import { whatsapp } from "@/lib/whatsapp";
+import whatsapp from "@/lib/whatsapp";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
-import { countMessagesThisMonth } from "@/data/message";
+import { countMessagesThisMonth, createMessage } from "@/data/message";
 import { validatePhoneNumberOwnership } from "@/data/phoneNumber";
+import { WhatsAppMessageSchema } from "@/lib/validations";
+import { findOrCreateContact } from "@/data/contact";
+import { MessageType } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -40,8 +43,19 @@ export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return new NextResponse("Unauthorized", { status: 401 });
 
-  const body = await request.json();
-  const { phoneNumberId, to, type, content } = body;
+  const rawBody = await request.json();
+  const result = WhatsAppMessageSchema.safeParse(rawBody);
+  if (!result.success) {
+    return NextResponse.json(
+      {
+        error: "Invalid request body",
+      },
+      { status: 400 }
+    );
+  }
+
+  const body = result.data;
+  const { phoneNumberId, to, type } = body;
 
   // Validate phone number ownership
   const phoneNumber = await validatePhoneNumberOwnership(
@@ -89,54 +103,21 @@ export async function POST(request: NextRequest) {
   // Send message via WhatsApp API
 
   try {
-    let waResponse;
-    if (type === "text") {
-      waResponse = await whatsapp.sendTextMessage(to, content.text);
-    } else if (type === "image") {
-      waResponse = await whatsapp.sendMediaMessage(
-        to,
-        "image",
-        content.url,
-        content.caption
-      );
-    }
-    // Add other message types...
+    const waResponse = await whatsapp.sendWhatsAppMessage(body);
 
-    // Find or create contact
-    const contact = await db.contact.upsert({
-      where: {
-        userId_phoneNumber: {
-          userId: session.user.id,
-          phoneNumber: to,
-        },
-      },
-      create: {
-        userId: session.user.id,
-        phoneNumber: to,
-        name: content.contactName || null,
-      },
-      update: {
-        lastMessageAt: new Date(),
-      },
-    });
+    const contact = await findOrCreateContact(session.user.id, to);
 
     // Store message in database
-    const message = await db.message.create({
-      data: {
-        userId: session.user.id,
-        contactId: contact.id,
-        phoneNumberId: phoneNumber.id,
-        waMessageId: waResponse.messages[0].id,
-        type,
-        content,
-        direction: "OUTBOUND",
-        status: "SENT",
-        timestamp: new Date(),
-      },
-      include: {
-        contact: true,
-        phoneNumber: true,
-      },
+    const message = await createMessage({
+      userId: session.user.id,
+      contactId: contact.id,
+      phoneNumberId: phoneNumber.id,
+      waMessageId: waResponse.messaging_product,
+      type: body.type.toUpperCase() as MessageType,
+      content: waResponse.sentMessage,
+      direction: "OUTBOUND",
+      status: "SENT",
+      timestamp: new Date(),
     });
 
     return NextResponse.json({ message });

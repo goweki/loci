@@ -152,7 +152,7 @@ model Message {
   contactId     String
   phoneNumberId String
   waMessageId   String?
-  type          MessageType
+  type          MessageType      @default(TEXT)
   content       Json
   direction     MessageDirection
   status        MessageStatus    @default(SENT)
@@ -272,6 +272,7 @@ enum MessageType {
   LOCATION
   CONTACT
   TEMPLATE
+  OTHER
 }
 
 enum MessageDirection {

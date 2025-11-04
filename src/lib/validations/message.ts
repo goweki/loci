@@ -1,12 +1,54 @@
 import { z } from "zod";
 
-export const messageSchema = z.object({
-  phoneNumberId: z.string().cuid(),
-  to: z.string().regex(/^\+[1-9]\d{1,14}$/),
-  type: z.enum(["text", "image", "document", "audio", "video"]),
-  content: z.object({
-    text: z.string().max(4096).optional(),
-    url: z.string().url().optional(),
-    caption: z.string().max(1024).optional(),
+export const textMessageSchema = z.object({
+  type: z.literal("text"),
+  text: z.object({
+    body: z.string().min(1),
   }),
 });
+
+export const imageMessageSchema = z.object({
+  type: z.literal("image"),
+  image: z.object({
+    link: z.string().url(),
+    caption: z.string().optional(),
+  }),
+});
+
+export const documentMessageSchema = z.object({
+  type: z.literal("document"),
+  document: z.object({
+    link: z.string().url(),
+    filename: z.string().optional(),
+    caption: z.string().optional(),
+  }),
+});
+
+export const locationMessageSchema = z.object({
+  type: z.literal("location"),
+  location: z.object({
+    latitude: z.string(),
+    longitude: z.string(),
+    name: z.string().optional(),
+    address: z.string().optional(),
+  }),
+});
+
+const baseSchema = z.object({
+  phoneNumberId: z.string().min(5),
+  to: z.string().min(5),
+  recipient_type: z.enum(["INDIVIDUAL", "GROUP"]).default("INDIVIDUAL"),
+  messaging_product: z.literal("whatsapp").default("whatsapp"),
+});
+
+// Discriminated union by "type"
+export const WhatsAppMessageSchema = z
+  .discriminatedUnion("type", [
+    textMessageSchema,
+    imageMessageSchema,
+    documentMessageSchema,
+    locationMessageSchema,
+  ])
+  .and(baseSchema);
+
+export type WhatsAppMessage = z.infer<typeof WhatsAppMessageSchema>;

@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
-import { processIncomingMessage } from "@/lib/waMessageProcessor";
+import { processIncomingMessage } from "@/lib/whatsapp";
 
 // Verification
 export async function GET(request: NextRequest) {

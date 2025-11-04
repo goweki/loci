@@ -14,8 +14,14 @@ export async function countMessagesThisMonth(userId: string) {
   });
 }
 
-export async function createMessage(data: any) {
+export async function createMessage(
+  data: Prisma.MessageCreateInput | Prisma.MessageUncheckedCreateInput
+) {
   return prisma.message.create({
     data,
+    include: {
+      contact: true,
+      phoneNumber: true,
+    },
   });
 }
