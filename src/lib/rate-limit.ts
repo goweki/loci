@@ -8,7 +8,11 @@ export function rateLimit(
   maxAttempts: number = 5,
   windowMs: number = 15 * 60 * 1000 // 15 minutes
 ) {
-  const ip = request.ip || request.headers.get("x-forwarded-for") || "unknown";
+  // const ip = request.ip || request.headers.get("x-forwarded-for") || "unknown";
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
   const now = Date.now();
   const userAttempts = attempts.get(ip) || {
     count: 0,
