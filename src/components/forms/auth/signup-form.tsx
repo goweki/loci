@@ -24,6 +24,12 @@ import Loader from "@/components/ui/loaders";
 import AuthErrorHandler, { ERROR_MESSAGES } from "./_errorHandler";
 import { registerSchema } from "@/lib/validations";
 import { createUser } from "@/data/user";
+import { useI18n } from "@/lib/i18n";
+
+const translations = {
+  en: { orCredentials: "or use your Credentials" },
+  sw: { orCredentials: "au tumia Barua pepe kuingia" },
+};
 
 interface SignInProps {
   emailLabel: string;
@@ -35,6 +41,7 @@ export function SignUpForm(copy: SignInProps) {
   const { emailLabel, passwordLabel, submitLabel } = copy;
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+  const { language } = useI18n();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -58,7 +65,7 @@ export function SignUpForm(copy: SignInProps) {
       });
       console.log(result);
       toast.success("Sign in to continue");
-      router.push("/sign-in");
+      router.push(`/${language}/sign-in`);
     } catch (error) {
       toast.error("Failed. Try again later");
       setLoading(false);
@@ -168,11 +175,17 @@ export function SignUpForm(copy: SignInProps) {
         </div>
         <hr className="my-6 border-t" />
         <div className="flex flex-row justify-between italic text-xs">
-          <Link href="/register" className="flex w-fit hover:underline">
-            No account? Register
+          <Link
+            href={`/${language}/sign-in`}
+            className="flex w-fit hover:underline"
+          >
+            Already registered?
           </Link>
 
-          <Link href="/reset-password" className="flex w-fit hover:underline">
+          <Link
+            href={`/${language}/reset-password`}
+            className="flex w-fit hover:underline"
+          >
             Forgot Password? Reset
           </Link>
         </div>

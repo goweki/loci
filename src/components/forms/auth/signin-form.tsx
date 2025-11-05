@@ -23,18 +23,34 @@ import { useRouter } from "next/navigation";
 import Loader from "@/components/ui/loaders";
 import AuthErrorHandler, { ERROR_MESSAGES } from "./_errorHandler";
 import { loginSchema } from "@/lib/validations";
+import { useI18n } from "@/lib/i18n";
 
-interface SignInProps {
-  emailLabel: string;
-  passwordLabel: string;
-  submitLabel: string;
-}
+const translations = {
+  en: {
+    orCredentials: "or use your Credentials",
+    usernamePlaceholder: "email / WhatsApp",
+    password: "password",
+    submit: "Sign In",
+    forgotPassword: "Forgot Password? Reset",
+    signUp: "No account? Register",
+  },
+  sw: {
+    orCredentials: "au tumia Vitambilisho vyako",
+    usernamePlaceholder: "barua pepe / Whatsapp",
+    password: "neno-siri",
+    submit: "Ingia",
+    forgotPassword: "Weka nenosiri upya",
+    signUp: "Jisajili",
+  },
+};
 
-export function SignInForm(copy: SignInProps) {
-  const { emailLabel, passwordLabel, submitLabel } = copy;
+export function SignInForm() {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { language } = useI18n();
+
+  const t = translations[language];
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -76,7 +92,7 @@ export function SignInForm(copy: SignInProps) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4 text-start"
       >
-        <div>
+        <div className="mb-8">
           <div className="space-x-2">
             <button
               type="button"
@@ -86,7 +102,7 @@ export function SignInForm(copy: SignInProps) {
               <GoogleSignin />
             </button>
           </div>
-          <p className="text-mute-foreground">or use your credentials:</p>
+          <p className="text-mute-foreground">{t.orCredentials}:</p>
         </div>
         <FormField
           control={form.control}
@@ -97,7 +113,7 @@ export function SignInForm(copy: SignInProps) {
                 <InputWithIcon
                   icon={UserIcon}
                   className="placeholder:italic placeholder:opacity-50"
-                  placeholder="loci@goweki.com..."
+                  placeholder={t.usernamePlaceholder}
                   {...field}
                 />
               </FormControl>
@@ -116,8 +132,9 @@ export function SignInForm(copy: SignInProps) {
                     <InputWithIcon
                       icon={Lock}
                       type={showPassword ? "text" : "password"}
+                      placeholder={t.password}
+                      className="pr-10 placeholder:italic placeholder:opacity-50"
                       {...field}
-                      className="pr-10"
                     />
                   </FormControl>
                   <Button
@@ -141,17 +158,23 @@ export function SignInForm(copy: SignInProps) {
         />
         <div className="py-4">
           <Button type="submit" className="w-full" disabled={loading}>
-            {!loading ? submitLabel : <Loader />}
+            {!loading ? t.submit : <Loader />}
           </Button>
         </div>
         <hr className="my-6 border-t" />
         <div className="flex flex-row justify-between italic text-xs">
-          <Link href="/register" className="flex w-fit hover:underline">
-            No account? Register
+          <Link
+            href={`/${language}/sign-up`}
+            className="flex w-fit hover:underline"
+          >
+            {t.signUp}
           </Link>
 
-          <Link href="/reset-password" className="flex w-fit hover:underline">
-            Forgot Password? Reset
+          <Link
+            href={`/${language}/reset-password`}
+            className="flex w-fit hover:underline"
+          >
+            {t.forgotPassword}
           </Link>
         </div>
       </form>

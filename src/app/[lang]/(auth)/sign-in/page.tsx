@@ -18,11 +18,7 @@ export default async function SignInPage({
         subtitle: dict.auth.signin.subtitle,
       }}
     >
-      <SignInForm
-        emailLabel={dict.auth.signin.emailLabel}
-        passwordLabel={dict.auth.signin.passwordLabel}
-        submitLabel={dict.auth.signin.button}
-      />
+      <SignInForm />
     </AuthLayout>
   );
 }
