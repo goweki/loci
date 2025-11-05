@@ -3,9 +3,10 @@
  * data/user.ts
  *
  * USER DATA ACCESS LAYER
- * Centralized repository for all user-related Prisma operations.
  * ============================================================
  */
+
+"use server";
 
 import db from "@/lib/prisma";
 import { Prisma, UserRole, UserStatus, User } from "@prisma/client";
@@ -21,6 +22,8 @@ export async function createUser(data: {
   status?: UserStatus;
   image?: string;
 }): Promise<User> {
+  console.log("Creating user... ", data);
+
   return db.user.create({
     data: {
       name: data.name ?? null,

@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { InputWithIcon } from "@/components/ui/input";
-import { Eye, EyeOff, Lock, User as UserIcon } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, User as UserIcon } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import GoogleSignin from "@/components/ui/svg";
@@ -22,14 +22,8 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/ui/loaders";
 import AuthErrorHandler, { ERROR_MESSAGES } from "./_errorHandler";
-
-const formSchema = z.object({
-  username: z.email({ message: "Please enter a valid email address" }),
-  password: z
-    .string()
-    .min(5, { message: "Password must be at least 5 characters" })
-    .max(16, { message: "Password must be less than 16 characters" }),
-});
+import { registerSchema } from "@/lib/validations";
+import { createUser } from "@/data/user";
 
 interface SignInProps {
   emailLabel: string;
@@ -40,39 +34,34 @@ interface SignInProps {
 export function SignUpForm(copy: SignInProps) {
   const { emailLabel, passwordLabel, submitLabel } = copy;
   const [loading, setLoading] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
+      name: "",
+      email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
     setLoading(true);
-
-    const { username, password } = values;
-
-    const result = await signIn("credentials", {
-      redirect: false,
-      username,
-      password,
-    });
-
-    setLoading(false);
-
-    if (result?.error) {
-      const error_ =
-        typeof result.error === "string" ? result.error : undefined;
-      const errorMessage = error_
-        ? ERROR_MESSAGES[error_ as keyof typeof ERROR_MESSAGES] ?? error_
-        : "Failed to sign in. Try again later";
-      toast.error(errorMessage);
-    } else {
-      router.push("/dashboard");
+    console.log(values);
+    const { name, email, password } = values;
+    try {
+      const result = await createUser({
+        name,
+        email,
+        password,
+      });
+      console.log(result);
+      toast.success("Sign in to continue");
+      router.push("/sign-in");
+    } catch (error) {
+      toast.error("Failed. Try again later");
+      setLoading(false);
     }
   };
 
@@ -97,14 +86,33 @@ export function SignUpForm(copy: SignInProps) {
         </div>
         <FormField
           control={form.control}
-          name="username"
+          name="name"
           render={({ field }) => (
             <FormItem>
               <FormControl>
                 <InputWithIcon
                   icon={UserIcon}
                   className="placeholder:italic placeholder:opacity-50"
-                  placeholder="loci@goweki.com..."
+                  placeholder="Your preferred name"
+                  type="text"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <InputWithIcon
+                  icon={Mail}
+                  className="placeholder:italic placeholder:opacity-50"
+                  placeholder="loci@goweki.com"
+                  type="email"
                   {...field}
                 />
               </FormControl>
@@ -118,29 +126,36 @@ export function SignUpForm(copy: SignInProps) {
           render={({ field }) => {
             return (
               <FormItem>
-                <div className="relative">
-                  <FormControl>
-                    <InputWithIcon
-                      icon={Lock}
-                      type={showPassword ? "text" : "password"}
-                      {...field}
-                      className="pr-10"
-                    />
-                  </FormControl>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-0 top-0 h-full px-3"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
+                <FormControl>
+                  <InputWithIcon
+                    icon={Lock}
+                    type="password"
+                    placeholder="Password"
+                    className="placeholder:italic placeholder:opacity-50"
+                    {...field}
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            );
+          }}
+        />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => {
+            return (
+              <FormItem>
+                <FormControl>
+                  <InputWithIcon
+                    icon={Lock}
+                    type="password"
+                    placeholder="Confirm password"
+                    className="placeholder:italic placeholder:opacity-50"
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             );
