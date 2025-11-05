@@ -37,7 +37,7 @@ export const metadata = {
     siteName: "loci",
     images: [
       {
-        url: "/brand/og_image.png",
+        url: "/brand/og_image.jpg",
         width: 1200,
         height: 630,
         alt: "loci - Supercharging Engagement", // Alternative text for accessibility
