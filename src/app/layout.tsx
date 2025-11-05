@@ -14,7 +14,7 @@ export const metadata = {
     shortcut: "/brand/favicon-16x16.png",
     apple: "/brand/apple-touch-icon.png",
   },
-  manifest: "/brand/site.webmanifest",
+  manifest: "/site.webmanifest",
   keywords: [
     "Communication",
     "WhatsApp",
