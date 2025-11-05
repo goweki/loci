@@ -37,7 +37,7 @@ export default async function AuthLayout({
           "fixed top-4 left-4 z-50 w-fit p-2 border bg-background/50 backdrop-blur-xs text-foreground"
         )}
       >
-        <House color="blue" size={24} /> Home
+        <House className="text-primary" size={24} /> Home
       </Link>
 
       <div

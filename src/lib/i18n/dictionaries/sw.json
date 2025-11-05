@@ -60,23 +60,6 @@
       }
     }
   },
-  "landing": {
-    "hero": {
-      "supercharge": "Boresha",
-      "customerEngagement": "Mwingiliano na wateja",
-      "description": "Simamia mawasiliano ya WhatsApp na CRM kwa urahisi katika jukwaa moja lenye nguvu — rahisisha kazi zako, jenga uhusiano imara zaidi, na kukuza biashara yako kwa urahisi.",
-      "startTrial": "Anza Jaribio la Bure",
-      "watchDemo": "Mfano wa Matumizi",
-      "features": {
-        "unifiedMessaging": "Ujumbe Uliounganishwa",
-        "unifiedMessagingDescription": "Gumzo zote za Kibiashara katika jukwaa moja",
-        "crm": "CRM Mahiri",
-        "crmDescription": "Uelewa wa wateja na uendeshaji wa kiotomatiki",
-        "fast": "Haraka Kama Umeme",
-        "fastDescription": "Ufikishaji na majibu ya ujumbe papo hapo"
-      }
-    }
-  },
   "pricing": {
     "title": "Bei Rahisi na Wazi",
     "subtitle": "Chagua mpango kamili kwa mahitaji ya biashara yako. Ongeza daraja, punguza, au ghairi wakati wowote.",

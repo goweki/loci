@@ -15,36 +15,47 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { useI18n } from "@/lib/i18n";
 
-export interface HeroProps {
-  supercharge: string;
-  customerEngagement: string;
-  description: string;
-  startTrial: string;
-  watchDemo: string;
-  unifiedMessaging: string;
-  unifiedMessagingDescription: string;
-  crm: string;
-  crmDescription: string;
-  fast: string;
-  fastDescription: string;
-}
+const translations = {
+  en: {
+    supercharge: "Supercharge",
+    customerEngagement: "Customer Engagement",
+    description:
+      "Seamlessly manage WhatsApp communications and CRM in one powerful platform — simplify workflows, build stronger relationships, and scale with ease.",
+    startTrial: "Start free trial",
+    watchDemo: "Watch Demo",
+    features: {
+      unifiedMessaging: "Unified Messaging",
+      unifiedMessagingDescription: "All WhatsApp chats in one dashboard",
+      crm: "Smart CRM",
+      crmDescription: "Customer insights & automation",
+      fast: "Lightning Fast",
+      fastDescription: "Instant message delivery & responses",
+    },
+  },
+  sw: {
+    supercharge: "Boresha",
+    customerEngagement: "Mwingiliano na wateja",
+    description:
+      "Simamia mawasiliano ya WhatsApp na CRM kwa urahisi katika jukwaa moja lenye nguvu — rahisisha kazi zako, jenga uhusiano imara zaidi, na kukuza biashara yako kwa urahisi.",
+    startTrial: "Anza Jaribio la Bure",
+    watchDemo: "Mfano wa Matumizi",
+    features: {
+      unifiedMessaging: "Ujumbe Uliounganishwa",
+      unifiedMessagingDescription:
+        "Gumzo zote za Kibiashara katika jukwaa moja",
+      crm: "CRM Mahiri",
+      crmDescription: "Uelewa wa wateja na uendeshaji wa kiotomatiki",
+      fast: "Haraka Kama Umeme",
+      fastDescription: "Ufikishaji na majibu ya ujumbe papo hapo",
+    },
+  },
+};
 
-export default function HeroSection(props: HeroProps) {
-  const pathname = usePathname();
-  const {
-    supercharge,
-    customerEngagement,
-    description,
-    startTrial,
-    watchDemo,
-    unifiedMessaging,
-    unifiedMessagingDescription,
-    crm,
-    crmDescription,
-    fast,
-    fastDescription,
-  } = props;
+export default function HeroSection() {
+  const { language } = useI18n();
+  const t = translations[language];
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
@@ -104,35 +115,35 @@ export default function HeroSection(props: HeroProps) {
 
           {/* Main headline */}
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
-            <span className="inline-block">{supercharge}</span>
+            <span className="inline-block">{t.supercharge}</span>
             <br />
             <span className="bg-gradient-to-r from-cyan-600 via-purple-600 to-cyan-800 bg-clip-text text-transparent animate-gradient">
-              {customerEngagement}
+              {t.customerEngagement}
             </span>
           </h1>
 
           {/* Subtitle */}
           <p className="mt-6 max-w-3xl mx-auto text-xl sm:text-2xl leading-relaxed text-gray-600 dark:text-gray-300 font-light">
-            {description}
+            {t.description}
           </p>
 
           {/* CTA Buttons */}
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href={`/sign-in`}
+              href={`/${language}/sign-up`}
               className={cn(
                 buttonVariants({ variant: "default", size: "lg" }),
                 "text-lg bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-800 hover:to-cyan-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl group"
               )}
             >
-              {startTrial}
+              {t.startTrial}
               <Zap className="ml-2 w-5 h-5 group-hover:animate-pulse" />
             </Link>
 
-            <Button variant="secondary" className="hover:scale-105" size="lg">
+            {/* <Button variant="secondary" className="hover:scale-105" size="lg">
               <Play className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform" />
-              {watchDemo}
-            </Button>
+              {t.watchDemo}
+            </Button> */}
           </div>
 
           {/* Feature highlights */}
@@ -140,18 +151,18 @@ export default function HeroSection(props: HeroProps) {
             {[
               {
                 icon: MessageCircle,
-                title: unifiedMessaging,
-                desc: unifiedMessagingDescription,
+                title: t.features.unifiedMessaging,
+                desc: t.features.unifiedMessagingDescription,
               },
               {
                 icon: Users,
-                title: crm,
-                desc: crmDescription,
+                title: t.features.crm,
+                desc: t.features.crmDescription,
               },
               {
                 icon: Zap,
-                title: fast,
-                desc: fastDescription,
+                title: t.features.fast,
+                desc: t.features.fastDescription,
               },
             ].map((feature, index) => (
               <div

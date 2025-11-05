@@ -60,23 +60,6 @@
       }
     }
   },
-  "landing": {
-    "hero": {
-      "supercharge": "Supercharge",
-      "customerEngagement": "Customer Engagement",
-      "description": "Seamlessly manage WhatsApp communications and CRM in one powerful platform — simplify workflows, build stronger relationships, and scale with ease.",
-      "startTrial": "Start free trial",
-      "watchDemo": "Watch Demo",
-      "features": {
-        "unifiedMessaging": "Unified Messaging",
-        "unifiedMessagingDescription": "All WhatsApp chats in one dashboard",
-        "crm": "Smart CRM",
-        "crmDescription": "Customer insights & automation",
-        "fast": "Lightning Fast",
-        "fastDescription": "Instant message delivery & responses"
-      }
-    }
-  },
   "pricing": {
     "title": "Simple, Transparent Pricing",
     "subtitle": "Choose the perfect plan for your business needs. Upgrade, downgrade, or cancel anytime.",

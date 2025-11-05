@@ -15,15 +15,11 @@ export default async function SignUpPage({
   return (
     <AuthLayout
       copy={{
-        title: dict.auth.signin.title,
-        subtitle: dict.auth.signin.subtitle,
+        title: dict.auth.signup.title,
+        subtitle: dict.auth.signup.subtitle,
       }}
     >
-      <SignUpForm
-        emailLabel={dict.auth.signin.emailLabel}
-        passwordLabel={dict.auth.signin.passwordLabel}
-        submitLabel={dict.auth.signin.button}
-      />
+      <SignUpForm />
     </AuthLayout>
   );
 }

@@ -27,21 +27,15 @@ import { createUser } from "@/data/user";
 import { useI18n } from "@/lib/i18n";
 
 const translations = {
-  en: { orCredentials: "or use your Credentials" },
-  sw: { orCredentials: "au tumia Barua pepe kuingia" },
+  en: { submit: "Sign Up", orCredentials: "or use your Credentials" },
+  sw: { submit: "Jisajili", orCredentials: "au tumia Barua pepe kuingia" },
 };
 
-interface SignInProps {
-  emailLabel: string;
-  passwordLabel: string;
-  submitLabel: string;
-}
-
-export function SignUpForm(copy: SignInProps) {
-  const { emailLabel, passwordLabel, submitLabel } = copy;
+export function SignUpForm() {
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
   const { language } = useI18n();
+  const t = translations[language];
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -50,6 +44,7 @@ export function SignUpForm(copy: SignInProps) {
       email: "",
       password: "",
       confirmPassword: "",
+      verificationMethod: "whatsapp",
     },
   });
 
@@ -79,18 +74,6 @@ export function SignUpForm(copy: SignInProps) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4 text-start"
       >
-        <div>
-          <div className="space-x-2">
-            <button
-              type="button"
-              className="hover:scale-105 transition-all duration-200"
-              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            >
-              <GoogleSignin />
-            </button>
-          </div>
-          <p className="text-mute-foreground">or use your credentials:</p>
-        </div>
         <FormField
           control={form.control}
           name="name"
@@ -168,9 +151,29 @@ export function SignUpForm(copy: SignInProps) {
             );
           }}
         />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => {
+            return (
+              <FormItem>
+                <FormControl>
+                  <InputWithIcon
+                    icon={Lock}
+                    type="password"
+                    placeholder="Confirm password"
+                    className="placeholder:italic placeholder:opacity-50"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
+        />
         <div className="py-4">
           <Button type="submit" className="w-full" disabled={loading}>
-            {!loading ? submitLabel : <Loader />}
+            {!loading ? t.submit : <Loader />}
           </Button>
         </div>
         <hr className="my-6 border-t" />

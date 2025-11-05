@@ -31,8 +31,7 @@ export default function LanguageRedirector() {
 
     const preferredPath = `/${preferredLanguage}`;
     router.replace(preferredPath);
-  }, [router]);
+  }, [router, window]);
 
-  // This component doesn't render anything visible
   return null;
 }
