@@ -6,25 +6,18 @@ import DashboardStats from "@/components/dashboard/stats";
 import QuickActions from "@/components/dashboard/quick-actions";
 import RecentConvos from "@/components/dashboard/recent-convos";
 
-const Dashboard = () => {
+const DashboardPage = () => {
   return (
-    <div className="flex h-screen bg-background pt-16">
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar />
-
-        {/* Content */}
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
-            <DashboardTitle />
-            <DashboardStats />
-            <QuickActions />
-            <RecentConvos />
-          </div>
-          <Footer />
-        </main>
+    <main className="flex-1 overflow-y-auto p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <DashboardTitle />
+        <DashboardStats />
+        <QuickActions />
+        <RecentConvos />
       </div>
-    </div>
+      <Footer />
+    </main>
   );
 };
 
-export default Dashboard;
+export default DashboardPage;

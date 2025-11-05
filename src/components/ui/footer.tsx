@@ -19,8 +19,8 @@ const footerLinks = [
 
 const Footer = () => {
   return (
-    <footer className="border-t">
-      <div className="max-w-(--breakpoint-xl) mx-auto">
+    <footer className="border-t mt-8">
+      <div className="max-w-screen-xl mx-auto">
         <div className="py-8 flex flex-col-reverse sm:flex-row items-center justify-between gap-x-2 gap-y-5 px-6">
           <span className="text-muted-foreground">
             &copy; {new Date().getFullYear()}{" "}

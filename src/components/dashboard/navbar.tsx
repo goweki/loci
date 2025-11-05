@@ -46,9 +46,9 @@ export default function DashboardNavbar() {
 
   const navigationLinks: NavbarNavLink[] = [
     { href: `/${language}/dashboard`, label: t.dashboard },
-    { href: `/${language}/conversations`, label: t.conversations },
-    { href: `/${language}/contacts`, label: t.contacts },
+    { href: `/${language}/dashboard/conversations`, label: t.conversations },
+    { href: `/${language}/dashboard/contacts`, label: t.contacts },
   ];
 
-  return <DefaultNavbar navigationLinks={navigationLinks} />;
+  return <DefaultNavbar navigationLinks={navigationLinks} authenticated />;
 }

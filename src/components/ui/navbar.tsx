@@ -23,6 +23,7 @@ import ThemeToggle from "./themeToggle";
 import LanguageToggle from "./language-toggle";
 import { usePathname } from "next/navigation";
 import { homePages, languages, useI18n } from "@/lib/i18n";
+import UserMenu from "../dashboard/user-menu";
 
 // Types
 export interface NavbarNavLink {
@@ -35,12 +36,11 @@ export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
   logo?: React.ReactNode;
   logoHref?: string;
   navigationLinks?: NavbarNavLink[];
+  authenticated?: boolean;
   signInText?: string;
   signInHref?: string;
   ctaText?: string;
   ctaHref?: string;
-  onSignInClick?: () => void;
-  onCtaClick?: () => void;
 }
 
 // Default navigation links
@@ -60,8 +60,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       signInHref = "/sign-in",
       ctaText = "Get Started",
       ctaHref = "/sign-up",
-      onSignInClick,
-      onCtaClick,
+      authenticated = false,
       ...props
     },
     ref
@@ -179,7 +178,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                         <NavigationMenuItem key={index} className="w-full">
                           <Link
                             href={link.href}
-                            onClick={(e) => e.preventDefault()}
                             className={cn(
                               buttonVariants({ variant: "ghost" }),
                               isActive(link.href)
@@ -200,7 +198,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
             <div className="flex items-center gap-6">
               <Link
                 href="/"
-                className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer"
+                className="flex items-center space-x-2 hover:text-primary/90 transition-colors cursor-pointer"
               >
                 <Image
                   src="/brand/logo_symbol.svg"
@@ -208,7 +206,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                   height={24}
                   width={24}
                 />
-                <span className="hidden font-bold text-xl md:inline-block">
+                <span className="hidden font-bold text:primary text-xl md:inline-block">
                   LOCi
                 </span>
               </Link>
@@ -240,18 +238,24 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
           <div className="flex items-center gap-3">
             <LanguageToggle />
             <ThemeToggle variant="outline" />
-            <Link
-              href={"/" + language + signInHref}
-              className={cn(buttonVariants({ variant: "outline" }))}
-            >
-              {signInText}
-            </Link>
-            <Link
-              href={"/" + language + ctaHref}
-              className={cn(buttonVariants({ variant: "default" }))}
-            >
-              {ctaText}
-            </Link>
+            {authenticated ? (
+              <UserMenu />
+            ) : (
+              <>
+                <Link
+                  href={"/" + language + signInHref}
+                  className={cn(buttonVariants({ variant: "outline" }))}
+                >
+                  {signInText}
+                </Link>
+                <Link
+                  href={"/" + language + ctaHref}
+                  className={cn(buttonVariants({ variant: "default" }))}
+                >
+                  {ctaText}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
