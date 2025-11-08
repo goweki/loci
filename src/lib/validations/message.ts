@@ -35,10 +35,13 @@ export const locationMessageSchema = z.object({
 });
 
 const baseSchema = z.object({
-  phoneNumberId: z.string().min(5),
+  phoneNumberId: z.string().min(5).optional(),
   to: z.string().min(5),
-  recipient_type: z.enum(["INDIVIDUAL", "GROUP"]).default("INDIVIDUAL"),
-  messaging_product: z.literal("whatsapp").default("whatsapp"),
+  recipient_type: z
+    .enum(["INDIVIDUAL", "GROUP"])
+    .default("INDIVIDUAL")
+    .optional(),
+  messaging_product: z.literal("whatsapp").default("whatsapp").optional(),
 });
 
 // Discriminated union by "type"

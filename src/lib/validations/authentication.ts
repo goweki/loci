@@ -9,9 +9,21 @@ export const loginSchema = z.object({
     .max(16, { message: "Password must be less than 16 characters" }),
 });
 
-export const registerSchema = z
+export const registerSchema = z.object({
+  email: z.email("Invalid email address").or(z.literal("")),
+  name: z.string().min(3, "Name must be at least 3 characters"),
+  phoneNumber: z
+    .string()
+    .min(3, "PhoneNumber should have at least 3 characters")
+    .or(z.literal("")),
+  verificationMethod: z.enum(["email", "sms", "whatsapp"] as const, {
+    message: "Verification method must be 'email' or 'whatsapp'",
+  }),
+});
+
+export const setPasswordSchema = z
   .object({
-    email: z.string().email("Invalid email address"),
+    email: z.email("Invalid email address"),
     name: z.string().min(3, "Name must be at least 3 characters"),
     password: z
       .string()

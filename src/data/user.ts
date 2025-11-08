@@ -9,31 +9,71 @@
 "use server";
 
 import db from "@/lib/prisma";
+import { buildResetURL, generateResetToken } from "@/lib/utils/resetToken";
 import { Prisma, UserRole, UserStatus, User } from "@prisma/client";
+import whatsapp from "@/lib/whatsapp";
+import { sendMail } from "@/lib/mail";
+import { welcomeEmail } from "@/lib/mail/email-render";
+import { BASE_URL } from "@/lib/utils/getUrl";
 
 /**
- * Creates a new user.
+ * Creates a new user (doesnt send Welcome email)
  */
-export async function createUser(data: {
-  name?: string;
-  email: string;
-  role?: UserRole;
-  password?: string;
-  status?: UserStatus;
-  image?: string;
-}): Promise<User> {
+export async function createUser(
+  data: Prisma.UserCreateInput | Prisma.UserUncheckedCreateInput
+): Promise<Pick<User, "id" | "name" | "email" | "tel">> {
   console.log("Creating user... ", data);
 
-  return db.user.create({
+  return await db.user.create({
+    data,
+    select: { id: true, name: true, email: true, tel: true },
+  });
+}
+/**
+ * Creates a new user, and sends Welcome email.
+ */
+export async function registerUser(
+  data: (Prisma.UserCreateInput | Prisma.UserUncheckedCreateInput) & {
+    verificationMethod?: "email" | "whatsapp" | "sms";
+  }
+): Promise<User & { verificationMethod?: "email" | "whatsapp" | "sms" }> {
+  console.log("Registering user... ", data);
+  let result = false;
+  let verificationMethod_: "email" | "whatsapp" | "sms" = undefined;
+  const { verificationMethod, ...data_ } = data;
+  const { name, email, tel } = data;
+
+  if (!email && !tel) {
+    throw new Error("Email or Phone No. is required");
+  }
+
+  const tokenObj = await generateResetToken();
+  const resetLink = await buildResetURL(BASE_URL, tokenObj.plain, email || tel);
+
+  const initUser = await db.user.create({
     data: {
-      name: data.name ?? null,
-      email: data.email,
-      password: data.password ?? null,
-      image: data.image ?? null,
-      role: data.role ?? UserRole.USER,
-      status: data.status ?? UserStatus.ACTIVE,
+      ...data_,
+      resetToken: tokenObj.hashed,
+      resetTokenExpiry: tokenObj.expiry.toISOString(),
     },
   });
+
+  if (email) {
+    const emailToSend = await welcomeEmail(name, resetLink);
+    await sendMail({
+      to: email,
+      subject: "Welcome to Loci",
+      html: emailToSend.html,
+      text: emailToSend.text,
+    });
+    verificationMethod_ = "email";
+  } else if (verificationMethod === "whatsapp" && tel) {
+    verificationMethod_ = "whatsapp";
+  } else if (verificationMethod === "sms") {
+    verificationMethod_ = "sms";
+  }
+
+  return { ...initUser, verificationMethod: verificationMethod_ };
 }
 
 /**
@@ -274,7 +314,7 @@ export async function getUserFullProfile(userId: string) {
       phoneNumbers: true,
       contacts: true,
       messages: true,
-      AutoReplyRule: true,
+      AutoReplyRules: true,
     },
   });
 }

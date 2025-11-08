@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "react-phone-number-input/style.css";
+
 :root {
   /* Light Theme */
   --background: 0 0% 100%;

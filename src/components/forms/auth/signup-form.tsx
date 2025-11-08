@@ -10,11 +10,12 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { InputWithIcon } from "@/components/ui/input";
 import { Eye, EyeOff, Lock, Mail, User as UserIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import GoogleSignin from "@/components/ui/svg";
 import { signIn } from "next-auth/react";
@@ -23,8 +24,10 @@ import { useRouter } from "next/navigation";
 import Loader from "@/components/ui/loaders";
 import AuthErrorHandler, { ERROR_MESSAGES } from "./_errorHandler";
 import { registerSchema } from "@/lib/validations";
-import { createUser } from "@/data/user";
+import { registerUser } from "@/data/user";
 import { useI18n } from "@/lib/i18n";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import InputPhone from "@/components/ui/input-phone";
 
 const translations = {
   en: { submit: "Sign Up", orCredentials: "or use your Credentials" },
@@ -42,24 +45,50 @@ export function SignUpForm() {
     defaultValues: {
       name: "",
       email: "",
-      password: "",
-      confirmPassword: "",
+      phoneNumber: "",
       verificationMethod: "whatsapp",
     },
   });
 
+  const { watch, setValue } = form;
+  const verificationMethod = watch("verificationMethod");
+
+  useEffect(() => {
+    if (verificationMethod === "whatsapp") {
+      setValue("email", "");
+    } else if (verificationMethod === "email") {
+      setValue("phoneNumber", "");
+    }
+  }, [verificationMethod, setValue]);
+
   const onSubmit = async (values: z.infer<typeof registerSchema>) => {
     setLoading(true);
     console.log(values);
-    const { name, email, password } = values;
+    const { name, email, phoneNumber, verificationMethod } = values;
+    if (!email && !phoneNumber) {
+      return toast.error("An email or PhoneNo. is required");
+    }
+
     try {
-      const result = await createUser({
+      const result = await registerUser({
         name,
-        email,
-        password,
+        email: verificationMethod === "email" ? email : undefined,
+        tel:
+          verificationMethod !== "email" && phoneNumber
+            ? phoneNumber
+            : undefined,
+        verificationMethod,
       });
+
+      if (result.verificationMethod === "email") {
+        toast.success(`Check email for instructions to set password`);
+      } else if (result.verificationMethod === "whatsapp") {
+        toast.success(`Text 0777833003 to set your password`);
+      } else if (result.verificationMethod === "sms") {
+        toast.success(`An sms will be sent to you in minute`);
+      }
+
       console.log(result);
-      toast.success("Sign in to continue");
       router.push(`/${language}/sign-in`);
     } catch (error) {
       toast.error("Failed. Try again later");
@@ -94,83 +123,74 @@ export function SignUpForm() {
         />
         <FormField
           control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <InputWithIcon
-                  icon={Mail}
-                  className="placeholder:italic placeholder:opacity-50"
-                  placeholder="loci@goweki.com"
-                  type="email"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
+          name="verificationMethod"
           render={({ field }) => {
             return (
-              <FormItem>
+              <FormItem className="space-y-3">
+                <FormLabel>Select a verification method</FormLabel>
                 <FormControl>
-                  <InputWithIcon
-                    icon={Lock}
-                    type="password"
-                    placeholder="Password"
-                    className="placeholder:italic placeholder:opacity-50"
-                    {...field}
-                  />
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-col space-y-2"
+                  >
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="email" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Email</FormLabel>
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <InputWithIcon
+                                disabled={verificationMethod !== "email"}
+                                icon={Mail}
+                                className="placeholder:italic placeholder:opacity-50"
+                                placeholder="loci@goweki.com"
+                                type="email"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="whatsapp" />
+                      </FormControl>
+                      <FormLabel className="font-normal">WhatsApp</FormLabel>
+                      <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <InputPhone
+                                disabled={verificationMethod !== "whatsapp"}
+                                // className="placeholder:italic placeholder:opacity-50"
+                                // placeholder="254 721..."
+                                value={field.value}
+                                setValue={field.onChange}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </FormItem>
+                  </RadioGroup>
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
+        />
 
-                <FormMessage />
-              </FormItem>
-            );
-          }}
-        />
-        <FormField
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => {
-            return (
-              <FormItem>
-                <FormControl>
-                  <InputWithIcon
-                    icon={Lock}
-                    type="password"
-                    placeholder="Confirm password"
-                    className="placeholder:italic placeholder:opacity-50"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            );
-          }}
-        />
-        <FormField
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => {
-            return (
-              <FormItem>
-                <FormControl>
-                  <InputWithIcon
-                    icon={Lock}
-                    type="password"
-                    placeholder="Confirm password"
-                    className="placeholder:italic placeholder:opacity-50"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            );
-          }}
-        />
         <div className="py-4">
           <Button type="submit" className="w-full" disabled={loading}>
             {!loading ? t.submit : <Loader />}

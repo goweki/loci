@@ -5,7 +5,7 @@ import db from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { NextAuthOptions } from "next-auth";
 import { createUser, getUserByEmail, getUserByKey } from "@/data/user";
-import { UserStatus } from "@prisma/client";
+import { User, UserStatus } from "@prisma/client";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
 import { Status as SubscriptionStatus } from "@/data/subscription";
 import { createAccount, upsertAccount } from "@/data/account";
@@ -150,11 +150,13 @@ export const authOptions: NextAuthOptions = {
       try {
         if (account?.provider === "google" && profile?.email) {
           // 1️⃣ Find or create local user
-          let localUser = await getUserByEmail(profile.email);
+          let localUser: Partial<User & { id: string }> = await getUserByEmail(
+            profile.email
+          );
 
           if (!localUser) {
             localUser = await createUser({
-              email: profile.email!,
+              email: profile.email,
               name: profile.name ?? "",
               image: profile.image ?? null,
             });
