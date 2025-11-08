@@ -1,5 +1,3 @@
-"use server";
-
 import { WhatsAppMessage } from "../validations";
 
 // lib/whatsapp.ts

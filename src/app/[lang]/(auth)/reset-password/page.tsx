@@ -19,11 +19,7 @@ export default async function ForgotPasswordPage({
         subtitle: dict.auth.signin.subtitle,
       }}
     >
-      <ForgotPasswordForm
-        emailLabel={dict.auth.signin.emailLabel}
-        passwordLabel={dict.auth.signin.passwordLabel}
-        submitLabel={dict.auth.signin.button}
-      />
+      <ForgotPasswordForm />
     </AuthLayout>
   );
 }

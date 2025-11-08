@@ -23,19 +23,20 @@ const WelcomeHtml = ({ name, onboardLink }: WelcomeEmailProps) => {
     <Html>
       <Head />
       <Body style={main}>
-        <Preview>Welcome to Rabee</Preview>
+        <Preview>Welcome to Loci</Preview>
         <Container style={container}>
           <Img
-            src={`${BASE_URL}/banner_sm.png`}
-            width="235"
-            height="100"
+            src={`${BASE_URL}/banner.png`}
+            width="240"
+            height="130"
             alt="banner"
           />
           <Section>
             <Text style={text}>Hello {name},</Text>
             <Text style={text}>
-              Thank you for signing up to Rabee. We&apos;re excited to have you
-              on board! We look forward to helping you optimize learning.
+              Thank you for signing up to Loci. We&apos;re excited to have you
+              on board! We look forward to helping you supercharge your
+              communications.
             </Text>
             <Text style={text}>
               To finish setting up your account, create a new password using
@@ -51,8 +52,8 @@ const WelcomeHtml = ({ name, onboardLink }: WelcomeEmailProps) => {
             <Text style={text}>
               To keep your account secure, please don&apos;t forward this email
               to anyone. Contact support in case you need assistance via{" "}
-              <Link style={anchor} href="mailto:rabee@goweki.com">
-                rabee@goweki.com
+              <Link style={anchor} href="mailto:loci@goweki.com">
+                loci@goweki.com
               </Link>
             </Text>
             <Text style={text}>See you around!</Text>
@@ -65,17 +66,17 @@ const WelcomeHtml = ({ name, onboardLink }: WelcomeEmailProps) => {
 
 const welcomeEmailText = ({ name, onboardLink }: WelcomeEmailProps) =>
   `Hello ${name},
-Thank you for signing up to Rabee. We're excited to have you onboard! 
-& look forward to helping you optimize learning.
+Thank you for signing up to Loci. We're excited to have you onboard! 
+& look forward to helping you supercharge your communications.
 
 To finish setting up your account, create a new password using
               this link: ${onboardLink}
 
 The link is valid for only 1 hour. If you have any questions, feel free 
-to contact support via rabee@goweki.com
+to contact support via loci@goweki.com
 
 Best regards,
-Team - Rabee`;
+Team - Loci`;
 
 WelcomeHtml.PreviewProps = {
   name: "Antonio",

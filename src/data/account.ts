@@ -1,3 +1,5 @@
+"use server";
+
 import prisma from "@/lib/prisma"; // or wherever your Prisma client is
 import { Prisma } from "@prisma/client";
 

@@ -11,10 +11,11 @@
 import db from "@/lib/prisma";
 import { buildResetURL, generateResetToken } from "@/lib/utils/resetToken";
 import { Prisma, UserRole, UserStatus, User } from "@prisma/client";
-import whatsapp from "@/lib/whatsapp";
 import { sendMail } from "@/lib/mail";
 import { welcomeEmail } from "@/lib/mail/email-render";
 import { BASE_URL } from "@/lib/utils/getUrl";
+import processError from "@/lib/utils/processError";
+import { hash } from "@/lib/utils/passwordHandlers";
 
 /**
  * Creates a new user (doesnt send Welcome email)
@@ -29,6 +30,7 @@ export async function createUser(
     select: { id: true, name: true, email: true, tel: true },
   });
 }
+
 /**
  * Creates a new user, and sends Welcome email.
  */
@@ -36,9 +38,8 @@ export async function registerUser(
   data: (Prisma.UserCreateInput | Prisma.UserUncheckedCreateInput) & {
     verificationMethod?: "email" | "whatsapp" | "sms";
   }
-): Promise<User & { verificationMethod?: "email" | "whatsapp" | "sms" }> {
+): Promise<User & { verificationMethod: "email" | "whatsapp" | "sms" }> {
   console.log("Registering user... ", data);
-  let result = false;
   let verificationMethod_: "email" | "whatsapp" | "sms" = undefined;
   const { verificationMethod, ...data_ } = data;
   const { name, email, tel } = data;
@@ -50,30 +51,125 @@ export async function registerUser(
   const tokenObj = await generateResetToken();
   const resetLink = await buildResetURL(BASE_URL, tokenObj.plain, email || tel);
 
-  const initUser = await db.user.create({
-    data: {
-      ...data_,
-      resetToken: tokenObj.hashed,
-      resetTokenExpiry: tokenObj.expiry.toISOString(),
-    },
-  });
-
-  if (email) {
-    const emailToSend = await welcomeEmail(name, resetLink);
-    await sendMail({
-      to: email,
-      subject: "Welcome to Loci",
-      html: emailToSend.html,
-      text: emailToSend.text,
+  try {
+    const initUser = await db.user.create({
+      data: {
+        ...data_,
+        resetToken: tokenObj.hashed,
+        resetTokenExpiry: tokenObj.expiry.toISOString(),
+      },
     });
-    verificationMethod_ = "email";
-  } else if (verificationMethod === "whatsapp" && tel) {
-    verificationMethod_ = "whatsapp";
-  } else if (verificationMethod === "sms") {
-    verificationMethod_ = "sms";
+
+    if (email) {
+      const emailToSend = await welcomeEmail(name, resetLink);
+      await sendMail({
+        to: email,
+        subject: "Welcome to Loci",
+        html: emailToSend.html,
+        text: emailToSend.text,
+      });
+      verificationMethod_ = "email";
+    } else if (verificationMethod === "whatsapp" && tel) {
+      verificationMethod_ = "whatsapp";
+    } else if (verificationMethod === "sms") {
+      verificationMethod_ = "sms";
+    }
+
+    return { ...initUser, verificationMethod: verificationMethod_ };
+  } catch (error) {
+    const err = processError(error);
+    console.error("User registration failed: ", err);
+    throw new Error(err.message);
+  }
+}
+
+/**
+ * Creates a new user, and sends Welcome email.
+ */
+export async function sendResetLink(data: {
+  username: string;
+  sendTo?: "email" | "whatsapp" | "sms";
+}): Promise<{
+  username: string;
+  sentTo: "email" | "whatsapp" | "sms";
+}> {
+  const { username, sendTo: verificationMethod } = data;
+  console.log(`Generating ResetToken for: ${username}`);
+
+  if (!username) {
+    throw new Error("A username is required");
   }
 
-  return { ...initUser, verificationMethod: verificationMethod_ };
+  const user_ = await getUserByKey(username);
+  if (!user_) {
+    throw new Error("User not found");
+  }
+  const usernameAttribute = user_.email === username ? "email" : "tel";
+  const tokenObj = await generateResetToken();
+  const resetLink = await buildResetURL(BASE_URL, tokenObj.plain, username);
+
+  try {
+    const userUpdates = {
+      resetToken: tokenObj.plain,
+      resetTokenExpiry: tokenObj.expiry,
+    };
+    await updateUserPassword(user_.id, userUpdates);
+
+    let sentTo_: "email" | "whatsapp" | "sms" = undefined;
+
+    if (usernameAttribute === "email") {
+      const emailToSend = await welcomeEmail(user_.name, resetLink);
+      await sendMail({
+        to: user_.email,
+        subject: "Welcome to Loci",
+        html: emailToSend.html,
+        text: emailToSend.text,
+      });
+      sentTo_ = "email";
+    } else if (verificationMethod === "whatsapp" && user_.tel) {
+      sentTo_ = "whatsapp";
+    } else if (verificationMethod === "sms" && user_.tel) {
+      sentTo_ = "sms";
+    }
+
+    return { username, sentTo: sentTo_ };
+  } catch (error) {
+    const err = processError(error);
+    console.error("Sending reset link failed: ", err);
+    throw new Error(err.message);
+  }
+}
+
+/**
+ * verify token.
+ */
+export async function verifyToken(data: {
+  token: string;
+  username: string;
+}): Promise<User | null> {
+  const { token, username } = data;
+
+  console.log(`verifying token for user: ${username} `);
+
+  try {
+    const user = await getUserByKey(username);
+
+    if (!user || !user.resetToken || !user.resetTokenExpiry) {
+      console.error("Invalid token");
+      return null;
+    }
+
+    if (user.resetTokenExpiry < new Date()) {
+      console.error("Expired link. Reset password to get new link");
+      return null;
+    }
+
+    return user;
+  } catch (error) {
+    const err = processError(error);
+    console.error("Token verification failed: ", err);
+    throw new Error(err.message);
+  }
 }
 
 /**
@@ -96,6 +192,13 @@ export async function getUserById(id: string): Promise<User | null> {
  */
 export async function getUserByEmail(email: string): Promise<User | null> {
   return db.user.findUnique({ where: { email } });
+}
+
+/**
+ * Find a user by tel.
+ */
+export async function getUserByTel(tel: string): Promise<User | null> {
+  return db.user.findUnique({ where: { tel } });
 }
 
 /**
@@ -151,24 +254,46 @@ export async function countUsers(): Promise<number> {
  */
 export async function updateUser(
   id: string,
-  data: Partial<Pick<User, "name" | "email" | "image" | "role" | "status">>
-): Promise<User> {
+  data: Partial<
+    Pick<User, "name" | "email" | "tel" | "image" | "role" | "status">
+  >
+): Promise<Partial<User>> {
   return db.user.update({
     where: { id },
     data,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      tel: true,
+      image: true,
+      role: true,
+      status: true,
+    },
   });
 }
 
 /**
  * Update user password.
  */
+
 export async function updateUserPassword(
   id: string,
-  hashedPassword: string
-): Promise<User> {
+  passwordAttributes: {
+    password?: string;
+    resetToken?: string | null;
+    resetTokenExpiry?: Date | null;
+  }
+): Promise<Partial<User>> {
+  if (passwordAttributes.password) {
+    passwordAttributes.password = await hash(passwordAttributes.password);
+  }
   return db.user.update({
     where: { id },
-    data: { password: hashedPassword },
+    data: {
+      ...passwordAttributes,
+    },
+    select: { id: true, email: true, tel: true },
   });
 }
 

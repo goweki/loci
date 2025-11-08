@@ -63,7 +63,7 @@ export function SignUpForm() {
 
   const onSubmit = async (values: z.infer<typeof registerSchema>) => {
     setLoading(true);
-    console.log(values);
+    // console.log(values);
     const { name, email, phoneNumber, verificationMethod } = values;
     if (!email && !phoneNumber) {
       return toast.error("An email or PhoneNo. is required");
@@ -85,13 +85,14 @@ export function SignUpForm() {
       } else if (result.verificationMethod === "whatsapp") {
         toast.success(`Text 0777833003 to set your password`);
       } else if (result.verificationMethod === "sms") {
-        toast.success(`An sms will be sent to you in minute`);
+        toast.success(`An sms will be sent to you in a minute`);
       }
 
       console.log(result);
       router.push(`/${language}/sign-in`);
     } catch (error) {
-      toast.error("Failed. Try again later");
+      console.log("Error signing up:", error);
+      toast.error(error.message || "Failed. Try again later");
       setLoading(false);
     }
   };
@@ -103,6 +104,7 @@ export function SignUpForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4 text-start"
       >
+        {/* <hr className="my-6 border-t" /> */}
         <FormField
           control={form.control}
           name="name"

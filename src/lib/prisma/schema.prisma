@@ -21,7 +21,7 @@ model User {
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
   resetToken       String?
-  resetTokenExpiry String?
+  resetTokenExpiry DateTime?
   AutoReplyRules   AutoReplyRule[]
   accounts         Account[]
   contacts         Contact[]

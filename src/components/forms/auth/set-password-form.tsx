@@ -1,165 +1,182 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import { InputWithIcon } from "@/components/ui/input";
-import { Eye, EyeOff, Lock, User as UserIcon } from "lucide-react";
-import { useState } from "react";
+  emailValidator,
+  institutionNameValidator,
+  locationValidator,
+  nameValidator,
+  passwordValidator,
+} from "@/lib/utils/inputValidators";
+import { strsMatch } from "@/lib/utils/stringHandlers";
 import Link from "next/link";
-import GoogleSignin from "@/components/ui/svg";
-import { signIn } from "next-auth/react";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import Loader from "@/components/ui/loaders";
-import AuthErrorHandler, { ERROR_MESSAGES } from "./_errorHandler";
+import { SideBanner } from "./_banner";
+import { useForm } from "react-hook-form";
+import z from "zod";
+import { setPasswordSchema } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { updateUserPassword, verifyToken } from "@/data/user";
+import processError from "@/lib/utils/processError";
+import { Form } from "@/components/ui/form";
+import AuthErrorHandler from "./_errorHandler";
 
-const formSchema = z.object({
-  username: z.email({ message: "Please enter a valid email address" }),
-  password: z
-    .string()
-    .min(5, { message: "Password must be at least 5 characters" })
-    .max(16, { message: "Password must be less than 16 characters" }),
-});
-
-interface SignInProps {
-  emailLabel: string;
-  passwordLabel: string;
-  submitLabel: string;
-}
-
-export function SetPasswordForm(copy: SignInProps) {
-  const { emailLabel, passwordLabel, submitLabel } = copy;
-  const [loading, setLoading] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState(false);
+export default function SetPasswordForm({
+  error,
+  token,
+  username,
+}: {
+  error?: string;
+  token?: string;
+  username?: string;
+}) {
   const router = useRouter();
+  const [password, setPassword] = useState("");
+  const [passwordRepeat, setPasswordRepeat] = useState("");
+  const [inputErrors, setInputErrors] = useState<{
+    password: string;
+    passwordRepeat: string;
+  }>({
+    password: "",
+    passwordRepeat: "",
+  });
+  const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof setPasswordSchema>>({
+    resolver: zodResolver(setPasswordSchema),
     defaultValues: {
-      username: "",
+      username,
+      token,
       password: "",
+      confirmPassword: "",
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setLoading(true);
+  // onMount
+  useEffect(() => {
+    (async () => {
+      if (!token || !username) {
+        const errorMessage = !token ? "no token provided" : "no email provided";
+        console.error("error mounting page - ", errorMessage);
+        toast.error(errorMessage);
+        router.push("/reset-password");
+      }
+    })();
+  }, [token, username, router]);
 
-    const { username, password } = values;
-
-    const result = await signIn("credentials", {
-      redirect: false,
-      username,
-      password,
-    });
-
-    setLoading(false);
-
-    if (result?.error) {
-      const error_ =
-        typeof result.error === "string" ? result.error : undefined;
-      const errorMessage = error_
-        ? ERROR_MESSAGES[error_ as keyof typeof ERROR_MESSAGES] ?? error_
-        : "Failed to sign in. Try again later";
-      toast.error(errorMessage);
-    } else {
-      router.push("/dashboard");
+  // if error
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
     }
-  };
+  }, [error]);
+
+  async function onSubmit(values: z.infer<typeof setPasswordSchema>) {
+    const { username, token, password } = values;
+
+    setLoading(true);
+    try {
+      const user = verifyToken({ token, username });
+      if (!user) {
+        toast.error("Invalid token");
+        setLoading(false);
+        return;
+      }
+
+      console.log(`Request to update password for user - ${user}`);
+
+      const userUpdates_ = {
+        password,
+        resetToken: null,
+        resetTokenExpriry: null,
+      };
+      const updateUser = updateUserPassword((await user).id, userUpdates_);
+
+      if (!updateUser) {
+        toast.error("Error updating password. Try again later");
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Password updated");
+      router.push(`/sign-in`);
+    } catch (error) {
+      const err = processError(error);
+      console.error("ERROR in set-password-form: ", err);
+      toast.error(err.message);
+    }
+  }
 
   return (
     <Form {...form}>
       <AuthErrorHandler />
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 text-start"
+        className="sm:w-2/3 w-full px-4 space-y-4 lg:px-0 mx-auto my-4 mt-8"
       >
-        <div>
-          <div className="space-x-2">
-            <button
-              type="button"
-              className="hover:scale-105 transition-all duration-200"
-              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            >
-              <GoogleSignin />
-            </button>
-          </div>
-          <p className="text-mute-foreground">or use your credentials:</p>
+        <div className="mb-4 md:flex md:justify-between">
+          <Input
+            name="password"
+            type="password"
+            placeholder="Enter new Password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (inputErrors.password)
+                setInputErrors((prev) => ({ ...prev, password: "" }));
+            }}
+            className={
+              inputErrors.password ? "border-destructive" : "border-border"
+            }
+          />
         </div>
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <InputWithIcon
-                  icon={UserIcon}
-                  className="placeholder:italic placeholder:opacity-50"
-                  placeholder="loci@goweki.com..."
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => {
-            return (
-              <FormItem>
-                <div className="relative">
-                  <FormControl>
-                    <InputWithIcon
-                      icon={Lock}
-                      type={showPassword ? "text" : "password"}
-                      {...field}
-                      className="pr-10"
-                    />
-                  </FormControl>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-0 top-0 h-full px-3"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                <FormMessage />
-              </FormItem>
-            );
-          }}
-        />
-        <div className="py-4">
+        <div className="mb-4 md:flex md:justify-between">
+          <Input
+            name="repeatPassword"
+            type="password"
+            placeholder="Re-enter Password"
+            className={
+              inputErrors.passwordRepeat
+                ? "border-destructive"
+                : "border-border"
+            }
+            value={passwordRepeat}
+            onChange={(e) => {
+              setPasswordRepeat(e.target.value);
+              if (inputErrors.passwordRepeat)
+                setInputErrors((prev) => ({ ...prev, passwordRepeat: "" }));
+            }}
+          />
+        </div>
+
+        <div className="px-4 pb-2 pt-4">
           <Button type="submit" className="w-full" disabled={loading}>
-            {!loading ? submitLabel : <Loader />}
+            {loading ? (
+              <div className="animate-pulse flex flex-row gap-x-4">
+                <Loader />
+                Loading...
+              </div>
+            ) : (
+              "Set New Password"
+            )}
           </Button>
         </div>
         <hr className="my-6 border-t" />
-        <div className="flex flex-row justify-between italic text-xs">
-          <Link href="/register" className="flex w-fit hover:underline">
-            No account? Register
-          </Link>
-
-          <Link href="/reset-password" className="flex w-fit hover:underline">
+        <div className="text-center grid grid-cols-1 gap-y-1 text-xs">
+          <Link href="/reset-password" className="hover:underline">
             Forgot Password? Reset
           </Link>
+          <Link href="/sign-in" className="hover:underline">
+            Already have an account? Login
+          </Link>
+        </div>
+        <div className="p-4 text-center right-0 left-0 flex justify-center space-x-4 mt-16 lg:hidden ">
+          <SideBanner />
         </div>
       </form>
     </Form>

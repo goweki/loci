@@ -10,11 +10,12 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { InputWithIcon } from "@/components/ui/input";
-import { Eye, EyeOff, Lock, User as UserIcon } from "lucide-react";
-import { useState } from "react";
+import { Eye, EyeOff, Lock, Mail, User as UserIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import GoogleSignin from "@/components/ui/svg";
 import { signIn } from "next-auth/react";
@@ -22,54 +23,76 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/ui/loaders";
 import AuthErrorHandler, { ERROR_MESSAGES } from "./_errorHandler";
+import { forgotPasswordSchema } from "@/lib/validations";
+import { registerUser, sendResetLink } from "@/data/user";
+import { useI18n } from "@/lib/i18n";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import InputPhone from "@/components/ui/input-phone";
 
-const formSchema = z.object({
-  username: z.email({ message: "Please enter a valid email address" }),
-  password: z
-    .string()
-    .min(5, { message: "Password must be at least 5 characters" })
-    .max(16, { message: "Password must be less than 16 characters" }),
-});
+const translations = {
+  en: { submit: "Send Link", orCredentials: "or use your Credentials" },
+  sw: { submit: "Tuma Linki", orCredentials: "au tumia Barua pepe kuingia" },
+};
 
-interface SignInProps {
-  emailLabel: string;
-  passwordLabel: string;
-  submitLabel: string;
-}
-
-export function ForgotPasswordForm(copy: SignInProps) {
-  const { emailLabel, passwordLabel, submitLabel } = copy;
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+export function ForgotPasswordForm() {
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+  const { language } = useI18n();
+  const t = translations[language];
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { username: "", password: "" },
+  const form = useForm<z.infer<typeof forgotPasswordSchema>>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
+      phoneNumber: "",
+      username: "email",
+    },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const { watch, setValue } = form;
+  const username = watch("username");
+
+  useEffect(() => {
+    if (username === "whatsapp") {
+      setValue("email", "");
+    } else if (username === "email") {
+      setValue("phoneNumber", "");
+    }
+  }, [username, setValue]);
+
+  const onSubmit = async (values: z.infer<typeof forgotPasswordSchema>) => {
     setLoading(true);
-    const { username, password } = values;
+    // console.log(values);
+    const { email, phoneNumber, username } = values;
+    if (!email && !phoneNumber) {
+      return toast.error("An email or PhoneNo. is required");
+    }
 
-    const result = await signIn("credentials", {
-      redirect: false,
-      username,
-      password,
-    });
+    try {
+      const result = await sendResetLink({
+        username: email || phoneNumber,
+        sendTo: username,
+      });
+      console.log(result);
 
-    setLoading(false);
+      if (!result) {
+        throw new Error("Error sending reset link");
+      }
+      const sentTo = result.sentTo;
 
-    if (result?.error) {
-      const error_ =
-        typeof result.error === "string" ? result.error : undefined;
-      const errorMessage =
-        error_ && ERROR_MESSAGES[error_ as keyof typeof ERROR_MESSAGES]
-          ? ERROR_MESSAGES[error_ as keyof typeof ERROR_MESSAGES]
-          : "Failed to sign in. Try again later";
-      toast.error(errorMessage);
-    } else {
-      router.push("/dashboard");
+      if (sentTo === "email") {
+        toast.success(`Password rest link sent to ${username}`);
+      }
+      if (sentTo === "whatsapp") {
+        toast.success(`Whatsapp +777833003 to get the reset link`);
+      }
+      if (sentTo === "sms") {
+        toast.success(`Your reset link will be sent via sms shortly.`);
+      }
+    } catch (error) {
+      console.log("Error sending reset link:", error);
+      toast.error(error.message || "Failed. Try again later");
+      setLoading(false);
     }
   };
 
@@ -80,84 +103,96 @@ export function ForgotPasswordForm(copy: SignInProps) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4 text-start"
       >
-        <div>
-          <div className="space-x-2">
-            <button
-              type="button"
-              className="hover:scale-105 transition-all duration-200"
-              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            >
-              <GoogleSignin />
-            </button>
-          </div>
-          <p className="text-mute-foreground">or use your credentials:</p>
-        </div>
-
-        {/* Username */}
         <FormField
           control={form.control}
           name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <InputWithIcon
-                  icon={UserIcon}
-                  className="placeholder:italic placeholder:opacity-50"
-                  placeholder="loci@goweki.com..."
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Password */}
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <div className="relative">
+          render={({ field }) => {
+            return (
+              <FormItem className="space-y-3">
+                <FormLabel>
+                  Select a method method to get a password reset link
+                </FormLabel>
                 <FormControl>
-                  <InputWithIcon
-                    icon={Lock}
-                    type={showPassword ? "text" : "password"}
-                    {...field}
-                    className="pr-10"
-                  />
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-col space-y-2"
+                  >
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="email" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Email</FormLabel>
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <InputWithIcon
+                                disabled={username !== "email"}
+                                icon={Mail}
+                                className="placeholder:italic placeholder:opacity-50"
+                                placeholder="loci@goweki.com"
+                                type="email"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="whatsapp" />
+                      </FormControl>
+                      <FormLabel className="font-normal">WhatsApp</FormLabel>
+                      <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <InputPhone
+                                disabled={username !== "whatsapp"}
+                                // className="placeholder:italic placeholder:opacity-50"
+                                // placeholder="254 721..."
+                                value={field.value}
+                                setValue={field.onChange}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </FormItem>
+                  </RadioGroup>
                 </FormControl>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-0 top-0 h-full px-3"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
 
         <div className="py-4">
           <Button type="submit" className="w-full" disabled={loading}>
-            {!loading ? submitLabel : <Loader />}
+            {!loading ? t.submit : <Loader />}
           </Button>
         </div>
-
         <hr className="my-6 border-t" />
         <div className="flex flex-row justify-between italic text-xs">
-          <Link href="/register" className="hover:underline">
-            No account? Register
+          <Link
+            href={`/${language}/sign-in`}
+            className="flex w-fit hover:underline"
+          >
+            Already registered?
           </Link>
-          <Link href="/reset-password" className="hover:underline">
+
+          <Link
+            href={`/${language}/reset-password`}
+            className="flex w-fit hover:underline"
+          >
             Forgot Password? Reset
           </Link>
         </div>

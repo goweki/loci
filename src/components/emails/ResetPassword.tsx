@@ -26,13 +26,13 @@ const ResetPasswordHtml = ({
     <Html>
       <Head />
       <Body style={main}>
-        <Preview>Reset Password - Rabee</Preview>
+        <Preview>Reset Password - Loci</Preview>
         <Container style={container}>
           <Img
-            src={`${BASE_URL}/banner_sm.png`}
-            width="235"
-            height="100"
-            alt="rabee"
+            src={`${BASE_URL}/banner.png`}
+            width="1200"
+            height="650"
+            alt="loci"
           />
           <Section>
             <Text style={text}>Hi {name},</Text>
