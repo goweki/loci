@@ -3,6 +3,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
 import { processIncomingMessage } from "@/lib/whatsapp";
+import { error } from "console";
+const WHATSAPP_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
 
 // Verification
 export async function GET(request: NextRequest) {
@@ -11,11 +13,20 @@ export async function GET(request: NextRequest) {
   const token = searchParams.get("hub.verify_token");
   const challenge = searchParams.get("hub.challenge");
 
-  if (mode === "subscribe" && token === process.env.WEBHOOK_VERIFY_TOKEN) {
+  if (!WHATSAPP_VERIFY_TOKEN) {
+    return NextResponse.json(
+      { error: "Verifivcation TOKEN not configured" },
+      { status: 500 }
+    );
+  }
+
+  console.log(`mode-${mode}\n`);
+
+  if (mode === "subscribe" && token === WHATSAPP_VERIFY_TOKEN) {
     return new NextResponse(challenge);
   }
 
-  return new NextResponse("Forbidden", { status: 403 });
+  return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 }
 
 export async function POST(request: NextRequest) {
