@@ -3,7 +3,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
 import { processIncomingMessage } from "@/lib/whatsapp";
-import { error } from "console";
 const WHATSAPP_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
 
 // Verification
