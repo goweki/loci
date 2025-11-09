@@ -260,7 +260,7 @@ export default function PrivacyPolicy() {
     <div className="min-h-screen bg-gradient-to-br from-background to-card">
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Header */}
-        <div className="bg-background rounded-xl shadow-lg p-8 mb-8">
+        <div className="p-8 mt-8">
           <h1 className="text-4xl font-bold mb-2">{t.title}</h1>
           <p className="text-muted-foreground text-sm">{t.lastUpdated}</p>
         </div>
@@ -388,7 +388,7 @@ export default function PrivacyPolicy() {
 
 function Section({ title, children }) {
   return (
-    <div className="bg-popover text-popover-foreground rounded-xl shadow-lg p-8">
+    <div className="bg-card text-card-foreground rounded-xl shadow-lg p-8">
       <h2 className="text-2xl font-bold mb-4">{title}</h2>
       <div className="space-y-4">{children}</div>
     </div>
