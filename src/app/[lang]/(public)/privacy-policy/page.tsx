@@ -10,7 +10,7 @@ const translations = {
     introduction: {
       title: "Introduction",
       content:
-        "Welcome to our WhatsApp Business messaging platform. We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our service.",
+        "Welcome to LOCi. We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our service.",
     },
     informationWeCollect: {
       title: "Information We Collect",
