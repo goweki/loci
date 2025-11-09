@@ -50,8 +50,8 @@ const ResetPasswordHtml = ({
             <Text style={text}>
               To keep your account secure, please don&apos;t forward this email
               to anyone. Contact support in case you nned assistance via{" "}
-              <Link style={anchor} href="mailto:rabee@goweki.com">
-                rabee@goweki.com
+              <Link style={anchor} href="mailto:loci@goweki.com">
+                loci@goweki.com
               </Link>
             </Text>
             <Text style={text}>Have a productive time!</Text>
