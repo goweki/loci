@@ -64,8 +64,8 @@ export default function SetPasswordForm({
           router.push(`/${language}/reset-password`);
           return;
         }
-
-        toast.success(verif_.message);
+        console.log(verif_.message);
+        toast.success("Set New password");
       }
     })();
   }, [token, username, router]);

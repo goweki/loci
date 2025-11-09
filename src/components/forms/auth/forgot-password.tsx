@@ -79,18 +79,18 @@ export function ForgotPasswordForm() {
       }
       const sentTo = result.sentTo;
 
-      if (sentTo === "email") {
-        toast.success(`Password rest link sent to ${username}`);
-      }
-      if (sentTo === "whatsapp") {
-        toast.success(`Whatsapp +777833003 to get the reset link`);
-      }
-      if (sentTo === "sms") {
-        toast.success(`Your reset link will be sent via sms shortly.`);
-      }
+      const messages: Record<string, string> = {
+        email: `Password reset link sent to ${username}`,
+        whatsapp: `Whatsapp +777833003 to get the reset link`,
+        sms: `Your reset link will be sent via sms shortly.`,
+      };
+
+      const message = messages[sentTo];
+      toast.success(message);
     } catch (error) {
       console.log("Error sending reset link:", error);
       toast.error(error.message || "Failed. Try again later");
+    } finally {
       setLoading(false);
     }
   };
