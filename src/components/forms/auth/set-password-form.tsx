@@ -97,7 +97,7 @@ export default function SetPasswordForm({
       const userUpdates_ = {
         password,
         resetToken: null,
-        resetTokenExpriry: null,
+        resetTokenExpiry: null,
       };
       const updateUser = updateUserPassword(user.id, userUpdates_);
 
