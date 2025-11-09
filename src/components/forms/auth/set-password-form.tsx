@@ -23,7 +23,8 @@ import {
 } from "@/components/ui/form";
 import AuthErrorHandler from "./_errorHandler";
 import { useI18n } from "@/lib/i18n";
-import { Lock, User } from "lucide-react";
+import { Lock, User as UserIcon } from "lucide-react";
+import { type User } from "@prisma/client";
 
 export default function SetPasswordForm({
   error,
@@ -56,13 +57,15 @@ export default function SetPasswordForm({
         console.error("error mounting page - ", errorMessage);
         toast.error(errorMessage);
       } else {
-        const isTokenValid = verifyToken({ token, username });
-        if (!isTokenValid) {
-          toast.error("Invalid token");
+        const verif_ = await verifyToken({ token, username });
+
+        if (!verif_.verification) {
+          toast.error(verif_.message);
           router.push(`/${language}/reset-password`);
           return;
         }
-        toast.success("Enter New Password");
+
+        toast.success(verif_.message);
       }
     })();
   }, [token, username, router]);
@@ -79,9 +82,12 @@ export default function SetPasswordForm({
 
     setLoading(true);
     try {
-      const user = await verifyToken({ token, username });
-      if (!user) {
-        toast.error("Invalid token");
+      const { verification, user, message } = await verifyToken({
+        token,
+        username,
+      });
+      if (!verification) {
+        toast.error(message);
         setLoading(false);
         return;
       }
@@ -124,7 +130,7 @@ export default function SetPasswordForm({
             <FormItem>
               <FormControl>
                 <InputWithIcon
-                  icon={User}
+                  icon={UserIcon}
                   className="placeholder:italic placeholder:opacity-50"
                   placeholder="Your Username"
                   disabled

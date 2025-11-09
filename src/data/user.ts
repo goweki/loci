@@ -15,7 +15,7 @@ import { sendMail } from "@/lib/mail";
 import { welcomeEmail, resetPasswordEmail } from "@/lib/mail/email-render";
 import { BASE_URL } from "@/lib/utils/getUrl";
 import processError from "@/lib/utils/processError";
-import { hash } from "@/lib/utils/passwordHandlers";
+import { compareHash, hash } from "@/lib/utils/passwordHandlers";
 import sendSms, { SMSprops } from "@/lib/sms";
 
 /**
@@ -122,16 +122,12 @@ export async function sendResetLink(data: {
     await updateUserPassword(user_.id, userUpdates);
 
     let sentTo_: "email" | "whatsapp" | "sms" = undefined;
-    const emailGenFunction =
-      emailTemplate === "welcome" ? welcomeEmail : resetPasswordEmail;
-    const emailToSend = await emailGenFunction(user_.name, resetLink);
-    const subject_ =
-      emailTemplate === "welcome" ? "Welcome to Loci" : "Reset Password: Loci";
+    const emailToSend = await resetPasswordEmail(user_.name, resetLink);
 
     if (usernameAttribute === "email") {
       await sendMail({
         to: user_.email,
-        subject: subject_,
+        subject: "Reset Password: LOCi",
         html: emailToSend.html,
         text: emailToSend.text,
       });
@@ -160,30 +156,29 @@ export async function sendResetLink(data: {
 export async function verifyToken(data: {
   token: string;
   username: string;
-}): Promise<Pick<User, "id" | "name" | "email" | "tel">> {
+}): Promise<{
+  verification: boolean;
+  user?: Pick<User, "id" | "name" | "email" | "tel">;
+  message: string;
+}> {
   const { token, username } = data;
 
-  console.log(`verifying token for user: ${username} `);
+  console.log(`verifying token for user: ${username} \ntoken:${token}\n`);
 
-  try {
-    const user = await getUserByKey(username);
-
-    if (!user || !user.resetToken || !user.resetTokenExpiry) {
-      console.error("Invalid token");
-      return null;
-    }
-
-    if (user.resetTokenExpiry < new Date()) {
-      console.error("Expired link. Reset password to get new link");
-      return null;
-    }
-
-    return user;
-  } catch (error) {
-    const err = processError(error);
-    console.error("Token verification failed: ", err);
-    throw new Error(err.message);
+  const user = await getUserByKey(username);
+  if (!user || !user.resetToken || !user.resetTokenExpiry) {
+    return { verification: false, message: "Invalid link" };
   }
+
+  if (!(await compareHash(token, user.resetToken))) {
+    return { verification: false, message: "Invalid token" };
+  }
+
+  if (user.resetTokenExpiry < new Date()) {
+    return { verification: false, message: "Expired token" };
+  }
+
+  return { verification: true, user, message: "Valid token" };
 }
 
 /**

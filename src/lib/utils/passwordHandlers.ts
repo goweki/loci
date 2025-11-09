@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 const saltRounds = Number(process.env.BCRYPT_SALTROUNDS || 9);
 import crypto from "crypto";
 
@@ -9,7 +9,10 @@ export async function hash(plaintext: string) {
 }
 
 // To compare input&hash
-export async function compareHash(input: string, hash: string) {
+export async function compareHash(
+  input: string,
+  hash: string
+): Promise<boolean> {
   const isValid = await bcrypt.compare(input, hash);
   return isValid;
 }

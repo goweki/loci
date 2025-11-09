@@ -23,12 +23,12 @@ const ConfirmHtml = ({ name, message }: MessageEmailProps) => {
     <Html>
       <Head />
       <Body style={main}>
-        <Preview>Welcome to Rabee</Preview>
+        <Preview>Thank you for reaching out</Preview>
         <Container style={container}>
           <Img
-            src={`${BASE_URL}/banner_sm.png`}
-            width="235"
-            height="100"
+            src={`${BASE_URL}/banner.png`}
+            width="240"
+            height="130"
             alt="banner"
           />
           <Section>
@@ -41,7 +41,7 @@ const ConfirmHtml = ({ name, message }: MessageEmailProps) => {
             <Text style={{ ...highlight, marginBottom: "1.5rem" }}>
               {message}
             </Text>
-            <Text style={text}>- Rabee</Text>
+            <Text style={text}>- Loci</Text>
           </Section>
         </Container>
       </Body>

@@ -30,14 +30,14 @@ const ResetPasswordHtml = ({
         <Container style={container}>
           <Img
             src={`${BASE_URL}/banner.png`}
-            width="1200"
-            height="650"
-            alt="loci"
+            width="240"
+            height="130"
+            alt="banner"
           />
           <Section>
             <Text style={text}>Hi {name},</Text>
             <Text style={text}>
-              Someone recently requested a password change for your Rabee
+              Someone recently requested a password change for your Loci
               account. If this was you, you can set a new password here:
             </Text>
             <Button style={button} href={resetPasswordLink}>
@@ -67,17 +67,17 @@ const resetPasswordText = ({
   resetPasswordLink,
 }: ResetPasswordEmailProps) =>
   `Hello ${name},
-Someone recently requested a password change for your Rabee
+Someone recently requested a password change for your Loci
 account. If this was you, you can set a new password here: ${resetPasswordLink}
 
 If you don't want to change your password or didn't
 request this, just ignore and delete this message.
 
 The link is valid for only 1 hour. If you have any questions, feel free 
-to contact support via rabee@goweki.com
+to contact support via loci@goweki.com
 
 Best regards,
-Team - Rabee`;
+Team - Loci`;
 
 ResetPasswordHtml.PreviewProps = {
   name: "Antonio",

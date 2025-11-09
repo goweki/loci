@@ -13,6 +13,14 @@ export type AppError = {
  * Returns a structured, uniform error response.
  */
 export default function processError(error: unknown): AppError {
+  console.error("handling error: ", error);
+  if (!error) {
+    return {
+      message: `Unknown error`,
+      code: "UNKNOWN_ERROR",
+      status: 500,
+    };
+  }
   // Handle Prisma client known errors
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     switch (error.code) {
