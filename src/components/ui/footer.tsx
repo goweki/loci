@@ -14,7 +14,6 @@ const Footer = () => {
     },
   ];
 
-const Footer = () => {
   return (
     <footer className="border-t mt-8">
       <div className="max-w-screen-xl mx-auto">
