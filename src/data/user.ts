@@ -294,11 +294,10 @@ export async function updateUserPassword(
   if (passwordAttributes.password) {
     passwordAttributes.password = await hash(passwordAttributes.password);
   }
+
   return db.user.update({
     where: { id },
-    data: {
-      ...passwordAttributes,
-    },
+    data: passwordAttributes,
     select: { id: true, email: true, tel: true },
   });
 }
