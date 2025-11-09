@@ -1,19 +1,10 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Input } from "@/components/ui/input";
+import { Input, InputWithIcon } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  emailValidator,
-  institutionNameValidator,
-  locationValidator,
-  nameValidator,
-  passwordValidator,
-} from "@/lib/utils/inputValidators";
-import { strsMatch } from "@/lib/utils/stringHandlers";
 import Link from "next/link";
 import Loader from "@/components/ui/loaders";
 import { SideBanner } from "./_banner";
@@ -23,8 +14,16 @@ import { setPasswordSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateUserPassword, verifyToken } from "@/data/user";
 import processError from "@/lib/utils/processError";
-import { Form } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import AuthErrorHandler from "./_errorHandler";
+import { useI18n } from "@/lib/i18n";
+import { Lock, User } from "lucide-react";
 
 export default function SetPasswordForm({
   error,
@@ -36,15 +35,7 @@ export default function SetPasswordForm({
   username?: string;
 }) {
   const router = useRouter();
-  const [password, setPassword] = useState("");
-  const [passwordRepeat, setPasswordRepeat] = useState("");
-  const [inputErrors, setInputErrors] = useState<{
-    password: string;
-    passwordRepeat: string;
-  }>({
-    password: "",
-    passwordRepeat: "",
-  });
+  const { language } = useI18n();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof setPasswordSchema>>({
@@ -64,7 +55,14 @@ export default function SetPasswordForm({
         const errorMessage = !token ? "no token provided" : "no email provided";
         console.error("error mounting page - ", errorMessage);
         toast.error(errorMessage);
-        router.push("/reset-password");
+      } else {
+        const isTokenValid = verifyToken({ token, username });
+        if (!isTokenValid) {
+          toast.error("Invalid token");
+          router.push(`/${language}/reset-password`);
+          return;
+        }
+        toast.success("Enter New Password");
       }
     })();
   }, [token, username, router]);
@@ -81,7 +79,7 @@ export default function SetPasswordForm({
 
     setLoading(true);
     try {
-      const user = verifyToken({ token, username });
+      const user = await verifyToken({ token, username });
       if (!user) {
         toast.error("Invalid token");
         setLoading(false);
@@ -95,7 +93,7 @@ export default function SetPasswordForm({
         resetToken: null,
         resetTokenExpriry: null,
       };
-      const updateUser = updateUserPassword((await user).id, userUpdates_);
+      const updateUser = updateUserPassword(user.id, userUpdates_);
 
       if (!updateUser) {
         toast.error("Error updating password. Try again later");
@@ -112,47 +110,73 @@ export default function SetPasswordForm({
     }
   }
 
-  return (
+  return username && token ? (
     <Form {...form}>
       <AuthErrorHandler />
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="sm:w-2/3 w-full px-4 space-y-4 lg:px-0 mx-auto my-4 mt-8"
       >
-        <div className="mb-4 md:flex md:justify-between">
-          <Input
-            name="password"
-            type="password"
-            placeholder="Enter new Password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (inputErrors.password)
-                setInputErrors((prev) => ({ ...prev, password: "" }));
-            }}
-            className={
-              inputErrors.password ? "border-destructive" : "border-border"
-            }
-          />
-        </div>
-        <div className="mb-4 md:flex md:justify-between">
-          <Input
-            name="repeatPassword"
-            type="password"
-            placeholder="Re-enter Password"
-            className={
-              inputErrors.passwordRepeat
-                ? "border-destructive"
-                : "border-border"
-            }
-            value={passwordRepeat}
-            onChange={(e) => {
-              setPasswordRepeat(e.target.value);
-              if (inputErrors.passwordRepeat)
-                setInputErrors((prev) => ({ ...prev, passwordRepeat: "" }));
-            }}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <InputWithIcon
+                  icon={User}
+                  className="placeholder:italic placeholder:opacity-50"
+                  placeholder="Your Username"
+                  disabled
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => {
+            return (
+              <FormItem>
+                <FormControl>
+                  <InputWithIcon
+                    icon={Lock}
+                    type="password"
+                    placeholder="Your New Password"
+                    className="pr-10 placeholder:italic placeholder:opacity-50"
+                    {...field}
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            );
+          }}
+        />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => {
+            return (
+              <FormItem>
+                <FormControl>
+                  <InputWithIcon
+                    icon={Lock}
+                    type="password"
+                    placeholder="Confirm New Password"
+                    className="pr-10 placeholder:italic placeholder:opacity-50"
+                    {...field}
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            );
+          }}
+        />
 
         <div className="px-4 pb-2 pt-4">
           <Button type="submit" className="w-full" disabled={loading}>
@@ -167,7 +191,7 @@ export default function SetPasswordForm({
           </Button>
         </div>
         <hr className="my-6 border-t" />
-        <div className="text-center grid grid-cols-1 gap-y-1 text-xs">
+        <div className="text-center grid grid-cols-1 gap-y-1 text-xs italic">
           <Link href="/reset-password" className="hover:underline">
             Forgot Password? Reset
           </Link>
@@ -180,5 +204,5 @@ export default function SetPasswordForm({
         </div>
       </form>
     </Form>
-  );
+  ) : null;
 }

@@ -2,40 +2,23 @@
   "auth": {
     "signin": {
       "title": "Karibu Tena",
-      "subtitle": "Ingia ili kuendelea",
-      "emailLabel": "Barua Pepe",
-      "passwordLabel": "Nenosiri",
-      "button": "Ingia",
-      "google": "Endelea na Google",
-      "forgotPassword": "Umesahau nenosiri?",
-      "noAccount": "Huna akaunti?",
-      "signupLink": "Unda Akaunti"
+      "subtitle": "Ingia ili kuendelea"
     },
     "signup": {
       "title": "Unda Akaunti Yako",
-      "subtitle": "Jiunge nasi leo uanze",
-      "nameLabel": "Jina Kamili",
-      "emailLabel": "Barua Pepe",
-      "passwordLabel": "Nenosiri",
-      "confirmPasswordLabel": "Thibitisha Nenosiri",
-      "button": "Jisajili",
-      "alreadyHaveAccount": "Tayari una akaunti?",
-      "signinLink": "Ingia"
+      "subtitle": "Jiunge nasi leo uanze"
     },
     "forgotPassword": {
       "title": "Umesahau Nenosiri?",
-      "subtitle": "Weka barua pepe yako ili upokee kiungo cha kuweka upya",
-      "emailLabel": "Barua Pepe",
-      "button": "Tuma Kiungo",
-      "backToSignIn": "Rudi kwenye ukurasa wa kuingia"
+      "subtitle": "Weka barua pepe yako ili upokee kiungo cha kuweka neno-siri upya",
+      "setPassword": {
+        "title": "Nenosiri Jipya",
+        "subTitle": "Unda neno-siri la kipekee"
+      }
     },
     "resetPassword": {
-      "title": "Weka Upya Nenosiri",
-      "subtitle": "Weka nenosiri jipya hapa chini",
-      "passwordLabel": "Nenosiri Jipya",
-      "confirmPasswordLabel": "Thibitisha Nenosiri Jipya",
-      "button": "Weka Upya Nenosiri",
-      "success": "Umefanikiwa kuweka upya nenosiri. Sasa unaweza kuingia."
+      "title": "Weka Upya Neno-siri",
+      "subtitle": "Weka nenosiri jipya hapa chini"
     },
     "contactUs": {
       "title": "Wasiliana Nasi",
@@ -46,18 +29,6 @@
       "button": "Tuma Ujumbe",
       "success": "Ujumbe umetumwa kwa mafanikio!",
       "error": "Imeshindikana kutuma ujumbe. Tafadhali jaribu tena baadaye."
-    },
-    "common": {
-      "logout": "Toka",
-      "successLogin": "Umeingia kwa mafanikio.",
-      "successLogout": "Umetoka kwa mafanikio.",
-      "errors": {
-        "invalidEmail": "Tafadhali weka anwani halali ya barua pepe.",
-        "requiredField": "Sehemu hii inahitajika.",
-        "passwordMismatch": "Manenosiri hayafanani.",
-        "incorrectCredentials": "Barua pepe au nenosiri si sahihi.",
-        "network": "Hitilafu ya mtandao. Tafadhali jaribu tena baadaye."
-      }
     }
   },
   "pricing": {

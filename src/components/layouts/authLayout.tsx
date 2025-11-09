@@ -56,17 +56,17 @@ export default async function AuthLayout({
       </div>
       <div className="lg:w-1/2 w-full flex items-center justify-center text-center px-4 sm:px-8 md:px-16 z-0">
         <div className="w-full py-6 z-20 space-y-2">
-          <div className="flex flex-row items-center">
+          <div className="flex flex-row items-center justify-center">
             <BrandSymbol height={24} />
             <span className="ml-2 font-bold font-sans hidden lg:flex">
               LOCi
             </span>
           </div>
           <div className="pb-4">
-            <h1 className="text-xl font-light tracking-wide m-0 text-start sr-only">
+            <h1 className="text-xl font-light tracking-wide m-auto sr-only">
               {title}
             </h1>
-            <p className="text-xl italic max-w-md text-start text-primary">
+            <p className="text-xl italic max-w-md text-primary m-auto">
               {subtitle}
             </p>
           </div>

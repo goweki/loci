@@ -77,7 +77,7 @@ export function SignInForm() {
       const error_ =
         typeof result.error === "string" ? result.error : undefined;
       const errorMessage = error_
-        ? ERROR_MESSAGES[error_ as keyof typeof ERROR_MESSAGES] ?? error_
+        ? (ERROR_MESSAGES[error_ as keyof typeof ERROR_MESSAGES] ?? error_)
         : "Failed to sign in. Try again later";
       toast.error(errorMessage);
     } else {
@@ -96,7 +96,7 @@ export function SignInForm() {
           <div className="space-x-2">
             <button
               type="button"
-              className="hover:scale-105 transition-all duration-200"
+              className="hover:scale-105 transition-all duration-200 m-auto"
               onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
             >
               <GoogleSignin />

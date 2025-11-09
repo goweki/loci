@@ -1,9 +1,10 @@
 import { sms } from "./client";
+const SENDER_ID = process.env.AFRICASTALKING_SENDER_ID;
 
-interface SMSOptions {
+export interface SMSprops {
   to: string | string[];
-  from: string;
   message: string;
+  from?: string;
 }
 
 interface SMSMessageData {
@@ -17,9 +18,14 @@ interface SMSMessageData {
   };
 }
 
-export default async function sendSms(options: SMSOptions) {
+export default async function sendSms(options: SMSprops) {
+  if (!SENDER_ID) {
+    throw new Error("missing .env AFRICASTALKING_SENDER_ID");
+  }
+  const smsOptions = { ...options, from: options.from || SENDER_ID };
+
   return sms
-    .send(options)
+    .send(smsOptions)
     .then((response: SMSMessageData) => {
       console.log("SMS sent successfully:", response);
       return response;

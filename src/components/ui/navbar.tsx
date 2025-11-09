@@ -6,7 +6,6 @@ import { useEffect, useState, useRef } from "react";
 import {
   NavigationMenu,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import {
@@ -25,6 +24,17 @@ import { usePathname } from "next/navigation";
 import { homePages, languages, useI18n } from "@/lib/i18n";
 import UserMenu from "../dashboard/user-menu";
 
+const translations = {
+  en: {
+    signInText: "Sign In",
+    ctaText: "Get Started",
+  },
+  sw: {
+    signInText: "Ingia",
+    ctaText: "Jiunge na Loci",
+  },
+};
+
 // Types
 export interface NavbarNavLink {
   href: string;
@@ -37,9 +47,7 @@ export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
   logoHref?: string;
   navigationLinks?: NavbarNavLink[];
   authenticated?: boolean;
-  signInText?: string;
   signInHref?: string;
-  ctaText?: string;
   ctaHref?: string;
 }
 
@@ -56,9 +64,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       logo = <BrandSymbol />,
       logoHref = "#",
       navigationLinks = defaultNavigationLinks,
-      signInText = "Sign In",
       signInHref = "/sign-in",
-      ctaText = "Get Started",
       ctaHref = "/sign-up",
       authenticated = false,
       ...props
@@ -70,6 +76,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     const containerRef = useRef<HTMLElement>(null);
     const pathname = usePathname();
     const { language } = useI18n();
+    const t = translations[language];
 
     const isActive = (href: string): boolean => {
       if (href === "/") {
@@ -246,13 +253,13 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                   href={"/" + language + signInHref}
                   className={cn(buttonVariants({ variant: "outline" }))}
                 >
-                  {signInText}
+                  {t.signInText}
                 </Link>
                 <Link
                   href={"/" + language + ctaHref}
                   className={cn(buttonVariants({ variant: "default" }))}
                 >
-                  {ctaText}
+                  {t.ctaText}
                 </Link>
               </>
             )}

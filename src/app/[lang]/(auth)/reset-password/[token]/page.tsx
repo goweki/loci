@@ -7,7 +7,7 @@ import SetPasswordForm from "@/components/forms/auth/set-password-form";
 import { verifyToken } from "@/data/user";
 import { redirect } from "next/navigation";
 
-export default async function ForgotPasswordPage({
+export default async function SetPasswordPage({
   params,
   searchParams,
 }: {
@@ -22,16 +22,14 @@ export default async function ForgotPasswordPage({
     redirect(`/${lang}/reset-password`);
   }
 
-  const tokenIsValid = verifyToken({ token, username });
-
   return (
     <AuthLayout
       copy={{
-        title: dict.auth.signin.title,
-        subtitle: dict.auth.signin.subtitle,
+        title: dict.auth.forgotPassword.setPassword.title,
+        subtitle: dict.auth.forgotPassword.setPassword.subTitle,
       }}
     >
-      <SetPasswordForm token={token} />
+      <SetPasswordForm token={token} username={username} />
     </AuthLayout>
   );
 }

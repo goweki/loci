@@ -15,8 +15,8 @@ export default async function ForgotPasswordPage({
   return (
     <AuthLayout
       copy={{
-        title: dict.auth.signin.title,
-        subtitle: dict.auth.signin.subtitle,
+        title: dict.auth.forgotPassword.title,
+        subtitle: dict.auth.forgotPassword.subtitle,
       }}
     >
       <ForgotPasswordForm />

@@ -12,10 +12,11 @@ import db from "@/lib/prisma";
 import { buildResetURL, generateResetToken } from "@/lib/utils/resetToken";
 import { Prisma, UserRole, UserStatus, User } from "@prisma/client";
 import { sendMail } from "@/lib/mail";
-import { welcomeEmail } from "@/lib/mail/email-render";
+import { welcomeEmail, resetPasswordEmail } from "@/lib/mail/email-render";
 import { BASE_URL } from "@/lib/utils/getUrl";
 import processError from "@/lib/utils/processError";
 import { hash } from "@/lib/utils/passwordHandlers";
+import sendSms, { SMSprops } from "@/lib/sms";
 
 /**
  * Creates a new user (doesnt send Welcome email)
@@ -89,11 +90,16 @@ export async function registerUser(
 export async function sendResetLink(data: {
   username: string;
   sendTo?: "email" | "whatsapp" | "sms";
+  template?: "welcome" | "resetPassword";
 }): Promise<{
   username: string;
   sentTo: "email" | "whatsapp" | "sms";
 }> {
-  const { username, sendTo: verificationMethod } = data;
+  const {
+    username,
+    sendTo: verificationMethod,
+    template: emailTemplate,
+  } = data;
   console.log(`Generating ResetToken for: ${username}`);
 
   if (!username) {
@@ -116,12 +122,16 @@ export async function sendResetLink(data: {
     await updateUserPassword(user_.id, userUpdates);
 
     let sentTo_: "email" | "whatsapp" | "sms" = undefined;
+    const emailGenFunction =
+      emailTemplate === "welcome" ? welcomeEmail : resetPasswordEmail;
+    const emailToSend = await emailGenFunction(user_.name, resetLink);
+    const subject_ =
+      emailTemplate === "welcome" ? "Welcome to Loci" : "Reset Password: Loci";
 
     if (usernameAttribute === "email") {
-      const emailToSend = await welcomeEmail(user_.name, resetLink);
       await sendMail({
         to: user_.email,
-        subject: "Welcome to Loci",
+        subject: subject_,
         html: emailToSend.html,
         text: emailToSend.text,
       });
@@ -129,7 +139,11 @@ export async function sendResetLink(data: {
     } else if (verificationMethod === "whatsapp" && user_.tel) {
       sentTo_ = "whatsapp";
     } else if (verificationMethod === "sms" && user_.tel) {
-      sentTo_ = "sms";
+      const options_: SMSprops = {
+        to: user_.tel,
+        message: emailToSend.text,
+      };
+      await sendSms(options_);
     }
 
     return { username, sentTo: sentTo_ };
@@ -146,7 +160,7 @@ export async function sendResetLink(data: {
 export async function verifyToken(data: {
   token: string;
   username: string;
-}): Promise<User | null> {
+}): Promise<Pick<User, "id" | "name" | "email" | "tel">> {
   const { token, username } = data;
 
   console.log(`verifying token for user: ${username} `);

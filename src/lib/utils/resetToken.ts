@@ -20,7 +20,7 @@ export async function buildResetURL(
   token: string,
   username: string
 ) {
-  return `${baseUrl}/reset-password/${token}/?username=${encodeURIComponent(
+  return `${baseUrl}/en/reset-password/${token}/?username=${encodeURIComponent(
     username
   )}`;
 }

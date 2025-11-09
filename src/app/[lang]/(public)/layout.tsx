@@ -31,11 +31,7 @@ export default async function UnAuthLayout({
 
   return (
     <>
-      <Navbar
-        navigationLinks={navigationLinks}
-        ctaText={dict.navbar.cta}
-        signInText={dict.auth.signin.button}
-      />
+      <Navbar navigationLinks={navigationLinks} />
       {children}
       <Footer />
     </>
