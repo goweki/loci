@@ -73,7 +73,6 @@ export function ForgotPasswordForm() {
         username: email || phoneNumber,
         sendTo: username,
       });
-      console.log(result);
 
       if (!result) {
         throw new Error("Error sending reset link");

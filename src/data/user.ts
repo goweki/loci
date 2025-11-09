@@ -90,25 +90,22 @@ export async function registerUser(
 export async function sendResetLink(data: {
   username: string;
   sendTo?: "email" | "whatsapp" | "sms";
-  template?: "welcome" | "resetPassword";
 }): Promise<{
   username: string;
   sentTo: "email" | "whatsapp" | "sms";
 }> {
-  const {
-    username,
-    sendTo: verificationMethod,
-    template: emailTemplate,
-  } = data;
+  const { username, sendTo: verificationMethod } = data;
   console.log(`Generating ResetToken for: ${username}`);
 
   if (!username) {
-    throw new Error("A username is required");
+    console.error("No username provided in generating resetToken");
+    return;
   }
 
   const user_ = await getUserByKey(username);
   if (!user_) {
-    throw new Error("User not found");
+    console.error(`User not found - ${username}`);
+    return;
   }
   const usernameAttribute = user_.email === username ? "email" : "tel";
   const tokenObj = await generateResetToken();
@@ -116,7 +113,7 @@ export async function sendResetLink(data: {
 
   try {
     const userUpdates = {
-      resetToken: tokenObj.plain,
+      resetToken: tokenObj.hashed,
       resetTokenExpiry: tokenObj.expiry,
     };
     await updateUserPassword(user_.id, userUpdates);
@@ -146,7 +143,7 @@ export async function sendResetLink(data: {
   } catch (error) {
     const err = processError(error);
     console.error("Sending reset link failed: ", err);
-    throw new Error(err.message);
+    return null;
   }
 }
 
