@@ -1,13 +1,15 @@
+// lib/validations/message.ts
+
 import { z } from "zod";
 
-export const textMessageSchema = z.object({
+const textMessageSchema = z.object({
   type: z.literal("text"),
   text: z.object({
     body: z.string().min(1),
   }),
 });
 
-export const imageMessageSchema = z.object({
+const imageMessageSchema = z.object({
   type: z.literal("image"),
   image: z.object({
     link: z.string().url(),
@@ -15,7 +17,7 @@ export const imageMessageSchema = z.object({
   }),
 });
 
-export const documentMessageSchema = z.object({
+const documentMessageSchema = z.object({
   type: z.literal("document"),
   document: z.object({
     link: z.string().url(),
@@ -24,13 +26,76 @@ export const documentMessageSchema = z.object({
   }),
 });
 
-export const locationMessageSchema = z.object({
+const locationMessageSchema = z.object({
   type: z.literal("location"),
   location: z.object({
     latitude: z.string(),
     longitude: z.string(),
     name: z.string().optional(),
     address: z.string().optional(),
+  }),
+});
+
+const audioMessageSchema = z.object({
+  type: z.literal("audio"),
+  audio: z.object({
+    id: z.string().optional(),
+    link: z.string().url().optional(),
+  }),
+});
+
+const contactsMessageSchema = z.object({
+  type: z.literal("contacts"),
+  contacts: z.array(
+    z.object({
+      phone: z.string(),
+      name: z.object({ first_name: z.string() }),
+    })
+  ),
+});
+
+const videoMessageSchema = z.object({
+  type: z.literal("video"),
+  video: z.object({
+    link: z.string().url(),
+    caption: z.string().optional(),
+  }),
+});
+
+const stickerMessageSchema = z.object({
+  type: z.literal("sticker"),
+  sticker: z.object({
+    id: z.string().optional(),
+    link: z.string().url().optional(),
+  }),
+});
+
+const interactiveMessageSchema = z.object({
+  type: z.literal("interactive"),
+  interactive: z.object({
+    type: z.enum(["list", "button"]),
+    body: z.object({ text: z.string() }),
+    action: z.object({
+      button: z.string().optional(),
+      sections: z.array(z.any()).optional(),
+    }),
+  }),
+});
+
+const reactionMessageSchema = z.object({
+  type: z.literal("reaction"),
+  reaction: z.object({
+    message_id: z.string(),
+    emoji: z.string(),
+  }),
+});
+
+const templateMessageSchema = z.object({
+  type: z.literal("template"),
+  template: z.object({
+    name: z.string(),
+    language: z.object({ code: z.string() }),
+    components: z.array(z.any()).optional(),
   }),
 });
 
@@ -42,6 +107,11 @@ const baseSchema = z.object({
     .default("INDIVIDUAL")
     .optional(),
   messaging_product: z.literal("whatsapp").default("whatsapp").optional(),
+  context: z
+    .object({
+      message_id: z.string().min(1),
+    })
+    .optional(),
 });
 
 // Discriminated union by "type"
@@ -51,6 +121,13 @@ export const WhatsAppMessageSchema = z
     imageMessageSchema,
     documentMessageSchema,
     locationMessageSchema,
+    audioMessageSchema,
+    contactsMessageSchema,
+    videoMessageSchema,
+    stickerMessageSchema,
+    interactiveMessageSchema,
+    reactionMessageSchema,
+    templateMessageSchema,
   ])
   .and(baseSchema);
 

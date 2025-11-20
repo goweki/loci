@@ -25,6 +25,8 @@ export interface WhatsAppClientEnv {
   wabaId: string;
   wabaAccessToken: string;
   verifyToken: string;
+  appSecret: string;
+  phoneNumberId: string;
 }
 
 export class WhatsAppClient {
@@ -59,14 +61,18 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   // 2. SEND MESSAGE
   // ---------------------------------------------------------------------
-  async sendMessage(
-    payload: WhatsAppMessage
-  ): Promise<WhatsAppSendMessageResponse> {
-    const url = `${this.baseUrl}/${payload.phoneNumberId}/messages`;
+  async sendMessage(input: WhatsAppMessage) {
+    const { phoneNumberId, to, type } = input;
+
+    const finalPhoneNumberId =
+      phoneNumberId ?? process.env.WHATSAPP_PHONE_NUMBER_ID;
+
+    const url = `https://graph.facebook.com/v22.0/${finalPhoneNumberId}/messages`;
 
     this.logger.info("Sending WhatsApp message", {
-      to: payload.to,
-      type: payload.type,
+      to,
+      type,
+      phoneNumberId: finalPhoneNumberId,
     });
 
     const res = await fetch(url, {
@@ -75,7 +81,7 @@ export class WhatsAppClient {
         Authorization: `Bearer ${this.env.wabaAccessToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(input),
     });
 
     const json = await res.json();
@@ -86,6 +92,7 @@ export class WhatsAppClient {
     }
 
     this.logger.info("Message sent successfully", json);
+
     return json;
   }
 
