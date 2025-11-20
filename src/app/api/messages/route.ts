@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
   // Send message via WhatsApp API
 
   try {
-    const waResponse = await whatsapp.sendWhatsAppMessage(body);
+    const waResponse = await whatsapp.sendMessage(body);
 
     const contact = await findOrCreateContact(session.user.id, to);
 
