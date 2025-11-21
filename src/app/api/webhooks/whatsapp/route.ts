@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function processWebhookEvent(body: any) {
+  console.log("processing webhook event:", body);
   const entry = body.entry?.[0];
   const changes = entry?.changes?.[0];
 
