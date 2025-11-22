@@ -1,5 +1,8 @@
 // lib/whatsapp/types.ts
 
+export * from "./inbound-webhook";
+export * from "./outbound-message";
+
 // ------------------------------
 // COMMON API ERROR FORMAT
 // ------------------------------
@@ -15,12 +18,13 @@ export interface WhatsAppAPIError {
 // SEND MESSAGE
 // ------------------------------
 export interface WhatsAppSendMessageResponse {
-  messaging_product: string;
+  messaging_product: "whatsapp";
   contacts?: Array<{ input: string; wa_id: string }>;
   messages?: Array<{ id: string }>;
   error?: WhatsAppAPIError;
 
-  sentMessage?: any; // your custom injection
+  // Custom injection (optional)
+  sentMessage?: any;
 }
 
 // ------------------------------
@@ -65,16 +69,39 @@ export interface WhatsAppMarkReadResponse {
 // ------------------------------
 // TEMPLATES
 // ------------------------------
+export interface WhatsAppTemplateComponentButton {
+  type: "QUICK_REPLY" | "URL" | "PHONE_NUMBER";
+  text: string;
+  url?: string;
+  phone_number?: string;
+}
+
+export interface WhatsAppTemplateComponent {
+  type: "header" | "body" | "footer" | "buttons";
+  text?: string;
+  format?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT";
+  buttons?: WhatsAppTemplateComponentButton[];
+}
+
 export interface WhatsAppTemplate {
   name: string;
-  language: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
-  category: string;
-  components: any[];
+  category: "MARKETING" | "UTILITY" | "AUTHENTICATION";
+  language: {
+    code: string; // e.g. "en_US"
+  };
+  status: "pending" | "approved" | "rejected";
+  components: WhatsAppTemplateComponent[];
 }
 
 export interface WhatsAppTemplateListResponse {
   data: WhatsAppTemplate[];
+}
+
+export interface WhatsAppTemplateCreateRequest {
+  name: string;
+  language: string; // e.g. "en_US"
+  category: "MARKETING" | "UTILITY" | "AUTHENTICATION";
+  components: WhatsAppTemplateComponent[];
 }
 
 export interface WhatsAppTemplateCreateResponse {
@@ -106,27 +133,5 @@ export type WhatsAppMediaDownloadResponse = ArrayBuffer;
 // SUBSCRIPTIONS
 // ------------------------------
 export interface WhatsAppSubscribedAppsResponse {
-  data: Array<{
-    id: string;
-    name: string;
-  }>;
-}
-
-export interface WhatsAppTemplateComponent {
-  type: "HEADER" | "BODY" | "FOOTER" | "BUTTONS";
-  text?: string;
-  format?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT";
-  buttons?: Array<{
-    type: "QUICK_REPLY" | "URL" | "PHONE_NUMBER";
-    text: string;
-    url?: string;
-    phone_number?: string;
-  }>;
-}
-
-export interface WhatsAppTemplateCreateRequest {
-  name: string;
-  language: string; // e.g. "en_US"
-  category: "MARKETING" | "UTILITY" | "AUTHENTICATION";
-  components: WhatsAppTemplateComponent[];
+  data: Array<{ id: string; name: string }>;
 }

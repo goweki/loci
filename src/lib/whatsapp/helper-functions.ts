@@ -1,4 +1,5 @@
-// lib/message-processor.ts
+// lib/whatsapp/helper-functions.ts
+
 import prisma from "@/lib/prisma";
 import {
   MessageType,
@@ -6,74 +7,8 @@ import {
   MessageStatus,
   Prisma,
 } from "@prisma/client";
-import { WhatsAppMessage as NewWhatsAppMessage } from "../validations";
-
-interface WhatsAppMessage {
-  id: string;
-  from: string;
-  timestamp: string;
-  type: string;
-  text?: {
-    body: string;
-  };
-  image?: {
-    id: string;
-    mime_type: string;
-    sha256: string;
-    caption?: string;
-  };
-  document?: {
-    id: string;
-    filename: string;
-    mime_type: string;
-    sha256: string;
-    caption?: string;
-  };
-  audio?: {
-    id: string;
-    mime_type: string;
-    sha256: string;
-  };
-  video?: {
-    id: string;
-    mime_type: string;
-    sha256: string;
-    caption?: string;
-  };
-  location?: {
-    latitude: number;
-    longitude: number;
-    name?: string;
-    address?: string;
-  };
-  contacts?: Array<{
-    name: {
-      formatted_name: string;
-      first_name?: string;
-      last_name?: string;
-    };
-    phones?: Array<{
-      phone: string;
-      type: string;
-    }>;
-  }>;
-  button?: {
-    text: string;
-    payload: string;
-  };
-  interactive?: {
-    type: string;
-    button_reply?: {
-      id: string;
-      title: string;
-    };
-    list_reply?: {
-      id: string;
-      title: string;
-      description?: string;
-    };
-  };
-}
+import { InboundMessage } from "./types";
+import { WhatsAppMessage } from "../validations";
 
 interface WhatsAppContact {
   profile: {
@@ -98,7 +33,7 @@ interface WhatsAppStatusUpdate {
  * Process incoming WhatsApp message and store in database
  */
 export async function processIncomingMessage(
-  message: WhatsAppMessage,
+  message: InboundMessage,
   contacts: WhatsAppContact[] = []
 ): Promise<void> {
   try {
@@ -210,16 +145,12 @@ export async function processStatusUpdate(
 /**
  * Find phone number based on webhook data
  */
-async function findPhoneNumberByWebhook(message: WhatsAppMessage) {
-  // In WhatsApp webhooks, you might receive the phone number ID in the webhook payload
-  // This is a simplified version - you'd need to adapt based on your webhook structure
-
+async function findPhoneNumberByWebhook(inboundMessage: InboundMessage) {
   // Option 1: If webhook includes phone_number_id in metadata (common)
-  // const phoneNumberId = webhookMetadata.phone_number_id
+  const phoneNumberId = inboundMessage.from;
 
   // Option 2: Find by the "to" field if available in your webhook
   // For now, we'll find the first active phone number for the user
-  // In production, you'd have better identification logic
 
   return await prisma.phoneNumber.findFirst({
     where: {
@@ -271,7 +202,7 @@ async function findOrCreateContact(
 /**
  * Process message content based on type
  */
-async function processMessageContent(message: WhatsAppMessage): Promise<any> {
+async function processMessageContent(message: InboundMessage): Promise<any> {
   switch (message.type) {
     case "text":
       return {
@@ -284,8 +215,6 @@ async function processMessageContent(message: WhatsAppMessage): Promise<any> {
         return {
           url: mediaUrl,
           caption: message.image.caption,
-          mimeType: message.image.mime_type,
-          sha256: message.image.sha256,
         };
       }
       break;
@@ -300,8 +229,6 @@ async function processMessageContent(message: WhatsAppMessage): Promise<any> {
           url: mediaUrl,
           filename: message.document.filename,
           caption: message.document.caption,
-          mimeType: message.document.mime_type,
-          sha256: message.document.sha256,
         };
       }
       break;
@@ -311,8 +238,6 @@ async function processMessageContent(message: WhatsAppMessage): Promise<any> {
         const mediaUrl = await downloadAndStoreMedia(message.audio.id, "audio");
         return {
           url: mediaUrl,
-          mimeType: message.audio.mime_type,
-          sha256: message.audio.sha256,
         };
       }
       break;
@@ -323,8 +248,6 @@ async function processMessageContent(message: WhatsAppMessage): Promise<any> {
         return {
           url: mediaUrl,
           caption: message.video.caption,
-          mimeType: message.video.mime_type,
-          sha256: message.video.sha256,
         };
       }
       break;
@@ -337,24 +260,24 @@ async function processMessageContent(message: WhatsAppMessage): Promise<any> {
         address: message.location?.address,
       };
 
-    case "contacts":
-      return {
-        contacts: message.contacts?.map((contact) => ({
-          name: contact.name.formatted_name,
-          firstName: contact.name.first_name,
-          lastName: contact.name.last_name,
-          phones: contact.phones?.map((phone) => ({
-            phone: phone.phone,
-            type: phone.type,
-          })),
-        })),
-      };
+    // case "contacts":
+    //   return {
+    //     contacts: message.contacts?.map((contact) => ({
+    //       name: contact.name.formatted_name,
+    //       firstName: contact.name.first_name,
+    //       lastName: contact.name.last_name,
+    //       phones: contact.phones?.map((phone) => ({
+    //         phone: phone.phone,
+    //         type: phone.type,
+    //       })),
+    //     })),
+    //   };
 
-    case "button":
-      return {
-        buttonText: message.button?.text,
-        buttonPayload: message.button?.payload,
-      };
+    // case "button":
+    //   return {
+    //     buttonText: message.button?.text,
+    //     buttonPayload: message.button?.payload,
+    //   };
 
     case "interactive":
       if (message.interactive?.button_reply) {
@@ -369,7 +292,6 @@ async function processMessageContent(message: WhatsAppMessage): Promise<any> {
           interactiveType: "list_reply",
           listId: message.interactive.list_reply.id,
           listTitle: message.interactive.list_reply.title,
-          listDescription: message.interactive.list_reply.description,
         };
       }
       break;
@@ -525,7 +447,7 @@ function mapWhatsAppStatusToMessageStatus(
 async function notifyUserOfNewMessage(
   userId: string,
   contactId: string,
-  message: WhatsAppMessage
+  message: InboundMessage
 ): Promise<void> {
   // Implement real-time notification logic
   // Examples:
@@ -552,7 +474,7 @@ async function notifyUserOfNewMessage(
 async function processAutoReplies(
   userId: string,
   contact: any,
-  message: WhatsAppMessage
+  message: InboundMessage
 ): Promise<void> {
   try {
     // Check if user has auto-reply rules configured
@@ -583,7 +505,7 @@ async function processAutoReplies(
  */
 async function shouldTriggerAutoReply(
   rule: any,
-  message: WhatsAppMessage,
+  message: InboundMessage,
   contact: any
 ): Promise<boolean> {
   // Implement your auto-reply logic
@@ -602,7 +524,7 @@ async function shouldTriggerAutoReply(
 async function triggerAutoReply(
   rule: any,
   contact: any,
-  originalMessage: WhatsAppMessage
+  originalMessage: InboundMessage
 ): Promise<void> {
   // Implement auto-reply sending logic
   console.log(`Triggering auto-reply for rule ${rule.id}`);
@@ -612,7 +534,7 @@ async function triggerAutoReply(
  * Store failed message for retry
  */
 async function storeFailedMessage(
-  message: WhatsAppMessage,
+  message: InboundMessage,
   error: any
 ): Promise<void> {
   try {
@@ -630,7 +552,7 @@ async function storeFailedMessage(
   }
 }
 
-export function buildWhatsAppMessage(input: NewWhatsAppMessage) {
+export function buildWhatsAppMessage(input: WhatsAppMessage) {
   const {
     to,
     type,

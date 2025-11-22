@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
 import { processIncomingMessage } from "@/lib/whatsapp";
+import { InboundWebhookPayload } from "@/lib/whatsapp/types";
 const WHATSAPP_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
 
 // Verification
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Store webhook event for processing
+    // Store webhook event
     await db.webhookEvent.create({
       data: {
         type: "whatsapp_webhook",
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Process webhook in background
+    // Process webhook
     await processWebhookEvent(body);
 
     return new NextResponse("OK");
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function processWebhookEvent(body: any) {
+async function processWebhookEvent(body: InboundWebhookPayload) {
   console.log("processing webhook event:", body);
   const entry = body.entry?.[0];
   const changes = entry?.changes?.[0];
