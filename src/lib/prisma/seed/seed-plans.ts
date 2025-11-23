@@ -1,6 +1,4 @@
-import { PrismaClient, PlanInterval, PlanName } from "@/lib/prisma/generated";
-
-const prisma = new PrismaClient();
+import { PrismaClient, PlanInterval, PlanName } from "../generated";
 
 const plansData = [
   {
@@ -19,9 +17,17 @@ const plansData = [
     maxMessagesPerMonth: 1000,
     active: true,
   },
+  {
+    name: PlanName.PREMIUM,
+    price: 1000,
+    interval: PlanInterval.MONTHLY,
+    maxPhoneNumbers: 5,
+    maxMessagesPerMonth: 1000,
+    active: true,
+  },
 ];
 
-export async function seedPlans() {
+export async function seedPlans(prisma: PrismaClient) {
   console.log("📦 Seeding plans...");
 
   for (const plan of plansData) {

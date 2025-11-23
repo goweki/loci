@@ -1,7 +1,7 @@
-import { PrismaClient, UserRole, UserStatus } from "@/lib/prisma/generated";
-import bcrypt from "bcryptjs";
+// @/lib/prisma/seed/seed-users.ts
 
-const prisma = new PrismaClient();
+import { PrismaClient, UserRole, UserStatus } from "../generated";
+import bcrypt from "bcryptjs";
 
 // Example users data
 const usersData = [
@@ -9,41 +9,56 @@ const usersData = [
     name: "Admin User",
     email: process.env.ADMIN_EMAIL || "loci@goweki.com",
     tel: "254721334944",
-    password: "admin1234",
+    password: process.env.ADMIN_PASSWORD || "admin1234", // ✅ Use env var for password
     role: UserRole.ADMIN,
     status: UserStatus.ACTIVE,
   },
   {
     name: "Demo User",
-    email: "demo@goweki.com.com",
+    email: "demo@goweki.com",
+    tel: "254722445566", // ✅ Added phone number
     password: "user1234",
     role: UserRole.USER,
     status: UserStatus.ACTIVE,
   },
 ];
 
-export async function seedUsers() {
+export async function seedUsers(prisma: PrismaClient) {
   console.log("👤 Seeding users...");
 
+  let createdCount = 0;
+  let skippedCount = 0;
+
   for (const userData of usersData) {
-    const existingUser = await prisma.user.findUnique({
-      where: { email: userData.email },
-    });
+    try {
+      const existingUser = await prisma.user.findUnique({
+        where: { email: userData.email },
+      });
 
-    if (existingUser) {
-      console.log("✔ User already exists:", existingUser.email);
-      continue;
+      if (existingUser) {
+        console.log(`✔ User already exists: ${existingUser.email}`);
+        skippedCount++;
+        continue;
+      }
+
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+
+      const newUser = await prisma.user.create({
+        data: {
+          ...userData,
+          password: hashedPassword,
+        },
+      });
+
+      console.log(`➕ Created user: ${newUser.email} (${newUser.role})`);
+      createdCount++;
+    } catch (error) {
+      console.error(`❌ Error creating user ${userData.email}:`, error);
+      throw error; // Re-throw to stop seeding on error
     }
-
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
-
-    await prisma.user.create({
-      data: {
-        ...userData,
-        password: hashedPassword,
-      },
-    });
-
-    console.log("➕ Created user:", userData.email);
   }
+
+  console.log(
+    `✅ Users seeding completed: ${createdCount} created, ${skippedCount} skipped\n`
+  );
 }

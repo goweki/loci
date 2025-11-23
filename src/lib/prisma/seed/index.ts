@@ -1,22 +1,26 @@
-import "dotenv/config";
-import { PrismaClient } from "../generated";
+// @/lib/prisma/seed.ts
 
+import prisma from "..";
 import { seedUsers } from "./seed-users";
-import { seedPlans } from "./seed.plans";
-const prisma = new PrismaClient();
+import { seedPlans } from "./seed-plans";
 
 async function main() {
-  console.log("🌱 Starting database seeding...");
+  console.log("🌱 Starting database seeding...\n");
 
-  await seedUsers();
-  await seedPlans();
+  try {
+    await seedUsers(prisma);
+    await seedPlans(prisma);
 
-  console.log("🌱 Database seeding completed!");
+    console.log("✅ Database seeding completed successfully!");
+  } catch (error) {
+    console.error("❌ Error during seeding:", error);
+    throw error;
+  }
 }
 
 main()
-  .catch((err) => {
-    console.error("❌ Seed error:", err);
+  .catch((error) => {
+    console.error(error);
     process.exit(1);
   })
   .finally(async () => {
