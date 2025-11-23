@@ -121,9 +121,9 @@ export function I18nProvider({
     setLanguage,
   };
 
-  return (
+  return currentLang ? (
     <I18nContext.Provider value={contextValue}>{children}</I18nContext.Provider>
-  );
+  ) : null;
 }
 
 export function useI18n(): I18nContextType {

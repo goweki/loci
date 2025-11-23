@@ -386,7 +386,13 @@ export default function PrivacyPolicy() {
   );
 }
 
-function Section({ title, children }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="bg-card text-card-foreground rounded-xl shadow-lg p-8">
       <h2 className="text-2xl font-bold mb-4">{title}</h2>
@@ -395,7 +401,13 @@ function Section({ title, children }) {
   );
 }
 
-function SubSection({ title, children }) {
+function SubSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="mt-4">
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
@@ -404,7 +416,7 @@ function SubSection({ title, children }) {
   );
 }
 
-function List({ items }) {
+function List({ items }: { items: string[] }) {
   return (
     <ul className="space-y-2 ml-4">
       {items.map((item, index) => (

@@ -59,9 +59,10 @@ async function processWebhookEvent(body: InboundWebhookPayload) {
   if (changes?.field === "messages") {
     const messages = changes.value?.messages || [];
     const contacts = changes.value?.contacts || [];
+    const metadata = changes.value?.metadata;
 
     for (const message of messages) {
-      await processIncomingMessage(message, contacts);
+      await processIncomingMessage(message, contacts, metadata);
     }
   }
 }

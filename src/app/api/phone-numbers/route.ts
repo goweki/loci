@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
 import { createPhoneNumber, getPhoneNumbersByUser } from "@/data/phoneNumber";
+import { PhoneNumberStatus } from "@/lib/prisma/generated";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
     userId: session.user.id,
     phoneNumber,
     displayName,
-    status: "PENDING",
+    status: PhoneNumberStatus.NOT_VERIFIED,
   });
 
   return NextResponse.json({ phoneNumber: newPhoneNumber });

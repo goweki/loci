@@ -115,7 +115,7 @@ const baseSchema = z.object({
 });
 
 // Discriminated union by "type"
-export const WhatsAppMessageSchema = z
+export const MessageSchema = z
   .discriminatedUnion("type", [
     textMessageSchema,
     imageMessageSchema,
@@ -131,4 +131,4 @@ export const WhatsAppMessageSchema = z
   ])
   .and(baseSchema);
 
-export type WhatsAppMessage = z.infer<typeof WhatsAppMessageSchema>;
+export type Message = z.infer<typeof MessageSchema>;

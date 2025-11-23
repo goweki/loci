@@ -5,11 +5,11 @@ import { authOptions } from "@/lib/auth";
 import db from "@/lib/prisma";
 import whatsapp from "@/lib/whatsapp";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
-import { countMessagesThisMonth, createMessage } from "@/data/message";
+import { countMessagesThisMonthByUserId, createMessage } from "@/data/message";
 import { validatePhoneNumberOwnership } from "@/data/phoneNumber";
-import { WhatsAppMessageSchema } from "@/lib/validations";
+import { MessageSchema } from "@/lib/validations";
 import { findOrCreateContact } from "@/data/contact";
-import { MessageType } from "@prisma/client";
+import { MessageType } from "@/lib/prisma/generated";
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
   if (!session) return new NextResponse("Unauthorized", { status: 401 });
 
   const rawBody = await request.json();
-  const result = WhatsAppMessageSchema.safeParse(rawBody);
+  const result = MessageSchema.safeParse(rawBody);
   if (!result.success) {
     return NextResponse.json(
       {
@@ -56,6 +56,10 @@ export async function POST(request: NextRequest) {
 
   const body = result.data;
   const { phoneNumberId, to, type } = body;
+
+  if (!phoneNumberId) {
+    return new NextResponse("No phoneNumberId provided", { status: 400 });
+  }
 
   // Validate phone number ownership
   const phoneNumber = await validatePhoneNumberOwnership(
@@ -88,7 +92,7 @@ export async function POST(request: NextRequest) {
   }
 
   // check against limit
-  const sentMessages = await countMessagesThisMonth(session.user.id);
+  const sentMessages = await countMessagesThisMonthByUserId(session.user.id);
   if (sentMessages > messageLimit) {
     return NextResponse.json(
       {

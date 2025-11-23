@@ -11,7 +11,41 @@ import {
 } from "@/components/ui/card";
 import { Check, X } from "lucide-react";
 
-export default function PricingComponent({ t }) {
+interface PricingProps {
+  t: {
+    title: string;
+    subtitle: string;
+    popular: string;
+    cta: string;
+    plans: {
+      starter: { name: string; description: string };
+      standard: { name: string; description: string };
+      enterprise: { name: string; description: string };
+    };
+    billing: {
+      monthly: string;
+      annual: string;
+      saveUp: string;
+      month: string;
+      year: string;
+      save: string;
+    };
+    features: {
+      phoneNumbers: string;
+      messages: string;
+      basicTemplates: string;
+      emailSupport: string;
+      analytics: string;
+      automation: string;
+      prioritySupport: string;
+      customIntegrations: string;
+    };
+    footer: { text: string; contactLink: string };
+    unlimited: string;
+  };
+}
+
+export default function PricingComponent({ t }: PricingProps) {
   const [billingInterval, setBillingInterval] = useState("monthly");
 
   // Static pricing data - will be replaced with DB data later
@@ -78,7 +112,7 @@ export default function PricingComponent({ t }) {
     },
   ];
 
-  const formatPrice = (price) => {
+  const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE", {
       style: "currency",
       currency: "KES",
@@ -86,13 +120,25 @@ export default function PricingComponent({ t }) {
     }).format(price);
   };
 
-  const getPrice = (plan) => {
-    return billingInterval === "monthly" ? plan.monthlyPrice : plan.annualPrice;
+  const getPrice = ({
+    monthlyPrice,
+    annualPrice,
+  }: {
+    monthlyPrice: number;
+    annualPrice: number;
+  }) => {
+    return billingInterval === "monthly" ? monthlyPrice : annualPrice;
   };
 
-  const getSavings = (plan) => {
-    const monthlyCost = plan.monthlyPrice * 12;
-    const annualCost = plan.annualPrice;
+  const getSavings = ({
+    monthlyPrice,
+    annualPrice,
+  }: {
+    monthlyPrice: number;
+    annualPrice: number;
+  }) => {
+    const monthlyCost = monthlyPrice * 12;
+    const annualCost = annualPrice;
     const savings = monthlyCost - annualCost;
     return Math.round((savings / monthlyCost) * 100);
   };

@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma"; // or wherever your Prisma client is
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/lib/prisma/generated";
 
 /**
  * Finds an account by provider + providerAccountId
@@ -34,7 +34,7 @@ export async function createAccount(
  */
 export async function upsertAccount(
   userId: string,
-  data: Prisma.AccountCreateInput
+  data: Prisma.AccountCreateInput | Prisma.AccountUncheckedCreateInput
 ) {
   return prisma.account.upsert({
     where: {
@@ -44,11 +44,6 @@ export async function upsertAccount(
       },
     },
     update: {},
-    create: {
-      user: {
-        connect: { id: userId },
-      },
-      ...data,
-    },
+    create: data,
   });
 }

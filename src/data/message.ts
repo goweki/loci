@@ -1,9 +1,9 @@
 "use server";
 
-import { Prisma, PrismaClient } from "@prisma/client";
 import prisma from "@/lib/prisma";
+import { Prisma } from "@/lib/prisma/generated";
 
-export async function countMessagesThisMonth(userId: string) {
+export async function countMessagesThisMonthByUserId(userId: string) {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -25,5 +25,12 @@ export async function createMessage(
       contact: true,
       phoneNumber: true,
     },
+  });
+}
+
+export async function getMessagesByContactId(contactId: string) {
+  return await prisma.message.findMany({
+    where: { contactId },
+    orderBy: { timestamp: "asc" },
   });
 }

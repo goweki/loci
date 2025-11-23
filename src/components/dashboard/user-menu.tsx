@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/lib/prisma/generated";
 
 export default function UserMenu() {
   const { data: session } = useSession();

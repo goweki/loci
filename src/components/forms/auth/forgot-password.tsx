@@ -28,6 +28,7 @@ import { registerUser, sendResetLink } from "@/data/user";
 import { useI18n } from "@/lib/i18n";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import InputPhone from "@/components/ui/input-phone";
+import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 
 const translations = {
   en: { submit: "Send Link", orCredentials: "or use your Credentials" },
@@ -90,7 +91,9 @@ export function ForgotPasswordForm() {
       router.push(`/${language}/`);
     } catch (error) {
       console.log("Error sending reset link:", error);
-      toast.error(error.message || "Failed. Try again later");
+
+      const errMessage = getFriendlyErrorMessage(error);
+      toast.error(errMessage || "Failed. Try again later");
       setLoading(false);
     }
   };

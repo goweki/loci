@@ -6,9 +6,15 @@ import {
   MessageDirection,
   MessageStatus,
   Prisma,
-} from "@prisma/client";
-import { InboundMessage } from "./types";
-import { WhatsAppMessage } from "../validations";
+  PhoneNumber,
+  PhoneNumberStatus,
+} from "@/lib/prisma/generated";
+import { InboundMessage, WhatsAppPhoneNumberDetailsResponse } from "./types";
+import { Message } from "../validations";
+import { createPhoneNumber, getPhoneNumberByNumber } from "@/data/phoneNumber";
+import { getAdminUsers, getUserByPhoneNumberId } from "@/data/user";
+import whatsapp from ".";
+import { findContactByPhoneNumber } from "@/data/contact";
 
 interface WhatsAppContact {
   profile: {
@@ -34,35 +40,67 @@ interface WhatsAppStatusUpdate {
  */
 export async function processIncomingMessage(
   message: InboundMessage,
-  contacts: WhatsAppContact[] = []
+  contacts: WhatsAppContact[] = [],
+  metadata: {
+    phone_number_id: string;
+    display_phone_number: string;
+  }
 ): Promise<void> {
   try {
-    console.log("Processing incoming message:", message.id);
+    console.log("Processing incoming message:", message);
 
-    // Find the phone number this message was sent to
-    const phoneNumber = await findPhoneNumberByWebhook(message);
-    if (!phoneNumber) {
-      console.warn(`No phone number found for message ${message.id}`);
+    const fromNumber = message.from;
+    var phoneNumberId = metadata.phone_number_id;
+
+    if (!phoneNumberId) {
+      console.warn(`No phone number id in metadata!`);
       return;
     }
 
-    // Find or create contact
-    const contactInfo = contacts.find((c) => c.wa_id === message.from);
-    const contact = await findOrCreateContact(
-      phoneNumber.userId,
-      message.from,
-      contactInfo?.profile?.name
-    );
+    let user = await getUserByPhoneNumberId(phoneNumberId);
+    if (!user) {
+      console.warn(
+        `No user assigned the phoneNumberId:${phoneNumberId}, assigning it to admin...`
+      );
+
+      const phoneNumberDetails: WhatsAppPhoneNumberDetailsResponse =
+        await whatsapp.getPhoneNumberDetails(phoneNumberId);
+      user = (await getAdminUsers())[0];
+      await createPhoneNumber({
+        userId: user.id,
+        phoneNumber: phoneNumberDetails.display_phone_number,
+        displayName: phoneNumberDetails.verified_name,
+        phoneNumberId,
+        status:
+          phoneNumberDetails.code_verification_status as PhoneNumberStatus,
+      });
+    }
+
+    if (contacts.length > 0) {
+      for (const contact of contacts) {
+        await findOrCreateContact(
+          user.id,
+          contact.wa_id,
+          contact.profile?.name
+        );
+      }
+    }
 
     // Process message content based on type
     const content = await processMessageContent(message);
 
     // Store message in database
+    const contact = await findContactByPhoneNumber(fromNumber);
+    if (!contact) {
+      console.warn(`No contact found with phone number: ${fromNumber}`);
+      return;
+    }
+
     await prisma.message.create({
       data: {
-        userId: phoneNumber.userId,
+        userId: user.id,
         contactId: contact.id,
-        phoneNumberId: phoneNumber.id,
+        phoneNumberId: phoneNumberId,
         waMessageId: message.id,
         type: mapWhatsAppTypeToMessageType(message.type),
         content,
@@ -79,10 +117,10 @@ export async function processIncomingMessage(
     });
 
     // Trigger real-time updates (WebSocket, SSE, etc.)
-    await notifyUserOfNewMessage(phoneNumber.userId, contact.id, message);
+    await notifyUserOfNewMessage(user.id, contact.id, message);
 
     // Process auto-replies if configured
-    await processAutoReplies(phoneNumber.userId, contact, message);
+    await processAutoReplies(user.id, contact, message);
 
     console.log(`Successfully processed message ${message.id}`);
   } catch (error) {
@@ -143,27 +181,6 @@ export async function processStatusUpdate(
 }
 
 /**
- * Find phone number based on webhook data
- */
-async function findPhoneNumberByWebhook(inboundMessage: InboundMessage) {
-  // Option 1: If webhook includes phone_number_id in metadata (common)
-  const phoneNumberId = inboundMessage.from;
-
-  // Option 2: Find by the "to" field if available in your webhook
-  // For now, we'll find the first active phone number for the user
-
-  return await prisma.phoneNumber.findFirst({
-    where: {
-      status: "VERIFIED",
-      // Add more specific matching logic here
-    },
-    include: {
-      user: true,
-    },
-  });
-}
-
-/**
  * Find or create contact
  */
 async function findOrCreateContact(
@@ -210,7 +227,7 @@ async function processMessageContent(message: InboundMessage): Promise<any> {
       };
 
     case "image":
-      if (message.image) {
+      if (message.image.id) {
         const mediaUrl = await downloadAndStoreMedia(message.image.id, "image");
         return {
           url: mediaUrl,
@@ -220,7 +237,7 @@ async function processMessageContent(message: InboundMessage): Promise<any> {
       break;
 
     case "document":
-      if (message.document) {
+      if (message.document.id) {
         const mediaUrl = await downloadAndStoreMedia(
           message.document.id,
           "document"
@@ -234,7 +251,7 @@ async function processMessageContent(message: InboundMessage): Promise<any> {
       break;
 
     case "audio":
-      if (message.audio) {
+      if (message.audio.id) {
         const mediaUrl = await downloadAndStoreMedia(message.audio.id, "audio");
         return {
           url: mediaUrl,
@@ -243,7 +260,7 @@ async function processMessageContent(message: InboundMessage): Promise<any> {
       break;
 
     case "video":
-      if (message.video) {
+      if (message.video.id) {
         const mediaUrl = await downloadAndStoreMedia(message.video.id, "video");
         return {
           url: mediaUrl,
@@ -552,7 +569,7 @@ async function storeFailedMessage(
   }
 }
 
-export function buildWhatsAppMessage(input: WhatsAppMessage) {
+export function buildWhatsAppMessage(input: Message) {
   const {
     to,
     type,

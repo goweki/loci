@@ -9,7 +9,7 @@ export default async function UnAuthLayout({
   params,
   children,
 }: {
-  params: Promise<{ lang: Language }>;
+  params: Promise<{ lang: string }>;
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);

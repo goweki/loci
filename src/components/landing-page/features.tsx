@@ -1,19 +1,32 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 
+interface TransitionProps {
+  show: boolean;
+  appear?: boolean;
+  className?: string;
+  enter?: string;
+  enterStart?: string;
+  enterEnd?: string;
+  leave?: string;
+  leaveStart?: string;
+  leaveEnd?: string;
+  children: React.ReactNode;
+}
 // Transition Component
-function Transition({
-  show,
-  appear,
-  className,
-  enter,
-  enterStart,
-  enterEnd,
-  leave,
-  leaveStart,
-  leaveEnd,
-  children,
-}) {
+function Transition(props: TransitionProps) {
+  const {
+    show,
+    appear,
+    className,
+    enter,
+    enterStart,
+    enterEnd,
+    leave,
+    leaveStart,
+    leaveEnd,
+    children,
+  } = props;
   const [render, setRender] = useState(show);
   const [stage, setStage] = useState(show ? "enterEnd" : "leaveEnd");
 
@@ -45,7 +58,7 @@ function Transition({
 
 export default function Features() {
   const [tab, setTab] = useState(1);
-  const tabs = useRef(null);
+  const tabs = useRef<HTMLDivElement | null>(null);
 
   const heightFix = () => {
     if (
@@ -53,8 +66,8 @@ export default function Features() {
       tabs.current.children &&
       tabs.current.children[tab - 1]
     ) {
-      tabs.current.style.height =
-        tabs.current.children[tab - 1].offsetHeight + "px";
+      const child = tabs.current.children[tab - 1] as HTMLElement;
+      tabs.current.style.height = child.offsetHeight + "px";
     }
   };
 

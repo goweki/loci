@@ -4,17 +4,19 @@ import GoogleProvider from "next-auth/providers/google";
 import db from "@/lib/prisma";
 import { NextAuthOptions } from "next-auth";
 import { createUser, getUserByEmail, getUserByKey } from "@/data/user";
-import { User, UserStatus } from "@prisma/client";
+import { User, UserRole, UserStatus } from "@/lib/prisma/generated";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
 import { Status as SubscriptionStatus } from "@/data/subscription";
 import { createAccount, upsertAccount } from "@/data/account";
 import { compareHash } from "../utils/passwordHandlers";
+import { Adapter } from "next-auth/adapters";
 
 if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("NEXTAUTH_SECRET is not set in environment variables");
 }
 
 export const authOptions: NextAuthOptions = {
+  // adapter: PrismaAdapter(db),
   adapter: PrismaAdapter(db),
 
   providers: [
@@ -33,6 +35,8 @@ export const authOptions: NextAuthOptions = {
 
         if (user.status === UserStatus.SUSPENDED)
           throw new Error("Account suspended");
+
+        if (!user.password) throw new Error("Create a password first");
 
         const isValid = await compareHash(credentials.password, user.password);
         if (!isValid) throw new Error("Invalid password");
@@ -147,9 +151,8 @@ export const authOptions: NextAuthOptions = {
       try {
         if (account?.provider === "google" && profile?.email) {
           // 1️⃣ Find or create local user
-          let localUser: Partial<User & { id: string }> = await getUserByEmail(
-            profile.email
-          );
+          let localUser: Partial<User & { id: string }> | null =
+            await getUserByEmail(profile.email);
 
           if (!localUser) {
             localUser = await createUser({
@@ -157,6 +160,10 @@ export const authOptions: NextAuthOptions = {
               name: profile.name ?? "",
               image: profile.image ?? null,
             });
+          }
+
+          if (!localUser.id || !localUser.role) {
+            return false;
           }
 
           // Ensure linkage

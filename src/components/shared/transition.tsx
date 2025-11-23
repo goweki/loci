@@ -124,7 +124,7 @@ function CSSTransition({
       }}
       onEnter={() => {
         if (!removeFromDom && nodeRef.current)
-          nodeRef.current.style.display = null;
+          nodeRef.current.style.display = "";
         if (nodeRef.current)
           addClasses(nodeRef.current, [...enterClasses, ...enterStartClasses]);
       }}

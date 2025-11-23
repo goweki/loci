@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { PaymentStatus, PaymentMethod } from "@prisma/client";
+import { PaymentStatus, PaymentMethod } from "@/lib/prisma/generated";
 
 /**
  * Create a new payment record when transaction is initialized

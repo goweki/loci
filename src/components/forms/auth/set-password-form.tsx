@@ -24,7 +24,7 @@ import {
 import AuthErrorHandler from "./_errorHandler";
 import { useI18n } from "@/lib/i18n";
 import { Lock, User as UserIcon } from "lucide-react";
-import { type User } from "@prisma/client";
+import { type User } from "@/lib/prisma/generated";
 
 export default function SetPasswordForm({
   error,
@@ -86,7 +86,7 @@ export default function SetPasswordForm({
         token,
         username,
       });
-      if (!verification) {
+      if (!verification || !user) {
         toast.error(message);
         setLoading(false);
         return;

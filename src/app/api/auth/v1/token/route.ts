@@ -1,9 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 const secret = process.env.NEXTAUTH_SECRET;
+if (!secret) {
+  throw new Error("missing process.env.NEXTAUTH_SECRET");
+}
 
-export async function POST(req) {
+export async function POST(req: NextRequest) {
   if (!secret) {
     console.error("missing process.env.NEXTAUTH_SECRET");
     return NextResponse.json(

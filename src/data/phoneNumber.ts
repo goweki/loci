@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/lib/prisma/generated";
 
 /**
  * 🔍 Find a phone number by its ID.
@@ -59,7 +59,7 @@ export async function getPhoneNumbersByUser(userId: string) {
  * ➕ Create a new phone number record.
  */
 export async function createPhoneNumber(
-  data: Prisma.PhoneNumberUncheckedCreateInput
+  data: Prisma.PhoneNumberCreateInput | Prisma.PhoneNumberUncheckedCreateInput
 ) {
   return prisma.phoneNumber.create({
     data,

@@ -1,6 +1,18 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { Prisma } from "@/lib/prisma/generated";
+
+/**
+ * Finds a contact for the given phone number.
+ */
+export async function findContactByPhoneNumber(phoneNumber: string) {
+  return prisma.contact.findFirst({
+    where: {
+      phoneNumber,
+    },
+  });
+}
 
 /**
  * Finds or creates a contact for the given user and phone number.
@@ -32,10 +44,22 @@ export async function findOrCreateContact(
 /**
  * Retrieves all contacts for a user.
  */
-export async function getContactsByUserId(userId: string) {
+export async function getContactsByUserId(userId: string): Promise<
+  Prisma.ContactGetPayload<{
+    include: {
+      messages: true;
+      user: true;
+    };
+  }>[]
+> {
   return prisma.contact.findMany({
     where: { userId },
-    orderBy: { lastMessageAt: "desc" },
+    include: {
+      messages: true,
+      user: true,
+    },
+    orderBy: { updatedAt: "desc" },
+    // orderBy: { lastMessageAt: "desc" },
   });
 }
 

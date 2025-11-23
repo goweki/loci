@@ -28,6 +28,7 @@ import { registerUser } from "@/data/user";
 import { useI18n } from "@/lib/i18n";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import InputPhone from "@/components/ui/input-phone";
+import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 
 const translations = {
   en: { submit: "Sign Up", orCredentials: "or use your Credentials" },
@@ -92,7 +93,9 @@ export function SignUpForm() {
       router.push(`/${language}/sign-in`);
     } catch (error) {
       console.log("Error signing up:", error);
-      toast.error(error.message || "Failed. Try again later");
+
+      const errorMessage = getFriendlyErrorMessage(error);
+      toast.error(errorMessage);
       setLoading(false);
     }
   };

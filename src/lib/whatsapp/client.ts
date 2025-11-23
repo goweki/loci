@@ -17,7 +17,7 @@ import {
   WhatsAppTemplateCreateRequest,
 } from "./types";
 
-import { WhatsAppMessage } from "../validations";
+import { Message } from "../validations";
 import { WhatsAppLogger } from "./logger";
 import { normalizeWhatsAppError } from "./errors";
 
@@ -61,7 +61,7 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   // 2. SEND MESSAGE
   // ---------------------------------------------------------------------
-  async sendMessage(input: WhatsAppMessage) {
+  async sendMessage(input: Message) {
     const { phoneNumberId, to, type } = input;
 
     const finalPhoneNumberId =

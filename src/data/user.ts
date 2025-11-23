@@ -10,7 +10,7 @@
 
 import db from "@/lib/prisma";
 import { buildResetURL, generateResetToken } from "@/lib/utils/resetToken";
-import { Prisma, UserRole, UserStatus, User } from "@prisma/client";
+import { Prisma, UserRole, UserStatus, User } from "@/lib/prisma/generated";
 import { sendMail } from "@/lib/mail";
 import { welcomeEmail, resetPasswordEmail } from "@/lib/mail/email-render";
 import { BASE_URL } from "@/lib/utils/getUrl";
@@ -23,7 +23,11 @@ import sendSms, { SMSprops } from "@/lib/sms";
  */
 export async function createUser(
   data: Prisma.UserCreateInput | Prisma.UserUncheckedCreateInput
-): Promise<Pick<User, "id" | "name" | "email" | "tel">> {
+): Promise<
+  Prisma.UserGetPayload<{
+    select: { id: true; name: true; email: true; tel: true };
+  }>
+> {
   console.log("Creating user... ", data);
 
   return await db.user.create({
@@ -41,16 +45,18 @@ export async function registerUser(
   }
 ): Promise<User & { verificationMethod: "email" | "whatsapp" | "sms" }> {
   console.log("Registering user... ", data);
-  let verificationMethod_: "email" | "whatsapp" | "sms" = undefined;
+  let verificationMethod_: "email" | "whatsapp" | "sms" | undefined = undefined;
   const { verificationMethod, ...data_ } = data;
   const { name, email, tel } = data;
 
-  if (!email && !tel) {
+  const tokenObj = await generateResetToken();
+
+  const username = email || tel;
+  if (!username) {
     throw new Error("Email or Phone No. is required");
   }
 
-  const tokenObj = await generateResetToken();
-  const resetLink = await buildResetURL(BASE_URL, tokenObj.plain, email || tel);
+  const resetLink = await buildResetURL(BASE_URL, tokenObj.plain, username);
 
   try {
     const initUser = await db.user.create({
@@ -62,7 +68,7 @@ export async function registerUser(
     });
 
     if (email) {
-      const emailToSend = await welcomeEmail(name, resetLink);
+      const emailToSend = await welcomeEmail(name || "", resetLink);
       await sendMail({
         to: email,
         subject: "Welcome to Loci",
@@ -74,6 +80,10 @@ export async function registerUser(
       verificationMethod_ = "whatsapp";
     } else if (verificationMethod === "sms") {
       verificationMethod_ = "sms";
+    }
+
+    if (!verificationMethod_) {
+      throw new Error(`Username not verified:${JSON.stringify(resetLink)}`);
     }
 
     return { ...initUser, verificationMethod: verificationMethod_ };
@@ -98,14 +108,12 @@ export async function sendResetLink(data: {
   console.log(`Generating ResetToken for: ${username}`);
 
   if (!username) {
-    console.error("No username provided in generating resetToken");
-    return;
+    throw new Error("No username provided in generating resetToken");
   }
 
   const user_ = await getUserByKey(username);
   if (!user_) {
-    console.error(`User not found - ${username}`);
-    return;
+    throw new Error(`User not found - ${username}`);
   }
   const usernameAttribute = user_.email === username ? "email" : "tel";
   const tokenObj = await generateResetToken();
@@ -118,10 +126,10 @@ export async function sendResetLink(data: {
     };
     await updateUserPassword(user_.id, userUpdates);
 
-    let sentTo_: "email" | "whatsapp" | "sms" = undefined;
-    const emailToSend = await resetPasswordEmail(user_.name, resetLink);
+    let sentTo_: "email" | "whatsapp" | "sms" | undefined = undefined;
+    const emailToSend = await resetPasswordEmail(user_.name || "", resetLink);
 
-    if (usernameAttribute === "email") {
+    if (usernameAttribute === "email" && user_.email) {
       await sendMail({
         to: user_.email,
         subject: "Reset Password: LOCi",
@@ -137,13 +145,18 @@ export async function sendResetLink(data: {
         message: emailToSend.text,
       };
       await sendSms(options_);
+      sentTo_ = "sms";
+    }
+
+    if (!sentTo_) {
+      throw new Error(`Message not sent to ${username}`);
     }
 
     return { username, sentTo: sentTo_ };
   } catch (error) {
     const err = processError(error);
     console.error("Sending reset link failed: ", err);
-    return null;
+    throw new Error(err.message);
   }
 }
 
@@ -230,6 +243,26 @@ export async function getAllUsers(skip = 0, take = 20): Promise<User[]> {
 }
 
 /**
+ * Get all admin users (paginated).
+ */
+
+type AdminUser = Prisma.UserGetPayload<{
+  include: { phoneNumbers: true };
+}>;
+
+export async function getAdminUsers(skip = 0, take = 20): Promise<AdminUser[]> {
+  return db.user.findMany({
+    where: { role: UserRole.ADMIN },
+    skip,
+    take,
+    orderBy: { createdAt: "desc" },
+    include: {
+      phoneNumbers: true,
+    },
+  });
+}
+
+/**
  * Search users by name or email.
  */
 export async function searchUsers(query: string): Promise<User[]> {
@@ -249,6 +282,26 @@ export async function searchUsers(query: string): Promise<User[]> {
  */
 export async function countUsers(): Promise<number> {
   return db.user.count();
+}
+
+/**
+ * Find a user by a phoneNumberId (from the PhoneNumber model).
+ */
+export async function getUserByPhoneNumberId(
+  phoneNumberId: string
+): Promise<User | null> {
+  return db.user.findFirst({
+    where: {
+      phoneNumbers: {
+        some: {
+          phoneNumberId,
+        },
+      },
+    },
+    include: {
+      phoneNumbers: true,
+    },
+  });
 }
 
 /* -----------------------------

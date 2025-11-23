@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma";
-import { Prisma, PrismaClient } from "@prisma/client";
-import { Plan, PlanInterval } from "@prisma/client";
+import { Prisma, Plan, PlanInterval } from "@/lib/prisma/generated";
 
 export enum Status {
   ACTIVE = "ACTIVE",

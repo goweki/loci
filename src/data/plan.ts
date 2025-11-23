@@ -1,7 +1,8 @@
 "use server";
 
-import { Prisma, PrismaClient } from "@prisma/client";
 import prisma from "@/lib/prisma";
+import { Prisma } from "@/lib/prisma/generated";
+
 /* -------------------------------------------------------------------------- */
 /*                              PLAN OPERATIONS                               */
 /* -------------------------------------------------------------------------- */

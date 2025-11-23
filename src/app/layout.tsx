@@ -4,11 +4,7 @@ export const metadata = {
     default: "loci",
   },
   description: "Supercharging Engagement",
-  metadataBase: new URL(
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3000"
-      : process.env.NEXTAUTH_URL
-  ),
+  metadataBase: new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000"),
   icons: {
     icon: "/brand/favicon.ico",
     shortcut: "/brand/favicon-16x16.png",
