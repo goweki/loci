@@ -1,3 +1,5 @@
+// @/components/dashboard/dashboard-stats.tsx
+
 "use client";
 
 import { useI18n } from "@/lib/i18n";
@@ -10,6 +12,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Card } from "../ui/card";
+import { LucideIcon } from "lucide-react";
 
 const translations = {
   en: {
@@ -26,40 +29,74 @@ const translations = {
   },
 };
 
-export default function DashboardStats() {
+// interface StatValue {
+//   label: string;
+//   value: string;
+//   change: string | number;
+//   trend: "up" | "down";
+//   icon: LucideIcon;
+//   color: string;
+// }
+
+export type StatsAttribute =
+  | "totalMessages"
+  | "activeContacts"
+  | "responseRate"
+  | "phoneNumbers";
+
+export interface StatItem {
+  label: string;
+  value: string;
+  change: string | number;
+  trend: "up" | "down";
+}
+
+type StatItemUI = StatItem & { icon: LucideIcon; color: string };
+
+export type DashboardStatsProps = Record<StatsAttribute, StatItem>;
+
+export default function DashboardStats({
+  stats,
+}: {
+  stats: DashboardStatsProps;
+}) {
+  const { totalMessages, activeContacts, responseRate, phoneNumbers } = stats;
   const { language } = useI18n();
   const t = translations[language];
 
-  const stats = [
+  const statsConfig: StatItemUI[] = [
     {
       label: t.totalMessages,
-      value: "12,847",
-      change: "+12.5%",
-      trend: "up",
+      value: totalMessages.value.toLocaleString(),
+      change: totalMessages.change,
+      trend: totalMessages.trend,
       icon: MessageSquare,
       color: "bg-muted text-muted-foreground",
     },
     {
       label: t.activeContacts,
-      value: "3,421",
-      change: "+8.2%",
-      trend: "up",
+      value: activeContacts.value.toLocaleString(),
+      change: activeContacts.change,
+      trend: activeContacts.trend,
       icon: Users,
       color: "bg-muted text-muted-foreground",
     },
     {
       label: t.responseRate,
-      value: "94.8%",
-      change: "-2.1%",
-      trend: "down",
+      value: `${responseRate.value}%`,
+      change: responseRate.change,
+      trend: responseRate.trend,
       icon: Zap,
       color: "bg-muted text-muted-foreground",
     },
     {
       label: t.phoneNumbers,
-      value: "5",
-      change: "+1",
-      trend: "up",
+      value: phoneNumbers.value.toString(),
+      change:
+        typeof phoneNumbers.change === "number"
+          ? `${phoneNumbers.change >= 0 ? "+" : ""}${phoneNumbers.change}`
+          : phoneNumbers.change,
+      trend: phoneNumbers.trend,
       icon: Phone,
       color: "bg-muted text-muted-foreground",
     },
@@ -67,7 +104,7 @@ export default function DashboardStats() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {stats.map((stat, idx) => (
+      {statsConfig.map((stat, idx) => (
         <Card key={idx} className="p-6 hover:shadow-lg transition-shadow">
           <div className="flex items-start justify-between">
             <div className="flex-1">

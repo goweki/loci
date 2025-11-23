@@ -48,10 +48,13 @@ export async function getPhoneNumberByNumber(phoneNumber: string) {
 /**
  * 📦 Get all phone numbers for a given user.
  */
-export async function getPhoneNumbersByUser(userId: string) {
+export async function getPhoneNumbersByUser(
+  userId: string
+): Promise<Prisma.PhoneNumberGetPayload<{ include: { messages: true } }>[]> {
   return prisma.phoneNumber.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
+    include: { messages: true },
   });
 }
 
