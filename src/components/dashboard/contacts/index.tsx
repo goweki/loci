@@ -22,7 +22,7 @@ import {
 import { PhoneNumberStatus, Prisma } from "@/lib/prisma/generated";
 import { Button } from "@/components/ui/button";
 import WhatsAppFormModal from "./new-phone-number-modal";
-import WhatsAppEmbeddedSignup from "../waba-embedded-signup";
+import WhatsAppEmbeddedSignup from "./waba-embedded-signup";
 
 export default function ContactsComponent({
   phoneNumbers,
@@ -207,13 +207,6 @@ export default function ContactsComponent({
                     Export Data
                   </button> */}
                   <WhatsAppEmbeddedSignup />
-                  <button
-                    onClick={() => setShowAddModal(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                  >
-                    <Plus className="w-5 h-5" />
-                    Add Whatsapp Number
-                  </button>
                 </div>
 
                 {/* Stats Cards */}

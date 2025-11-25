@@ -2,8 +2,9 @@
 
 import { useEffect } from "react";
 import Script from "next/script";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import { Plus } from "lucide-react";
 
 const FACEBOOK_APP_ID = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
 const WABA_EMBEDDED_CONFIG_ID = process.env.NEXT_PUBLIC_WABA_EMBEDDED_CONFIG_ID;
@@ -32,8 +33,8 @@ interface WhatsAppEmbeddedSignupProps {
 }
 
 const translations = {
-  en: { submit: "Connect WhatsApp Business" },
-  sw: { submit: "Unganisha WhatsApp Business" },
+  en: { submit: "Connect WhatsApp Number" },
+  sw: { submit: "Unganisha Number ya WhatsApp" },
 };
 
 export default function WhatsAppEmbeddedSignup({
@@ -133,7 +134,9 @@ export default function WhatsAppEmbeddedSignup({
       />
 
       {/* Launch button */}
-      <Button onClick={launchWhatsAppSignup}>{t.submit}</Button>
+      <Button onClick={launchWhatsAppSignup} className="text-lg">
+        <Plus className="w-5 h-5" /> {t.submit}
+      </Button>
     </>
   );
 }
