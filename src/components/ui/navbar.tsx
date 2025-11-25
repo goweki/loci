@@ -157,7 +157,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       <header
         ref={combinedRef}
         className={cn(
-          "fixed top-0 z-50 w-full border-b bg-popover/50 text-popover-foreground backdrop-blur px-4 md:px-6 [&_*]:no-underline transition-transform duration-300",
+          "fixed top-0 z-40 w-full border-b bg-popover/50 text-popover-foreground backdrop-blur px-4 md:px-6 [&_*]:no-underline transition-transform duration-300",
           className,
           isVisible ? "translate-y-0" : "-translate-y-full"
         )}

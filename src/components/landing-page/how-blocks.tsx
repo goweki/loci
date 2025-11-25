@@ -37,7 +37,7 @@ export default function HowBlocks() {
       ),
     },
     {
-      title: "Add Phone Numbers",
+      title: "Add Whatsapp Numbers",
       description:
         "Connect your custom business phone numbers or get new ones instantly",
       icon: (

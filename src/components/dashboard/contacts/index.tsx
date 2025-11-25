@@ -20,6 +20,8 @@ import {
   MoreVertical,
 } from "lucide-react";
 import { PhoneNumberStatus, Prisma } from "@/lib/prisma/generated";
+import { Button } from "@/components/ui/button";
+import WhatsAppFormModal from "./new-phone-number-modal";
 
 export default function ContactsComponent({
   phoneNumbers,
@@ -115,6 +117,8 @@ export default function ContactsComponent({
     });
   };
 
+  const closeAddModal = () => setShowAddModal(false);
+
   const filteredPhoneNumbers = phoneNumbers.filter((pn) => {
     const matchesSearch =
       pn.phoneNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -206,7 +210,7 @@ export default function ContactsComponent({
                     className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
                   >
                     <Plus className="w-5 h-5" />
-                    Add Number
+                    Add Whatsapp Number
                   </button>
                 </div>
 
@@ -540,13 +544,12 @@ export default function ContactsComponent({
           </div>
         </div>
 
-        {/* Add Phone Number Modal */}
-        {showAddModal && (
+        {/* {showAddModal && (
           <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-xl">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-card-foreground">
-                  Add Phone Number
+                  Add Whatsapp Phone
                 </h2>
                 <button
                   onClick={() => setShowAddModal(false)}
@@ -584,53 +587,24 @@ export default function ContactsComponent({
                     className="w-full px-4 py-2 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   />
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-card-foreground mb-2">
-                    WABA ID
-                  </label>
-                  <input
-                    type="text"
-                    name="wabaId"
-                    value={formData.wabaId}
-                    onChange={handleInputChange}
-                    placeholder="102345678901234"
-                    className="w-full px-4 py-2 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-card-foreground mb-2">
-                    Phone Number ID
-                  </label>
-                  <input
-                    type="text"
-                    name="phoneNumberId"
-                    value={formData.phoneNumberId}
-                    onChange={handleInputChange}
-                    placeholder="123456789012345"
-                    className="w-full px-4 py-2 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                </div>
-
                 <div className="flex gap-3 pt-4">
-                  <button
+                  <Button onClick={handleAddNumber} className="flex flex-1">
+                    Save
+                  </Button>
+                  <Button
                     onClick={() => setShowAddModal(false)}
-                    className="flex-1 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+                    variant="destructive"
                   >
                     Cancel
-                  </button>
-                  <button
-                    onClick={handleAddNumber}
-                    className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                  >
-                    Save
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
           </div>
-        )}
+        )} */}
+
+        {/* Add Whatsapp Number Modal */}
+        <WhatsAppFormModal show={showAddModal} setShow={setShowAddModal} />
 
         {/* Details Modal */}
         {showDetailsModal && selectedPhone && (

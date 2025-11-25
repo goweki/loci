@@ -7,15 +7,18 @@ type InputPhoneProps = {
   setValue: (value?: string) => void;
   inputComponent?: React.ElementType;
   disabled?: boolean;
+  name?: string;
 };
 
 const InputPhone: React.FC<InputPhoneProps> = ({
   value,
   setValue,
   disabled = false,
+  name = "phone-number",
 }) => {
   return (
     <PhoneInput
+      name
       disabled={disabled}
       value={value}
       onChange={setValue}
