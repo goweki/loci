@@ -22,6 +22,7 @@ import {
 import { PhoneNumberStatus, Prisma } from "@/lib/prisma/generated";
 import { Button } from "@/components/ui/button";
 import WhatsAppFormModal from "./new-phone-number-modal";
+import WhatsAppEmbeddedSignup from "../waba-embedded-signup";
 
 export default function ContactsComponent({
   phoneNumbers,
@@ -201,10 +202,11 @@ export default function ContactsComponent({
               <div className="space-y-6">
                 {/* Action Buttons */}
                 <div className="flex justify-end gap-2">
-                  <button className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors">
+                  {/* <button className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors">
                     <Download className="w-4 h-4" />
                     Export Data
-                  </button>
+                  </button> */}
+                  <WhatsAppEmbeddedSignup />
                   <button
                     onClick={() => setShowAddModal(true)}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
@@ -450,13 +452,10 @@ export default function ContactsComponent({
                     <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                       Get started by adding your first phone number
                     </p>
-                    <button
-                      onClick={() => setShowAddModal(true)}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                    >
+                    <Button onClick={() => setShowAddModal(true)}>
                       <Plus className="w-5 h-5" />
                       Add Number
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -543,65 +542,6 @@ export default function ContactsComponent({
             )}
           </div>
         </div>
-
-        {/* {showAddModal && (
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-xl">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-card-foreground">
-                  Add Whatsapp Phone
-                </h2>
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="p-2 hover:bg-accent rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5 text-muted-foreground" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-card-foreground mb-2">
-                    Phone Number *
-                  </label>
-                  <input
-                    type="tel"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleInputChange}
-                    placeholder="+254712345678"
-                    className="w-full px-4 py-2 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-card-foreground mb-2">
-                    Display Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="displayName"
-                    value={formData.displayName}
-                    onChange={handleInputChange}
-                    placeholder="Customer Support"
-                    className="w-full px-4 py-2 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                </div>
-                <div className="flex gap-3 pt-4">
-                  <Button onClick={handleAddNumber} className="flex flex-1">
-                    Save
-                  </Button>
-                  <Button
-                    onClick={() => setShowAddModal(false)}
-                    variant="destructive"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )} */}
 
         {/* Add Whatsapp Number Modal */}
         <WhatsAppFormModal show={showAddModal} setShow={setShowAddModal} />

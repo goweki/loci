@@ -67,7 +67,7 @@ export class WhatsAppClient {
     const finalPhoneNumberId =
       phoneNumberId ?? process.env.WHATSAPP_PHONE_NUMBER_ID;
 
-    const url = `https://graph.facebook.com/v22.0/${finalPhoneNumberId}/messages`;
+    const url = `${this.baseUrl}/${finalPhoneNumberId}/messages`;
 
     this.logger.info("Sending WhatsApp message", {
       to,

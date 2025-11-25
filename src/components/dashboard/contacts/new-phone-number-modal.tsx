@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import InputPhone from "@/components/ui/input-phone";
+import toast from "react-hot-toast";
+import Loader from "@/components/ui/loaders";
 
 export interface ModalProps {
   show: boolean;
@@ -17,10 +19,10 @@ export interface ModalProps {
 }
 
 export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState<1 | 2 | null>(1);
   const [formData, setFormData] = useState({
-    phoneNumber: "",
-    displayName: "",
+    whatsappPhoneNumber: "",
+    whatsappDisplayName: "",
     pinCode: "",
   });
 
@@ -34,13 +36,15 @@ export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
 
   const handleNextStep = () => {
     // Validate first step
-    if (!formData.phoneNumber || !formData.displayName) {
-      alert("Please fill in all required fields");
+    if (!formData.whatsappPhoneNumber || !formData.whatsappDisplayName) {
+      toast.error(
+        `Please fill in ${!formData.whatsappPhoneNumber ? "the WhatsApp Number" : "the Display Name"}`
+      );
       return;
     }
 
-    // Here you would typically send the PIN to the phone
-    console.log("Sending PIN to:", formData.phoneNumber);
+    // send the PIN to the phone
+    console.log("Sending PIN to:", formData.whatsappPhoneNumber);
     setStep(2);
   };
 
@@ -59,18 +63,28 @@ export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
     // Add your submission logic here
 
     // Reset and close
-    setFormData({ phoneNumber: "", displayName: "", pinCode: "" });
+    setFormData({
+      whatsappPhoneNumber: "",
+      whatsappDisplayName: "",
+      pinCode: "",
+    });
     setStep(1);
     setShow(false);
   };
 
   const handleCancel = () => {
-    setFormData({ phoneNumber: "", displayName: "", pinCode: "" });
+    setFormData({
+      whatsappPhoneNumber: "",
+      whatsappDisplayName: "",
+      pinCode: "",
+    });
     setStep(1);
     setShow(false);
   };
 
-  return show ? (
+  return !step ? (
+    <Loader />
+  ) : show ? (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-40 !m-0">
       <Card className="w-full max-w-sm">
         <CardHeader>
@@ -107,13 +121,13 @@ export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
                     Phone Number *
                   </label>
                   <InputPhone
-                    name="whatsapp-number"
-                    value={formData.phoneNumber}
+                    name="whatsappPhoneNumber"
+                    value={formData.whatsappPhoneNumber}
                     setValue={(val) => {
                       if (val)
                         setFormData((prev) => ({
                           ...prev,
-                          phoneNumber: val,
+                          whatsappPhoneNumber: val,
                         }));
                     }}
                   />
@@ -125,8 +139,8 @@ export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
                   </label>
                   <Input
                     type="text"
-                    name="whatsapp-display-name"
-                    value={formData.displayName}
+                    name="whatsappDisplayName"
+                    value={formData.whatsappDisplayName}
                     onChange={handleInputChange}
                     placeholder="eg. Customer Support"
                   />
@@ -150,7 +164,7 @@ export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
                 <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-4">
                   <p className="text-sm">A PIN code has been sent to:</p>
                   <p className="text-lg font-semibold mt-1">
-                    {formData.phoneNumber}
+                    {formData.whatsappPhoneNumber}
                   </p>
                 </div>
 

@@ -18,7 +18,7 @@ const InputPhone: React.FC<InputPhoneProps> = ({
 }) => {
   return (
     <PhoneInput
-      name
+      name={name}
       disabled={disabled}
       value={value}
       onChange={setValue}

@@ -63,7 +63,7 @@ export async function getPhoneNumbersByUser(
  */
 export async function createPhoneNumber(
   data: Prisma.PhoneNumberCreateInput | Prisma.PhoneNumberUncheckedCreateInput
-) {
+): Promise<Prisma.PhoneNumberGetPayload<{}>> {
   return prisma.phoneNumber.create({
     data,
   });

@@ -30,5 +30,5 @@
     "src/lib/authRouteWrappers.js",
     "src/app/api/auth/[...nextauth]/authOptions.js"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "prisma/generated"]
 }
