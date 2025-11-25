@@ -114,8 +114,8 @@ export type Currency = (typeof Currency)[keyof typeof Currency]
 export const TriggerType: {
   KEYWORD: 'KEYWORD',
   MESSAGE_TYPE: 'MESSAGE_TYPE',
-  DEFAULT: 'DEFAULT',
-  TIME_BASED: 'TIME_BASED'
+  TIME_BASED: 'TIME_BASED',
+  DEFAULT: 'DEFAULT'
 };
 
 export type TriggerType = (typeof TriggerType)[keyof typeof TriggerType]

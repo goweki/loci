@@ -246,8 +246,8 @@ model Account {
 enum TriggerType {
   KEYWORD
   MESSAGE_TYPE
-  DEFAULT
   TIME_BASED
+  DEFAULT
 }
 
 enum PlanName {

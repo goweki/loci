@@ -388,8 +388,8 @@ exports.MessageStatus = exports.$Enums.MessageStatus = {
 exports.TriggerType = exports.$Enums.TriggerType = {
   KEYWORD: 'KEYWORD',
   MESSAGE_TYPE: 'MESSAGE_TYPE',
-  DEFAULT: 'DEFAULT',
-  TIME_BASED: 'TIME_BASED'
+  TIME_BASED: 'TIME_BASED',
+  DEFAULT: 'DEFAULT'
 };
 
 exports.AccountType = exports.$Enums.AccountType = {
