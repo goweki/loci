@@ -1,10 +1,15 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import db from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { NextAuthOptions } from "next-auth";
 import { createUser, getUserByEmail, getUserByKey } from "@/data/user";
-import { User, UserRole, UserStatus } from "@/lib/prisma/generated";
+import {
+  PrismaClient,
+  User,
+  UserRole,
+  UserStatus,
+} from "@/lib/prisma/generated";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
 import { Status as SubscriptionStatus } from "@/data/subscription";
 import { createAccount, upsertAccount } from "@/data/account";
@@ -16,8 +21,7 @@ if (!process.env.NEXTAUTH_SECRET) {
 }
 
 export const authOptions: NextAuthOptions = {
-  // adapter: PrismaAdapter(db),
-  adapter: PrismaAdapter(db),
+  adapter: PrismaAdapter(prisma as unknown as PrismaClient),
 
   providers: [
     CredentialsProvider({
