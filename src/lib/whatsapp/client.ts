@@ -32,24 +32,15 @@ import {
   verifyPreVerifiedNumber as _verifyPreVerifiedNumber,
   getTokenUsingWabaAuthCode as _getTokenUsingWabaAuthCode,
 } from "./actions";
-
-export const BASE_URL = "https://graph.facebook.com/v22.0";
-
-export interface WhatsAppClientEnv {
-  wabaId: string;
-  wabaAccessToken: string;
-  verifyToken: string;
-  appSecret: string;
-  phoneNumberId: string;
-  fbAppId: string;
-  fbBusinessId: string;
-}
+import { WhatsAppClientEnv } from "./types/environment-variables";
 
 export class WhatsAppClient {
-  private baseUrl = BASE_URL;
   private logger = new WhatsAppLogger({ maskSecrets: true });
+  private baseUrl: string;
 
-  constructor(private env: WhatsAppClientEnv) {}
+  constructor(private env: WhatsAppClientEnv) {
+    this.baseUrl = `https://graph.facebook.com/${env.apiVersion}`;
+  }
 
   // ---------------------------------------------------------------------
   // 1. WEBHOOK VERIFICATION
@@ -441,12 +432,7 @@ export class WhatsAppClient {
   async createPreVerifiedNumber(
     phoneNumber: string
   ): Promise<PreVerifiedNumberResponse> {
-    return _createPreVerifiedNumber(
-      this.baseUrl,
-      this.env.fbBusinessId,
-      this.env.wabaAccessToken,
-      phoneNumber
-    );
+    return _createPreVerifiedNumber(phoneNumber);
   }
 
   /**

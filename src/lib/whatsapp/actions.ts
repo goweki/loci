@@ -1,4 +1,5 @@
-// lib/whatsapp/helper-functions.ts
+// lib/whatsapp/actions.ts
+
 "use server";
 
 import prisma from "@/lib/prisma";
@@ -12,7 +13,7 @@ import {
 } from "@/lib/prisma/generated";
 import { InboundMessage, WhatsAppPhoneNumberDetailsResponse } from "./types";
 import { Message } from "../validations";
-import { createPhoneNumber, getPhoneNumberByNumber } from "@/data/phoneNumber";
+import { createPhoneNumber } from "@/data/phoneNumber";
 import { getAdminUsers, getUserByPhoneNumberId } from "@/data/user";
 import whatsapp from ".";
 import { findContactByPhoneNumber } from "@/data/contact";
@@ -24,6 +25,9 @@ import {
 } from "./types/waba-api-reponses";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth";
+import { env_ } from "./types/environment-variables";
+
+const BASE_URL = `https://graph.facebook.com/${env_.apiVersion}`;
 
 interface WhatsAppContact {
   profile: {
@@ -679,9 +683,6 @@ export async function buildWhatsAppMessage(input: Message) {
  * Create a pre-verified business phone number in your portfolio
  */
 export async function createPreVerifiedNumber(
-  baseUrl: string,
-  fbBusinessId: string,
-  wabaAccessToken: string,
   phoneNumber: string
 ): Promise<PreVerifiedNumberResponse> {
   const session = await getServerSession(authOptions);
@@ -691,13 +692,13 @@ export async function createPreVerifiedNumber(
     throw new Error("401: Unaauthorized");
   }
 
-  const url = `${baseUrl}/${fbBusinessId}/add_phone_numbers?phone_number=${encodeURIComponent(
+  const url = `${BASE_URL}/${env_.fbBusinessId}/add_phone_numbers?phone_number=${encodeURIComponent(
     phoneNumber
   )}`;
 
   const res = await fetch(url, {
     method: "POST",
-    headers: { Authorization: `Bearer ${wabaAccessToken}` },
+    headers: { Authorization: `Bearer ${env_.wabaAccessToken}` },
   });
 
   if (!res.ok) {

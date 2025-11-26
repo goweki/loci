@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
-import { processIncomingMessage } from "@/lib/whatsapp";
+import { processIncomingMessage } from "@/lib/whatsapp/actions";
 import { InboundWebhookPayload } from "@/lib/whatsapp/types";
 const WHATSAPP_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
 

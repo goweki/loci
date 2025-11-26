@@ -12,8 +12,7 @@ import { Input } from "@/components/ui/input";
 import InputPhone from "@/components/ui/input-phone";
 import toast from "react-hot-toast";
 import Loader from "@/components/ui/loaders";
-import { createPreVerifiedNumber, env_ } from "@/lib/whatsapp";
-import { BASE_URL as WABA_BASE_URL } from "@/lib/whatsapp/client";
+import { createPreVerifiedNumber } from "@/lib/whatsapp/actions";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 
 export interface ModalProps {
@@ -26,6 +25,7 @@ export default function AddWhatsappNumberModal({ show, setShow }: ModalProps) {
   const [phoneNoData, setPhoneNoData] = useState({
     whatsappPhoneNumber: "",
     whatsappDisplayName: "",
+    preverifiedNoId: "",
     pinCode: "",
   });
 
@@ -54,12 +54,13 @@ export default function AddWhatsappNumberModal({ show, setShow }: ModalProps) {
 
     try {
       const { preverificationId } = await createPreVerifiedNumber(
-        WABA_BASE_URL,
-        env_.fbAppId,
-        env_.wabaAccessToken,
         phoneNoData.whatsappPhoneNumber
       );
 
+      setPhoneNoData((prev) => ({
+        ...prev,
+        preverifiedNoId: preverificationId,
+      }));
       setStep(2);
     } catch (error) {
       console.error("Error pre-verifying phone number:", error);
@@ -75,7 +76,7 @@ export default function AddWhatsappNumberModal({ show, setShow }: ModalProps) {
   const handleSubmit = () => {
     // Validate PIN
     if (!phoneNoData.pinCode) {
-      alert("Please enter the PIN code");
+      toast.error("Please enter the PIN code");
       return;
     }
 
@@ -86,6 +87,7 @@ export default function AddWhatsappNumberModal({ show, setShow }: ModalProps) {
     setPhoneNoData({
       whatsappPhoneNumber: "",
       whatsappDisplayName: "",
+      preverifiedNoId: "",
       pinCode: "",
     });
     setStep(1);
@@ -96,6 +98,7 @@ export default function AddWhatsappNumberModal({ show, setShow }: ModalProps) {
     setPhoneNoData({
       whatsappPhoneNumber: "",
       whatsappDisplayName: "",
+      preverifiedNoId: "",
       pinCode: "",
     });
     setStep(1);
