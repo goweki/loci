@@ -13,7 +13,7 @@ import InputPhone from "@/components/ui/input-phone";
 import toast from "react-hot-toast";
 import Loader from "@/components/ui/loaders";
 import { createPreVerifiedNumber } from "@/lib/whatsapp/actions";
-import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
+import { removePlus } from "@/lib/utils/telHandlers";
 
 export interface ModalProps {
   show: boolean;
@@ -54,7 +54,7 @@ export default function AddWhatsappNumberModal({ show, setShow }: ModalProps) {
 
     try {
       const { preverificationId } = await createPreVerifiedNumber(
-        phoneNoData.whatsappPhoneNumber
+        removePlus(phoneNoData.whatsappPhoneNumber)
       );
 
       setPhoneNoData((prev) => ({
@@ -63,8 +63,10 @@ export default function AddWhatsappNumberModal({ show, setShow }: ModalProps) {
       }));
       setStep(2);
     } catch (error) {
-      console.error("Error pre-verifying phone number:", error);
-      const errorMessage = getFriendlyErrorMessage(error);
+      let errorMessage = "Error pre-verifying phone number";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
       toast.error(errorMessage);
     }
   };

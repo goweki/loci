@@ -1,3 +1,5 @@
+import "server-only";
+
 import { Prisma } from "../prisma/generated";
 
 interface ErrorHandlerOptions {
@@ -13,11 +15,14 @@ export function getFriendlyErrorMessage(
 
   // Log the original error for debugging (in development or if explicitly enabled)
   if (logErrors && (isDev || process.env.NODE_ENV === "development")) {
-    console.error("Database error:", error);
+    console.error("ERROR:", error);
   }
 
   // Handle Prisma "known" errors
-  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+  if (
+    !!Prisma.PrismaClientKnownRequestError &&
+    error instanceof Prisma.PrismaClientKnownRequestError
+  ) {
     switch (error.code) {
       // ===== UNIQUE CONSTRAINT VIOLATIONS =====
       case "P2002":
@@ -167,7 +172,10 @@ export function getFriendlyErrorMessage(
   }
 
   // Prisma validation errors (bad query structure or input shape)
-  if (error instanceof Prisma.PrismaClientValidationError) {
+  if (
+    !!Prisma.PrismaClientValidationError &&
+    error instanceof Prisma.PrismaClientValidationError
+  ) {
     if (isDev) {
       return `Validation error: ${error.message}`;
     }
@@ -175,7 +183,10 @@ export function getFriendlyErrorMessage(
   }
 
   // Database connection/initialization errors
-  if (error instanceof Prisma.PrismaClientInitializationError) {
+  if (
+    !!Prisma.PrismaClientInitializationError &&
+    error instanceof Prisma.PrismaClientInitializationError
+  ) {
     if (isDev) {
       return `Database initialization error: ${error.message}`;
     }
@@ -183,7 +194,10 @@ export function getFriendlyErrorMessage(
   }
 
   // Prisma engine panic (very rare, usually indicates a bug)
-  if (error instanceof Prisma.PrismaClientRustPanicError) {
+  if (
+    !!Prisma.PrismaClientRustPanicError &&
+    error instanceof Prisma.PrismaClientRustPanicError
+  ) {
     if (isDev) {
       return `Engine panic: ${error.message}`;
     }

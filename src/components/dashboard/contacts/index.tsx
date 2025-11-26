@@ -202,11 +202,11 @@ export default function ContactsComponent({
               <div className="space-y-6">
                 {/* Action Buttons */}
                 <div className="flex justify-end gap-2">
-                  <Button onClick={() => setShowAddModal(true)}>
+                  {/* <Button onClick={() => setShowAddModal(true)}>
                     <Plus className="w-5 h-5" />
                     Add WhatsApp Number
-                  </Button>
-                  {/* <WhatsAppEmbeddedSignup /> */}
+                  </Button> */}
+                  <WhatsAppEmbeddedSignup />
                 </div>
 
                 {/* Stats Cards */}

@@ -358,8 +358,9 @@ exports.PlanName = exports.$Enums.PlanName = {
 };
 
 exports.PhoneNumberStatus = exports.$Enums.PhoneNumberStatus = {
-  VERIFIED: 'VERIFIED',
+  NOT_CLAIMED: 'NOT_CLAIMED',
   NOT_VERIFIED: 'NOT_VERIFIED',
+  VERIFIED: 'VERIFIED',
   EXPIRED: 'EXPIRED'
 };
 

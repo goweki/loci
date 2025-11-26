@@ -1,5 +1,11 @@
 -- CreateEnum
-CREATE TYPE "TriggerType" AS ENUM ('KEYWORD', 'MESSAGE_TYPE', 'DEFAULT', 'TIME_BASED');
+CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED', 'REVERSED');
+
+-- CreateEnum
+CREATE TYPE "Currency" AS ENUM ('KSH', 'US');
+
+-- CreateEnum
+CREATE TYPE "TriggerType" AS ENUM ('KEYWORD', 'MESSAGE_TYPE', 'TIME_BASED', 'DEFAULT');
 
 -- CreateEnum
 CREATE TYPE "PlanName" AS ENUM ('BASIC', 'STANDARD', 'PREMIUM');
@@ -17,7 +23,7 @@ CREATE TYPE "AccountType" AS ENUM ('oauth', 'oidc', 'email', 'credentials');
 CREATE TYPE "PlanInterval" AS ENUM ('MONTHLY', 'YEARLY');
 
 -- CreateEnum
-CREATE TYPE "PhoneNumberStatus" AS ENUM ('PENDING', 'VERIFIED', 'FAILED');
+CREATE TYPE "PhoneNumberStatus" AS ENUM ('NOT_CLAIMED', 'NOT_VERIFIED', 'VERIFIED', 'EXPIRED');
 
 -- CreateEnum
 CREATE TYPE "MessageType" AS ENUM ('TEXT', 'IMAGE', 'DOCUMENT', 'AUDIO', 'VIDEO', 'LOCATION', 'CONTACT', 'TEMPLATE', 'OTHER');
@@ -35,14 +41,18 @@ CREATE TYPE "PaymentMethod" AS ENUM ('ONLINE', 'OTHER', 'MPESA', 'CASH');
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
     "name" TEXT,
-    "email" TEXT NOT NULL,
+    "email" TEXT,
     "emailVerified" TIMESTAMP(3),
+    "tel" TEXT,
+    "telVerified" TIMESTAMP(3),
     "image" TEXT,
     "password" TEXT,
     "role" "UserRole" NOT NULL DEFAULT 'USER',
     "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "resetToken" TEXT,
+    "resetTokenExpiry" TIMESTAMP(3),
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -82,7 +92,12 @@ CREATE TABLE "Payment" (
     "id" TEXT NOT NULL,
     "reference" TEXT NOT NULL,
     "paymentMethod" "PaymentMethod" NOT NULL DEFAULT 'ONLINE',
+    "amount" INTEGER NOT NULL,
+    "currency" "Currency" NOT NULL DEFAULT 'KSH',
+    "status" "PaymentStatus" NOT NULL DEFAULT 'PENDING',
     "subscriptionId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Payment_pkey" PRIMARY KEY ("id")
 );
@@ -130,12 +145,14 @@ CREATE TABLE "plan_features" (
 -- CreateTable
 CREATE TABLE "phone_numbers" (
     "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "phoneNumber" TEXT NOT NULL,
-    "displayName" TEXT,
-    "wabaId" TEXT,
     "phoneNumberId" TEXT,
-    "status" "PhoneNumberStatus" NOT NULL DEFAULT 'PENDING',
+    "phoneNumber" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "displayName" TEXT,
+    "preVerificationId" TEXT,
+    "preVerificationCode" TEXT,
+    "wabaId" TEXT,
+    "status" "PhoneNumberStatus" NOT NULL DEFAULT 'NOT_CLAIMED',
     "verifiedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -239,6 +256,9 @@ CREATE TABLE "accounts" (
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "users_tel_key" ON "users"("tel");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "user_sessions_sessionToken_key" ON "user_sessions"("sessionToken");
 
 -- CreateIndex
@@ -251,7 +271,16 @@ CREATE UNIQUE INDEX "verification_tokens_identifier_token_key" ON "verification_
 CREATE INDEX "subscriptions_userId_idx" ON "subscriptions"("userId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Payment_reference_key" ON "Payment"("reference");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "plans_name_key" ON "plans"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Feature_name_key" ON "Feature"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "phone_numbers_phoneNumberId_key" ON "phone_numbers"("phoneNumberId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "phone_numbers_phoneNumber_key" ON "phone_numbers"("phoneNumber");

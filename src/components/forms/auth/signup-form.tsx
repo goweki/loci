@@ -92,9 +92,10 @@ export function SignUpForm() {
       console.log(result);
       router.push(`/${language}/sign-in`);
     } catch (error) {
-      console.log("Error signing up:", error);
-
-      const errorMessage = getFriendlyErrorMessage(error);
+      let errorMessage = "Error signing up";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
       toast.error(errorMessage);
       setLoading(false);
     }

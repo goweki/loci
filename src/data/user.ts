@@ -14,9 +14,9 @@ import { Prisma, UserRole, UserStatus, User } from "@/lib/prisma/generated";
 import { sendMail } from "@/lib/mail";
 import { welcomeEmail, resetPasswordEmail } from "@/lib/mail/email-render";
 import { BASE_URL } from "@/lib/utils/getUrl";
-import processError from "@/lib/utils/processError";
 import { compareHash, hash } from "@/lib/utils/passwordHandlers";
 import sendSms, { SMSprops } from "@/lib/sms";
+import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 
 /**
  * Creates a new user (doesnt send Welcome email)
@@ -88,9 +88,9 @@ export async function registerUser(
 
     return { ...initUser, verificationMethod: verificationMethod_ };
   } catch (error) {
-    const err = processError(error);
-    console.error("User registration failed: ", err);
-    throw new Error(err.message);
+    console.error("User registration failed: ", error);
+    const errorMessage = getFriendlyErrorMessage(error);
+    throw new Error(errorMessage);
   }
 }
 
@@ -154,9 +154,9 @@ export async function sendResetLink(data: {
 
     return { username, sentTo: sentTo_ };
   } catch (error) {
-    const err = processError(error);
-    console.error("Sending reset link failed: ", err);
-    throw new Error(err.message);
+    console.error("Sending reset link failed: ", error);
+    const errorMessage = getFriendlyErrorMessage(error);
+    throw new Error(errorMessage);
   }
 }
 

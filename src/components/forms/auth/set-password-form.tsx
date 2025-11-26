@@ -13,7 +13,6 @@ import z from "zod";
 import { setPasswordSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateUserPassword, verifyToken } from "@/data/user";
-import processError from "@/lib/utils/processError";
 import {
   Form,
   FormControl,
@@ -25,6 +24,7 @@ import AuthErrorHandler from "./_errorHandler";
 import { useI18n } from "@/lib/i18n";
 import { Lock, User as UserIcon } from "lucide-react";
 import { type User } from "@/lib/prisma/generated";
+import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 
 export default function SetPasswordForm({
   error,
@@ -110,9 +110,11 @@ export default function SetPasswordForm({
       toast.success("Password updated");
       router.push(`/sign-in`);
     } catch (error) {
-      const err = processError(error);
-      console.error("ERROR in set-password-form: ", err);
-      toast.error(err.message);
+      let errorMessage = "Error updating password";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      toast.error(errorMessage);
     }
   }
 

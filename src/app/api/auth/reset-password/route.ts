@@ -10,7 +10,7 @@ import { BASE_URL } from "@/lib/utils/getUrl";
 import { resetPasswordEmail as resetPasswordEmailTemplate } from "@/lib/mail/email-render";
 import { sendMail } from "@/lib/mail";
 import { getUserByKey, updateUser, updateUserPassword } from "@/data/user";
-import processError from "@/lib/utils/processError";
+import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 
 //validates token
 export async function GET(request: NextRequest) {
@@ -90,8 +90,9 @@ export async function PUT(request: Request) {
 
     return Response.json({ message: "Password updated" });
   } catch (error) {
-    const err_ = processError(error);
-    console.log("ERROR in route /api/reset-password:\n >", err_);
-    return Response.json({ error: err_.message }, { status: 500 });
+    console.log("ERROR in route /api/reset-password:\n >", error);
+    const errorMessage = getFriendlyErrorMessage(error);
+
+    return Response.json({ errorMessage }, { status: 500 });
   }
 }

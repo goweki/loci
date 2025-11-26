@@ -90,10 +90,11 @@ export function ForgotPasswordForm() {
       toast.success(message);
       router.push(`/${language}/`);
     } catch (error) {
-      console.log("Error sending reset link:", error);
-
-      const errMessage = getFriendlyErrorMessage(error);
-      toast.error(errMessage || "Failed. Try again later");
+      let errorMessage = "Error sending reset link:";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      toast.error(errorMessage);
       setLoading(false);
     }
   };

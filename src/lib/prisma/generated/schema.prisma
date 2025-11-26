@@ -144,7 +144,7 @@ model PhoneNumber {
   preVerificationId   String?
   preVerificationCode String?
   wabaId              String?
-  status              PhoneNumberStatus @default(NOT_VERIFIED)
+  status              PhoneNumberStatus @default(NOT_CLAIMED)
   verifiedAt          DateTime?
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
@@ -282,8 +282,9 @@ enum PlanInterval {
 }
 
 enum PhoneNumberStatus {
-  VERIFIED
+  NOT_CLAIMED
   NOT_VERIFIED
+  VERIFIED
   EXPIRED
 }
 

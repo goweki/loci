@@ -689,29 +689,34 @@ export async function createPreVerifiedNumber(
   const user = session?.user;
 
   if (!user) {
-    throw new Error("401: Unaauthorized");
+    throw new Error("401: Unauthorized");
   }
 
-  const url = `${BASE_URL}/${env_.fbBusinessId}/add_phone_numbers?phone_number=${encodeURIComponent(
-    phoneNumber
-  )}`;
+  const url = `${BASE_URL}/${env_.fbBusinessId}/add_phone_numbers?phone_number=${phoneNumber}`;
+
+  console.log(`Creating new preverified WhatsApp No....\n
+     >>> Whatsapp Number: ${phoneNumber}\n
+     >>> url: ${url}`);
 
   const res = await fetch(url, {
     method: "POST",
-    headers: { Authorization: `Bearer ${env_.wabaAccessToken}` },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${env_.wabaAccessToken}`,
+    },
   });
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Failed to create pre-verified number: ${text}`);
+    console.error(text);
+    throw new Error(`Failed: Try again later`);
   }
   const { preverificationId }: PreVerifiedNumberResponse = await res.json();
-  const createNewPhone_DTO = {
+  await createPhoneNumber({
     phoneNumber,
     userId: user.id,
     preVerificationId: preverificationId,
-  };
-  const createdPhoneNo = await createPhoneNumber(createNewPhone_DTO);
+  });
 
   return { preverificationId };
 }
@@ -721,8 +726,7 @@ export async function createPreVerifiedNumber(
  */
 export async function requestVerificationCode(
   baseUrl: string,
-  preVerifiedNumberId: string,
-  wabaAccessToken: string
+  preVerifiedNumberId: string
 ): Promise<RequestCodeResponse> {
   var body = JSON.stringify({
     code_method: "SMS",
@@ -735,7 +739,7 @@ export async function requestVerificationCode(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${wabaAccessToken}`,
+      Authorization: `Bearer ${env_.wabaAccessToken}`,
     },
     body: body,
   });

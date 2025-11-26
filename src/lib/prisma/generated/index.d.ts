@@ -166,8 +166,9 @@ export type PlanInterval = (typeof PlanInterval)[keyof typeof PlanInterval]
 
 
 export const PhoneNumberStatus: {
-  VERIFIED: 'VERIFIED',
+  NOT_CLAIMED: 'NOT_CLAIMED',
   NOT_VERIFIED: 'NOT_VERIFIED',
+  VERIFIED: 'VERIFIED',
   EXPIRED: 'EXPIRED'
 };
 

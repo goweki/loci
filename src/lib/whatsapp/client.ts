@@ -441,11 +441,7 @@ export class WhatsAppClient {
   async requestVerificationCode(
     preVerifiedNumberId: string
   ): Promise<RequestCodeResponse> {
-    return _requestVerificationCode(
-      this.baseUrl,
-      preVerifiedNumberId,
-      this.env.wabaAccessToken
-    );
+    return _requestVerificationCode(this.baseUrl, preVerifiedNumberId);
   }
 
   /**
