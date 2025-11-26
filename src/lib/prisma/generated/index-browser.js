@@ -209,6 +209,8 @@ exports.Prisma.PhoneNumberScalarFieldEnum = {
   phoneNumber: 'phoneNumber',
   userId: 'userId',
   displayName: 'displayName',
+  preVerificationId: 'preVerificationId',
+  preVerificationCode: 'preVerificationCode',
   wabaId: 'wabaId',
   status: 'status',
   verifiedAt: 'verifiedAt',

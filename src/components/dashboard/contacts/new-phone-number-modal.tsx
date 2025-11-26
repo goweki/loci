@@ -12,15 +12,18 @@ import { Input } from "@/components/ui/input";
 import InputPhone from "@/components/ui/input-phone";
 import toast from "react-hot-toast";
 import Loader from "@/components/ui/loaders";
+import { createPreVerifiedNumber, env_ } from "@/lib/whatsapp";
+import { BASE_URL as WABA_BASE_URL } from "@/lib/whatsapp/client";
+import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 
 export interface ModalProps {
   show: boolean;
   setShow: (val: boolean) => void;
 }
 
-export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
+export default function AddWhatsappNumberModal({ show, setShow }: ModalProps) {
   const [step, setStep] = useState<1 | 2 | null>(1);
-  const [formData, setFormData] = useState({
+  const [phoneNoData, setPhoneNoData] = useState({
     whatsappPhoneNumber: "",
     whatsappDisplayName: "",
     pinCode: "",
@@ -28,24 +31,41 @@ export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setPhoneNoData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     // Validate first step
-    if (!formData.whatsappPhoneNumber || !formData.whatsappDisplayName) {
+    if (!phoneNoData.whatsappPhoneNumber || !phoneNoData.whatsappDisplayName) {
       toast.error(
-        `Please fill in ${!formData.whatsappPhoneNumber ? "the WhatsApp Number" : "the Display Name"}`
+        `Please fill in ${!phoneNoData.whatsappPhoneNumber ? "the WhatsApp Number" : "the Display Name"}`
       );
       return;
     }
 
     // send the PIN to the phone
-    console.log("Sending PIN to:", formData.whatsappPhoneNumber);
-    setStep(2);
+    console.log(
+      "preverifying whatsapp number:",
+      phoneNoData.whatsappPhoneNumber
+    );
+
+    try {
+      const { preverificationId } = await createPreVerifiedNumber(
+        WABA_BASE_URL,
+        env_.fbAppId,
+        env_.wabaAccessToken,
+        phoneNoData.whatsappPhoneNumber
+      );
+
+      setStep(2);
+    } catch (error) {
+      console.error("Error pre-verifying phone number:", error);
+      const errorMessage = getFriendlyErrorMessage(error);
+      toast.error(errorMessage);
+    }
   };
 
   const handlePreviousStep = () => {
@@ -54,16 +74,16 @@ export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
 
   const handleSubmit = () => {
     // Validate PIN
-    if (!formData.pinCode) {
+    if (!phoneNoData.pinCode) {
       alert("Please enter the PIN code");
       return;
     }
 
-    console.log("Submitting form:", formData);
+    console.log("Submitting form:", phoneNoData);
     // Add your submission logic here
 
     // Reset and close
-    setFormData({
+    setPhoneNoData({
       whatsappPhoneNumber: "",
       whatsappDisplayName: "",
       pinCode: "",
@@ -73,7 +93,7 @@ export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
   };
 
   const handleCancel = () => {
-    setFormData({
+    setPhoneNoData({
       whatsappPhoneNumber: "",
       whatsappDisplayName: "",
       pinCode: "",
@@ -122,10 +142,10 @@ export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
                   </label>
                   <InputPhone
                     name="whatsappPhoneNumber"
-                    value={formData.whatsappPhoneNumber}
+                    value={phoneNoData.whatsappPhoneNumber}
                     setValue={(val) => {
                       if (val)
-                        setFormData((prev) => ({
+                        setPhoneNoData((prev) => ({
                           ...prev,
                           whatsappPhoneNumber: val,
                         }));
@@ -140,7 +160,7 @@ export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
                   <Input
                     type="text"
                     name="whatsappDisplayName"
-                    value={formData.whatsappDisplayName}
+                    value={phoneNoData.whatsappDisplayName}
                     onChange={handleInputChange}
                     placeholder="eg. Customer Support"
                   />
@@ -164,7 +184,7 @@ export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
                 <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-4">
                   <p className="text-sm">A PIN code has been sent to:</p>
                   <p className="text-lg font-semibold mt-1">
-                    {formData.whatsappPhoneNumber}
+                    {phoneNoData.whatsappPhoneNumber}
                   </p>
                 </div>
 
@@ -175,7 +195,7 @@ export default function WhatsAppFormModal({ show, setShow }: ModalProps) {
                   <Input
                     type="text"
                     name="pinCode"
-                    value={formData.pinCode}
+                    value={phoneNoData.pinCode}
                     onChange={handleInputChange}
                     placeholder="_ _ _ _ _ _"
                     maxLength={6}

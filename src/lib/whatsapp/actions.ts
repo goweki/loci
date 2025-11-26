@@ -1,4 +1,5 @@
 // lib/whatsapp/helper-functions.ts
+"use server";
 
 import prisma from "@/lib/prisma";
 import {
@@ -15,6 +16,14 @@ import { createPhoneNumber, getPhoneNumberByNumber } from "@/data/phoneNumber";
 import { getAdminUsers, getUserByPhoneNumberId } from "@/data/user";
 import whatsapp from ".";
 import { findContactByPhoneNumber } from "@/data/contact";
+import {
+  GetTokenUsingWabaAuthCodeResult,
+  PreVerifiedNumberResponse,
+  RequestCodeResponse,
+  VerifyNumberResponse,
+} from "./types/waba-api-reponses";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth";
 
 interface WhatsAppContact {
   profile: {
@@ -569,7 +578,7 @@ async function storeFailedMessage(
   }
 }
 
-export function buildWhatsAppMessage(input: Message) {
+export async function buildWhatsAppMessage(input: Message) {
   const {
     to,
     type,
@@ -661,4 +670,147 @@ export function buildWhatsAppMessage(input: Message) {
   }
 
   return message;
+}
+
+// ---------------------------------------------------------------------
+// 8. NUMBER PREVERIFICATION
+// ---------------------------------------------------------------------
+/**
+ * Create a pre-verified business phone number in your portfolio
+ */
+export async function createPreVerifiedNumber(
+  baseUrl: string,
+  fbBusinessId: string,
+  wabaAccessToken: string,
+  phoneNumber: string
+): Promise<PreVerifiedNumberResponse> {
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
+
+  if (!user) {
+    throw new Error("401: Unaauthorized");
+  }
+
+  const url = `${baseUrl}/${fbBusinessId}/add_phone_numbers?phone_number=${encodeURIComponent(
+    phoneNumber
+  )}`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${wabaAccessToken}` },
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to create pre-verified number: ${text}`);
+  }
+  const { preverificationId }: PreVerifiedNumberResponse = await res.json();
+  const createNewPhone_DTO = {
+    phoneNumber,
+    userId: user.id,
+    preVerificationId: preverificationId,
+  };
+  const createdPhoneNo = await createPhoneNumber(createNewPhone_DTO);
+
+  return { preverificationId };
+}
+
+/**
+ * Request a verification code (OTP) for a pre-verified number
+ */
+export async function requestVerificationCode(
+  baseUrl: string,
+  preVerifiedNumberId: string,
+  wabaAccessToken: string
+): Promise<RequestCodeResponse> {
+  var body = JSON.stringify({
+    code_method: "SMS",
+    locale: "en_US",
+  });
+
+  const url = `${baseUrl}/${preVerifiedNumberId}/request_code`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${wabaAccessToken}`,
+    },
+    body: body,
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to request verification code: ${text}`);
+  }
+
+  const data: RequestCodeResponse = await res.json();
+  return data;
+}
+
+/**
+ * Verify a pre-verified number using the otp
+ */
+export async function verifyPreVerifiedNumber(
+  baseUrl: string,
+  preVerifiedNumberId: string,
+  otpCode: string,
+  wabaAccessToken: string
+): Promise<VerifyNumberResponse> {
+  var body = JSON.stringify({
+    code: otpCode,
+  });
+
+  const url = `${baseUrl}/${preVerifiedNumberId}/verify_code`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${wabaAccessToken}` },
+    redirect: "follow",
+    body: body,
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to verify pre-verified number: ${text}`);
+  }
+
+  const data: VerifyNumberResponse = await res.json();
+  return data;
+}
+
+export async function getTokenUsingWabaAuthCode(
+  baseUrl: string,
+  code: string,
+  fbAppId: string,
+  appSecret: string
+): Promise<GetTokenUsingWabaAuthCodeResult> {
+  const url = new URL(`${baseUrl}/oauth_access_token`);
+
+  url.searchParams.set("client_id", fbAppId);
+  url.searchParams.set("client_secret", appSecret);
+  url.searchParams.set("code", code);
+
+  try {
+    const req = new Request(url.toString(), { method: "GET" });
+    const res = await fetch(req);
+
+    if (!res.ok) {
+      const errorDetail = await res.text();
+      console.error("OAuth exchange failed:", errorDetail);
+      throw new Error("Failed to exchange auth code for business token");
+    }
+
+    const data: { access_token: string } = await res.json();
+
+    return {
+      success: true,
+      businessToken: data.access_token,
+    };
+  } catch (error: any) {
+    console.error("OAuth exchange error:", error);
+    return {
+      success: false,
+      error: error?.message || "Unknown error",
+    };
+  }
 }

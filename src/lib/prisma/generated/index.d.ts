@@ -11601,6 +11601,8 @@ export namespace Prisma {
     phoneNumber: string | null
     userId: string | null
     displayName: string | null
+    preVerificationId: string | null
+    preVerificationCode: string | null
     wabaId: string | null
     status: $Enums.PhoneNumberStatus | null
     verifiedAt: Date | null
@@ -11614,6 +11616,8 @@ export namespace Prisma {
     phoneNumber: string | null
     userId: string | null
     displayName: string | null
+    preVerificationId: string | null
+    preVerificationCode: string | null
     wabaId: string | null
     status: $Enums.PhoneNumberStatus | null
     verifiedAt: Date | null
@@ -11627,6 +11631,8 @@ export namespace Prisma {
     phoneNumber: number
     userId: number
     displayName: number
+    preVerificationId: number
+    preVerificationCode: number
     wabaId: number
     status: number
     verifiedAt: number
@@ -11642,6 +11648,8 @@ export namespace Prisma {
     phoneNumber?: true
     userId?: true
     displayName?: true
+    preVerificationId?: true
+    preVerificationCode?: true
     wabaId?: true
     status?: true
     verifiedAt?: true
@@ -11655,6 +11663,8 @@ export namespace Prisma {
     phoneNumber?: true
     userId?: true
     displayName?: true
+    preVerificationId?: true
+    preVerificationCode?: true
     wabaId?: true
     status?: true
     verifiedAt?: true
@@ -11668,6 +11678,8 @@ export namespace Prisma {
     phoneNumber?: true
     userId?: true
     displayName?: true
+    preVerificationId?: true
+    preVerificationCode?: true
     wabaId?: true
     status?: true
     verifiedAt?: true
@@ -11754,6 +11766,8 @@ export namespace Prisma {
     phoneNumber: string
     userId: string
     displayName: string | null
+    preVerificationId: string | null
+    preVerificationCode: string | null
     wabaId: string | null
     status: $Enums.PhoneNumberStatus
     verifiedAt: Date | null
@@ -11784,6 +11798,8 @@ export namespace Prisma {
     phoneNumber?: boolean
     userId?: boolean
     displayName?: boolean
+    preVerificationId?: boolean
+    preVerificationCode?: boolean
     wabaId?: boolean
     status?: boolean
     verifiedAt?: boolean
@@ -11800,6 +11816,8 @@ export namespace Prisma {
     phoneNumber?: boolean
     userId?: boolean
     displayName?: boolean
+    preVerificationId?: boolean
+    preVerificationCode?: boolean
     wabaId?: boolean
     status?: boolean
     verifiedAt?: boolean
@@ -11814,6 +11832,8 @@ export namespace Prisma {
     phoneNumber?: boolean
     userId?: boolean
     displayName?: boolean
+    preVerificationId?: boolean
+    preVerificationCode?: boolean
     wabaId?: boolean
     status?: boolean
     verifiedAt?: boolean
@@ -11828,6 +11848,8 @@ export namespace Prisma {
     phoneNumber?: boolean
     userId?: boolean
     displayName?: boolean
+    preVerificationId?: boolean
+    preVerificationCode?: boolean
     wabaId?: boolean
     status?: boolean
     verifiedAt?: boolean
@@ -11835,7 +11857,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type PhoneNumberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "phoneNumberId" | "phoneNumber" | "userId" | "displayName" | "wabaId" | "status" | "verifiedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["phoneNumber"]>
+  export type PhoneNumberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "phoneNumberId" | "phoneNumber" | "userId" | "displayName" | "preVerificationId" | "preVerificationCode" | "wabaId" | "status" | "verifiedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["phoneNumber"]>
   export type PhoneNumberInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     messages?: boolean | PhoneNumber$messagesArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -11860,6 +11882,8 @@ export namespace Prisma {
       phoneNumber: string
       userId: string
       displayName: string | null
+      preVerificationId: string | null
+      preVerificationCode: string | null
       wabaId: string | null
       status: $Enums.PhoneNumberStatus
       verifiedAt: Date | null
@@ -12295,6 +12319,8 @@ export namespace Prisma {
     readonly phoneNumber: FieldRef<"PhoneNumber", 'String'>
     readonly userId: FieldRef<"PhoneNumber", 'String'>
     readonly displayName: FieldRef<"PhoneNumber", 'String'>
+    readonly preVerificationId: FieldRef<"PhoneNumber", 'String'>
+    readonly preVerificationCode: FieldRef<"PhoneNumber", 'String'>
     readonly wabaId: FieldRef<"PhoneNumber", 'String'>
     readonly status: FieldRef<"PhoneNumber", 'PhoneNumberStatus'>
     readonly verifiedAt: FieldRef<"PhoneNumber", 'DateTime'>
@@ -19561,6 +19587,8 @@ export namespace Prisma {
     phoneNumber: 'phoneNumber',
     userId: 'userId',
     displayName: 'displayName',
+    preVerificationId: 'preVerificationId',
+    preVerificationCode: 'preVerificationCode',
     wabaId: 'wabaId',
     status: 'status',
     verifiedAt: 'verifiedAt',
@@ -20549,6 +20577,8 @@ export namespace Prisma {
     phoneNumber?: StringFilter<"PhoneNumber"> | string
     userId?: StringFilter<"PhoneNumber"> | string
     displayName?: StringNullableFilter<"PhoneNumber"> | string | null
+    preVerificationId?: StringNullableFilter<"PhoneNumber"> | string | null
+    preVerificationCode?: StringNullableFilter<"PhoneNumber"> | string | null
     wabaId?: StringNullableFilter<"PhoneNumber"> | string | null
     status?: EnumPhoneNumberStatusFilter<"PhoneNumber"> | $Enums.PhoneNumberStatus
     verifiedAt?: DateTimeNullableFilter<"PhoneNumber"> | Date | string | null
@@ -20564,6 +20594,8 @@ export namespace Prisma {
     phoneNumber?: SortOrder
     userId?: SortOrder
     displayName?: SortOrderInput | SortOrder
+    preVerificationId?: SortOrderInput | SortOrder
+    preVerificationCode?: SortOrderInput | SortOrder
     wabaId?: SortOrderInput | SortOrder
     status?: SortOrder
     verifiedAt?: SortOrderInput | SortOrder
@@ -20582,6 +20614,8 @@ export namespace Prisma {
     NOT?: PhoneNumberWhereInput | PhoneNumberWhereInput[]
     userId?: StringFilter<"PhoneNumber"> | string
     displayName?: StringNullableFilter<"PhoneNumber"> | string | null
+    preVerificationId?: StringNullableFilter<"PhoneNumber"> | string | null
+    preVerificationCode?: StringNullableFilter<"PhoneNumber"> | string | null
     wabaId?: StringNullableFilter<"PhoneNumber"> | string | null
     status?: EnumPhoneNumberStatusFilter<"PhoneNumber"> | $Enums.PhoneNumberStatus
     verifiedAt?: DateTimeNullableFilter<"PhoneNumber"> | Date | string | null
@@ -20597,6 +20631,8 @@ export namespace Prisma {
     phoneNumber?: SortOrder
     userId?: SortOrder
     displayName?: SortOrderInput | SortOrder
+    preVerificationId?: SortOrderInput | SortOrder
+    preVerificationCode?: SortOrderInput | SortOrder
     wabaId?: SortOrderInput | SortOrder
     status?: SortOrder
     verifiedAt?: SortOrderInput | SortOrder
@@ -20616,6 +20652,8 @@ export namespace Prisma {
     phoneNumber?: StringWithAggregatesFilter<"PhoneNumber"> | string
     userId?: StringWithAggregatesFilter<"PhoneNumber"> | string
     displayName?: StringNullableWithAggregatesFilter<"PhoneNumber"> | string | null
+    preVerificationId?: StringNullableWithAggregatesFilter<"PhoneNumber"> | string | null
+    preVerificationCode?: StringNullableWithAggregatesFilter<"PhoneNumber"> | string | null
     wabaId?: StringNullableWithAggregatesFilter<"PhoneNumber"> | string | null
     status?: EnumPhoneNumberStatusWithAggregatesFilter<"PhoneNumber"> | $Enums.PhoneNumberStatus
     verifiedAt?: DateTimeNullableWithAggregatesFilter<"PhoneNumber"> | Date | string | null
@@ -21718,6 +21756,8 @@ export namespace Prisma {
     phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
+    preVerificationId?: string | null
+    preVerificationCode?: string | null
     wabaId?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
@@ -21733,6 +21773,8 @@ export namespace Prisma {
     phoneNumber: string
     userId: string
     displayName?: string | null
+    preVerificationId?: string | null
+    preVerificationCode?: string | null
     wabaId?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
@@ -21746,6 +21788,8 @@ export namespace Prisma {
     phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -21761,6 +21805,8 @@ export namespace Prisma {
     phoneNumber?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -21775,6 +21821,8 @@ export namespace Prisma {
     phoneNumber: string
     userId: string
     displayName?: string | null
+    preVerificationId?: string | null
+    preVerificationCode?: string | null
     wabaId?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
@@ -21787,6 +21835,8 @@ export namespace Prisma {
     phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -21800,6 +21850,8 @@ export namespace Prisma {
     phoneNumber?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -23040,6 +23092,8 @@ export namespace Prisma {
     phoneNumber?: SortOrder
     userId?: SortOrder
     displayName?: SortOrder
+    preVerificationId?: SortOrder
+    preVerificationCode?: SortOrder
     wabaId?: SortOrder
     status?: SortOrder
     verifiedAt?: SortOrder
@@ -23053,6 +23107,8 @@ export namespace Prisma {
     phoneNumber?: SortOrder
     userId?: SortOrder
     displayName?: SortOrder
+    preVerificationId?: SortOrder
+    preVerificationCode?: SortOrder
     wabaId?: SortOrder
     status?: SortOrder
     verifiedAt?: SortOrder
@@ -23066,6 +23122,8 @@ export namespace Prisma {
     phoneNumber?: SortOrder
     userId?: SortOrder
     displayName?: SortOrder
+    preVerificationId?: SortOrder
+    preVerificationCode?: SortOrder
     wabaId?: SortOrder
     status?: SortOrder
     verifiedAt?: SortOrder
@@ -24887,6 +24945,8 @@ export namespace Prisma {
     phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
+    preVerificationId?: string | null
+    preVerificationCode?: string | null
     wabaId?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
@@ -24900,6 +24960,8 @@ export namespace Prisma {
     phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
+    preVerificationId?: string | null
+    preVerificationCode?: string | null
     wabaId?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
@@ -25126,6 +25188,8 @@ export namespace Prisma {
     phoneNumber?: StringFilter<"PhoneNumber"> | string
     userId?: StringFilter<"PhoneNumber"> | string
     displayName?: StringNullableFilter<"PhoneNumber"> | string | null
+    preVerificationId?: StringNullableFilter<"PhoneNumber"> | string | null
+    preVerificationCode?: StringNullableFilter<"PhoneNumber"> | string | null
     wabaId?: StringNullableFilter<"PhoneNumber"> | string | null
     status?: EnumPhoneNumberStatusFilter<"PhoneNumber"> | $Enums.PhoneNumberStatus
     verifiedAt?: DateTimeNullableFilter<"PhoneNumber"> | Date | string | null
@@ -26217,6 +26281,8 @@ export namespace Prisma {
     phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
+    preVerificationId?: string | null
+    preVerificationCode?: string | null
     wabaId?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
@@ -26231,6 +26297,8 @@ export namespace Prisma {
     phoneNumber: string
     userId: string
     displayName?: string | null
+    preVerificationId?: string | null
+    preVerificationCode?: string | null
     wabaId?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
@@ -26343,6 +26411,8 @@ export namespace Prisma {
     phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -26357,6 +26427,8 @@ export namespace Prisma {
     phoneNumber?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -26693,6 +26765,8 @@ export namespace Prisma {
     phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
+    preVerificationId?: string | null
+    preVerificationCode?: string | null
     wabaId?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
@@ -26875,6 +26949,8 @@ export namespace Prisma {
     phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -26888,6 +26964,8 @@ export namespace Prisma {
     phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -26901,6 +26979,8 @@ export namespace Prisma {
     phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
+    preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

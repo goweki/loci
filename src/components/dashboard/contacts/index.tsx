@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { PhoneNumberStatus, Prisma } from "@/lib/prisma/generated";
 import { Button } from "@/components/ui/button";
-import WhatsAppFormModal from "./new-phone-number-modal";
+import AddWhatsappNumberModal from "./new-phone-number-modal";
 import WhatsAppEmbeddedSignup from "./waba-embedded-signup";
 
 export default function ContactsComponent({
@@ -202,11 +202,11 @@ export default function ContactsComponent({
               <div className="space-y-6">
                 {/* Action Buttons */}
                 <div className="flex justify-end gap-2">
-                  {/* <button className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors">
-                    <Download className="w-4 h-4" />
-                    Export Data
-                  </button> */}
-                  <WhatsAppEmbeddedSignup />
+                  <Button onClick={() => setShowAddModal(true)}>
+                    <Plus className="w-5 h-5" />
+                    Add WhatsApp Number
+                  </Button>
+                  {/* <WhatsAppEmbeddedSignup /> */}
                 </div>
 
                 {/* Stats Cards */}
@@ -447,7 +447,7 @@ export default function ContactsComponent({
                     </p>
                     <Button onClick={() => setShowAddModal(true)}>
                       <Plus className="w-5 h-5" />
-                      Add Number
+                      Add WhatsApp Number
                     </Button>
                   </div>
                 )}
@@ -537,7 +537,7 @@ export default function ContactsComponent({
         </div>
 
         {/* Add Whatsapp Number Modal */}
-        <WhatsAppFormModal show={showAddModal} setShow={setShowAddModal} />
+        <AddWhatsappNumberModal show={showAddModal} setShow={setShowAddModal} />
 
         {/* Details Modal */}
         {showDetailsModal && selectedPhone && (

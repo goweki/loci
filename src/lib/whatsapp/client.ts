@@ -20,6 +20,20 @@ import {
 import { Message } from "../validations";
 import { WhatsAppLogger } from "./logger";
 import { normalizeWhatsAppError } from "./errors";
+import {
+  GetTokenUsingWabaAuthCodeResult,
+  PreVerifiedNumberResponse,
+  RequestCodeResponse,
+  VerifyNumberResponse,
+} from "./types/waba-api-reponses";
+import {
+  createPreVerifiedNumber as _createPreVerifiedNumber,
+  requestVerificationCode as _requestVerificationCode,
+  verifyPreVerifiedNumber as _verifyPreVerifiedNumber,
+  getTokenUsingWabaAuthCode as _getTokenUsingWabaAuthCode,
+} from "./actions";
+
+export const BASE_URL = "https://graph.facebook.com/v22.0";
 
 export interface WhatsAppClientEnv {
   wabaId: string;
@@ -27,10 +41,12 @@ export interface WhatsAppClientEnv {
   verifyToken: string;
   appSecret: string;
   phoneNumberId: string;
+  fbAppId: string;
+  fbBusinessId: string;
 }
 
 export class WhatsAppClient {
-  private baseUrl = "https://graph.facebook.com/v22.0";
+  private baseUrl = BASE_URL;
   private logger = new WhatsAppLogger({ maskSecrets: true });
 
   constructor(private env: WhatsAppClientEnv) {}
@@ -414,5 +430,61 @@ export class WhatsAppClient {
     }
 
     return json;
+  }
+
+  // ---------------------------------------------------------------------
+  // 8. NUMBER PREVERIFICATION
+  // ---------------------------------------------------------------------
+  /**
+   * Create a pre-verified business phone number in your portfolio
+   */
+  async createPreVerifiedNumber(
+    phoneNumber: string
+  ): Promise<PreVerifiedNumberResponse> {
+    return _createPreVerifiedNumber(
+      this.baseUrl,
+      this.env.fbBusinessId,
+      this.env.wabaAccessToken,
+      phoneNumber
+    );
+  }
+
+  /**
+   * Request a verification code (OTP) for a pre-verified number
+   */
+  async requestVerificationCode(
+    preVerifiedNumberId: string
+  ): Promise<RequestCodeResponse> {
+    return _requestVerificationCode(
+      this.baseUrl,
+      preVerifiedNumberId,
+      this.env.wabaAccessToken
+    );
+  }
+
+  /**
+   * Verify a pre-verified number using the otp
+   */
+  async verifyPreVerifiedNumber(
+    preVerifiedNumberId: string,
+    otpCode: string
+  ): Promise<VerifyNumberResponse> {
+    return _verifyPreVerifiedNumber(
+      this.baseUrl,
+      preVerifiedNumberId,
+      otpCode,
+      this.env.wabaAccessToken
+    );
+  }
+
+  async getTokenUsingWabaAuthCode(
+    code: string
+  ): Promise<GetTokenUsingWabaAuthCodeResult> {
+    return _getTokenUsingWabaAuthCode(
+      this.baseUrl,
+      code,
+      this.env.fbAppId,
+      this.env.appSecret
+    );
   }
 }

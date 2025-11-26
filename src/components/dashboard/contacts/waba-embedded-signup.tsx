@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Script from "next/script";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
@@ -8,6 +8,7 @@ import { Plus } from "lucide-react";
 
 const FACEBOOK_APP_ID = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
 const WABA_EMBEDDED_CONFIG_ID = process.env.NEXT_PUBLIC_WABA_EMBEDDED_CONFIG_ID;
+const API_VERSION = "v22.0";
 
 if (!FACEBOOK_APP_ID) {
   throw new Error("missing process.env.NEXT_PUBLIC_FACEBOOK_APP_ID");
@@ -17,7 +18,6 @@ if (!WABA_EMBEDDED_CONFIG_ID) {
   throw new Error("missing process.env.NEXT_PUBLIC_WABA_EMBEDDED_CONFIG_ID");
 }
 
-// Extend Window interface for TypeScript
 declare global {
   interface Window {
     fbAsyncInit: () => void;
@@ -26,7 +26,6 @@ declare global {
 }
 
 interface WhatsAppEmbeddedSignupProps {
-  apiVersion?: string;
   onSuccess?: (code: string) => void;
   onError?: (error: any) => void;
   onSessionInfo?: (data: any) => void;
@@ -38,76 +37,65 @@ const translations = {
 };
 
 export default function WhatsAppEmbeddedSignup({
-  apiVersion = "v22.0",
   onSuccess,
   onError,
   onSessionInfo,
 }: WhatsAppEmbeddedSignupProps) {
   const { language } = useI18n();
-
+  const [sdkReady, setSdkReady] = useState(false);
   const t = translations[language];
 
   useEffect(() => {
-    // SDK initialization
-    window.fbAsyncInit = function () {
+    // Initialize SDK
+    window.fbAsyncInit = () => {
       window.FB.init({
         appId: FACEBOOK_APP_ID,
-        autoLogAppEvents: true,
+        cookie: true,
         xfbml: true,
-        version: apiVersion,
+        autoLogAppEvents: true,
+        version: API_VERSION,
       });
+
+      setSdkReady(true);
     };
 
-    // Session logging message event listener
+    // Session logging
     const handleMessage = async (event: MessageEvent) => {
-      if (!event.origin.endsWith("facebook.com")) return;
+      if (
+        !event.origin.includes("facebook.com") &&
+        !event.origin.includes("fbcdn.net")
+      )
+        return;
 
       try {
         const data = JSON.parse(event.data);
-
         if (data.type === "WA_EMBEDDED_SIGNUP") {
-          console.log("WhatsApp Embedded Signup event:", data);
-
-          // NEW — Send to server
-          // await logWabaEvent(data);
-
-          if (onSessionInfo) onSessionInfo(data);
+          console.log("Embedded Signup event:", data);
+          onSessionInfo?.(data);
         }
       } catch {
-        console.log("Message event (non-JSON):", event.data);
-
-        // Still send raw string for logging
-        // await logWabaEvent({ event: "NON_JSON", raw: event.data });
+        console.log("Non-JSON message:", event.data);
       }
     };
 
     window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [onSessionInfo]);
 
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, [FACEBOOK_APP_ID, apiVersion, onSessionInfo]);
-
-  // Response callback
   const fbLoginCallback = (response: any) => {
     if (response.authResponse) {
       const code = response.authResponse.code;
-      console.log("Authorization code received:", code);
-      if (onSuccess) {
-        onSuccess(code);
-      }
+      console.log("Authorization code:", code);
+      onSuccess?.(code);
     } else {
-      console.log("Login failed or was cancelled:", response);
-      if (onError) {
-        onError(response);
-      }
+      console.log("Login failed or cancelled:", response);
+      onError?.(response);
     }
   };
 
-  // Launch WhatsApp signup
   const launchWhatsAppSignup = () => {
-    if (!window.FB) {
-      console.error("Facebook SDK not loaded yet");
+    if (!sdkReady) {
+      console.error("Facebook SDK not ready yet");
       return;
     }
 
@@ -115,15 +103,13 @@ export default function WhatsAppEmbeddedSignup({
       config_id: WABA_EMBEDDED_CONFIG_ID,
       response_type: "code",
       override_default_response_type: true,
-      extras: {
-        setup: {},
-      },
+      extras: { setup: {} },
     });
   };
 
   return (
     <>
-      {/* Load Facebook SDK */}
+      {/* Facebook SDK */}
       <Script
         id="facebook-sdk"
         src="https://connect.facebook.net/en_US/sdk.js"
@@ -134,9 +120,14 @@ export default function WhatsAppEmbeddedSignup({
       />
 
       {/* Launch button */}
-      <Button onClick={launchWhatsAppSignup} className="text-lg">
-        <Plus className="w-5 h-5" /> {t.submit}
-      </Button>
+      {sdkReady ? (
+        <Button
+          onClick={launchWhatsAppSignup}
+          className="flex items-center space-x-2"
+        >
+          <Plus className="w-5 h-5" /> <span>{t.submit}</span>
+        </Button>
+      ) : null}
     </>
   );
 }
