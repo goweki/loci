@@ -445,10 +445,11 @@ export default function ContactsComponent({
                     <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                       Get started by adding your first phone number
                     </p>
-                    <Button onClick={() => setShowAddModal(true)}>
+                    {/* <Button onClick={() => setShowAddModal(true)}>
                       <Plus className="w-5 h-5" />
                       Add WhatsApp Number
-                    </Button>
+                    </Button> */}
+                    <WhatsAppEmbeddedSignup />
                   </div>
                 )}
               </div>
