@@ -1,133 +1,133 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Script from "next/script";
 import { Button } from "@/components/ui/button";
-import { useI18n } from "@/lib/i18n";
-import { Plus } from "lucide-react";
+import Loader from "@/components/ui/loaders";
+import { toastWarn } from "@/components/ui/toast-warn";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
-const FACEBOOK_APP_ID = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
-const WABA_EMBEDDED_CONFIG_ID = process.env.NEXT_PUBLIC_WABA_EMBEDDED_CONFIG_ID;
+const META_APP_ID = process.env.NEXT_PUBLIC_META_APP_ID;
+const META_EMBEDDED_CONFIG_ID = process.env.NEXT_PUBLIC_WABA_EMBEDDED_CONFIG_ID;
 const API_VERSION = "v22.0";
 
-if (!FACEBOOK_APP_ID) {
-  throw new Error("missing process.env.NEXT_PUBLIC_FACEBOOK_APP_ID");
+if (!META_APP_ID) {
+  throw new Error("missing process.env.NEXT_PUBLIC_META_APP_ID");
 }
 
-if (!WABA_EMBEDDED_CONFIG_ID) {
+if (!META_EMBEDDED_CONFIG_ID) {
   throw new Error("missing process.env.NEXT_PUBLIC_WABA_EMBEDDED_CONFIG_ID");
 }
 
-declare global {
-  interface Window {
-    fbAsyncInit: () => void;
-    FB: any;
-  }
+if (!API_VERSION) {
+  throw new Error("missing process.env.API_VERSION");
 }
 
-interface WhatsAppEmbeddedSignupProps {
-  onSuccess?: (code: string) => void;
-  onError?: (error: any) => void;
-  onSessionInfo?: (data: any) => void;
+interface FacebookProfile {
+  name: string;
+  email: string;
 }
 
-const translations = {
-  en: { submit: "Connect WhatsApp Number" },
-  sw: { submit: "Unganisha Number ya WhatsApp" },
-};
-
-export default function WhatsAppEmbeddedSignup({
-  onSuccess,
-  onError,
-  onSessionInfo,
-}: WhatsAppEmbeddedSignupProps) {
-  const { language } = useI18n();
+export default function FacebookLogin() {
+  const [profile, setProfile] = useState<FacebookProfile | null>(null);
   const [sdkReady, setSdkReady] = useState(false);
-  const t = translations[language];
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Initialize SDK
-    window.fbAsyncInit = () => {
-      window.FB.init({
-        appId: FACEBOOK_APP_ID,
-        cookie: true,
-        xfbml: true,
-        autoLogAppEvents: true,
-        version: API_VERSION,
-      });
-
+    if (!window) return;
+    if ((window as any).FB) {
       setSdkReady(true);
-    };
-
-    // Session logging
-    const handleMessage = async (event: MessageEvent) => {
-      if (
-        !event.origin.includes("facebook.com") &&
-        !event.origin.includes("fbcdn.net")
-      )
-        return;
-
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === "WA_EMBEDDED_SIGNUP") {
-          console.log("Embedded Signup event:", data);
-          onSessionInfo?.(data);
-        }
-      } catch {
-        console.log("Non-JSON message:", event.data);
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [onSessionInfo]);
-
-  const fbLoginCallback = (response: any) => {
-    if (response.authResponse) {
-      const code = response.authResponse.code;
-      console.log("Authorization code:", code);
-      onSuccess?.(code);
-    } else {
-      console.log("Login failed or cancelled:", response);
-      onError?.(response);
-    }
-  };
-
-  const launchWhatsAppSignup = () => {
-    if (!sdkReady) {
-      console.error("Facebook SDK not ready yet");
       return;
     }
 
-    window.FB.login(fbLoginCallback, {
-      config_id: WABA_EMBEDDED_CONFIG_ID,
-      response_type: "code",
-      override_default_response_type: true,
-      extras: { setup: {} },
+    // Inject SDK script only once
+    if (document.getElementById("facebook-jssdk")) return;
+
+    const js = document.createElement("script");
+    js.id = "facebook-jssdk";
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    js.onerror = () => toast.error("Failed to load Facebook SDK");
+    document.body.appendChild(js);
+
+    // Initialize the SDK when it loads
+    (window as any).fbAsyncInit = () => {
+      (window as any).FB.init({
+        appId: META_APP_ID,
+        xfbml: true,
+        version: API_VERSION,
+      });
+      setSdkReady(true);
+    };
+  }, []);
+
+  const handleLogin = () => {
+    if (!sdkReady) {
+      toast.error("Facebook SDK not ready");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      (window as any).FB.login(
+        (response: any) => {
+          console.log("FB.login response:", response);
+
+          if (response.authResponse) {
+            console.log("Welcome! Fetching your information...");
+
+            (window as any).FB.api(
+              "/me",
+              { fields: "name,email" },
+              (profileResponse: FacebookProfile) => {
+                if (profileResponse) {
+                  setProfile(profileResponse);
+                } else {
+                  toast.error("Failed to fetch profile information");
+                }
+                setLoading(false);
+              }
+            );
+          } else {
+            console.log("User cancelled login or did not fully authorize.");
+            toastWarn("Meta authentication cancelled");
+            setLoading(false);
+          }
+        },
+        {
+          config_id: META_EMBEDDED_CONFIG_ID,
+          response_type: "code",
+          override_default_response_type: true,
+          extras: { setup: {} },
+        }
+      );
+    } catch {
+      toastWarn("META authentication failed, try again later");
+    }
+  };
+
+  const handleLogout = () => {
+    (window as any).FB.logout(() => {
+      setProfile(null);
+      console.log("User logged out");
     });
   };
 
   return (
-    <>
-      {/* Facebook SDK */}
-      <Script
-        id="facebook-sdk"
-        src="https://connect.facebook.net/en_US/sdk.js"
-        strategy="afterInteractive"
-        async
-        defer
-        crossOrigin="anonymous"
-      />
-
-      {/* Launch button */}
-      {sdkReady ? (
-        <Button
-          onClick={launchWhatsAppSignup}
-          className="flex items-center space-x-2"
-        >
-          <Plus className="w-5 h-5" /> <span>{t.submit}</span>
+    <div>
+      {profile ? (
+        <div>
+          <p id="profile" className="mb-4">
+            Meta Linkage <strong>{profile.name}</strong> - {profile.email}
+          </p>
+          <Button onClick={handleLogout} variant="destructive">
+            Logout
+          </Button>
+        </div>
+      ) : (
+        <Button onClick={handleLogin} disabled={!sdkReady || loading}>
+          {loading ? <Loader /> : "Integrate new Whatsapp Number"}
         </Button>
-      ) : null}
-    </>
+      )}
+    </div>
   );
 }

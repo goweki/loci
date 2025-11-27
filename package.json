@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "npx prisma migrate dev && prisma generate && next dev",
+    "dev:https": "npx prisma migrate dev && prisma generate && next dev --experimental-https",
     "build": "NODE_ENV=production next build",
     "postbuild": "npx prisma migrate deploy",
     "docker:build": "docker build -t ghcr.io/goweki/loci:latest .",

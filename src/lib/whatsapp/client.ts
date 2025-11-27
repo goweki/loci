@@ -143,7 +143,7 @@ export class WhatsAppClient {
   // 4. PHONE NUMBERS
   // ---------------------------------------------------------------------
   async getPhoneNumbers(): Promise<WhatsAppPhoneNumberListResponse> {
-    const url = `${this.baseUrl}/${this.env.wabaId}/phone_numbers?access_token=${this.env.wabaAccessToken}`;
+    const url = `${this.baseUrl}/${this.env.fbAppId}/phone_numbers?access_token=${this.env.wabaAccessToken}`;
 
     this.logger.info("Fetching phone numbers");
 
@@ -230,7 +230,7 @@ export class WhatsAppClient {
   // 5. TEMPLATE MANAGEMENT
   // ---------------------------------------------------------------------
   async getTemplates(): Promise<WhatsAppTemplateListResponse> {
-    const url = `${this.baseUrl}/${this.env.wabaId}/message_templates?access_token=${this.env.wabaAccessToken}`;
+    const url = `${this.baseUrl}/${this.env.fbAppId}/message_templates?access_token=${this.env.wabaAccessToken}`;
 
     this.logger.info("Fetching templates");
 
@@ -248,7 +248,7 @@ export class WhatsAppClient {
   async createTemplate(
     template: WhatsAppTemplateCreateRequest
   ): Promise<WhatsAppTemplateCreateResponse> {
-    const url = `${this.baseUrl}/${this.env.wabaId}/message_templates`;
+    const url = `${this.baseUrl}/${this.env.fbAppId}/message_templates`;
 
     this.logger.info("Creating template", { name: template.name });
 
@@ -275,7 +275,7 @@ export class WhatsAppClient {
     name: string,
     language: string
   ): Promise<WhatsAppTemplateDeleteResponse> {
-    const url = `${this.baseUrl}/${this.env.wabaId}/message_templates`;
+    const url = `${this.baseUrl}/${this.env.fbAppId}/message_templates`;
 
     this.logger.info("Deleting template", { name, language });
 
@@ -305,7 +305,7 @@ export class WhatsAppClient {
     file: Buffer,
     mimeType: string
   ): Promise<WhatsAppUploadMediaResponse> {
-    const url = `${this.baseUrl}/${this.env.wabaId}/media`;
+    const url = `${this.baseUrl}/${this.env.fbAppId}/media`;
     const form = new FormData();
     form.append(
       "file",
@@ -368,7 +368,7 @@ export class WhatsAppClient {
   // 7. WEBHOOK SUBSCRIPTION MANAGEMENT
   // ---------------------------------------------------------------------
   async subscribeApp(): Promise<WhatsAppSubscribedAppsResponse> {
-    const url = `${this.baseUrl}/${this.env.wabaId}/subscribed_apps`;
+    const url = `${this.baseUrl}/${this.env.fbAppId}/subscribed_apps`;
 
     this.logger.info("Subscribing app to WABA");
 
@@ -388,7 +388,7 @@ export class WhatsAppClient {
   }
 
   async unsubscribeApp(): Promise<WhatsAppSubscribedAppsResponse> {
-    const url = `${this.baseUrl}/${this.env.wabaId}/subscribed_apps`;
+    const url = `${this.baseUrl}/${this.env.fbAppId}/subscribed_apps`;
 
     this.logger.info("Unsubscribing app from WABA");
 
@@ -408,7 +408,7 @@ export class WhatsAppClient {
   }
 
   async getSubscribedApps(): Promise<WhatsAppSubscribedAppsResponse> {
-    const url = `${this.baseUrl}/${this.env.wabaId}/subscribed_apps?access_token=${this.env.wabaAccessToken}`;
+    const url = `${this.baseUrl}/${this.env.fbAppId}/subscribed_apps?access_token=${this.env.wabaAccessToken}`;
 
     this.logger.info("Fetching subscribed apps");
 

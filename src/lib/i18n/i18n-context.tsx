@@ -88,8 +88,9 @@ export function I18nProvider({
     if (storedLang && isValidLanguage(storedLang)) {
       if (!isValidLanguage(_lang)) {
         router.replace(`/${storedLang}${pathname}`);
-      } else if (_lang === storedLang) setCurrentLang(storedLang);
-      else {
+      } else if (_lang === storedLang) {
+        setCurrentLang(storedLang);
+      } else {
         localStorage.setItem(LS_KEY, _lang);
         setCurrentLang(_lang);
       }

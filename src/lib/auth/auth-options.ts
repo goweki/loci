@@ -165,7 +165,7 @@ export const authOptions: NextAuthOptions = {
             });
           }
 
-          if (!localUser.id || !localUser.role) {
+          if (!localUser.id) {
             return false;
           }
 
@@ -189,7 +189,7 @@ export const authOptions: NextAuthOptions = {
           );
 
           user.id = localUser.id;
-          user.role = localUser.role;
+          user.role = localUser.role || UserRole.USER;
           user.subscriptionStatus = subscription.status;
           user.subscriptionPlan = subscription.plan;
         }
