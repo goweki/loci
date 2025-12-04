@@ -11,21 +11,21 @@ import {
   PhoneNumber,
   PhoneNumberStatus,
 } from "@/lib/prisma/generated";
-import { InboundMessage, WhatsAppPhoneNumberDetailsResponse } from "./types";
-import { Message } from "../validations";
+import { InboundMessage, WhatsAppPhoneNumberDetailsResponse } from "../types";
+import { Message } from "../../validations";
 import { createPhoneNumber } from "@/data/phoneNumber";
 import { getAdminUsers, getUserByPhoneNumberId } from "@/data/user";
-import whatsapp from ".";
+import whatsapp from "../";
 import { findContactByPhoneNumber } from "@/data/contact";
 import {
   GetTokenUsingWabaAuthCodeResult,
   PreVerifiedNumberResponse,
   RequestCodeResponse,
   VerifyNumberResponse,
-} from "./types/waba-api-reponses";
+} from "..//types/waba-api-reponses";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth";
-import { env_ } from "./types/environment-variables";
+import { authOptions } from "../../auth";
+import { env_ } from "../types/environment-variables";
 
 const BASE_URL = `https://graph.facebook.com/${env_.apiVersion}`;
 

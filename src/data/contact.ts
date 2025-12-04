@@ -44,14 +44,17 @@ export async function findOrCreateContact(
 /**
  * Retrieves all contacts for a user.
  */
-export async function getContactsByUserId(userId: string): Promise<
-  Prisma.ContactGetPayload<{
-    include: {
-      messages: true;
-      user: true;
-    };
-  }>[]
-> {
+
+export type ContactGetPayload = Prisma.ContactGetPayload<{
+  include: {
+    messages: true;
+    user: true;
+  };
+}>;
+
+export async function getContactsByUserId(
+  userId: string
+): Promise<ContactGetPayload[]> {
   return prisma.contact.findMany({
     where: { userId },
     include: {

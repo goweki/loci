@@ -1,6 +1,7 @@
 "use client";
 
 import { useI18n } from "@/lib/i18n";
+import PageTitle from "../ui/page-title";
 
 const translations = {
   en: {
@@ -18,10 +19,5 @@ const translations = {
 export default function DashboardTitle() {
   const { language } = useI18n();
   const t = translations[language];
-  return (
-    <div>
-      <h1 className="text-3xl font-bold ">{t.title}</h1>
-      <p className="text-muted-foreground mt-1">{t.subtitle}</p>
-    </div>
-  );
+  return <PageTitle title={t.title} subtitle={t.subtitle} />;
 }

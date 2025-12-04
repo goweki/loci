@@ -497,7 +497,7 @@ export async function getUserFullProfile(userId: string) {
       phoneNumbers: true,
       contacts: true,
       messages: true,
-      AutoReplyRules: true,
+      autoReplyRules: true,
     },
   });
 }

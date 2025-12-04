@@ -32,7 +32,7 @@ import {
   verifyPreVerifiedNumber as _verifyPreVerifiedNumber,
   getTokenUsingWabaAuthCode as _getTokenUsingWabaAuthCode,
 } from "./actions";
-import { WhatsAppClientEnv } from "./types/environment-variables";
+import type { WhatsAppClientEnv } from "./types/environment-variables";
 
 export class WhatsAppClient {
   private logger = new WhatsAppLogger({ maskSecrets: true });

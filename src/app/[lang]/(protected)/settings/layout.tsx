@@ -1,8 +1,8 @@
 import React from "react";
-import Navbar from "@/components/dashboard/navbar";
+import Navbar from "@/components/settings/navbar";
 import { isValidLanguage, Language } from "@/lib/i18n";
 
-const DashboardLayout = async ({
+const SettingsLayout = async ({
   params,
   children,
 }: {
@@ -21,4 +21,4 @@ const DashboardLayout = async ({
   ) : null;
 };
 
-export default DashboardLayout;
+export default SettingsLayout;

@@ -61,8 +61,8 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
   (
     {
       className,
-      logo = <BrandSymbol />,
-      logoHref = "#",
+      logo = <BrandSymbol height={24} />,
+      logoHref = "/",
       navigationLinks = defaultNavigationLinks,
       signInHref = "/sign-in",
       ctaHref = "/sign-up",
@@ -204,16 +204,11 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
             {/* Main nav */}
             <div className="flex items-center gap-6">
               <Link
-                href="/"
+                href={logoHref}
                 className="flex items-center space-x-2 hover:text-primary/90 transition-colors cursor-pointer"
               >
-                <Image
-                  src="/brand/logo_symbol.svg"
-                  alt="logo"
-                  height={24}
-                  width={24}
-                />
-                <span className="hidden font-bold text:primary text-xl md:inline-block">
+                {logo}
+                <span className="hidden font-bold text-primary text-xl md:inline-block">
                   LOCi
                 </span>
               </Link>

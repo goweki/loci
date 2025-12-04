@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
+ * Model WabaTemplate
+ * 
+ */
+export type WabaTemplate = $Result.DefaultSelection<Prisma.$WabaTemplatePayload>
+/**
  * Model Session
  * 
  */
@@ -93,7 +98,33 @@ export type Account = $Result.DefaultSelection<Prisma.$AccountPayload>
  * Enums
  */
 export namespace $Enums {
-  export const PaymentStatus: {
+  export const TemplateLanguage: {
+  en_US: 'en_US'
+};
+
+export type TemplateLanguage = (typeof TemplateLanguage)[keyof typeof TemplateLanguage]
+
+
+export const TemplateCategory: {
+  MARKETING: 'MARKETING',
+  UTILITY: 'UTILITY',
+  AUTHENTICATION: 'AUTHENTICATION'
+};
+
+export type TemplateCategory = (typeof TemplateCategory)[keyof typeof TemplateCategory]
+
+
+export const TemplateApprovalStatus: {
+  APPROVED: 'APPROVED',
+  PENDING: 'PENDING',
+  REJECTED: 'REJECTED',
+  DISABLED: 'DISABLED'
+};
+
+export type TemplateApprovalStatus = (typeof TemplateApprovalStatus)[keyof typeof TemplateApprovalStatus]
+
+
+export const PaymentStatus: {
   PENDING: 'PENDING',
   SUCCESS: 'SUCCESS',
   FAILED: 'FAILED',
@@ -218,6 +249,18 @@ export const PaymentMethod: {
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
 
 }
+
+export type TemplateLanguage = $Enums.TemplateLanguage
+
+export const TemplateLanguage: typeof $Enums.TemplateLanguage
+
+export type TemplateCategory = $Enums.TemplateCategory
+
+export const TemplateCategory: typeof $Enums.TemplateCategory
+
+export type TemplateApprovalStatus = $Enums.TemplateApprovalStatus
+
+export const TemplateApprovalStatus: typeof $Enums.TemplateApprovalStatus
 
 export type PaymentStatus = $Enums.PaymentStatus
 
@@ -397,6 +440,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.wabaTemplate`: Exposes CRUD operations for the **WabaTemplate** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more WabaTemplates
+    * const wabaTemplates = await prisma.wabaTemplate.findMany()
+    * ```
+    */
+  get wabaTemplate(): Prisma.WabaTemplateDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.session`: Exposes CRUD operations for the **Session** model.
@@ -972,6 +1025,7 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
+    WabaTemplate: 'WabaTemplate',
     Session: 'Session',
     VerificationToken: 'VerificationToken',
     Subscription: 'Subscription',
@@ -1001,7 +1055,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "session" | "verificationToken" | "subscription" | "payment" | "plan" | "feature" | "planFeature" | "phoneNumber" | "contact" | "message" | "messageUnprocessed" | "autoReplyRule" | "webhookEvent" | "account"
+      modelProps: "user" | "wabaTemplate" | "session" | "verificationToken" | "subscription" | "payment" | "plan" | "feature" | "planFeature" | "phoneNumber" | "contact" | "message" | "messageUnprocessed" | "autoReplyRule" | "webhookEvent" | "account"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1076,6 +1130,80 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      WabaTemplate: {
+        payload: Prisma.$WabaTemplatePayload<ExtArgs>
+        fields: Prisma.WabaTemplateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.WabaTemplateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WabaTemplatePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.WabaTemplateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WabaTemplatePayload>
+          }
+          findFirst: {
+            args: Prisma.WabaTemplateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WabaTemplatePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.WabaTemplateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WabaTemplatePayload>
+          }
+          findMany: {
+            args: Prisma.WabaTemplateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WabaTemplatePayload>[]
+          }
+          create: {
+            args: Prisma.WabaTemplateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WabaTemplatePayload>
+          }
+          createMany: {
+            args: Prisma.WabaTemplateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.WabaTemplateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WabaTemplatePayload>[]
+          }
+          delete: {
+            args: Prisma.WabaTemplateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WabaTemplatePayload>
+          }
+          update: {
+            args: Prisma.WabaTemplateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WabaTemplatePayload>
+          }
+          deleteMany: {
+            args: Prisma.WabaTemplateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.WabaTemplateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.WabaTemplateUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WabaTemplatePayload>[]
+          }
+          upsert: {
+            args: Prisma.WabaTemplateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WabaTemplatePayload>
+          }
+          aggregate: {
+            args: Prisma.WabaTemplateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateWabaTemplate>
+          }
+          groupBy: {
+            args: Prisma.WabaTemplateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<WabaTemplateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.WabaTemplateCountArgs<ExtArgs>
+            result: $Utils.Optional<WabaTemplateCountAggregateOutputType> | number
           }
         }
       }
@@ -2208,6 +2336,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
+    wabaTemplate?: WabaTemplateOmit
     session?: SessionOmit
     verificationToken?: VerificationTokenOmit
     subscription?: SubscriptionOmit
@@ -2302,23 +2431,25 @@ export namespace Prisma {
    */
 
   export type UserCountOutputType = {
-    AutoReplyRules: number
+    autoReplyRules: number
     accounts: number
     contacts: number
     messages: number
     phoneNumbers: number
     subscriptions: number
     sessions: number
+    wabaTemplates: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    AutoReplyRules?: boolean | UserCountOutputTypeCountAutoReplyRulesArgs
+    autoReplyRules?: boolean | UserCountOutputTypeCountAutoReplyRulesArgs
     accounts?: boolean | UserCountOutputTypeCountAccountsArgs
     contacts?: boolean | UserCountOutputTypeCountContactsArgs
     messages?: boolean | UserCountOutputTypeCountMessagesArgs
     phoneNumbers?: boolean | UserCountOutputTypeCountPhoneNumbersArgs
     subscriptions?: boolean | UserCountOutputTypeCountSubscriptionsArgs
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
+    wabaTemplates?: boolean | UserCountOutputTypeCountWabaTemplatesArgs
   }
 
   // Custom InputTypes
@@ -2379,6 +2510,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SessionWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountWabaTemplatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WabaTemplateWhereInput
   }
 
 
@@ -2786,13 +2924,14 @@ export namespace Prisma {
     updatedAt?: boolean
     resetToken?: boolean
     resetTokenExpiry?: boolean
-    AutoReplyRules?: boolean | User$AutoReplyRulesArgs<ExtArgs>
+    autoReplyRules?: boolean | User$autoReplyRulesArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
     contacts?: boolean | User$contactsArgs<ExtArgs>
     messages?: boolean | User$messagesArgs<ExtArgs>
     phoneNumbers?: boolean | User$phoneNumbersArgs<ExtArgs>
     subscriptions?: boolean | User$subscriptionsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
+    wabaTemplates?: boolean | User$wabaTemplatesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2849,13 +2988,14 @@ export namespace Prisma {
 
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "tel" | "telVerified" | "image" | "password" | "role" | "status" | "createdAt" | "updatedAt" | "resetToken" | "resetTokenExpiry", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    AutoReplyRules?: boolean | User$AutoReplyRulesArgs<ExtArgs>
+    autoReplyRules?: boolean | User$autoReplyRulesArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
     contacts?: boolean | User$contactsArgs<ExtArgs>
     messages?: boolean | User$messagesArgs<ExtArgs>
     phoneNumbers?: boolean | User$phoneNumbersArgs<ExtArgs>
     subscriptions?: boolean | User$subscriptionsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
+    wabaTemplates?: boolean | User$wabaTemplatesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2864,13 +3004,14 @@ export namespace Prisma {
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
     objects: {
-      AutoReplyRules: Prisma.$AutoReplyRulePayload<ExtArgs>[]
+      autoReplyRules: Prisma.$AutoReplyRulePayload<ExtArgs>[]
       accounts: Prisma.$AccountPayload<ExtArgs>[]
       contacts: Prisma.$ContactPayload<ExtArgs>[]
       messages: Prisma.$MessagePayload<ExtArgs>[]
       phoneNumbers: Prisma.$PhoneNumberPayload<ExtArgs>[]
       subscriptions: Prisma.$SubscriptionPayload<ExtArgs>[]
       sessions: Prisma.$SessionPayload<ExtArgs>[]
+      wabaTemplates: Prisma.$WabaTemplatePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3281,13 +3422,14 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    AutoReplyRules<T extends User$AutoReplyRulesArgs<ExtArgs> = {}>(args?: Subset<T, User$AutoReplyRulesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AutoReplyRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    autoReplyRules<T extends User$autoReplyRulesArgs<ExtArgs> = {}>(args?: Subset<T, User$autoReplyRulesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AutoReplyRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     accounts<T extends User$accountsArgs<ExtArgs> = {}>(args?: Subset<T, User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     contacts<T extends User$contactsArgs<ExtArgs> = {}>(args?: Subset<T, User$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     messages<T extends User$messagesArgs<ExtArgs> = {}>(args?: Subset<T, User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     phoneNumbers<T extends User$phoneNumbersArgs<ExtArgs> = {}>(args?: Subset<T, User$phoneNumbersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhoneNumberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     subscriptions<T extends User$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, User$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    wabaTemplates<T extends User$wabaTemplatesArgs<ExtArgs> = {}>(args?: Subset<T, User$wabaTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3719,9 +3861,9 @@ export namespace Prisma {
   }
 
   /**
-   * User.AutoReplyRules
+   * User.autoReplyRules
    */
-  export type User$AutoReplyRulesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type User$autoReplyRulesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the AutoReplyRule
      */
@@ -3887,6 +4029,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.wabaTemplates
+   */
+  export type User$wabaTemplatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateInclude<ExtArgs> | null
+    where?: WabaTemplateWhereInput
+    orderBy?: WabaTemplateOrderByWithRelationInput | WabaTemplateOrderByWithRelationInput[]
+    cursor?: WabaTemplateWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: WabaTemplateScalarFieldEnum | WabaTemplateScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3902,6 +4068,1138 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model WabaTemplate
+   */
+
+  export type AggregateWabaTemplate = {
+    _count: WabaTemplateCountAggregateOutputType | null
+    _min: WabaTemplateMinAggregateOutputType | null
+    _max: WabaTemplateMaxAggregateOutputType | null
+  }
+
+  export type WabaTemplateMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    status: $Enums.TemplateApprovalStatus | null
+    category: $Enums.TemplateCategory | null
+    language: $Enums.TemplateLanguage | null
+    wabaAccountId: string | null
+    rejectedReason: string | null
+    userId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type WabaTemplateMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    status: $Enums.TemplateApprovalStatus | null
+    category: $Enums.TemplateCategory | null
+    language: $Enums.TemplateLanguage | null
+    wabaAccountId: string | null
+    rejectedReason: string | null
+    userId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type WabaTemplateCountAggregateOutputType = {
+    id: number
+    name: number
+    status: number
+    category: number
+    language: number
+    components: number
+    wabaAccountId: number
+    rejectedReason: number
+    userId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type WabaTemplateMinAggregateInputType = {
+    id?: true
+    name?: true
+    status?: true
+    category?: true
+    language?: true
+    wabaAccountId?: true
+    rejectedReason?: true
+    userId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type WabaTemplateMaxAggregateInputType = {
+    id?: true
+    name?: true
+    status?: true
+    category?: true
+    language?: true
+    wabaAccountId?: true
+    rejectedReason?: true
+    userId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type WabaTemplateCountAggregateInputType = {
+    id?: true
+    name?: true
+    status?: true
+    category?: true
+    language?: true
+    components?: true
+    wabaAccountId?: true
+    rejectedReason?: true
+    userId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type WabaTemplateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WabaTemplate to aggregate.
+     */
+    where?: WabaTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WabaTemplates to fetch.
+     */
+    orderBy?: WabaTemplateOrderByWithRelationInput | WabaTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: WabaTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WabaTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WabaTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned WabaTemplates
+    **/
+    _count?: true | WabaTemplateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: WabaTemplateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: WabaTemplateMaxAggregateInputType
+  }
+
+  export type GetWabaTemplateAggregateType<T extends WabaTemplateAggregateArgs> = {
+        [P in keyof T & keyof AggregateWabaTemplate]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateWabaTemplate[P]>
+      : GetScalarType<T[P], AggregateWabaTemplate[P]>
+  }
+
+
+
+
+  export type WabaTemplateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WabaTemplateWhereInput
+    orderBy?: WabaTemplateOrderByWithAggregationInput | WabaTemplateOrderByWithAggregationInput[]
+    by: WabaTemplateScalarFieldEnum[] | WabaTemplateScalarFieldEnum
+    having?: WabaTemplateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: WabaTemplateCountAggregateInputType | true
+    _min?: WabaTemplateMinAggregateInputType
+    _max?: WabaTemplateMaxAggregateInputType
+  }
+
+  export type WabaTemplateGroupByOutputType = {
+    id: string
+    name: string
+    status: $Enums.TemplateApprovalStatus
+    category: $Enums.TemplateCategory
+    language: $Enums.TemplateLanguage
+    components: JsonValue
+    wabaAccountId: string
+    rejectedReason: string | null
+    userId: string
+    createdAt: Date
+    updatedAt: Date
+    _count: WabaTemplateCountAggregateOutputType | null
+    _min: WabaTemplateMinAggregateOutputType | null
+    _max: WabaTemplateMaxAggregateOutputType | null
+  }
+
+  type GetWabaTemplateGroupByPayload<T extends WabaTemplateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<WabaTemplateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof WabaTemplateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], WabaTemplateGroupByOutputType[P]>
+            : GetScalarType<T[P], WabaTemplateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type WabaTemplateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    status?: boolean
+    category?: boolean
+    language?: boolean
+    components?: boolean
+    wabaAccountId?: boolean
+    rejectedReason?: boolean
+    userId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["wabaTemplate"]>
+
+  export type WabaTemplateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    status?: boolean
+    category?: boolean
+    language?: boolean
+    components?: boolean
+    wabaAccountId?: boolean
+    rejectedReason?: boolean
+    userId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["wabaTemplate"]>
+
+  export type WabaTemplateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    status?: boolean
+    category?: boolean
+    language?: boolean
+    components?: boolean
+    wabaAccountId?: boolean
+    rejectedReason?: boolean
+    userId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["wabaTemplate"]>
+
+  export type WabaTemplateSelectScalar = {
+    id?: boolean
+    name?: boolean
+    status?: boolean
+    category?: boolean
+    language?: boolean
+    components?: boolean
+    wabaAccountId?: boolean
+    rejectedReason?: boolean
+    userId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type WabaTemplateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "status" | "category" | "language" | "components" | "wabaAccountId" | "rejectedReason" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["wabaTemplate"]>
+  export type WabaTemplateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type WabaTemplateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type WabaTemplateIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $WabaTemplatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "WabaTemplate"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      status: $Enums.TemplateApprovalStatus
+      category: $Enums.TemplateCategory
+      language: $Enums.TemplateLanguage
+      components: Prisma.JsonValue
+      wabaAccountId: string
+      rejectedReason: string | null
+      userId: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["wabaTemplate"]>
+    composites: {}
+  }
+
+  type WabaTemplateGetPayload<S extends boolean | null | undefined | WabaTemplateDefaultArgs> = $Result.GetResult<Prisma.$WabaTemplatePayload, S>
+
+  type WabaTemplateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<WabaTemplateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: WabaTemplateCountAggregateInputType | true
+    }
+
+  export interface WabaTemplateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['WabaTemplate'], meta: { name: 'WabaTemplate' } }
+    /**
+     * Find zero or one WabaTemplate that matches the filter.
+     * @param {WabaTemplateFindUniqueArgs} args - Arguments to find a WabaTemplate
+     * @example
+     * // Get one WabaTemplate
+     * const wabaTemplate = await prisma.wabaTemplate.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends WabaTemplateFindUniqueArgs>(args: SelectSubset<T, WabaTemplateFindUniqueArgs<ExtArgs>>): Prisma__WabaTemplateClient<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one WabaTemplate that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {WabaTemplateFindUniqueOrThrowArgs} args - Arguments to find a WabaTemplate
+     * @example
+     * // Get one WabaTemplate
+     * const wabaTemplate = await prisma.wabaTemplate.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends WabaTemplateFindUniqueOrThrowArgs>(args: SelectSubset<T, WabaTemplateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__WabaTemplateClient<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WabaTemplate that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WabaTemplateFindFirstArgs} args - Arguments to find a WabaTemplate
+     * @example
+     * // Get one WabaTemplate
+     * const wabaTemplate = await prisma.wabaTemplate.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends WabaTemplateFindFirstArgs>(args?: SelectSubset<T, WabaTemplateFindFirstArgs<ExtArgs>>): Prisma__WabaTemplateClient<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WabaTemplate that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WabaTemplateFindFirstOrThrowArgs} args - Arguments to find a WabaTemplate
+     * @example
+     * // Get one WabaTemplate
+     * const wabaTemplate = await prisma.wabaTemplate.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends WabaTemplateFindFirstOrThrowArgs>(args?: SelectSubset<T, WabaTemplateFindFirstOrThrowArgs<ExtArgs>>): Prisma__WabaTemplateClient<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more WabaTemplates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WabaTemplateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all WabaTemplates
+     * const wabaTemplates = await prisma.wabaTemplate.findMany()
+     * 
+     * // Get first 10 WabaTemplates
+     * const wabaTemplates = await prisma.wabaTemplate.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const wabaTemplateWithIdOnly = await prisma.wabaTemplate.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends WabaTemplateFindManyArgs>(args?: SelectSubset<T, WabaTemplateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a WabaTemplate.
+     * @param {WabaTemplateCreateArgs} args - Arguments to create a WabaTemplate.
+     * @example
+     * // Create one WabaTemplate
+     * const WabaTemplate = await prisma.wabaTemplate.create({
+     *   data: {
+     *     // ... data to create a WabaTemplate
+     *   }
+     * })
+     * 
+     */
+    create<T extends WabaTemplateCreateArgs>(args: SelectSubset<T, WabaTemplateCreateArgs<ExtArgs>>): Prisma__WabaTemplateClient<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many WabaTemplates.
+     * @param {WabaTemplateCreateManyArgs} args - Arguments to create many WabaTemplates.
+     * @example
+     * // Create many WabaTemplates
+     * const wabaTemplate = await prisma.wabaTemplate.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends WabaTemplateCreateManyArgs>(args?: SelectSubset<T, WabaTemplateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many WabaTemplates and returns the data saved in the database.
+     * @param {WabaTemplateCreateManyAndReturnArgs} args - Arguments to create many WabaTemplates.
+     * @example
+     * // Create many WabaTemplates
+     * const wabaTemplate = await prisma.wabaTemplate.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many WabaTemplates and only return the `id`
+     * const wabaTemplateWithIdOnly = await prisma.wabaTemplate.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends WabaTemplateCreateManyAndReturnArgs>(args?: SelectSubset<T, WabaTemplateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a WabaTemplate.
+     * @param {WabaTemplateDeleteArgs} args - Arguments to delete one WabaTemplate.
+     * @example
+     * // Delete one WabaTemplate
+     * const WabaTemplate = await prisma.wabaTemplate.delete({
+     *   where: {
+     *     // ... filter to delete one WabaTemplate
+     *   }
+     * })
+     * 
+     */
+    delete<T extends WabaTemplateDeleteArgs>(args: SelectSubset<T, WabaTemplateDeleteArgs<ExtArgs>>): Prisma__WabaTemplateClient<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one WabaTemplate.
+     * @param {WabaTemplateUpdateArgs} args - Arguments to update one WabaTemplate.
+     * @example
+     * // Update one WabaTemplate
+     * const wabaTemplate = await prisma.wabaTemplate.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends WabaTemplateUpdateArgs>(args: SelectSubset<T, WabaTemplateUpdateArgs<ExtArgs>>): Prisma__WabaTemplateClient<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more WabaTemplates.
+     * @param {WabaTemplateDeleteManyArgs} args - Arguments to filter WabaTemplates to delete.
+     * @example
+     * // Delete a few WabaTemplates
+     * const { count } = await prisma.wabaTemplate.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends WabaTemplateDeleteManyArgs>(args?: SelectSubset<T, WabaTemplateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more WabaTemplates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WabaTemplateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many WabaTemplates
+     * const wabaTemplate = await prisma.wabaTemplate.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends WabaTemplateUpdateManyArgs>(args: SelectSubset<T, WabaTemplateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more WabaTemplates and returns the data updated in the database.
+     * @param {WabaTemplateUpdateManyAndReturnArgs} args - Arguments to update many WabaTemplates.
+     * @example
+     * // Update many WabaTemplates
+     * const wabaTemplate = await prisma.wabaTemplate.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more WabaTemplates and only return the `id`
+     * const wabaTemplateWithIdOnly = await prisma.wabaTemplate.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends WabaTemplateUpdateManyAndReturnArgs>(args: SelectSubset<T, WabaTemplateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one WabaTemplate.
+     * @param {WabaTemplateUpsertArgs} args - Arguments to update or create a WabaTemplate.
+     * @example
+     * // Update or create a WabaTemplate
+     * const wabaTemplate = await prisma.wabaTemplate.upsert({
+     *   create: {
+     *     // ... data to create a WabaTemplate
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the WabaTemplate we want to update
+     *   }
+     * })
+     */
+    upsert<T extends WabaTemplateUpsertArgs>(args: SelectSubset<T, WabaTemplateUpsertArgs<ExtArgs>>): Prisma__WabaTemplateClient<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of WabaTemplates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WabaTemplateCountArgs} args - Arguments to filter WabaTemplates to count.
+     * @example
+     * // Count the number of WabaTemplates
+     * const count = await prisma.wabaTemplate.count({
+     *   where: {
+     *     // ... the filter for the WabaTemplates we want to count
+     *   }
+     * })
+    **/
+    count<T extends WabaTemplateCountArgs>(
+      args?: Subset<T, WabaTemplateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], WabaTemplateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a WabaTemplate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WabaTemplateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends WabaTemplateAggregateArgs>(args: Subset<T, WabaTemplateAggregateArgs>): Prisma.PrismaPromise<GetWabaTemplateAggregateType<T>>
+
+    /**
+     * Group by WabaTemplate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WabaTemplateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends WabaTemplateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: WabaTemplateGroupByArgs['orderBy'] }
+        : { orderBy?: WabaTemplateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, WabaTemplateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetWabaTemplateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the WabaTemplate model
+   */
+  readonly fields: WabaTemplateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for WabaTemplate.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__WabaTemplateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the WabaTemplate model
+   */
+  interface WabaTemplateFieldRefs {
+    readonly id: FieldRef<"WabaTemplate", 'String'>
+    readonly name: FieldRef<"WabaTemplate", 'String'>
+    readonly status: FieldRef<"WabaTemplate", 'TemplateApprovalStatus'>
+    readonly category: FieldRef<"WabaTemplate", 'TemplateCategory'>
+    readonly language: FieldRef<"WabaTemplate", 'TemplateLanguage'>
+    readonly components: FieldRef<"WabaTemplate", 'Json'>
+    readonly wabaAccountId: FieldRef<"WabaTemplate", 'String'>
+    readonly rejectedReason: FieldRef<"WabaTemplate", 'String'>
+    readonly userId: FieldRef<"WabaTemplate", 'String'>
+    readonly createdAt: FieldRef<"WabaTemplate", 'DateTime'>
+    readonly updatedAt: FieldRef<"WabaTemplate", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * WabaTemplate findUnique
+   */
+  export type WabaTemplateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which WabaTemplate to fetch.
+     */
+    where: WabaTemplateWhereUniqueInput
+  }
+
+  /**
+   * WabaTemplate findUniqueOrThrow
+   */
+  export type WabaTemplateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which WabaTemplate to fetch.
+     */
+    where: WabaTemplateWhereUniqueInput
+  }
+
+  /**
+   * WabaTemplate findFirst
+   */
+  export type WabaTemplateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which WabaTemplate to fetch.
+     */
+    where?: WabaTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WabaTemplates to fetch.
+     */
+    orderBy?: WabaTemplateOrderByWithRelationInput | WabaTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for WabaTemplates.
+     */
+    cursor?: WabaTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WabaTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WabaTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WabaTemplates.
+     */
+    distinct?: WabaTemplateScalarFieldEnum | WabaTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * WabaTemplate findFirstOrThrow
+   */
+  export type WabaTemplateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which WabaTemplate to fetch.
+     */
+    where?: WabaTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WabaTemplates to fetch.
+     */
+    orderBy?: WabaTemplateOrderByWithRelationInput | WabaTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for WabaTemplates.
+     */
+    cursor?: WabaTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WabaTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WabaTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WabaTemplates.
+     */
+    distinct?: WabaTemplateScalarFieldEnum | WabaTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * WabaTemplate findMany
+   */
+  export type WabaTemplateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which WabaTemplates to fetch.
+     */
+    where?: WabaTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WabaTemplates to fetch.
+     */
+    orderBy?: WabaTemplateOrderByWithRelationInput | WabaTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing WabaTemplates.
+     */
+    cursor?: WabaTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WabaTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WabaTemplates.
+     */
+    skip?: number
+    distinct?: WabaTemplateScalarFieldEnum | WabaTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * WabaTemplate create
+   */
+  export type WabaTemplateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateInclude<ExtArgs> | null
+    /**
+     * The data needed to create a WabaTemplate.
+     */
+    data: XOR<WabaTemplateCreateInput, WabaTemplateUncheckedCreateInput>
+  }
+
+  /**
+   * WabaTemplate createMany
+   */
+  export type WabaTemplateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many WabaTemplates.
+     */
+    data: WabaTemplateCreateManyInput | WabaTemplateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * WabaTemplate createManyAndReturn
+   */
+  export type WabaTemplateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * The data used to create many WabaTemplates.
+     */
+    data: WabaTemplateCreateManyInput | WabaTemplateCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * WabaTemplate update
+   */
+  export type WabaTemplateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateInclude<ExtArgs> | null
+    /**
+     * The data needed to update a WabaTemplate.
+     */
+    data: XOR<WabaTemplateUpdateInput, WabaTemplateUncheckedUpdateInput>
+    /**
+     * Choose, which WabaTemplate to update.
+     */
+    where: WabaTemplateWhereUniqueInput
+  }
+
+  /**
+   * WabaTemplate updateMany
+   */
+  export type WabaTemplateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update WabaTemplates.
+     */
+    data: XOR<WabaTemplateUpdateManyMutationInput, WabaTemplateUncheckedUpdateManyInput>
+    /**
+     * Filter which WabaTemplates to update
+     */
+    where?: WabaTemplateWhereInput
+    /**
+     * Limit how many WabaTemplates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * WabaTemplate updateManyAndReturn
+   */
+  export type WabaTemplateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * The data used to update WabaTemplates.
+     */
+    data: XOR<WabaTemplateUpdateManyMutationInput, WabaTemplateUncheckedUpdateManyInput>
+    /**
+     * Filter which WabaTemplates to update
+     */
+    where?: WabaTemplateWhereInput
+    /**
+     * Limit how many WabaTemplates to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * WabaTemplate upsert
+   */
+  export type WabaTemplateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateInclude<ExtArgs> | null
+    /**
+     * The filter to search for the WabaTemplate to update in case it exists.
+     */
+    where: WabaTemplateWhereUniqueInput
+    /**
+     * In case the WabaTemplate found by the `where` argument doesn't exist, create a new WabaTemplate with this data.
+     */
+    create: XOR<WabaTemplateCreateInput, WabaTemplateUncheckedCreateInput>
+    /**
+     * In case the WabaTemplate was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<WabaTemplateUpdateInput, WabaTemplateUncheckedUpdateInput>
+  }
+
+  /**
+   * WabaTemplate delete
+   */
+  export type WabaTemplateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateInclude<ExtArgs> | null
+    /**
+     * Filter which WabaTemplate to delete.
+     */
+    where: WabaTemplateWhereUniqueInput
+  }
+
+  /**
+   * WabaTemplate deleteMany
+   */
+  export type WabaTemplateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WabaTemplates to delete
+     */
+    where?: WabaTemplateWhereInput
+    /**
+     * Limit how many WabaTemplates to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * WabaTemplate without action
+   */
+  export type WabaTemplateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateInclude<ExtArgs> | null
   }
 
 
@@ -19495,6 +20793,23 @@ export namespace Prisma {
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+  export const WabaTemplateScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    status: 'status',
+    category: 'category',
+    language: 'language',
+    components: 'components',
+    wabaAccountId: 'wabaAccountId',
+    rejectedReason: 'rejectedReason',
+    userId: 'userId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type WabaTemplateScalarFieldEnum = (typeof WabaTemplateScalarFieldEnum)[keyof typeof WabaTemplateScalarFieldEnum]
+
+
   export const SessionScalarFieldEnum: {
     id: 'id',
     sessionToken: 'sessionToken',
@@ -19794,6 +21109,62 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'TemplateApprovalStatus'
+   */
+  export type EnumTemplateApprovalStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TemplateApprovalStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'TemplateApprovalStatus[]'
+   */
+  export type ListEnumTemplateApprovalStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TemplateApprovalStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'TemplateCategory'
+   */
+  export type EnumTemplateCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TemplateCategory'>
+    
+
+
+  /**
+   * Reference to a field of type 'TemplateCategory[]'
+   */
+  export type ListEnumTemplateCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TemplateCategory[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'TemplateLanguage'
+   */
+  export type EnumTemplateLanguageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TemplateLanguage'>
+    
+
+
+  /**
+   * Reference to a field of type 'TemplateLanguage[]'
+   */
+  export type ListEnumTemplateLanguageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TemplateLanguage[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
    * Reference to a field of type 'PaymentMethod'
    */
   export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod'>
@@ -19913,20 +21284,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Json'
-   */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
-   * Reference to a field of type 'QueryMode'
-   */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-  /**
    * Reference to a field of type 'MessageDirection'
    */
   export type EnumMessageDirectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageDirection'>
@@ -20017,13 +21374,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     resetToken?: StringNullableFilter<"User"> | string | null
     resetTokenExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
-    AutoReplyRules?: AutoReplyRuleListRelationFilter
+    autoReplyRules?: AutoReplyRuleListRelationFilter
     accounts?: AccountListRelationFilter
     contacts?: ContactListRelationFilter
     messages?: MessageListRelationFilter
     phoneNumbers?: PhoneNumberListRelationFilter
     subscriptions?: SubscriptionListRelationFilter
     sessions?: SessionListRelationFilter
+    wabaTemplates?: WabaTemplateListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -20041,13 +21399,14 @@ export namespace Prisma {
     updatedAt?: SortOrder
     resetToken?: SortOrderInput | SortOrder
     resetTokenExpiry?: SortOrderInput | SortOrder
-    AutoReplyRules?: AutoReplyRuleOrderByRelationAggregateInput
+    autoReplyRules?: AutoReplyRuleOrderByRelationAggregateInput
     accounts?: AccountOrderByRelationAggregateInput
     contacts?: ContactOrderByRelationAggregateInput
     messages?: MessageOrderByRelationAggregateInput
     phoneNumbers?: PhoneNumberOrderByRelationAggregateInput
     subscriptions?: SubscriptionOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
+    wabaTemplates?: WabaTemplateOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -20068,13 +21427,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     resetToken?: StringNullableFilter<"User"> | string | null
     resetTokenExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
-    AutoReplyRules?: AutoReplyRuleListRelationFilter
+    autoReplyRules?: AutoReplyRuleListRelationFilter
     accounts?: AccountListRelationFilter
     contacts?: ContactListRelationFilter
     messages?: MessageListRelationFilter
     phoneNumbers?: PhoneNumberListRelationFilter
     subscriptions?: SubscriptionListRelationFilter
     sessions?: SessionListRelationFilter
+    wabaTemplates?: WabaTemplateListRelationFilter
   }, "id" | "email" | "tel">
 
   export type UserOrderByWithAggregationInput = {
@@ -20115,6 +21475,91 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     resetToken?: StringNullableWithAggregatesFilter<"User"> | string | null
     resetTokenExpiry?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  }
+
+  export type WabaTemplateWhereInput = {
+    AND?: WabaTemplateWhereInput | WabaTemplateWhereInput[]
+    OR?: WabaTemplateWhereInput[]
+    NOT?: WabaTemplateWhereInput | WabaTemplateWhereInput[]
+    id?: StringFilter<"WabaTemplate"> | string
+    name?: StringFilter<"WabaTemplate"> | string
+    status?: EnumTemplateApprovalStatusFilter<"WabaTemplate"> | $Enums.TemplateApprovalStatus
+    category?: EnumTemplateCategoryFilter<"WabaTemplate"> | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFilter<"WabaTemplate"> | $Enums.TemplateLanguage
+    components?: JsonFilter<"WabaTemplate">
+    wabaAccountId?: StringFilter<"WabaTemplate"> | string
+    rejectedReason?: StringNullableFilter<"WabaTemplate"> | string | null
+    userId?: StringFilter<"WabaTemplate"> | string
+    createdAt?: DateTimeFilter<"WabaTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"WabaTemplate"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type WabaTemplateOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    status?: SortOrder
+    category?: SortOrder
+    language?: SortOrder
+    components?: SortOrder
+    wabaAccountId?: SortOrder
+    rejectedReason?: SortOrderInput | SortOrder
+    userId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type WabaTemplateWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: WabaTemplateWhereInput | WabaTemplateWhereInput[]
+    OR?: WabaTemplateWhereInput[]
+    NOT?: WabaTemplateWhereInput | WabaTemplateWhereInput[]
+    name?: StringFilter<"WabaTemplate"> | string
+    status?: EnumTemplateApprovalStatusFilter<"WabaTemplate"> | $Enums.TemplateApprovalStatus
+    category?: EnumTemplateCategoryFilter<"WabaTemplate"> | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFilter<"WabaTemplate"> | $Enums.TemplateLanguage
+    components?: JsonFilter<"WabaTemplate">
+    wabaAccountId?: StringFilter<"WabaTemplate"> | string
+    rejectedReason?: StringNullableFilter<"WabaTemplate"> | string | null
+    userId?: StringFilter<"WabaTemplate"> | string
+    createdAt?: DateTimeFilter<"WabaTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"WabaTemplate"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type WabaTemplateOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    status?: SortOrder
+    category?: SortOrder
+    language?: SortOrder
+    components?: SortOrder
+    wabaAccountId?: SortOrder
+    rejectedReason?: SortOrderInput | SortOrder
+    userId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: WabaTemplateCountOrderByAggregateInput
+    _max?: WabaTemplateMaxOrderByAggregateInput
+    _min?: WabaTemplateMinOrderByAggregateInput
+  }
+
+  export type WabaTemplateScalarWhereWithAggregatesInput = {
+    AND?: WabaTemplateScalarWhereWithAggregatesInput | WabaTemplateScalarWhereWithAggregatesInput[]
+    OR?: WabaTemplateScalarWhereWithAggregatesInput[]
+    NOT?: WabaTemplateScalarWhereWithAggregatesInput | WabaTemplateScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"WabaTemplate"> | string
+    name?: StringWithAggregatesFilter<"WabaTemplate"> | string
+    status?: EnumTemplateApprovalStatusWithAggregatesFilter<"WabaTemplate"> | $Enums.TemplateApprovalStatus
+    category?: EnumTemplateCategoryWithAggregatesFilter<"WabaTemplate"> | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageWithAggregatesFilter<"WabaTemplate"> | $Enums.TemplateLanguage
+    components?: JsonWithAggregatesFilter<"WabaTemplate">
+    wabaAccountId?: StringWithAggregatesFilter<"WabaTemplate"> | string
+    rejectedReason?: StringNullableWithAggregatesFilter<"WabaTemplate"> | string | null
+    userId?: StringWithAggregatesFilter<"WabaTemplate"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"WabaTemplate"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"WabaTemplate"> | Date | string
   }
 
   export type SessionWhereInput = {
@@ -21148,13 +22593,14 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
     phoneNumbers?: PhoneNumberCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -21172,13 +22618,14 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     phoneNumbers?: PhoneNumberUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -21196,13 +22643,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
     phoneNumbers?: PhoneNumberUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -21220,13 +22668,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     phoneNumbers?: PhoneNumberUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -21278,6 +22727,103 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type WabaTemplateCreateInput = {
+    id?: string
+    name: string
+    status: $Enums.TemplateApprovalStatus
+    category: $Enums.TemplateCategory
+    language?: $Enums.TemplateLanguage
+    components: JsonNullValueInput | InputJsonValue
+    wabaAccountId: string
+    rejectedReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutWabaTemplatesInput
+  }
+
+  export type WabaTemplateUncheckedCreateInput = {
+    id?: string
+    name: string
+    status: $Enums.TemplateApprovalStatus
+    category: $Enums.TemplateCategory
+    language?: $Enums.TemplateLanguage
+    components: JsonNullValueInput | InputJsonValue
+    wabaAccountId: string
+    rejectedReason?: string | null
+    userId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WabaTemplateUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    status?: EnumTemplateApprovalStatusFieldUpdateOperationsInput | $Enums.TemplateApprovalStatus
+    category?: EnumTemplateCategoryFieldUpdateOperationsInput | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFieldUpdateOperationsInput | $Enums.TemplateLanguage
+    components?: JsonNullValueInput | InputJsonValue
+    wabaAccountId?: StringFieldUpdateOperationsInput | string
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutWabaTemplatesNestedInput
+  }
+
+  export type WabaTemplateUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    status?: EnumTemplateApprovalStatusFieldUpdateOperationsInput | $Enums.TemplateApprovalStatus
+    category?: EnumTemplateCategoryFieldUpdateOperationsInput | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFieldUpdateOperationsInput | $Enums.TemplateLanguage
+    components?: JsonNullValueInput | InputJsonValue
+    wabaAccountId?: StringFieldUpdateOperationsInput | string
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WabaTemplateCreateManyInput = {
+    id?: string
+    name: string
+    status: $Enums.TemplateApprovalStatus
+    category: $Enums.TemplateCategory
+    language?: $Enums.TemplateLanguage
+    components: JsonNullValueInput | InputJsonValue
+    wabaAccountId: string
+    rejectedReason?: string | null
+    userId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WabaTemplateUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    status?: EnumTemplateApprovalStatusFieldUpdateOperationsInput | $Enums.TemplateApprovalStatus
+    category?: EnumTemplateCategoryFieldUpdateOperationsInput | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFieldUpdateOperationsInput | $Enums.TemplateLanguage
+    components?: JsonNullValueInput | InputJsonValue
+    wabaAccountId?: StringFieldUpdateOperationsInput | string
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WabaTemplateUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    status?: EnumTemplateApprovalStatusFieldUpdateOperationsInput | $Enums.TemplateApprovalStatus
+    category?: EnumTemplateCategoryFieldUpdateOperationsInput | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFieldUpdateOperationsInput | $Enums.TemplateLanguage
+    components?: JsonNullValueInput | InputJsonValue
+    wabaAccountId?: StringFieldUpdateOperationsInput | string
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SessionCreateInput = {
@@ -22484,6 +24030,12 @@ export namespace Prisma {
     none?: SessionWhereInput
   }
 
+  export type WabaTemplateListRelationFilter = {
+    every?: WabaTemplateWhereInput
+    some?: WabaTemplateWhereInput
+    none?: WabaTemplateWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -22514,6 +24066,10 @@ export namespace Prisma {
   }
 
   export type SessionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type WabaTemplateOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -22652,9 +24208,149 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type EnumTemplateApprovalStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateApprovalStatus | EnumTemplateApprovalStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateApprovalStatus[] | ListEnumTemplateApprovalStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateApprovalStatus[] | ListEnumTemplateApprovalStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateApprovalStatusFilter<$PrismaModel> | $Enums.TemplateApprovalStatus
+  }
+
+  export type EnumTemplateCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateCategory | EnumTemplateCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateCategory[] | ListEnumTemplateCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateCategory[] | ListEnumTemplateCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateCategoryFilter<$PrismaModel> | $Enums.TemplateCategory
+  }
+
+  export type EnumTemplateLanguageFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateLanguage | EnumTemplateLanguageFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateLanguage[] | ListEnumTemplateLanguageFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateLanguage[] | ListEnumTemplateLanguageFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateLanguageFilter<$PrismaModel> | $Enums.TemplateLanguage
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
+  }
+
+  export type WabaTemplateCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    status?: SortOrder
+    category?: SortOrder
+    language?: SortOrder
+    components?: SortOrder
+    wabaAccountId?: SortOrder
+    rejectedReason?: SortOrder
+    userId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type WabaTemplateMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    status?: SortOrder
+    category?: SortOrder
+    language?: SortOrder
+    wabaAccountId?: SortOrder
+    rejectedReason?: SortOrder
+    userId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type WabaTemplateMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    status?: SortOrder
+    category?: SortOrder
+    language?: SortOrder
+    wabaAccountId?: SortOrder
+    rejectedReason?: SortOrder
+    userId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumTemplateApprovalStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateApprovalStatus | EnumTemplateApprovalStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateApprovalStatus[] | ListEnumTemplateApprovalStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateApprovalStatus[] | ListEnumTemplateApprovalStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateApprovalStatusWithAggregatesFilter<$PrismaModel> | $Enums.TemplateApprovalStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTemplateApprovalStatusFilter<$PrismaModel>
+    _max?: NestedEnumTemplateApprovalStatusFilter<$PrismaModel>
+  }
+
+  export type EnumTemplateCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateCategory | EnumTemplateCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateCategory[] | ListEnumTemplateCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateCategory[] | ListEnumTemplateCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateCategoryWithAggregatesFilter<$PrismaModel> | $Enums.TemplateCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTemplateCategoryFilter<$PrismaModel>
+    _max?: NestedEnumTemplateCategoryFilter<$PrismaModel>
+  }
+
+  export type EnumTemplateLanguageWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateLanguage | EnumTemplateLanguageFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateLanguage[] | ListEnumTemplateLanguageFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateLanguage[] | ListEnumTemplateLanguageFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateLanguageWithAggregatesFilter<$PrismaModel> | $Enums.TemplateLanguage
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTemplateLanguageFilter<$PrismaModel>
+    _max?: NestedEnumTemplateLanguageFilter<$PrismaModel>
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type SessionCountOrderByAggregateInput = {
@@ -23186,29 +24882,6 @@ export namespace Prisma {
     notIn?: $Enums.MessageType[] | ListEnumMessageTypeFieldRefInput<$PrismaModel>
     not?: NestedEnumMessageTypeFilter<$PrismaModel> | $Enums.MessageType
   }
-  export type JsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type EnumMessageDirectionFilter<$PrismaModel = never> = {
     equals?: $Enums.MessageDirection | EnumMessageDirectionFieldRefInput<$PrismaModel>
@@ -23285,32 +24958,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumMessageTypeFilter<$PrismaModel>
     _max?: NestedEnumMessageTypeFilter<$PrismaModel>
-  }
-  export type JsonWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedJsonFilter<$PrismaModel>
-    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type EnumMessageDirectionWithAggregatesFilter<$PrismaModel = never> = {
@@ -23585,6 +25232,13 @@ export namespace Prisma {
     connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
   }
 
+  export type WabaTemplateCreateNestedManyWithoutUserInput = {
+    create?: XOR<WabaTemplateCreateWithoutUserInput, WabaTemplateUncheckedCreateWithoutUserInput> | WabaTemplateCreateWithoutUserInput[] | WabaTemplateUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WabaTemplateCreateOrConnectWithoutUserInput | WabaTemplateCreateOrConnectWithoutUserInput[]
+    createMany?: WabaTemplateCreateManyUserInputEnvelope
+    connect?: WabaTemplateWhereUniqueInput | WabaTemplateWhereUniqueInput[]
+  }
+
   export type AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AutoReplyRuleCreateWithoutUserInput, AutoReplyRuleUncheckedCreateWithoutUserInput> | AutoReplyRuleCreateWithoutUserInput[] | AutoReplyRuleUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AutoReplyRuleCreateOrConnectWithoutUserInput | AutoReplyRuleCreateOrConnectWithoutUserInput[]
@@ -23632,6 +25286,13 @@ export namespace Prisma {
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
     createMany?: SessionCreateManyUserInputEnvelope
     connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+  }
+
+  export type WabaTemplateUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<WabaTemplateCreateWithoutUserInput, WabaTemplateUncheckedCreateWithoutUserInput> | WabaTemplateCreateWithoutUserInput[] | WabaTemplateUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WabaTemplateCreateOrConnectWithoutUserInput | WabaTemplateCreateOrConnectWithoutUserInput[]
+    createMany?: WabaTemplateCreateManyUserInputEnvelope
+    connect?: WabaTemplateWhereUniqueInput | WabaTemplateWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -23756,6 +25417,20 @@ export namespace Prisma {
     deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
   }
 
+  export type WabaTemplateUpdateManyWithoutUserNestedInput = {
+    create?: XOR<WabaTemplateCreateWithoutUserInput, WabaTemplateUncheckedCreateWithoutUserInput> | WabaTemplateCreateWithoutUserInput[] | WabaTemplateUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WabaTemplateCreateOrConnectWithoutUserInput | WabaTemplateCreateOrConnectWithoutUserInput[]
+    upsert?: WabaTemplateUpsertWithWhereUniqueWithoutUserInput | WabaTemplateUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: WabaTemplateCreateManyUserInputEnvelope
+    set?: WabaTemplateWhereUniqueInput | WabaTemplateWhereUniqueInput[]
+    disconnect?: WabaTemplateWhereUniqueInput | WabaTemplateWhereUniqueInput[]
+    delete?: WabaTemplateWhereUniqueInput | WabaTemplateWhereUniqueInput[]
+    connect?: WabaTemplateWhereUniqueInput | WabaTemplateWhereUniqueInput[]
+    update?: WabaTemplateUpdateWithWhereUniqueWithoutUserInput | WabaTemplateUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: WabaTemplateUpdateManyWithWhereWithoutUserInput | WabaTemplateUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: WabaTemplateScalarWhereInput | WabaTemplateScalarWhereInput[]
+  }
+
   export type AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AutoReplyRuleCreateWithoutUserInput, AutoReplyRuleUncheckedCreateWithoutUserInput> | AutoReplyRuleCreateWithoutUserInput[] | AutoReplyRuleUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AutoReplyRuleCreateOrConnectWithoutUserInput | AutoReplyRuleCreateOrConnectWithoutUserInput[]
@@ -23852,6 +25527,46 @@ export namespace Prisma {
     update?: SessionUpdateWithWhereUniqueWithoutUserInput | SessionUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: SessionUpdateManyWithWhereWithoutUserInput | SessionUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
+  }
+
+  export type WabaTemplateUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<WabaTemplateCreateWithoutUserInput, WabaTemplateUncheckedCreateWithoutUserInput> | WabaTemplateCreateWithoutUserInput[] | WabaTemplateUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WabaTemplateCreateOrConnectWithoutUserInput | WabaTemplateCreateOrConnectWithoutUserInput[]
+    upsert?: WabaTemplateUpsertWithWhereUniqueWithoutUserInput | WabaTemplateUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: WabaTemplateCreateManyUserInputEnvelope
+    set?: WabaTemplateWhereUniqueInput | WabaTemplateWhereUniqueInput[]
+    disconnect?: WabaTemplateWhereUniqueInput | WabaTemplateWhereUniqueInput[]
+    delete?: WabaTemplateWhereUniqueInput | WabaTemplateWhereUniqueInput[]
+    connect?: WabaTemplateWhereUniqueInput | WabaTemplateWhereUniqueInput[]
+    update?: WabaTemplateUpdateWithWhereUniqueWithoutUserInput | WabaTemplateUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: WabaTemplateUpdateManyWithWhereWithoutUserInput | WabaTemplateUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: WabaTemplateScalarWhereInput | WabaTemplateScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutWabaTemplatesInput = {
+    create?: XOR<UserCreateWithoutWabaTemplatesInput, UserUncheckedCreateWithoutWabaTemplatesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutWabaTemplatesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumTemplateApprovalStatusFieldUpdateOperationsInput = {
+    set?: $Enums.TemplateApprovalStatus
+  }
+
+  export type EnumTemplateCategoryFieldUpdateOperationsInput = {
+    set?: $Enums.TemplateCategory
+  }
+
+  export type EnumTemplateLanguageFieldUpdateOperationsInput = {
+    set?: $Enums.TemplateLanguage
+  }
+
+  export type UserUpdateOneRequiredWithoutWabaTemplatesNestedInput = {
+    create?: XOR<UserCreateWithoutWabaTemplatesInput, UserUncheckedCreateWithoutWabaTemplatesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutWabaTemplatesInput
+    upsert?: UserUpsertWithoutWabaTemplatesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutWabaTemplatesInput, UserUpdateWithoutWabaTemplatesInput>, UserUncheckedUpdateWithoutWabaTemplatesInput>
   }
 
   export type UserCreateNestedOneWithoutSessionsInput = {
@@ -24520,6 +26235,80 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedEnumTemplateApprovalStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateApprovalStatus | EnumTemplateApprovalStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateApprovalStatus[] | ListEnumTemplateApprovalStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateApprovalStatus[] | ListEnumTemplateApprovalStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateApprovalStatusFilter<$PrismaModel> | $Enums.TemplateApprovalStatus
+  }
+
+  export type NestedEnumTemplateCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateCategory | EnumTemplateCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateCategory[] | ListEnumTemplateCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateCategory[] | ListEnumTemplateCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateCategoryFilter<$PrismaModel> | $Enums.TemplateCategory
+  }
+
+  export type NestedEnumTemplateLanguageFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateLanguage | EnumTemplateLanguageFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateLanguage[] | ListEnumTemplateLanguageFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateLanguage[] | ListEnumTemplateLanguageFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateLanguageFilter<$PrismaModel> | $Enums.TemplateLanguage
+  }
+
+  export type NestedEnumTemplateApprovalStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateApprovalStatus | EnumTemplateApprovalStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateApprovalStatus[] | ListEnumTemplateApprovalStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateApprovalStatus[] | ListEnumTemplateApprovalStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateApprovalStatusWithAggregatesFilter<$PrismaModel> | $Enums.TemplateApprovalStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTemplateApprovalStatusFilter<$PrismaModel>
+    _max?: NestedEnumTemplateApprovalStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTemplateCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateCategory | EnumTemplateCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateCategory[] | ListEnumTemplateCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateCategory[] | ListEnumTemplateCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateCategoryWithAggregatesFilter<$PrismaModel> | $Enums.TemplateCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTemplateCategoryFilter<$PrismaModel>
+    _max?: NestedEnumTemplateCategoryFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTemplateLanguageWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateLanguage | EnumTemplateLanguageFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateLanguage[] | ListEnumTemplateLanguageFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateLanguage[] | ListEnumTemplateLanguageFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateLanguageWithAggregatesFilter<$PrismaModel> | $Enums.TemplateLanguage
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTemplateLanguageFilter<$PrismaModel>
+    _max?: NestedEnumTemplateLanguageFilter<$PrismaModel>
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
   export type NestedEnumPaymentMethodFilter<$PrismaModel = never> = {
     equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel>
     in?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel>
@@ -24718,29 +26507,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumMessageTypeFilter<$PrismaModel>
     _max?: NestedEnumMessageTypeFilter<$PrismaModel>
-  }
-  export type NestedJsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NestedEnumMessageDirectionWithAggregatesFilter<$PrismaModel = never> = {
@@ -25033,6 +26799,42 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type WabaTemplateCreateWithoutUserInput = {
+    id?: string
+    name: string
+    status: $Enums.TemplateApprovalStatus
+    category: $Enums.TemplateCategory
+    language?: $Enums.TemplateLanguage
+    components: JsonNullValueInput | InputJsonValue
+    wabaAccountId: string
+    rejectedReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WabaTemplateUncheckedCreateWithoutUserInput = {
+    id?: string
+    name: string
+    status: $Enums.TemplateApprovalStatus
+    category: $Enums.TemplateCategory
+    language?: $Enums.TemplateLanguage
+    components: JsonNullValueInput | InputJsonValue
+    wabaAccountId: string
+    rejectedReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WabaTemplateCreateOrConnectWithoutUserInput = {
+    where: WabaTemplateWhereUniqueInput
+    create: XOR<WabaTemplateCreateWithoutUserInput, WabaTemplateUncheckedCreateWithoutUserInput>
+  }
+
+  export type WabaTemplateCreateManyUserInputEnvelope = {
+    data: WabaTemplateCreateManyUserInput | WabaTemplateCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AutoReplyRuleUpsertWithWhereUniqueWithoutUserInput = {
     where: AutoReplyRuleWhereUniqueInput
     update: XOR<AutoReplyRuleUpdateWithoutUserInput, AutoReplyRuleUncheckedUpdateWithoutUserInput>
@@ -25253,6 +27055,151 @@ export namespace Prisma {
     expires?: DateTimeFilter<"Session"> | Date | string
   }
 
+  export type WabaTemplateUpsertWithWhereUniqueWithoutUserInput = {
+    where: WabaTemplateWhereUniqueInput
+    update: XOR<WabaTemplateUpdateWithoutUserInput, WabaTemplateUncheckedUpdateWithoutUserInput>
+    create: XOR<WabaTemplateCreateWithoutUserInput, WabaTemplateUncheckedCreateWithoutUserInput>
+  }
+
+  export type WabaTemplateUpdateWithWhereUniqueWithoutUserInput = {
+    where: WabaTemplateWhereUniqueInput
+    data: XOR<WabaTemplateUpdateWithoutUserInput, WabaTemplateUncheckedUpdateWithoutUserInput>
+  }
+
+  export type WabaTemplateUpdateManyWithWhereWithoutUserInput = {
+    where: WabaTemplateScalarWhereInput
+    data: XOR<WabaTemplateUpdateManyMutationInput, WabaTemplateUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type WabaTemplateScalarWhereInput = {
+    AND?: WabaTemplateScalarWhereInput | WabaTemplateScalarWhereInput[]
+    OR?: WabaTemplateScalarWhereInput[]
+    NOT?: WabaTemplateScalarWhereInput | WabaTemplateScalarWhereInput[]
+    id?: StringFilter<"WabaTemplate"> | string
+    name?: StringFilter<"WabaTemplate"> | string
+    status?: EnumTemplateApprovalStatusFilter<"WabaTemplate"> | $Enums.TemplateApprovalStatus
+    category?: EnumTemplateCategoryFilter<"WabaTemplate"> | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFilter<"WabaTemplate"> | $Enums.TemplateLanguage
+    components?: JsonFilter<"WabaTemplate">
+    wabaAccountId?: StringFilter<"WabaTemplate"> | string
+    rejectedReason?: StringNullableFilter<"WabaTemplate"> | string | null
+    userId?: StringFilter<"WabaTemplate"> | string
+    createdAt?: DateTimeFilter<"WabaTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"WabaTemplate"> | Date | string
+  }
+
+  export type UserCreateWithoutWabaTemplatesInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    tel?: string | null
+    telVerified?: Date | string | null
+    image?: string | null
+    password?: string | null
+    role?: $Enums.UserRole
+    status?: $Enums.UserStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
+    autoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    phoneNumbers?: PhoneNumberCreateNestedManyWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutWabaTemplatesInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    tel?: string | null
+    telVerified?: Date | string | null
+    image?: string | null
+    password?: string | null
+    role?: $Enums.UserRole
+    status?: $Enums.UserStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
+    autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    phoneNumbers?: PhoneNumberUncheckedCreateNestedManyWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutWabaTemplatesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutWabaTemplatesInput, UserUncheckedCreateWithoutWabaTemplatesInput>
+  }
+
+  export type UserUpsertWithoutWabaTemplatesInput = {
+    update: XOR<UserUpdateWithoutWabaTemplatesInput, UserUncheckedUpdateWithoutWabaTemplatesInput>
+    create: XOR<UserCreateWithoutWabaTemplatesInput, UserUncheckedCreateWithoutWabaTemplatesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutWabaTemplatesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutWabaTemplatesInput, UserUncheckedUpdateWithoutWabaTemplatesInput>
+  }
+
+  export type UserUpdateWithoutWabaTemplatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tel?: NullableStringFieldUpdateOperationsInput | string | null
+    telVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    autoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    phoneNumbers?: PhoneNumberUpdateManyWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutWabaTemplatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tel?: NullableStringFieldUpdateOperationsInput | string | null
+    telVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    phoneNumbers?: PhoneNumberUncheckedUpdateManyWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
   export type UserCreateWithoutSessionsInput = {
     id?: string
     name?: string | null
@@ -25268,12 +27215,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
     phoneNumbers?: PhoneNumberCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -25291,12 +27239,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     phoneNumbers?: PhoneNumberUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -25330,12 +27279,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
     phoneNumbers?: PhoneNumberUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -25353,12 +27303,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     phoneNumbers?: PhoneNumberUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type PaymentCreateWithoutSubscriptionInput = {
@@ -25441,12 +27392,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
     phoneNumbers?: PhoneNumberCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionsInput = {
@@ -25464,12 +27416,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     phoneNumbers?: PhoneNumberUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionsInput = {
@@ -25573,12 +27526,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
     phoneNumbers?: PhoneNumberUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionsInput = {
@@ -25596,12 +27550,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     phoneNumbers?: PhoneNumberUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionCreateWithoutPaymentsInput = {
@@ -25979,12 +27934,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPhoneNumbersInput = {
@@ -26002,12 +27958,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPhoneNumbersInput = {
@@ -26057,12 +28014,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPhoneNumbersInput = {
@@ -26080,12 +28038,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutContactsInput = {
@@ -26103,12 +28062,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
     phoneNumbers?: PhoneNumberCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactsInput = {
@@ -26126,12 +28086,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     phoneNumbers?: PhoneNumberUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactsInput = {
@@ -26203,12 +28164,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
     phoneNumbers?: PhoneNumberUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactsInput = {
@@ -26226,12 +28188,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     phoneNumbers?: PhoneNumberUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type MessageUpsertWithWhereUniqueWithoutContactInput = {
@@ -26327,12 +28290,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     phoneNumbers?: PhoneNumberCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMessagesInput = {
@@ -26350,12 +28314,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     phoneNumbers?: PhoneNumberUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMessagesInput = {
@@ -26463,12 +28428,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     phoneNumbers?: PhoneNumberUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -26486,12 +28452,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     phoneNumbers?: PhoneNumberUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAutoReplyRulesInput = {
@@ -26515,6 +28482,7 @@ export namespace Prisma {
     phoneNumbers?: PhoneNumberCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAutoReplyRulesInput = {
@@ -26538,6 +28506,7 @@ export namespace Prisma {
     phoneNumbers?: PhoneNumberUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAutoReplyRulesInput = {
@@ -26577,6 +28546,7 @@ export namespace Prisma {
     phoneNumbers?: PhoneNumberUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAutoReplyRulesInput = {
@@ -26600,6 +28570,7 @@ export namespace Prisma {
     phoneNumbers?: PhoneNumberUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -26617,12 +28588,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
     phoneNumbers?: PhoneNumberCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -26640,12 +28612,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     resetToken?: string | null
     resetTokenExpiry?: Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
+    autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     phoneNumbers?: PhoneNumberUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -26679,12 +28652,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
     phoneNumbers?: PhoneNumberUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -26702,12 +28676,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resetToken?: NullableStringFieldUpdateOperationsInput | string | null
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    AutoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
+    autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     phoneNumbers?: PhoneNumberUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type AutoReplyRuleCreateManyUserInput = {
@@ -26788,6 +28763,19 @@ export namespace Prisma {
     id?: string
     sessionToken: string
     expires: Date | string
+  }
+
+  export type WabaTemplateCreateManyUserInput = {
+    id?: string
+    name: string
+    status: $Enums.TemplateApprovalStatus
+    category: $Enums.TemplateCategory
+    language?: $Enums.TemplateLanguage
+    components: JsonNullValueInput | InputJsonValue
+    wabaAccountId: string
+    rejectedReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type AutoReplyRuleUpdateWithoutUserInput = {
@@ -27034,6 +29022,45 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     sessionToken?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WabaTemplateUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    status?: EnumTemplateApprovalStatusFieldUpdateOperationsInput | $Enums.TemplateApprovalStatus
+    category?: EnumTemplateCategoryFieldUpdateOperationsInput | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFieldUpdateOperationsInput | $Enums.TemplateLanguage
+    components?: JsonNullValueInput | InputJsonValue
+    wabaAccountId?: StringFieldUpdateOperationsInput | string
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WabaTemplateUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    status?: EnumTemplateApprovalStatusFieldUpdateOperationsInput | $Enums.TemplateApprovalStatus
+    category?: EnumTemplateCategoryFieldUpdateOperationsInput | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFieldUpdateOperationsInput | $Enums.TemplateLanguage
+    components?: JsonNullValueInput | InputJsonValue
+    wabaAccountId?: StringFieldUpdateOperationsInput | string
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WabaTemplateUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    status?: EnumTemplateApprovalStatusFieldUpdateOperationsInput | $Enums.TemplateApprovalStatus
+    category?: EnumTemplateCategoryFieldUpdateOperationsInput | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFieldUpdateOperationsInput | $Enums.TemplateLanguage
+    components?: JsonNullValueInput | InputJsonValue
+    wabaAccountId?: StringFieldUpdateOperationsInput | string
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PaymentCreateManySubscriptionInput = {

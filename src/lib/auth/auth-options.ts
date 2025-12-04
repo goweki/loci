@@ -145,21 +145,22 @@ export const authOptions: NextAuthOptions = {
      */
     async signIn({ user, account, profile }) {
       console.log(
-        "SIGN IN ATTEMPT",
-        `user-${JSON.stringify(user)}`,
-        `account-${JSON.stringify(account)}`,
-        `profile-${JSON.stringify(profile)}`
+        "SIGN IN ATTEMPT....",
+        ` >> user.email - ${user.email}`,
+        ` >> account.provider - ${account?.provider}`,
+        ` >> profile.email - ${profile?.email}`
       );
 
       try {
         if (account?.provider === "google" && profile?.email) {
+          const userEmail_ = profile?.email;
           // 1️⃣ Find or create local user
           let localUser: Partial<User & { id: string }> | null =
-            await getUserByEmail(profile.email);
+            await getUserByEmail(userEmail_);
 
           if (!localUser) {
             localUser = await createUser({
-              email: profile.email,
+              email: userEmail_,
               name: profile.name ?? "",
               image: profile.image ?? null,
             });

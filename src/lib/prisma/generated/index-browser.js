@@ -137,6 +137,20 @@ exports.Prisma.UserScalarFieldEnum = {
   resetTokenExpiry: 'resetTokenExpiry'
 };
 
+exports.Prisma.WabaTemplateScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  status: 'status',
+  category: 'category',
+  language: 'language',
+  components: 'components',
+  wabaAccountId: 'wabaAccountId',
+  rejectedReason: 'rejectedReason',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SessionScalarFieldEnum = {
   id: 'id',
   sessionToken: 'sessionToken',
@@ -327,6 +341,23 @@ exports.UserStatus = exports.$Enums.UserStatus = {
   INACTIVE: 'INACTIVE'
 };
 
+exports.TemplateApprovalStatus = exports.$Enums.TemplateApprovalStatus = {
+  APPROVED: 'APPROVED',
+  PENDING: 'PENDING',
+  REJECTED: 'REJECTED',
+  DISABLED: 'DISABLED'
+};
+
+exports.TemplateCategory = exports.$Enums.TemplateCategory = {
+  MARKETING: 'MARKETING',
+  UTILITY: 'UTILITY',
+  AUTHENTICATION: 'AUTHENTICATION'
+};
+
+exports.TemplateLanguage = exports.$Enums.TemplateLanguage = {
+  en_US: 'en_US'
+};
+
 exports.PaymentMethod = exports.$Enums.PaymentMethod = {
   ONLINE: 'ONLINE',
   OTHER: 'OTHER',
@@ -404,6 +435,7 @@ exports.AccountType = exports.$Enums.AccountType = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  WabaTemplate: 'WabaTemplate',
   Session: 'Session',
   VerificationToken: 'VerificationToken',
   Subscription: 'Subscription',

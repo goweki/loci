@@ -22,7 +22,7 @@ model User {
   updatedAt        DateTime        @updatedAt
   resetToken       String?
   resetTokenExpiry DateTime?
-  AutoReplyRules   AutoReplyRule[]
+  autoReplyRules   AutoReplyRule[]
   accounts         Account[]
   contacts         Contact[]
   messages         Message[]
@@ -30,8 +30,53 @@ model User {
   subscriptions    Subscription[]
   sessions         Session[]
 
+  wabaTemplates WabaTemplate[]
+
   @@map("users")
 }
+
+model WabaTemplate {
+  id             String                 @id @default(cuid())
+  name           String
+  status         TemplateApprovalStatus
+  category       TemplateCategory
+  language       TemplateLanguage       @default(en_US)
+  components     Json
+  wabaAccountId  String
+  rejectedReason String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([wabaAccountId])
+  @@index([status])
+  @@index([category])
+  @@map("waba_templates")
+}
+
+enum TemplateLanguage {
+  en_US
+}
+
+enum TemplateCategory {
+  MARKETING
+  UTILITY
+  AUTHENTICATION
+}
+
+enum TemplateApprovalStatus {
+  APPROVED
+  PENDING
+  REJECTED
+  DISABLED
+
+  @@map("TemplateApprovalStatus")
+}
+
+// 
 
 model Session {
   id           String   @id @default(cuid())

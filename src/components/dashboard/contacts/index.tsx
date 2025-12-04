@@ -148,7 +148,7 @@ export default function ContactsComponent({
   };
 
   return (
-    <div className="h-screen overflow-y-auto p-6">
+    <main className="h-screen overflow-y-auto p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -667,6 +667,6 @@ export default function ContactsComponent({
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }
