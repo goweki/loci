@@ -50,11 +50,13 @@ export async function getPhoneNumberByNumber(phoneNumber: string) {
  */
 export async function getPhoneNumbersByUser(
   userId: string
-): Promise<Prisma.PhoneNumberGetPayload<{ include: { messages: true } }>[]> {
+): Promise<
+  Prisma.PhoneNumberGetPayload<{ include: { messages: true; waba: true } }>[]
+> {
   return prisma.phoneNumber.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
-    include: { messages: true },
+    include: { messages: true, waba: true },
   });
 }
 

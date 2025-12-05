@@ -137,6 +137,13 @@ exports.Prisma.UserScalarFieldEnum = {
   resetTokenExpiry: 'resetTokenExpiry'
 };
 
+exports.Prisma.WabaAccountScalarFieldEnum = {
+  userId: 'userId',
+  businessId: 'businessId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.WabaTemplateScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -144,9 +151,9 @@ exports.Prisma.WabaTemplateScalarFieldEnum = {
   category: 'category',
   language: 'language',
   components: 'components',
-  wabaAccountId: 'wabaAccountId',
   rejectedReason: 'rejectedReason',
-  userId: 'userId',
+  wabaId: 'wabaId',
+  createdById: 'createdById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -158,10 +165,14 @@ exports.Prisma.SessionScalarFieldEnum = {
   expires: 'expires'
 };
 
-exports.Prisma.VerificationTokenScalarFieldEnum = {
-  identifier: 'identifier',
+exports.Prisma.TokenScalarFieldEnum = {
+  id: 'id',
   token: 'token',
-  expires: 'expires'
+  expires: 'expires',
+  channel: 'channel',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  lastUsedAt: 'lastUsedAt'
 };
 
 exports.Prisma.SubscriptionScalarFieldEnum = {
@@ -221,15 +232,14 @@ exports.Prisma.PhoneNumberScalarFieldEnum = {
   id: 'id',
   phoneNumberId: 'phoneNumberId',
   phoneNumber: 'phoneNumber',
-  userId: 'userId',
   displayName: 'displayName',
   preVerificationId: 'preVerificationId',
   preVerificationCode: 'preVerificationCode',
-  wabaId: 'wabaId',
   status: 'status',
   verifiedAt: 'verifiedAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  userId: 'userId'
 };
 
 exports.Prisma.ContactScalarFieldEnum = {
@@ -271,7 +281,7 @@ exports.Prisma.MessageUnprocessedScalarFieldEnum = {
 
 exports.Prisma.AutoReplyRuleScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
+  phoneNumberId: 'phoneNumberId',
   name: 'name',
   triggerType: 'triggerType',
   triggerValue: 'triggerValue',
@@ -280,7 +290,8 @@ exports.Prisma.AutoReplyRuleScalarFieldEnum = {
   priority: 'priority',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  active: 'active'
+  active: 'active',
+  createdById: 'createdById'
 };
 
 exports.Prisma.WebhookEventScalarFieldEnum = {
@@ -349,13 +360,18 @@ exports.TemplateApprovalStatus = exports.$Enums.TemplateApprovalStatus = {
 };
 
 exports.TemplateCategory = exports.$Enums.TemplateCategory = {
-  MARKETING: 'MARKETING',
+  AUTHENTICATION: 'AUTHENTICATION',
   UTILITY: 'UTILITY',
-  AUTHENTICATION: 'AUTHENTICATION'
+  MARKETING: 'MARKETING'
 };
 
 exports.TemplateLanguage = exports.$Enums.TemplateLanguage = {
   en_US: 'en_US'
+};
+
+exports.VerificationChannel = exports.$Enums.VerificationChannel = {
+  EMAIL: 'EMAIL',
+  WHATSAPP: 'WHATSAPP'
 };
 
 exports.PaymentMethod = exports.$Enums.PaymentMethod = {
@@ -435,9 +451,10 @@ exports.AccountType = exports.$Enums.AccountType = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  WabaAccount: 'WabaAccount',
   WabaTemplate: 'WabaTemplate',
   Session: 'Session',
-  VerificationToken: 'VerificationToken',
+  Token: 'Token',
   Subscription: 'Subscription',
   Payment: 'Payment',
   Plan: 'Plan',

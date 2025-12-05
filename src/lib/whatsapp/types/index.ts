@@ -1,5 +1,10 @@
 // lib/whatsapp/types.ts
 
+import {
+  TemplateApprovalStatus,
+  TemplateCategory,
+} from "@/lib/prisma/generated";
+
 export * from "./inbound-webhook";
 export * from "./outbound-message";
 
@@ -30,17 +35,17 @@ export interface WhatsAppSendMessageResponse {
 // ------------------------------
 // PHONE NUMBERS
 // ------------------------------
-export interface WhatsAppPhoneNumber {
+export interface WabaPhoneBumber {
   verified_name: string;
   display_phone_number: string;
   id: string;
 }
 
-export interface WhatsAppPhoneNumberListResponse {
-  data: WhatsAppPhoneNumber[];
+export interface WabaPhoneNumberListResponse {
+  data: WabaPhoneBumber[];
 }
 
-export interface WhatsAppPhoneNumberDetailsResponse {
+export interface WabaPhoneNumberDetailsResponse {
   verified_name: string;
   display_phone_number: string;
   quality_rating?: string;
@@ -50,18 +55,18 @@ export interface WhatsAppPhoneNumberDetailsResponse {
 // ------------------------------
 // PHONE NUMBER VERIFICATION
 // ------------------------------
-export interface WhatsAppRequestCodeResponse {
+export interface WabaRequestCodeResponse {
   success: boolean;
 }
 
-export interface WhatsAppVerifyCodeResponse {
+export interface WabaVerifyCodeResponse {
   success: boolean;
 }
 
 // ------------------------------
 // MESSAGE READ RECEIPTS
 // ------------------------------
-export interface WhatsAppMarkReadResponse {
+export interface WabaMarkReadResponse {
   success?: boolean;
   error?: WhatsAppAPIError;
 }
@@ -69,69 +74,81 @@ export interface WhatsAppMarkReadResponse {
 // ------------------------------
 // TEMPLATES
 // ------------------------------
-export interface WhatsAppTemplateComponentButton {
-  type: "QUICK_REPLY" | "URL" | "PHONE_NUMBER";
+export type WabaTemplateComponentButtonType =
+  | "QUICK_REPLY"
+  | "URL"
+  | "PHONE_NUMBER";
+
+export interface WabaTemplateComponentButton {
+  type: WabaTemplateComponentButtonType;
   text: string;
   url?: string;
   phone_number?: string;
 }
 
-export interface WhatsAppTemplateComponent {
-  type: "header" | "body" | "footer" | "buttons";
+export type WabaTemplateComponentType =
+  | "HEADER"
+  | "BODY"
+  | "FOOTER"
+  | "BUTTONS";
+
+export type WabaTemplateComponentFormat =
+  | "TEXT"
+  | "IMAGE"
+  | "VIDEO"
+  | "DOCUMENT";
+
+export interface WabaTemplateComponent {
+  type: WabaTemplateComponentType;
   text?: string;
-  format?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT";
-  buttons?: WhatsAppTemplateComponentButton[];
+  format?: WabaTemplateComponentFormat;
+  buttons?: WabaTemplateComponentButton[];
 }
 
-export interface WhatsAppTemplate {
+export interface WabaTemplate {
   name: string;
-  category: "MARKETING" | "UTILITY" | "AUTHENTICATION";
+  category: TemplateCategory;
   language: {
     code: string; // e.g. "en_US"
   };
-  status: "pending" | "approved" | "rejected";
-  components: WhatsAppTemplateComponent[];
+  status: TemplateApprovalStatus;
+  components: WabaTemplateComponent[];
 }
 
-export interface WhatsAppTemplateListResponse {
-  data: WhatsAppTemplate[];
-}
-
-export interface WhatsAppTemplateCreateRequest {
+export interface WabaTemplateCreateRequest {
   name: string;
   language: string; // e.g. "en_US"
-  category: "MARKETING" | "UTILITY" | "AUTHENTICATION";
-  components: WhatsAppTemplateComponent[];
+  category: TemplateCategory;
+  components: WabaTemplateComponent[];
 }
 
-export interface WhatsAppTemplateCreateResponse {
-  success?: boolean;
-  id?: string;
-  error?: WhatsAppAPIError;
+export interface WabaTemplateCreateResponse {
+  id: string;
+  status: TemplateApprovalStatus;
+  category: TemplateCategory;
 }
 
-export interface WhatsAppTemplateDeleteResponse {
-  success?: boolean;
-  error?: WhatsAppAPIError;
+export interface WabaTemplateDeleteResponse {
+  success: boolean;
 }
 
 // ------------------------------
 // MEDIA
 // ------------------------------
-export interface WhatsAppUploadMediaResponse {
+export interface WabaUploadMediaResponse {
   id: string;
 }
 
-export interface WhatsAppMediaUrlResponse {
+export interface WabaMediaUrlResponse {
   url: string;
   mime_type: string;
 }
 
-export type WhatsAppMediaDownloadResponse = ArrayBuffer;
+export type WabaMediaDownloadResponse = ArrayBuffer;
 
 // ------------------------------
 // SUBSCRIPTIONS
 // ------------------------------
-export interface WhatsAppSubscribedAppsResponse {
+export interface WabaSubscribedAppsResponse {
   data: Array<{ id: string; name: string }>;
 }

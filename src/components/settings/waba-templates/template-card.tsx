@@ -40,9 +40,9 @@ export function TemplateCard({ template }: TemplateCardProps) {
   };
 
   const categoryColors: Record<string, string> = {
-    MARKETING: "bg-purple-100 text-purple-800",
-    UTILITY: "bg-blue-100 text-blue-800",
-    AUTHENTICATION: "bg-indigo-100 text-indigo-800",
+    marketing: "bg-purple-100 text-purple-800",
+    utility: "bg-blue-100 text-blue-800",
+    authentication: "bg-indigo-100 text-indigo-800",
   };
 
   const components = (template.components as unknown as ComponentType[]) || [];

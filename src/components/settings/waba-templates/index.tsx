@@ -2,18 +2,20 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { WabaTemplate } from "@/lib/prisma/generated";
+import type {
+  TemplateApprovalStatus,
+  TemplateCategory,
+  WabaTemplate,
+} from "@/lib/prisma/generated";
 import { TemplateCard } from "./template-card";
 import { TemplateFilters } from "./template-filters";
 import { CreateTemplateButton } from "./create-template-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useSession } from "next-auth/react";
 
 interface TemplatesClientProps {
   initialTemplates: WabaTemplate[];
 }
-
-export type TemplateStatus = "APPROVED" | "PENDING" | "REJECTED" | "DISABLED";
-export type TemplateCategory = "MARKETING" | "UTILITY" | "AUTHENTICATION";
 
 interface StatCardProps {
   label: string;
@@ -46,11 +48,12 @@ function StatCard({ label, value, color }: StatCardProps) {
 }
 
 export function TemplatesClient({ initialTemplates }: TemplatesClientProps) {
+  const { data: session } = useSession();
   const [templates] = useState<WabaTemplate[]>(initialTemplates);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<TemplateStatus | "ALL">(
-    "ALL"
-  );
+  const [statusFilter, setStatusFilter] = useState<
+    TemplateApprovalStatus | "ALL"
+  >("ALL");
   const [categoryFilter, setCategoryFilter] = useState<
     TemplateCategory | "ALL"
   >("ALL");
@@ -79,6 +82,8 @@ export function TemplatesClient({ initialTemplates }: TemplatesClientProps) {
       rejected: templates.filter((t) => t.status === "REJECTED").length,
     };
   }, [templates]);
+
+  if (!session?.user) return;
 
   return (
     <div className="space-y-6">

@@ -1,30 +1,31 @@
 // lib/services/template-sync.service.ts
 
+"use server";
+
 import { WabaTemplateRepository } from "@/data/repositories/waba-template";
-import type {
+
+import {
   WabaTemplate,
   TemplateApprovalStatus,
+  TemplateCategory,
 } from "@/lib/prisma/generated";
-import {
-  WabaApiService,
-  createWabaApiService,
-  type MetaTemplate,
-  type CreateTemplateInput,
-} from "./template-endpoint";
+import type { WhatsAppClient } from "./client";
+import whatsapp from "..";
+import { WabaTemplateCreateRequest } from "../types";
 
 /**
  * Service that syncs templates between Meta's API and our database
  * Combines WabaApiService (external API) with WabaTemplateRepository (database)
  */
 export class TemplateSyncService {
-  private apiService: WabaApiService;
+  private WaClient: WhatsAppClient;
   private userId: string;
   private wabaAccountId: string;
 
   constructor(userId: string, wabaAccountId: string) {
     this.userId = userId;
     this.wabaAccountId = wabaAccountId;
-    this.apiService = createWabaApiService(wabaAccountId);
+    this.WaClient = whatsapp;
   }
 
   /**
@@ -44,7 +45,7 @@ export class TemplateSyncService {
 
     try {
       // Fetch all templates from Meta
-      const metaTemplates = await this.apiService.getAllTemplates();
+      const metaTemplates = await this.WaClient.getTemplates();
 
       for (const metaTemplate of metaTemplates) {
         try {
@@ -64,7 +65,10 @@ export class TemplateSyncService {
             await WabaTemplateRepository.update(existingTemplate.id, {
               status: metaTemplate.status as TemplateApprovalStatus,
               components: metaTemplate.components as any,
-              rejectedReason: metaTemplate.rejected_reason || null,
+              rejectedReason:
+                metaTemplate.status == TemplateApprovalStatus.REJECTED
+                  ? "template rejected - shrug"
+                  : null,
               language: metaTemplate.language as any,
               category: metaTemplate.category,
             });
@@ -77,9 +81,12 @@ export class TemplateSyncService {
               category: metaTemplate.category,
               language: metaTemplate.language as any,
               components: metaTemplate.components as any,
-              wabaAccountId: this.wabaAccountId,
-              userId: this.userId,
-              rejectedReason: metaTemplate.rejected_reason || null,
+              wabaId: this.wabaAccountId,
+              createdById: this.userId,
+              rejectedReason:
+                metaTemplate.status == TemplateApprovalStatus.REJECTED
+                  ? "template rejected - shrug"
+                  : null,
             });
             result.created++;
           }
@@ -101,19 +108,19 @@ export class TemplateSyncService {
   /**
    * Create a template in Meta and save to database
    */
-  async createTemplate(input: CreateTemplateInput): Promise<WabaTemplate> {
+  async createTemplate(data: WabaTemplateCreateRequest): Promise<WabaTemplate> {
     // Create in Meta first
-    const metaResponse = await this.apiService.createTemplate(input);
+    const metaResponse = await this.WaClient.createTemplate(data);
 
     // Save to database
     const template = await WabaTemplateRepository.create({
-      name: input.name,
+      name: data.name,
       status: metaResponse.status as TemplateApprovalStatus,
       category: metaResponse.category,
-      language: input.language as any,
-      components: input.components as any,
-      wabaAccountId: this.wabaAccountId,
-      userId: this.userId,
+      language: data.language as any,
+      components: data.components as any,
+      wabaId: this.wabaAccountId,
+      createdById: this.userId,
     });
 
     return template;
@@ -134,7 +141,7 @@ export class TemplateSyncService {
     }
 
     // Delete from Meta
-    await this.apiService.deleteTemplateByName(template.name);
+    await this.WaClient.deleteTemplate(template.name);
 
     // Delete from database
     await WabaTemplateRepository.delete(templateId);
@@ -155,7 +162,7 @@ export class TemplateSyncService {
     }
 
     // Fetch latest status from Meta
-    const metaTemplate = await this.apiService.getTemplateByName(template.name);
+    const metaTemplate = await this.WaClient.getTemplateByName(template.name);
 
     if (!metaTemplate) {
       throw new Error("Template not found in Meta");
@@ -164,7 +171,10 @@ export class TemplateSyncService {
     // Update database with latest status
     const updated = await WabaTemplateRepository.update(templateId, {
       status: metaTemplate.status as TemplateApprovalStatus,
-      rejectedReason: metaTemplate.rejected_reason || null,
+      rejectedReason:
+        metaTemplate.status == TemplateApprovalStatus.REJECTED
+          ? "template rejected - shrug"
+          : null,
     });
 
     return updated;
@@ -195,7 +205,7 @@ export class TemplateSyncService {
         userId: this.userId,
         wabaAccountId: this.wabaAccountId,
       }),
-      this.apiService.getAllTemplates(),
+      this.WaClient.getTemplates(),
     ]);
 
     const localNames = new Set(localTemplates.map((t) => t.name));
@@ -260,7 +270,7 @@ export async function syncUserTemplates(userId: string, wabaAccountId: string) {
 export async function createUserTemplate(
   userId: string,
   wabaAccountId: string,
-  input: CreateTemplateInput
+  input: WabaTemplateCreateRequest
 ) {
   const syncService = createTemplateSyncService(userId, wabaAccountId);
   return syncService.createTemplate(input);

@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 
-import type {
+import {
   Prisma,
   WabaTemplate,
   TemplateApprovalStatus,
@@ -66,11 +66,11 @@ export class WabaTemplateRepository {
   static async findByIdAndUserId(
     id: string,
     userId: string
-  ): Promise<WabaTemplate | null> {
+  ): Promise<Prisma.WabaTemplateGetPayload<{ include: {} }> | null> {
     return prisma.wabaTemplate.findFirst({
       where: {
         id,
-        userId,
+        createdById: userId,
       },
     });
   }
@@ -129,9 +129,11 @@ export class WabaTemplateRepository {
   /**
    * Find all templates by user ID
    */
-  static async findByUserId(userId: string): Promise<WabaTemplate[]> {
+  static async findByUserId(
+    userId: string
+  ): Promise<Prisma.WabaTemplateGetPayload<{}>[]> {
     return prisma.wabaTemplate.findMany({
-      where: { userId },
+      where: { createdById: userId },
       orderBy: { createdAt: "desc" },
     });
   }
@@ -139,11 +141,9 @@ export class WabaTemplateRepository {
   /**
    * Find all templates by WABA account ID
    */
-  static async findByWabaAccountId(
-    wabaAccountId: string
-  ): Promise<WabaTemplate[]> {
+  static async findByWabaAccountId(wabaId: string): Promise<WabaTemplate[]> {
     return prisma.wabaTemplate.findMany({
-      where: { wabaAccountId },
+      where: { wabaId },
       orderBy: { createdAt: "desc" },
     });
   }
@@ -185,11 +185,11 @@ export class WabaTemplateRepository {
    */
   static async update(
     id: string,
-    input: Prisma.WabaTemplateUpdateInput
+    data: Prisma.WabaTemplateUpdateInput
   ): Promise<WabaTemplate> {
     return prisma.wabaTemplate.update({
       where: { id },
-      data: input,
+      data: data,
     });
   }
 
@@ -245,7 +245,7 @@ export class WabaTemplateRepository {
    */
   static async deleteByUserId(userId: string): Promise<{ count: number }> {
     return prisma.wabaTemplate.deleteMany({
-      where: { userId },
+      where: { createdById: userId },
     });
   }
 
@@ -262,18 +262,18 @@ export class WabaTemplateRepository {
    */
   static async getStatsByUserId(userId: string) {
     const [total, approved, pending, rejected, disabled] = await Promise.all([
-      prisma.wabaTemplate.count({ where: { userId } }),
+      prisma.wabaTemplate.count({ where: { createdById: userId } }),
       prisma.wabaTemplate.count({
-        where: { userId, status: "APPROVED" },
+        where: { createdById: userId, status: "APPROVED" },
       }),
       prisma.wabaTemplate.count({
-        where: { userId, status: "PENDING" },
+        where: { createdById: userId, status: "PENDING" },
       }),
       prisma.wabaTemplate.count({
-        where: { userId, status: "REJECTED" },
+        where: { createdById: userId, status: "REJECTED" },
       }),
       prisma.wabaTemplate.count({
-        where: { userId, status: "DISABLED" },
+        where: { createdById: userId, status: "DISABLED" },
       }),
     ]);
 
@@ -294,13 +294,16 @@ export class WabaTemplateRepository {
   static async getStatsByCategoryForUser(userId: string) {
     const [marketing, utility, authentication] = await Promise.all([
       prisma.wabaTemplate.count({
-        where: { userId, category: "MARKETING" },
+        where: { createdById: userId, category: TemplateCategory.MARKETING },
       }),
       prisma.wabaTemplate.count({
-        where: { userId, category: "UTILITY" },
+        where: { createdById: userId, category: TemplateCategory.UTILITY },
       }),
       prisma.wabaTemplate.count({
-        where: { userId, category: "AUTHENTICATION" },
+        where: {
+          createdById: userId,
+          category: TemplateCategory.AUTHENTICATION,
+        },
       }),
     ]);
 
@@ -324,7 +327,7 @@ export class WabaTemplateRepository {
     const count = await prisma.wabaTemplate.count({
       where: {
         name,
-        userId,
+        createdById: userId,
         ...(excludeId && { id: { not: excludeId } }),
       },
     });
@@ -377,11 +380,11 @@ export class WabaTemplateRepository {
     const where: Prisma.WabaTemplateWhereInput = {};
 
     if (filters.userId) {
-      where.userId = filters.userId;
+      where.createdById = filters.userId;
     }
 
     if (filters.wabaAccountId) {
-      where.wabaAccountId = filters.wabaAccountId;
+      where.wabaId = filters.wabaAccountId;
     }
 
     if (filters.status) {

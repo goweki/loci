@@ -1,3 +1,5 @@
+// lib/services/waba-qr.service.ts
+
 export class WhatsAppQrService {
   private baseUrl: string;
 

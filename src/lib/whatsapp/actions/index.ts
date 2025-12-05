@@ -11,7 +11,7 @@ import {
   PhoneNumber,
   PhoneNumberStatus,
 } from "@/lib/prisma/generated";
-import { InboundMessage, WhatsAppPhoneNumberDetailsResponse } from "../types";
+import { InboundMessage, WabaPhoneNumberDetailsResponse } from "../types";
 import { Message } from "../../validations";
 import { createPhoneNumber } from "@/data/phoneNumber";
 import { getAdminUsers, getUserByPhoneNumberId } from "@/data/user";
@@ -76,7 +76,7 @@ export async function processIncomingMessage(
         `No user assigned the phoneNumberId:${phoneNumberId}, assigning it to admin...`
       );
 
-      const phoneNumberDetails: WhatsAppPhoneNumberDetailsResponse =
+      const phoneNumberDetails: WabaPhoneNumberDetailsResponse =
         await whatsapp.getPhoneNumberDetails(phoneNumberId);
       user = (await getAdminUsers())[0];
       await createPhoneNumber({
@@ -510,7 +510,7 @@ async function processAutoReplies(
     // Check if user has auto-reply rules configured
     const autoReplyRules = await prisma.autoReplyRule?.findMany?.({
       where: {
-        userId,
+        createdById: userId,
         active: true,
       },
       orderBy: { priority: "asc" },

@@ -8,31 +8,47 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(cuid())
+  id               String     @id @default(cuid())
   name             String?
-  email            String?         @unique
+  email            String?    @unique
   emailVerified    DateTime?
-  tel              String?         @unique
+  tel              String?    @unique
   telVerified      DateTime?
   image            String?
   password         String?
-  role             UserRole        @default(USER)
-  status           UserStatus      @default(ACTIVE)
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  role             UserRole   @default(USER)
+  status           UserStatus @default(ACTIVE)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
   resetToken       String?
   resetTokenExpiry DateTime?
-  autoReplyRules   AutoReplyRule[]
-  accounts         Account[]
-  contacts         Contact[]
-  messages         Message[]
-  phoneNumbers     PhoneNumber[]
-  subscriptions    Subscription[]
-  sessions         Session[]
 
-  wabaTemplates WabaTemplate[]
+  waba WabaAccount?
+
+  accounts       Account[]
+  contacts       Contact[]
+  messages       Message[]
+  subscriptions  Subscription[]
+  sessions       Session[]
+  tokens         Token[]
+  autoreplyRules AutoReplyRule[]
+  wabaTemplates  WabaTemplate[]
 
   @@map("users")
+}
+
+model WabaAccount {
+  userId     String @id @unique
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessId String @unique
+
+  phoneNumbers PhoneNumber[]
+  templates    WabaTemplate[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("waba_accounts")
 }
 
 model WabaTemplate {
@@ -42,16 +58,17 @@ model WabaTemplate {
   category       TemplateCategory
   language       TemplateLanguage       @default(en_US)
   components     Json
-  wabaAccountId  String
   rejectedReason String?
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wabaId String
+  waba   WabaAccount @relation(fields: [wabaId], references: [userId], onDelete: SetNull)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([wabaAccountId])
   @@index([status])
   @@index([category])
   @@map("waba_templates")
@@ -62,9 +79,9 @@ enum TemplateLanguage {
 }
 
 enum TemplateCategory {
-  MARKETING
-  UTILITY
   AUTHENTICATION
+  UTILITY
+  MARKETING
 }
 
 enum TemplateApprovalStatus {
@@ -72,8 +89,6 @@ enum TemplateApprovalStatus {
   PENDING
   REJECTED
   DISABLED
-
-  @@map("TemplateApprovalStatus")
 }
 
 // 
@@ -88,13 +103,24 @@ model Session {
   @@map("user_sessions")
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+model Token {
+  id      String               @id @default(cuid())
+  token   String
+  expires DateTime
+  channel VerificationChannel?
 
-  @@unique([identifier, token])
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+
   @@map("verification_tokens")
+}
+
+enum VerificationChannel {
+  EMAIL
+  WHATSAPP
 }
 
 model Subscription {
@@ -181,20 +207,23 @@ model PlanFeature {
 }
 
 model PhoneNumber {
-  id                  String            @id @default(cuid())
-  phoneNumberId       String?           @unique
-  phoneNumber         String            @unique
-  userId              String
+  id                  String  @id @default(cuid())
+  phoneNumberId       String? @unique
+  phoneNumber         String  @unique
   displayName         String?
   preVerificationId   String?
   preVerificationCode String?
-  wabaId              String?
-  status              PhoneNumberStatus @default(NOT_CLAIMED)
-  verifiedAt          DateTime?
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
-  messages            Message[]
-  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status     PhoneNumberStatus @default(NOT_CLAIMED)
+  verifiedAt DateTime?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  messages       Message[]
+  autoReplyRules AutoReplyRule[]
+
+  userId String
+  waba   WabaAccount @relation(fields: [userId], references: [userId], onDelete: Restrict)
 
   @@map("phone_numbers")
 }
@@ -247,18 +276,23 @@ model MessageUnprocessed {
 }
 
 model AutoReplyRule {
-  id           String      @id @default(cuid())
-  userId       String
-  name         String
-  triggerType  TriggerType
-  triggerValue String?
-  replyMessage String
-  isActive     Boolean     @default(true)
-  priority     Int         @default(0)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  active       Boolean     @default(true)
-  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String      @id @default(cuid())
+  phoneNumberId String
+  name          String
+  triggerType   TriggerType
+  triggerValue  String?
+  replyMessage  String
+  isActive      Boolean     @default(true)
+  priority      Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  active        Boolean     @default(true)
+  phoneNumber   PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@map("autoreply_rules")
 }
 
 model WebhookEvent {

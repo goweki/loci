@@ -61,7 +61,14 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
   (
     {
       className,
-      logo = <BrandSymbol height={24} />,
+      logo = (
+        <>
+          <BrandSymbol height={24} />
+          <span className="hidden font-bold text-primary text-xl md:inline-block">
+            LOCi
+          </span>
+        </>
+      ),
       logoHref = "/",
       navigationLinks = defaultNavigationLinks,
       signInHref = "/sign-in",
@@ -208,9 +215,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                 className="flex items-center space-x-2 hover:text-primary/90 transition-colors cursor-pointer"
               >
                 {logo}
-                <span className="hidden font-bold text-primary text-xl md:inline-block">
-                  LOCi
-                </span>
               </Link>
               {/* Navigation menu */}
               {!isMobile && (

@@ -2,37 +2,37 @@
 
 import {
   WhatsAppSendMessageResponse,
-  WhatsAppPhoneNumberListResponse,
-  WhatsAppPhoneNumberDetailsResponse,
-  WhatsAppRequestCodeResponse,
-  WhatsAppVerifyCodeResponse,
-  WhatsAppTemplateListResponse,
-  WhatsAppTemplateCreateResponse,
-  WhatsAppTemplateDeleteResponse,
-  WhatsAppUploadMediaResponse,
-  WhatsAppMediaUrlResponse,
-  WhatsAppMediaDownloadResponse,
-  WhatsAppSubscribedAppsResponse,
-  WhatsAppMarkReadResponse,
-  WhatsAppTemplateCreateRequest,
-} from "./types";
+  WabaPhoneNumberListResponse,
+  WabaPhoneNumberDetailsResponse,
+  WabaRequestCodeResponse,
+  WabaVerifyCodeResponse,
+  WabaTemplateCreateResponse,
+  WabaTemplateDeleteResponse,
+  WabaUploadMediaResponse,
+  WabaMediaUrlResponse,
+  WabaMediaDownloadResponse,
+  WabaSubscribedAppsResponse,
+  WabaMarkReadResponse,
+  WabaTemplateCreateRequest,
+  WabaTemplate,
+} from "../types";
 
-import { Message } from "../validations";
-import { WhatsAppLogger } from "./logger";
-import { normalizeWhatsAppError } from "./errors";
+import { Message } from "../../validations";
+import { WhatsAppLogger } from "../logger";
+import { normalizeWhatsAppError } from "../errors";
 import {
   GetTokenUsingWabaAuthCodeResult,
   PreVerifiedNumberResponse,
   RequestCodeResponse,
   VerifyNumberResponse,
-} from "./types/waba-api-reponses";
+} from "../types/waba-api-reponses";
 import {
   createPreVerifiedNumber as _createPreVerifiedNumber,
   requestVerificationCode as _requestVerificationCode,
   verifyPreVerifiedNumber as _verifyPreVerifiedNumber,
   getTokenUsingWabaAuthCode as _getTokenUsingWabaAuthCode,
-} from "./actions";
-import type { WhatsAppClientEnv } from "./types/environment-variables";
+} from "../actions";
+import type { WhatsAppClientEnv } from "../types/environment-variables";
 
 export class WhatsAppClient {
   private logger = new WhatsAppLogger({ maskSecrets: true });
@@ -109,7 +109,7 @@ export class WhatsAppClient {
   async markMessageAsRead(
     messageId: string,
     phoneNumberId: string
-  ): Promise<WhatsAppMarkReadResponse> {
+  ): Promise<WabaMarkReadResponse> {
     const url = `${this.baseUrl}/${phoneNumberId}/messages`;
 
     const payload = {
@@ -142,12 +142,16 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   // 4. PHONE NUMBERS
   // ---------------------------------------------------------------------
-  async getPhoneNumbers(): Promise<WhatsAppPhoneNumberListResponse> {
-    const url = `${this.baseUrl}/${this.env.fbAppId}/phone_numbers?access_token=${this.env.wabaAccessToken}`;
+  async getPhoneNumbers(): Promise<WabaPhoneNumberListResponse> {
+    const url = `${this.baseUrl}/${this.env.wabaId}/phone_numbers`;
 
     this.logger.info("Fetching phone numbers");
 
-    const res = await fetch(url);
+    const headers = {
+      Authorization: `Bearer ${this.env.wabaAccessToken}`,
+    };
+
+    const res = await fetch(url, { headers });
     const json = await res.json();
 
     if (!res.ok) {
@@ -160,12 +164,16 @@ export class WhatsAppClient {
 
   async getPhoneNumberDetails(
     phoneNumberId: string
-  ): Promise<WhatsAppPhoneNumberDetailsResponse> {
-    const url = `${this.baseUrl}/${phoneNumberId}?access_token=${this.env.wabaAccessToken}`;
+  ): Promise<WabaPhoneNumberDetailsResponse> {
+    const url = `${this.baseUrl}/${phoneNumberId}`;
 
     this.logger.info("Fetching phone number details", { phoneNumberId });
 
-    const res = await fetch(url);
+    const headers = {
+      Authorization: `Bearer ${this.env.wabaAccessToken}`,
+    };
+
+    const res = await fetch(url, { headers });
     const json = await res.json();
 
     if (!res.ok) {
@@ -178,7 +186,7 @@ export class WhatsAppClient {
 
   async requestPhoneVerificationCode(
     phoneNumberId: string
-  ): Promise<WhatsAppRequestCodeResponse> {
+  ): Promise<WabaRequestCodeResponse> {
     const url = `${this.baseUrl}/${phoneNumberId}/request_code`;
 
     this.logger.info("Requesting phone verification code");
@@ -202,7 +210,7 @@ export class WhatsAppClient {
   async verifyPhoneCode(
     phoneNumberId: string,
     code: string
-  ): Promise<WhatsAppVerifyCodeResponse> {
+  ): Promise<WabaVerifyCodeResponse> {
     const url = `${this.baseUrl}/${phoneNumberId}/verify_code`;
 
     this.logger.info("Verifying phone number code");
@@ -229,7 +237,7 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   // 5. TEMPLATE MANAGEMENT
   // ---------------------------------------------------------------------
-  async getTemplates(): Promise<WhatsAppTemplateListResponse> {
+  async getTemplates(): Promise<WabaTemplate[]> {
     const url = `${this.baseUrl}/${this.env.fbAppId}/message_templates?access_token=${this.env.wabaAccessToken}`;
 
     this.logger.info("Fetching templates");
@@ -242,12 +250,32 @@ export class WhatsAppClient {
       throw normalizeWhatsAppError(res.status, json);
     }
 
-    return json;
+    return json.data;
+  }
+
+  async getTemplateByName(name: string): Promise<WabaTemplate> {
+    const url = `${this.baseUrl}/${this.env.wabaId}/message_templates?name=${name}`;
+
+    this.logger.info(`Fetching template - ${name}`);
+
+    const headers = {
+      Authorization: `Bearer ${this.env.wabaAccessToken}`,
+    };
+
+    const res = await fetch(url, { headers });
+    const json = await res.json();
+
+    if (!res.ok) {
+      this.logger.error("WhatsApp API Error (getTemplates)", json);
+      throw normalizeWhatsAppError(res.status, json);
+    }
+
+    return json.data;
   }
 
   async createTemplate(
-    template: WhatsAppTemplateCreateRequest
-  ): Promise<WhatsAppTemplateCreateResponse> {
+    template: WabaTemplateCreateRequest
+  ): Promise<WabaTemplateCreateResponse> {
     const url = `${this.baseUrl}/${this.env.fbAppId}/message_templates`;
 
     this.logger.info("Creating template", { name: template.name });
@@ -271,13 +299,10 @@ export class WhatsAppClient {
     return json;
   }
 
-  async deleteTemplate(
-    name: string,
-    language: string
-  ): Promise<WhatsAppTemplateDeleteResponse> {
-    const url = `${this.baseUrl}/${this.env.fbAppId}/message_templates`;
+  async deleteTemplate(name: string): Promise<WabaTemplateDeleteResponse> {
+    const url = `${this.baseUrl}/${this.env.fbAppId}/message_templates?name=${name}`;
 
-    this.logger.info("Deleting template", { name, language });
+    this.logger.info(`Deleting template - ${name}`);
 
     const res = await fetch(url, {
       method: "DELETE",
@@ -285,7 +310,6 @@ export class WhatsAppClient {
         Authorization: `Bearer ${this.env.wabaAccessToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, language }),
     });
 
     const json = await res.json();
@@ -304,7 +328,7 @@ export class WhatsAppClient {
   async uploadMedia(
     file: Buffer,
     mimeType: string
-  ): Promise<WhatsAppUploadMediaResponse> {
+  ): Promise<WabaUploadMediaResponse> {
     const url = `${this.baseUrl}/${this.env.fbAppId}/media`;
     const form = new FormData();
     form.append(
@@ -332,7 +356,7 @@ export class WhatsAppClient {
     return json;
   }
 
-  async getMediaUrl(mediaId: string): Promise<WhatsAppMediaUrlResponse> {
+  async getMediaUrl(mediaId: string): Promise<WabaMediaUrlResponse> {
     const url = `${this.baseUrl}/${mediaId}?access_token=${this.env.wabaAccessToken}`;
 
     this.logger.info("Getting media URL", { mediaId });
@@ -348,7 +372,7 @@ export class WhatsAppClient {
     return json;
   }
 
-  async downloadMedia(mediaId: string): Promise<WhatsAppMediaDownloadResponse> {
+  async downloadMedia(mediaId: string): Promise<WabaMediaDownloadResponse> {
     const url = `${this.baseUrl}/${mediaId}/media?access_token=${this.env.wabaAccessToken}`;
 
     this.logger.info("Downloading media", { mediaId });
@@ -367,7 +391,7 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   // 7. WEBHOOK SUBSCRIPTION MANAGEMENT
   // ---------------------------------------------------------------------
-  async subscribeApp(): Promise<WhatsAppSubscribedAppsResponse> {
+  async subscribeApp(): Promise<WabaSubscribedAppsResponse> {
     const url = `${this.baseUrl}/${this.env.fbAppId}/subscribed_apps`;
 
     this.logger.info("Subscribing app to WABA");
@@ -387,7 +411,7 @@ export class WhatsAppClient {
     return json;
   }
 
-  async unsubscribeApp(): Promise<WhatsAppSubscribedAppsResponse> {
+  async unsubscribeApp(): Promise<WabaSubscribedAppsResponse> {
     const url = `${this.baseUrl}/${this.env.fbAppId}/subscribed_apps`;
 
     this.logger.info("Unsubscribing app from WABA");
@@ -407,7 +431,7 @@ export class WhatsAppClient {
     return json;
   }
 
-  async getSubscribedApps(): Promise<WhatsAppSubscribedAppsResponse> {
+  async getSubscribedApps(): Promise<WabaSubscribedAppsResponse> {
     const url = `${this.baseUrl}/${this.env.fbAppId}/subscribed_apps?access_token=${this.env.wabaAccessToken}`;
 
     this.logger.info("Fetching subscribed apps");

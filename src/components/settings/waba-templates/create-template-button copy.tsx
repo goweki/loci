@@ -46,7 +46,7 @@ import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { TemplateForm, TemplateFormProps } from "./create-edit-form";
 
-export function CreateTemplateButton() {
+export function CreateTemplateButton(props: TemplateFormProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -59,7 +59,7 @@ export function CreateTemplateButton() {
           <DialogTitle>Create Template</DialogTitle>
           <DialogDescription>Configure a message template</DialogDescription>
         </DialogHeader>
-        <TemplateForm />
+        <TemplateForm {...props} />
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>

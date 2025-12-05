@@ -2,41 +2,20 @@
 
 import { useI18n } from "@/lib/i18n";
 import { Navbar as DefaultNavbar, NavbarNavLink } from "@/components/ui/navbar";
+import { LucideArrowLeft } from "lucide-react";
 
 const translations = {
   en: {
-    dashboard: "Dashboard",
-    conversations: "Conversations",
-    phoneNumbers: "Phone Numbers",
-    autoReply: "Auto-Reply",
-    contacts: "Contacts",
-    analytics: "Analytics",
-    billing: "Billing",
+    home: "Home",
     settings: "Settings",
-    actions: {
-      search: "Search...",
-      filter: "Filter",
-      notifications: "Notifications",
-      profile: "Profile",
-      logout: "Logout",
-    },
+    templates: "Templates",
+    brand: "Brand",
   },
   sw: {
-    dashboard: "Dashibodi",
-    conversations: "Mazungumzo",
-    phoneNumbers: "Nambari za Simu",
-    autoReply: "Majibu ya Kiotomatiki",
-    contacts: "Anwani",
-    analytics: "Takwimu",
-    billing: "Malipo",
+    home: "Nyumbani",
     settings: "Mipangilio",
-    actions: {
-      search: "Tafuta...",
-      filter: "Chuja",
-      notifications: "Arifa",
-      profile: "Wasifu",
-      logout: "Toka",
-    },
+    templates: "Templet",
+    brand: "Alama",
   },
 };
 
@@ -45,10 +24,29 @@ export default function SettingsNavbar() {
   const t = translations[language];
 
   const navigationLinks: NavbarNavLink[] = [
-    { href: `/${language}/dashboard`, label: t.dashboard },
-    { href: `/${language}/dashboard/conversations`, label: t.conversations },
-    { href: `/${language}/dashboard/contacts`, label: t.contacts },
+    {
+      href: `/${language}/settings`,
+      label: t.settings,
+      active: false,
+    },
+    { href: `/${language}/settings/templates`, label: t.templates },
   ];
 
-  return <DefaultNavbar navigationLinks={navigationLinks} authenticated />;
+  const logo = (
+    <>
+      <LucideArrowLeft />
+      <span className="hidden font-bold text-primary text-xl md:inline-block">
+        {t.home}
+      </span>
+    </>
+  );
+
+  return (
+    <DefaultNavbar
+      logo={logo}
+      logoHref={`/${language}/dashboard`}
+      navigationLinks={navigationLinks}
+      authenticated
+    />
+  );
 }

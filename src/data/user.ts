@@ -194,12 +194,19 @@ export async function verifyToken(data: {
 /**
  * Find a user by ID.
  */
-export async function getUserById(id: string): Promise<User | null> {
+export async function getUserById(id: string): Promise<Prisma.UserGetPayload<{
+  include: {
+    subscriptions: true;
+    waba: true;
+    contacts: true;
+    messages: true;
+  };
+}> | null> {
   return db.user.findUnique({
     where: { id },
     include: {
       subscriptions: { include: { plan: true } },
-      phoneNumbers: true,
+      waba: true,
       contacts: true,
       messages: true,
     },
@@ -247,7 +254,7 @@ export async function getAllUsers(skip = 0, take = 20): Promise<User[]> {
  */
 
 type AdminUser = Prisma.UserGetPayload<{
-  include: { phoneNumbers: true };
+  include: { waba: true };
 }>;
 
 export async function getAdminUsers(skip = 0, take = 20): Promise<AdminUser[]> {
@@ -257,7 +264,7 @@ export async function getAdminUsers(skip = 0, take = 20): Promise<AdminUser[]> {
     take,
     orderBy: { createdAt: "desc" },
     include: {
-      phoneNumbers: true,
+      waba: true,
     },
   });
 }
@@ -289,17 +296,19 @@ export async function countUsers(): Promise<number> {
  */
 export async function getUserByPhoneNumberId(
   phoneNumberId: string
-): Promise<User | null> {
+): Promise<Prisma.UserGetPayload<{ include: { waba: true } }> | null> {
   return db.user.findFirst({
     where: {
-      phoneNumbers: {
-        some: {
-          phoneNumberId,
+      waba: {
+        phoneNumbers: {
+          some: {
+            phoneNumberId,
+          },
         },
       },
     },
     include: {
-      phoneNumbers: true,
+      waba: true,
     },
   });
 }
@@ -494,10 +503,10 @@ export async function getUserFullProfile(userId: string) {
     where: { id: userId },
     include: {
       subscriptions: { include: { plan: true, payments: true } },
-      phoneNumbers: true,
+      waba: true,
       contacts: true,
       messages: true,
-      autoReplyRules: true,
+      autoreplyRules: true,
     },
   });
 }

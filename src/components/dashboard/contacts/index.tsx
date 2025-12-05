@@ -28,7 +28,9 @@ export default function ContactsComponent({
   phoneNumbers,
   contacts,
 }: {
-  phoneNumbers: Prisma.PhoneNumberGetPayload<{ include: { messages: true } }>[];
+  phoneNumbers: Prisma.PhoneNumberGetPayload<{
+    include: { messages: true; waba: true };
+  }>[];
   contacts: Prisma.ContactGetPayload<{ include: { messages: true } }>[];
 }) {
   const [activeTab, setActiveTab] = useState<"phone-numbers" | "contacts">(
@@ -298,25 +300,26 @@ export default function ContactsComponent({
 
                             {/* IDs Section */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                              {phone.wabaId && (
+                              {phone.waba.userId && (
                                 <div className="bg-muted/50 rounded-lg p-3">
                                   <p className="text-xs text-muted-foreground mb-1">
                                     WABA ID
                                   </p>
                                   <div className="flex items-center justify-between gap-2">
                                     <span className="font-mono text-xs text-card-foreground truncate">
-                                      {phone.wabaId}
+                                      {phone.waba.userId}
                                     </span>
                                     <button
                                       onClick={() =>
                                         handleCopyId(
-                                          phone.wabaId ?? undefined,
+                                          phone.waba.userId ?? undefined,
                                           "waba"
                                         )
                                       }
                                       className="p-1.5 hover:bg-accent rounded transition-colors flex-shrink-0"
                                     >
-                                      {copiedId === `waba-${phone.wabaId}` ? (
+                                      {copiedId ===
+                                      `waba-${phone.waba.userId}` ? (
                                         <Check className="w-3.5 h-3.5 text-green-600" />
                                       ) : (
                                         <Copy className="w-3.5 h-3.5 text-muted-foreground" />
