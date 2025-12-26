@@ -6,16 +6,17 @@ import {
   WabaPhoneNumberDetailsResponse,
   WabaRequestCodeResponse,
   WabaVerifyCodeResponse,
-  WabaTemplateCreateResponse,
-  WabaTemplateDeleteResponse,
   WabaUploadMediaResponse,
   WabaMediaUrlResponse,
   WabaMediaDownloadResponse,
   WabaSubscribedAppsResponse,
   WabaMarkReadResponse,
-  WabaTemplateCreateRequest,
-  WabaTemplate,
 } from "../types";
+
+import {
+  WabaTemplateCreateResponse,
+  WabaTemplateDeleteResponse,
+} from "../types/waba-template";
 
 import { Message } from "../../validations";
 import { WhatsAppLogger } from "../logger";
@@ -33,6 +34,8 @@ import {
   getTokenUsingWabaAuthCode as _getTokenUsingWabaAuthCode,
 } from "../actions";
 import type { WhatsAppClientEnv } from "../types/environment-variables";
+import { Prisma } from "@/lib/prisma/generated";
+import { Template as TemplateOptions } from "../types/waba-template";
 
 export class WhatsAppClient {
   private logger = new WhatsAppLogger({ maskSecrets: true });
@@ -237,7 +240,7 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   // 5. TEMPLATE MANAGEMENT
   // ---------------------------------------------------------------------
-  async getTemplates(): Promise<WabaTemplate[]> {
+  async getTemplates(): Promise<(TemplateOptions & { id: string })[]> {
     const url = `${this.baseUrl}/${this.env.fbAppId}/message_templates?access_token=${this.env.wabaAccessToken}`;
 
     this.logger.info("Fetching templates");
@@ -253,7 +256,7 @@ export class WhatsAppClient {
     return json.data;
   }
 
-  async getTemplateByName(name: string): Promise<WabaTemplate> {
+  async getTemplateByName(name: string): Promise<TemplateOptions> {
     const url = `${this.baseUrl}/${this.env.wabaId}/message_templates?name=${name}`;
 
     this.logger.info(`Fetching template - ${name}`);
@@ -274,13 +277,13 @@ export class WhatsAppClient {
   }
 
   async createTemplate(
-    template: WabaTemplateCreateRequest
+    template: TemplateOptions
   ): Promise<WabaTemplateCreateResponse> {
-    const url = `${this.baseUrl}/${this.env.fbAppId}/message_templates`;
+    const url = `${this.baseUrl}/${this.env.wabaId}/message_templates`;
 
     this.logger.info("Creating template", { name: template.name });
 
-    const res = await fetch(url, {
+    const _res = await fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${this.env.wabaAccessToken}`,
@@ -289,11 +292,11 @@ export class WhatsAppClient {
       body: JSON.stringify(template),
     });
 
-    const json = await res.json();
+    const json = await _res.json();
 
-    if (!res.ok) {
+    if (!_res.ok) {
       this.logger.error("WhatsApp API Error (createTemplate)", json);
-      throw normalizeWhatsAppError(res.status, json);
+      throw normalizeWhatsAppError(_res.status, json);
     }
 
     return json;

@@ -410,7 +410,7 @@ export class WabaTemplateRepository {
   }
 }
 
-// Export convenience functions for backward compatibility
+// convenience functions for backward compatibility
 export const createWabaTemplate = WabaTemplateRepository.create;
 export const findWabaTemplateById = WabaTemplateRepository.findById;
 export const findWabaTemplates = WabaTemplateRepository.findMany;

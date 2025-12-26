@@ -23,6 +23,7 @@ import { PhoneNumberStatus, Prisma } from "@/lib/prisma/generated";
 import { Button } from "@/components/ui/button";
 import AddWhatsappNumberModal from "./new-phone-number-modal";
 import WhatsAppEmbeddedSignup from "./waba-embedded-signup";
+import Image from "next/image";
 
 export default function ContactsComponent({
   phoneNumbers,
@@ -493,10 +494,12 @@ export default function ContactsComponent({
                         <div className="flex items-center gap-4 flex-1">
                           <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
                             {contact.avatar ? (
-                              <img
+                              <Image
                                 src={contact.avatar}
                                 alt={contact.name || contact.phoneNumber}
                                 className="w-full h-full rounded-full object-cover"
+                                width={44}
+                                height={44}
                               />
                             ) : (
                               <span className="text-lg font-semibold text-secondary-foreground">

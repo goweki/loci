@@ -76,6 +76,9 @@ model WabaTemplate {
 
 enum TemplateLanguage {
   en_US
+  en_GB
+  fr_FR
+  sw_KE
 }
 
 enum TemplateCategory {

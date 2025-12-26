@@ -2,25 +2,29 @@
 
 "use server";
 
-import { WabaTemplateRepository } from "@/data/repositories/waba-template";
+import {
+  WabaTemplateFilters,
+  WabaTemplateRepository,
+} from "@/data/repositories/waba-template";
 
 import {
   WabaTemplate,
   TemplateApprovalStatus,
   TemplateCategory,
+  TemplateLanguage,
 } from "@/lib/prisma/generated";
 import type { WhatsAppClient } from "./client";
 import whatsapp from "..";
-import { WabaTemplateCreateRequest } from "../types";
+import { Template as WabaTemplateCreateRequest } from "../types/waba-template";
 
 /**
  * Service that syncs templates between Meta's API and our database
  * Combines WabaApiService (external API) with WabaTemplateRepository (database)
  */
 export class TemplateSyncService {
-  private WaClient: WhatsAppClient;
   private userId: string;
   private wabaAccountId: string;
+  private WaClient: WhatsAppClient;
 
   constructor(userId: string, wabaAccountId: string) {
     this.userId = userId;
@@ -49,27 +53,19 @@ export class TemplateSyncService {
 
       for (const metaTemplate of metaTemplates) {
         try {
-          // Check if template exists in database
-          const existing = await WabaTemplateRepository.findMany({
-            userId: this.userId,
-            wabaAccountId: this.wabaAccountId,
-            searchQuery: metaTemplate.name,
-          });
-
-          const existingTemplate = existing.find(
-            (t) => t.name === metaTemplate.name
+          const existingTemplate = await WabaTemplateRepository.findById(
+            metaTemplate.id
           );
-
           if (existingTemplate) {
             // Update existing template
             await WabaTemplateRepository.update(existingTemplate.id, {
               status: metaTemplate.status as TemplateApprovalStatus,
-              components: metaTemplate.components as any,
+              components: metaTemplate.components,
               rejectedReason:
                 metaTemplate.status == TemplateApprovalStatus.REJECTED
                   ? "template rejected - shrug"
                   : null,
-              language: metaTemplate.language as any,
+              language: metaTemplate.language as TemplateLanguage,
               category: metaTemplate.category,
             });
             result.updated++;
@@ -79,8 +75,8 @@ export class TemplateSyncService {
               name: metaTemplate.name,
               status: metaTemplate.status as TemplateApprovalStatus,
               category: metaTemplate.category,
-              language: metaTemplate.language as any,
-              components: metaTemplate.components as any,
+              language: metaTemplate.language,
+              components: metaTemplate.components,
               wabaId: this.wabaAccountId,
               createdById: this.userId,
               rejectedReason:

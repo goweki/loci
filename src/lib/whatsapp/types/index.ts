@@ -1,10 +1,5 @@
 // lib/whatsapp/types.ts
 
-import {
-  TemplateApprovalStatus,
-  TemplateCategory,
-} from "@/lib/prisma/generated";
-
 export * from "./inbound-webhook";
 export * from "./outbound-message";
 
@@ -69,67 +64,6 @@ export interface WabaVerifyCodeResponse {
 export interface WabaMarkReadResponse {
   success?: boolean;
   error?: WhatsAppAPIError;
-}
-
-// ------------------------------
-// TEMPLATES
-// ------------------------------
-export type WabaTemplateComponentButtonType =
-  | "QUICK_REPLY"
-  | "URL"
-  | "PHONE_NUMBER";
-
-export interface WabaTemplateComponentButton {
-  type: WabaTemplateComponentButtonType;
-  text: string;
-  url?: string;
-  phone_number?: string;
-}
-
-export type WabaTemplateComponentType =
-  | "HEADER"
-  | "BODY"
-  | "FOOTER"
-  | "BUTTONS";
-
-export type WabaTemplateComponentFormat =
-  | "TEXT"
-  | "IMAGE"
-  | "VIDEO"
-  | "DOCUMENT";
-
-export interface WabaTemplateComponent {
-  type: WabaTemplateComponentType;
-  text?: string;
-  format?: WabaTemplateComponentFormat;
-  buttons?: WabaTemplateComponentButton[];
-}
-
-export interface WabaTemplate {
-  name: string;
-  category: TemplateCategory;
-  language: {
-    code: string; // e.g. "en_US"
-  };
-  status: TemplateApprovalStatus;
-  components: WabaTemplateComponent[];
-}
-
-export interface WabaTemplateCreateRequest {
-  name: string;
-  language: string; // e.g. "en_US"
-  category: TemplateCategory;
-  components: WabaTemplateComponent[];
-}
-
-export interface WabaTemplateCreateResponse {
-  id: string;
-  status: TemplateApprovalStatus;
-  category: TemplateCategory;
-}
-
-export interface WabaTemplateDeleteResponse {
-  success: boolean;
 }
 
 // ------------------------------
