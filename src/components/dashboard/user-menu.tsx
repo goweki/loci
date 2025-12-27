@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserRole } from "@/lib/prisma/generated";
+import { useI18n } from "@/lib/i18n";
 
 export default function UserMenu() {
   const { data: session } = useSession();
   const userRole = session?.user?.role;
+  const { language } = useI18n();
 
   return (
     <DropdownMenu>
@@ -35,14 +37,14 @@ export default function UserMenu() {
         </div>
 
         <DropdownMenuItem asChild>
-          <Link href="/settings" className="text-foreground">
+          <Link href={`/${language}/settings`} className="text-foreground">
             Settings
           </Link>
         </DropdownMenuItem>
         {userRole === UserRole.ADMIN && (
           <DropdownMenuItem asChild>
-            <Link href="/manager" className="text-foreground">
-              Manager
+            <Link href={`/${language}/manager`} className="text-foreground">
+              System Manager
             </Link>
           </DropdownMenuItem>
         )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Plus,
   Phone,
@@ -18,26 +18,28 @@ import {
   Edit,
   Trash2,
   MoreVertical,
+  Bot,
 } from "lucide-react";
 import { PhoneNumberStatus, Prisma } from "@/lib/prisma/generated";
 import { Button } from "@/components/ui/button";
 import AddWhatsappNumberModal from "./new-phone-number-modal";
-import WhatsAppEmbeddedSignup from "./waba-embedded-signup";
+import WabaEmbeddedSignup from "@/components/ui/waba-embedded-signup";
 import Image from "next/image";
+import { getPhoneNumberById, PhoneNumberGetPayload } from "@/data/phoneNumber";
 
-export default function ContactsComponent({
-  phoneNumbers,
-  contacts,
-}: {
-  phoneNumbers: Prisma.PhoneNumberGetPayload<{
-    include: { messages: true; waba: true };
-  }>[];
+interface Props {
+  wabaAccount: Prisma.WabaAccountGetPayload<{
+    include: { templates: true; phoneNumbers: true };
+  }> | null;
   contacts: Prisma.ContactGetPayload<{ include: { messages: true } }>[];
-}) {
+}
+
+export default function ContactsComponent({ wabaAccount, contacts }: Props) {
   const [activeTab, setActiveTab] = useState<"phone-numbers" | "contacts">(
     "phone-numbers"
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumberGetPayload[]>([]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -49,6 +51,23 @@ export default function ContactsComponent({
     wabaId: "",
     phoneNumberId: "",
   });
+
+  useEffect(() => {
+    if (!wabaAccount?.phoneNumbers) return;
+
+    const fetchPhoneNos = async () => {
+      let phoneWithMessages: PhoneNumberGetPayload[] = [];
+      for (const phone of phoneNumbers) {
+        const phone_ = await getPhoneNumberById(phone.id);
+        if (phone_) {
+          phoneWithMessages.push(phone_);
+        }
+      }
+      setPhoneNumbers(phoneWithMessages);
+    };
+
+    fetchPhoneNos();
+  }, [wabaAccount?.phoneNumbers]);
 
   const stats = [
     {
@@ -177,8 +196,8 @@ export default function ContactsComponent({
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Phone className="w-4 h-4" />
-                My Phone Numbers
+                <Bot className="w-4 h-4" />
+                Whatsapp Bots
                 {activeTab === "phone-numbers" && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
                 )}
@@ -191,7 +210,7 @@ export default function ContactsComponent({
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <User className="w-4 h-4" />
+                <Phone className="w-4 h-4" />
                 Contacts
                 {activeTab === "contacts" && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
@@ -202,261 +221,257 @@ export default function ContactsComponent({
 
           <div className="p-6">
             {activeTab === "phone-numbers" ? (
-              <div className="space-y-6">
-                {/* Action Buttons */}
-                <div className="flex justify-start gap-2">
-                  {/* <Button onClick={() => setShowAddModal(true)}>
-                    <Plus className="w-5 h-5" />
-                    Add WhatsApp Number
-                  </Button> */}
-                  <WhatsAppEmbeddedSignup />
-                </div>
-
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {stats.map((stat, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-card border border-border rounded-xl p-6 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-muted-foreground">
-                            {stat.label}
-                          </p>
-                          <p className="text-3xl font-bold text-card-foreground mt-2">
-                            {stat.value}
-                          </p>
-                        </div>
-                        <div className={`p-3 rounded-lg ${stat.color}`}>
-                          <stat.icon className="w-6 h-6" />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Filters and Search */}
-                <div className="bg-card border border-border rounded-xl p-4">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-1 relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <input
-                        type="text"
-                        placeholder="Search phone numbers..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                    </div>
-
-                    <div className="flex gap-2">
-                      {["all", "verified", "pending"].map((filter) => (
-                        <button
-                          key={filter}
-                          onClick={() => setStatusFilter(filter)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            statusFilter === filter
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                          }`}
-                        >
-                          {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                        </button>
-                      ))}
-                    </div>
+              wabaAccount ? (
+                <div className="space-y-6">
+                  <div className="flex justify-start gap-2">
+                    <WabaEmbeddedSignup />
                   </div>
-                </div>
 
-                {/* Phone Numbers List */}
-                {filteredPhoneNumbers.length > 0 ? (
-                  <div className="grid grid-cols-1 gap-4">
-                    {filteredPhoneNumbers.map((phone) => (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {stats.map((stat, idx) => (
                       <div
-                        key={phone.id}
+                        key={idx}
                         className="bg-card border border-border rounded-xl p-6 hover:shadow-md transition-shadow"
                       >
-                        <div className="flex flex-col lg:flex-row gap-6">
-                          {/* Left Section - Main Info */}
-                          <div className="flex-1 space-y-4">
-                            <div className="flex items-start justify-between">
-                              <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                                  <Phone className="w-6 h-6 text-primary" />
-                                </div>
-                                <div>
-                                  <h3 className="font-semibold text-lg text-card-foreground">
-                                    {phone.displayName}
-                                  </h3>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    <PhoneCall className="w-3.5 h-3.5 text-muted-foreground" />
-                                    <span className="font-mono text-sm text-muted-foreground">
-                                      {phone.phoneNumber}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              {getStatusBadge(phone.status)}
-                            </div>
-
-                            {/* IDs Section */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                              {phone.waba.userId && (
-                                <div className="bg-muted/50 rounded-lg p-3">
-                                  <p className="text-xs text-muted-foreground mb-1">
-                                    WABA ID
-                                  </p>
-                                  <div className="flex items-center justify-between gap-2">
-                                    <span className="font-mono text-xs text-card-foreground truncate">
-                                      {phone.waba.userId}
-                                    </span>
-                                    <button
-                                      onClick={() =>
-                                        handleCopyId(
-                                          phone.waba.userId ?? undefined,
-                                          "waba"
-                                        )
-                                      }
-                                      className="p-1.5 hover:bg-accent rounded transition-colors flex-shrink-0"
-                                    >
-                                      {copiedId ===
-                                      `waba-${phone.waba.userId}` ? (
-                                        <Check className="w-3.5 h-3.5 text-green-600" />
-                                      ) : (
-                                        <Copy className="w-3.5 h-3.5 text-muted-foreground" />
-                                      )}
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-
-                              {phone.phoneNumberId && (
-                                <div className="bg-muted/50 rounded-lg p-3">
-                                  <p className="text-xs text-muted-foreground mb-1">
-                                    Phone Number ID
-                                  </p>
-                                  <div className="flex items-center justify-between gap-2">
-                                    <span className="font-mono text-xs text-card-foreground truncate">
-                                      {phone.phoneNumberId}
-                                    </span>
-                                    <button
-                                      onClick={() =>
-                                        handleCopyId(
-                                          phone.phoneNumberId ?? undefined,
-                                          "phone"
-                                        )
-                                      }
-                                      className="p-1.5 hover:bg-accent rounded transition-colors flex-shrink-0"
-                                    >
-                                      {copiedId ===
-                                      `phone-${phone.phoneNumberId}` ? (
-                                        <Check className="w-3.5 h-3.5 text-green-600" />
-                                      ) : (
-                                        <Copy className="w-3.5 h-3.5 text-muted-foreground" />
-                                      )}
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-muted-foreground">
+                              {stat.label}
+                            </p>
+                            <p className="text-3xl font-bold text-card-foreground mt-2">
+                              {stat.value}
+                            </p>
                           </div>
-
-                          {/* Right Section - Stats */}
-                          <div className="lg:w-80 space-y-4">
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="bg-blue-50 dark:bg-blue-950/30 rounded-lg p-3">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <TrendingUp className="w-4 h-4 text-blue-600" />
-                                  <span className="text-xs font-medium text-blue-600">
-                                    Messages Sent
-                                  </span>
-                                </div>
-                                <p className="text-xl font-bold text-blue-600">
-                                  {phone.updatedAt.toLocaleString()}
-                                </p>
-                              </div>
-
-                              <div className="bg-green-50 dark:bg-green-950/30 rounded-lg p-3">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <MessageSquare className="w-4 h-4 text-green-600" />
-                                  <span className="text-xs font-medium text-green-600">
-                                    Messages Received
-                                  </span>
-                                </div>
-                                <p className="text-xl font-bold text-green-600">
-                                  {phone.messages.toLocaleString()}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-muted-foreground">
-                                Last Active:
-                              </span>
-                              <span className="font-medium text-card-foreground">
-                                {phone.updatedAt.toLocaleDateString()}
-                              </span>
-                            </div>
-
-                            {phone.verifiedAt && (
-                              <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">
-                                  Verified At:
-                                </span>
-                                <span className="font-medium text-card-foreground">
-                                  {phone.verifiedAt.toLocaleDateString()}
-                                </span>
-                              </div>
-                            )}
-
-                            {/* Action Buttons */}
-                            <div className="flex gap-2 pt-2 border-t border-border">
-                              <button
-                                onClick={() => handleViewDetails(phone)}
-                                className="flex-1 px-3 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors text-sm font-medium"
-                              >
-                                View Details
-                              </button>
-                              {phone.status ===
-                                PhoneNumberStatus.NOT_VERIFIED && (
-                                <button className="px-3 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium">
-                                  <CheckCircle className="w-4 h-4" />
-                                </button>
-                              )}
-                              <button className="px-3 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors">
-                                <Settings className="w-4 h-4" />
-                              </button>
-                              <button className="px-3 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors">
-                                <Edit className="w-4 h-4" />
-                              </button>
-                              <button className="px-3 py-2 bg-destructive/10 text-destructive rounded-lg hover:bg-destructive/20 transition-colors">
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
+                          <div className={`p-3 rounded-lg ${stat.color}`}>
+                            <stat.icon className="w-6 h-6" />
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div className="bg-card border border-border rounded-xl p-12 text-center">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                      <Phone className="w-10 h-10 text-muted-foreground" />
+
+                  <div className="bg-card border border-border rounded-xl p-4">
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <div className="flex-1 relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <input
+                          type="text"
+                          placeholder="Search phone numbers..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="w-full pl-10 pr-4 py-2 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        />
+                      </div>
+
+                      <div className="flex gap-2">
+                        {["all", "verified", "pending"].map((filter) => (
+                          <button
+                            key={filter}
+                            onClick={() => setStatusFilter(filter)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              statusFilter === filter
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                            }`}
+                          >
+                            {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    <h3 className="text-xl font-semibold text-card-foreground mb-2">
-                      No phone numbers found
-                    </h3>
-                    <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                      Get started by adding your first phone number
-                    </p>
-                    {/* <Button onClick={() => setShowAddModal(true)}>
-                      <Plus className="w-5 h-5" />
-                      Add WhatsApp Number
-                    </Button> */}
-                    {/* <WhatsAppEmbeddedSignup /> */}
                   </div>
-                )}
-              </div>
+
+                  {filteredPhoneNumbers.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4">
+                      {filteredPhoneNumbers.map((phone) => (
+                        <div
+                          key={phone.id}
+                          className="bg-card border border-border rounded-xl p-6 hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex flex-col lg:flex-row gap-6">
+                            {/* Left Section - Main Info */}
+                            <div className="flex-1 space-y-4">
+                              <div className="flex items-start justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <Phone className="w-6 h-6 text-primary" />
+                                  </div>
+                                  <div>
+                                    <h3 className="font-semibold text-lg text-card-foreground">
+                                      {phone.displayName}
+                                    </h3>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <PhoneCall className="w-3.5 h-3.5 text-muted-foreground" />
+                                      <span className="font-mono text-sm text-muted-foreground">
+                                        {phone.phoneNumber}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                {getStatusBadge(phone.status)}
+                              </div>
+
+                              {/* IDs Section */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {phone.waba.userId && (
+                                  <div className="bg-muted/50 rounded-lg p-3">
+                                    <p className="text-xs text-muted-foreground mb-1">
+                                      WABA ID
+                                    </p>
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className="font-mono text-xs text-card-foreground truncate">
+                                        {phone.waba.userId}
+                                      </span>
+                                      <button
+                                        onClick={() =>
+                                          handleCopyId(
+                                            phone.waba.userId ?? undefined,
+                                            "waba"
+                                          )
+                                        }
+                                        className="p-1.5 hover:bg-accent rounded transition-colors flex-shrink-0"
+                                      >
+                                        {copiedId ===
+                                        `waba-${phone.waba.userId}` ? (
+                                          <Check className="w-3.5 h-3.5 text-green-600" />
+                                        ) : (
+                                          <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                                        )}
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {phone.phoneNumberId && (
+                                  <div className="bg-muted/50 rounded-lg p-3">
+                                    <p className="text-xs text-muted-foreground mb-1">
+                                      Phone Number ID
+                                    </p>
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className="font-mono text-xs text-card-foreground truncate">
+                                        {phone.phoneNumberId}
+                                      </span>
+                                      <button
+                                        onClick={() =>
+                                          handleCopyId(
+                                            phone.phoneNumberId ?? undefined,
+                                            "phone"
+                                          )
+                                        }
+                                        className="p-1.5 hover:bg-accent rounded transition-colors flex-shrink-0"
+                                      >
+                                        {copiedId ===
+                                        `phone-${phone.phoneNumberId}` ? (
+                                          <Check className="w-3.5 h-3.5 text-green-600" />
+                                        ) : (
+                                          <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                                        )}
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Right Section - Stats */}
+                            <div className="lg:w-80 space-y-4">
+                              <div className="grid grid-cols-2 gap-3">
+                                <div className="bg-blue-50 dark:bg-blue-950/30 rounded-lg p-3">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <TrendingUp className="w-4 h-4 text-blue-600" />
+                                    <span className="text-xs font-medium text-blue-600">
+                                      Messages Sent
+                                    </span>
+                                  </div>
+                                  <p className="text-xl font-bold text-blue-600">
+                                    {phone.updatedAt.toLocaleString()}
+                                  </p>
+                                </div>
+
+                                <div className="bg-green-50 dark:bg-green-950/30 rounded-lg p-3">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <MessageSquare className="w-4 h-4 text-green-600" />
+                                    <span className="text-xs font-medium text-green-600">
+                                      Messages Received
+                                    </span>
+                                  </div>
+                                  <p className="text-xl font-bold text-green-600">
+                                    {phone.messages.toLocaleString()}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">
+                                  Last Active:
+                                </span>
+                                <span className="font-medium text-card-foreground">
+                                  {phone.updatedAt.toLocaleDateString()}
+                                </span>
+                              </div>
+
+                              {phone.verifiedAt && (
+                                <div className="flex items-center justify-between text-sm">
+                                  <span className="text-muted-foreground">
+                                    Verified At:
+                                  </span>
+                                  <span className="font-medium text-card-foreground">
+                                    {phone.verifiedAt.toLocaleDateString()}
+                                  </span>
+                                </div>
+                              )}
+
+                              {/* Action Buttons */}
+                              <div className="flex gap-2 pt-2 border-t border-border">
+                                <button
+                                  onClick={() => handleViewDetails(phone)}
+                                  className="flex-1 px-3 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors text-sm font-medium"
+                                >
+                                  View Details
+                                </button>
+                                {phone.status ===
+                                  PhoneNumberStatus.NOT_VERIFIED && (
+                                  <button className="px-3 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium">
+                                    <CheckCircle className="w-4 h-4" />
+                                  </button>
+                                )}
+                                <button className="px-3 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors">
+                                  <Settings className="w-4 h-4" />
+                                </button>
+                                <button className="px-3 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors">
+                                  <Edit className="w-4 h-4" />
+                                </button>
+                                <button className="px-3 py-2 bg-destructive/10 text-destructive rounded-lg hover:bg-destructive/20 transition-colors">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="bg-card border border-border rounded-xl p-12 text-center">
+                      <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+                        <Phone className="w-10 h-10 text-muted-foreground" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-card-foreground mb-2">
+                        No phone numbers found
+                      </h3>
+                      <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                        Get started by adding your first phone number
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-muted-foreground text-center py-12 border-2 border-dashed rounded-lg">
+                  <p className="text-lg mb-2">WhatsApp integration required</p>
+                  <p className="text-sm italic">
+                    Connect your account with Meta to continue
+                  </p>
+                </div>
+              )
             ) : (
               /* Contacts Tab */
               <div className="space-y-6">

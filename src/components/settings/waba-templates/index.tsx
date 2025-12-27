@@ -6,15 +6,20 @@ import type {
   TemplateApprovalStatus,
   TemplateCategory,
   WabaTemplate,
+  WabaAccount,
+  Prisma,
 } from "@/lib/prisma/generated";
 import { TemplateCard } from "./template-card";
 import { TemplateFilters } from "./template-filters";
 import { CreateTemplateButton } from "./create-template-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
+import { isValidLanguage, useI18n } from "@/lib/i18n";
 
 interface TemplatesClientProps {
-  initialTemplates: WabaTemplate[];
+  wabaAccount: Prisma.WabaAccountGetPayload<{
+    include: { templates: true; phoneNumbers: true };
+  }> | null;
 }
 
 interface StatCardProps {
@@ -47,9 +52,21 @@ function StatCard({ label, value, color }: StatCardProps) {
   );
 }
 
-export function TemplatesClient({ initialTemplates }: TemplatesClientProps) {
+const translations = {
+  en: {
+    noWabaTitle: "WhatsApp integration required",
+    noWabaSubtitle: "Connect your account with Meta to continue",
+  },
+  sw: {
+    noWabaTitle: "Muunganisho wa WhatsApp unahitajika",
+    noWabaSubtitle: "Unganisha akaunti yako na Meta ili kuendelea",
+  },
+};
+
+export function TemplatesClient({ wabaAccount }: TemplatesClientProps) {
   const { data: session } = useSession();
-  const [templates] = useState<WabaTemplate[]>(initialTemplates);
+  const { language } = useI18n();
+  const [templates] = useState<WabaTemplate[]>(wabaAccount?.templates || []);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     TemplateApprovalStatus | "ALL"
@@ -85,7 +102,10 @@ export function TemplatesClient({ initialTemplates }: TemplatesClientProps) {
 
   if (!session?.user) return;
 
-  return (
+  if (!isValidLanguage) return;
+  const t = translations[language];
+
+  return wabaAccount?.userId ? (
     <div className="space-y-6">
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -123,6 +143,11 @@ export function TemplatesClient({ initialTemplates }: TemplatesClientProps) {
           ))}
         </div>
       )}
+    </div>
+  ) : (
+    <div className="text-muted-foreground text-center py-12 border-2 border-dashed rounded-lg">
+      <p className="text-lg mb-2">{t.noWabaTitle}</p>
+      <p className="text-sm italic">{t.noWabaSubtitle}</p>
     </div>
   );
 }

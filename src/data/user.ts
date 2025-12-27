@@ -18,6 +18,15 @@ import { compareHash, hash } from "@/lib/utils/passwordHandlers";
 import sendSms, { SMSprops } from "@/lib/sms";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 
+export type UserGetPayload = Prisma.UserGetPayload<{
+  include: {
+    contacts: true;
+    messages: true;
+    subscriptions: { include: { plan: true } };
+    waba: { include: { phoneNumbers: true; templates: true } };
+  };
+}>;
+
 /**
  * Creates a new user (doesnt send Welcome email)
  */
@@ -194,21 +203,30 @@ export async function verifyToken(data: {
 /**
  * Find a user by ID.
  */
-export async function getUserById(id: string): Promise<Prisma.UserGetPayload<{
-  include: {
-    subscriptions: true;
-    waba: true;
-    contacts: true;
-    messages: true;
-  };
-}> | null> {
+export async function getUserById(id: string): Promise<UserGetPayload | null> {
   return db.user.findUnique({
     where: { id },
     include: {
-      subscriptions: { include: { plan: true } },
-      waba: true,
       contacts: true,
       messages: true,
+      waba: {
+        include: {
+          phoneNumbers: true,
+          templates: true,
+        },
+      },
+      subscriptions: {
+        where: {
+          cancelDate: null,
+        },
+        include: {
+          plan: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1,
+      },
     },
   });
 }

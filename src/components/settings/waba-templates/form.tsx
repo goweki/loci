@@ -94,8 +94,8 @@ const WabaTemplateForm = () => {
       if (stepNum === 1) {
         z.object({
           name: z.string().min(1),
-          language: z.enum(TemplateLanguage),
-          category: z.enum(TemplateCategory),
+          language: z.nativeEnum(TemplateLanguage),
+          category: z.nativeEnum(TemplateCategory),
         }).parse({
           name: formData.name,
           language: formData.language,
@@ -129,26 +129,23 @@ const WabaTemplateForm = () => {
 
   const handleSubmit = async () => {
     try {
-      // Validate using the builder schema
       const validated = templateBuilderSchema.parse(formData);
-      console.log("Validated builder:", validated);
+      console.log("Validated builder:", JSON.stringify(validated, null, 2));
 
-      // Convert builder format to template format
       const template = builderToTemplate(validated);
-      console.log("Converted template:", template);
+      console.log("Converted template:", JSON.stringify(template, null, 2));
+
+      // Check the components array specifically
+      console.log(
+        "Template components:",
+        JSON.stringify(template.components, null, 2)
+      );
 
       const augmented = { ...template, createdById: userId };
       const newTemplate: WabaTemplate = await createTemplate(augmented);
       toast.success(`Template created: ${newTemplate.name}`);
     } catch (err) {
-      if (err instanceof z.ZodError) {
-        err.issues.forEach((e) => {
-          toast.error(`${e.path.join(".")}: ${e.message}`);
-        });
-      } else {
-        toast.error("Failed to create template");
-        console.error(err);
-      }
+      // ...
     }
   };
 
@@ -180,465 +177,519 @@ const WabaTemplateForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-4 sm:p-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            WhatsApp Template Creator
-          </h1>
-          <p className="text-gray-600">
-            Create message templates for WhatsApp Business API
-          </p>
-        </div>
-
-        {/* Steps */}
-        <div className="flex items-center justify-center mb-8">
-          {[1, 2, 3, ...(isAuth ? [] : [4])].map((s, i) => (
-            <React.Fragment key={s}>
+    <div className="w-full mx-auto">
+      {/* Steps */}
+      <div className="flex items-center justify-center mb-8">
+        {[1, 2, 3, ...(isAuth ? [] : [4])].map((s, i) => (
+          <React.Fragment key={s}>
+            <div
+              className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold transition-colors ${
+                s < step
+                  ? "bg-green-500 text-white"
+                  : s === step
+                    ? "bg-green-600 text-white"
+                    : "bg-gray-200 text-gray-500"
+              }`}
+            >
+              {s < step ? <Check className="w-5 h-5" /> : s}
+            </div>
+            {i < (isAuth ? 2 : 3) && (
               <div
-                className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold transition-colors ${
-                  s < step
-                    ? "bg-green-500 text-white"
-                    : s === step
-                      ? "bg-green-600 text-white"
-                      : "bg-gray-200 text-gray-500"
-                }`}
-              >
-                {s < step ? <Check className="w-5 h-5" /> : s}
-              </div>
-              {i < (isAuth ? 2 : 3) && (
-                <div
-                  className={`w-16 h-1 transition-colors ${s < step ? "bg-green-500" : "bg-gray-200"}`}
-                />
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {step === 1 && "Basic Information"}
-              {step === 2 && "Message Body"}
-              {step === 3 &&
-                (isAuth ? "Authentication Settings" : "Header & Footer")}
-              {step === 4 && "Buttons"}
-            </CardTitle>
-            <CardDescription>
-              Step {step} of {maxSteps}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Step 1: Basic Info */}
-            {step === 1 && (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="name">Template Name *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) =>
-                      updateFormData("name", e.target.value.toLowerCase())
-                    }
-                    placeholder="my_template_name"
-                  />
-                  {errors.name && (
-                    <p className="text-sm text-red-500">{errors.name}</p>
-                  )}
-                  <p className="text-xs text-gray-500">
-                    Lowercase letters, numbers, and underscores only
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Language *</Label>
-                  <Select
-                    value={formData.language}
-                    onValueChange={(v) => updateFormData("language", v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={TemplateLanguage.en_US}>
-                        English (US)
-                      </SelectItem>
-                      {/* <SelectItem value={TemplateLanguage.en_GB}>
-                        English (GB)
-                      </SelectItem> */}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Category *</Label>
-                  <RadioGroup
-                    value={formData.category}
-                    onValueChange={(v) => updateFormData("category", v)}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem
-                        value={TemplateCategory.UTILITY}
-                        id="utility"
-                      />
-                      <Label
-                        htmlFor="utility"
-                        className="cursor-pointer font-normal"
-                      >
-                        Utility
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem
-                        value={TemplateCategory.MARKETING}
-                        id="marketing"
-                      />
-                      <Label
-                        htmlFor="marketing"
-                        className="cursor-pointer font-normal"
-                      >
-                        Marketing
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem
-                        value={TemplateCategory.AUTHENTICATION}
-                        id="auth"
-                      />
-                      <Label
-                        htmlFor="auth"
-                        className="cursor-pointer font-normal"
-                      >
-                        Authentication
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-              </>
+                className={`w-16 h-1 transition-colors ${s < step ? "bg-green-500" : "bg-gray-200"}`}
+              />
             )}
+          </React.Fragment>
+        ))}
+      </div>
 
-            {/* Step 2: Body */}
-            {step === 2 && (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="bodyText">Message Body *</Label>
-                  <Textarea
-                    id="bodyText"
-                    value={formData.body?.text || ""}
-                    onChange={(e) =>
-                      updateFormData("body.text", e.target.value)
-                    }
-                    rows={6}
-                    placeholder="Your message text here..."
-                  />
-                  {errors["body.text"] && (
-                    <p className="text-sm text-red-500">
-                      {errors["body.text"]}
-                    </p>
-                  )}
-                </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {step === 1 && "Basic Information"}
+            {step === 2 && "Message Body"}
+            {step === 3 &&
+              (isAuth ? "Authentication Settings" : "Header & Footer")}
+            {step === 4 && "Buttons"}
+          </CardTitle>
+          <CardDescription>
+            Step {step} of {maxSteps}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Step 1: Basic Info */}
+          {step === 1 && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="name">Template Name *</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) =>
+                    updateFormData("name", e.target.value.toLowerCase())
+                  }
+                  placeholder="my_template_name"
+                />
+                {errors.name && (
+                  <p className="text-sm text-red-500">{errors.name}</p>
+                )}
+                <p className="text-xs text-gray-500">
+                  Lowercase letters, numbers, and underscores only
+                </p>
+              </div>
 
-                {isAuth && (
+              <div className="space-y-2">
+                <Label>Language *</Label>
+                <Select
+                  value={formData.language}
+                  onValueChange={(v) => updateFormData("language", v)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={TemplateLanguage.en_US}>
+                      English (US)
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Category *</Label>
+                <RadioGroup
+                  value={formData.category}
+                  onValueChange={(v) => updateFormData("category", v)}
+                >
                   <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="addSecurityRecommendation"
-                      checked={
-                        authData?.body?.addSecurityRecommendation || false
-                      }
-                      onCheckedChange={(checked) =>
-                        updateFormData(
-                          "body.addSecurityRecommendation",
-                          checked
-                        )
-                      }
+                    <RadioGroupItem
+                      value={TemplateCategory.UTILITY}
+                      id="utility"
                     />
                     <Label
-                      htmlFor="addSecurityRecommendation"
+                      htmlFor="utility"
                       className="cursor-pointer font-normal"
                     >
-                      Add security recommendation
+                      Utility
                     </Label>
                   </div>
-                )}
-
-                {!isAuth && (
-                  <div className="space-y-2">
-                    <Label>Body Variable Examples (Optional)</Label>
-                    <p className="text-xs text-gray-500">
-                      Add example values for variables in your body text
-                    </p>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const current = nonAuthData?.body?.example || [];
-                        updateFormData("body.example", [...current, [""]]);
-                      }}
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem
+                      value={TemplateCategory.MARKETING}
+                      id="marketing"
+                    />
+                    <Label
+                      htmlFor="marketing"
+                      className="cursor-pointer font-normal"
                     >
-                      <Plus className="w-4 h-4 mr-1" /> Add Example Set
-                    </Button>
+                      Marketing
+                    </Label>
                   </div>
-                )}
-              </>
-            )}
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem
+                      value={TemplateCategory.AUTHENTICATION}
+                      id="auth"
+                    />
+                    <Label
+                      htmlFor="auth"
+                      className="cursor-pointer font-normal"
+                    >
+                      Authentication
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </>
+          )}
 
-            {/* Step 3: Auth Settings or Header/Footer */}
-            {step === 3 && isAuth && authData && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="footerText">Footer Text (Optional)</Label>
-                  <Input
-                    id="footerText"
-                    value={authData.footer?.text || ""}
-                    onChange={(e) =>
-                      updateFormData("footer.text", e.target.value)
+          {/* Step 2: Body */}
+          {step === 2 && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="bodyText">Message Body *</Label>
+                <Textarea
+                  id="bodyText"
+                  value={formData.body?.text || ""}
+                  onChange={(e) => updateFormData("body.text", e.target.value)}
+                  rows={6}
+                  placeholder="Your message text here..."
+                />
+                {errors["body.text"] && (
+                  <p className="text-sm text-red-500">{errors["body.text"]}</p>
+                )}
+              </div>
+
+              {isAuth && (
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="addSecurityRecommendation"
+                    checked={authData?.body?.addSecurityRecommendation || false}
+                    onCheckedChange={(checked) =>
+                      updateFormData("body.addSecurityRecommendation", checked)
                     }
-                    placeholder="Footer text"
+                  />
+                  <Label
+                    htmlFor="addSecurityRecommendation"
+                    className="cursor-pointer font-normal"
+                  >
+                    Add security recommendation
+                  </Label>
+                </div>
+              )}
+
+              {!isAuth && (
+                <div className="space-y-2">
+                  <Label>Body Variable Examples (Optional)</Label>
+                  <p className="text-xs text-gray-500">
+                    Add example values for variables in your body text
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const current = nonAuthData?.body?.example || [];
+                      updateFormData("body.example", [...current, [""]]);
+                    }}
+                  >
+                    <Plus className="w-4 h-4 mr-1" /> Add Example Set
+                  </Button>
+
+                  {/* Render example sets */}
+                  {(nonAuthData?.body?.example || []).map(
+                    (exampleSet: string[], setIndex: number) => (
+                      <Card key={setIndex} className="p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label>Example Set {setIndex + 1}</Label>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              const examples = [
+                                ...(nonAuthData?.body?.example || []),
+                              ];
+                              examples.splice(setIndex, 1);
+                              updateFormData(
+                                "body.example",
+                                examples.length > 0 ? examples : undefined
+                              );
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </Button>
+                        </div>
+                        {exampleSet.map((value: string, valueIndex: number) => (
+                          <Input
+                            key={valueIndex}
+                            value={value}
+                            onChange={(e) => {
+                              const examples = [
+                                ...(nonAuthData?.body?.example || []),
+                              ];
+                              examples[setIndex][valueIndex] = e.target.value;
+                              updateFormData("body.example", examples);
+                            }}
+                            placeholder={`Variable ${valueIndex + 1} example`}
+                          />
+                        ))}
+                      </Card>
+                    )
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Step 3: Auth Settings or Header/Footer */}
+          {step === 3 && isAuth && authData && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="footerText">Footer Text (Optional)</Label>
+                <Input
+                  id="footerText"
+                  value={authData.footer?.text || ""}
+                  onChange={(e) =>
+                    updateFormData("footer.text", e.target.value)
+                  }
+                  placeholder="Footer text"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="codeExpiration">
+                  Code Expiration (minutes)
+                </Label>
+                <Input
+                  id="codeExpiration"
+                  type="number"
+                  min={1}
+                  max={90}
+                  value={authData.footer?.codeExpirationMinutes || ""}
+                  onChange={(e) =>
+                    updateFormData(
+                      "footer.codeExpirationMinutes",
+                      parseInt(e.target.value) || undefined
+                    )
+                  }
+                  placeholder="e.g., 10"
+                />
+                <p className="text-xs text-gray-500">
+                  Must be between 1-90 minutes
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>OTP Button Type</Label>
+                <Select
+                  value={authData.buttons?.[0]?.otp_type || "COPY_CODE"}
+                  onValueChange={(v) => {
+                    updateFormData("buttons", [
+                      {
+                        type: "OTP",
+                        otp_type: v,
+                        text: v === "COPY_CODE" ? "Copy code" : "Autofill",
+                        ...(v === "ONE_TAP" && {
+                          autofill_text: "Autofill",
+                          package_name: "com.example.app",
+                          signature_hash: "",
+                        }),
+                      },
+                    ]);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="COPY_CODE">Copy Code</SelectItem>
+                    <SelectItem value="ONE_TAP">One Tap</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {authData.buttons?.[0]?.otp_type === "ONE_TAP" && (
+                <>
+                  <Input
+                    placeholder="Package name"
+                    value={(authData.buttons[0] as any).package_name || ""}
+                    onChange={(e) =>
+                      updateButton(0, "package_name", e.target.value)
+                    }
+                  />
+                  <Input
+                    placeholder="Signature hash"
+                    value={(authData.buttons[0] as any).signature_hash || ""}
+                    onChange={(e) =>
+                      updateButton(0, "signature_hash", e.target.value)
+                    }
+                  />
+                </>
+              )}
+
+              <Alert>
+                <AlertDescription>
+                  Authentication templates require exactly one OTP button.
+                </AlertDescription>
+              </Alert>
+            </div>
+          )}
+
+          {step === 3 && !isAuth && nonAuthData && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Header Format (Optional)</Label>
+                <Select
+                  value={nonAuthData.header?.format || ""}
+                  onValueChange={(v) => {
+                    if (v) {
+                      updateFormData("header.format", v);
+                      // Initialize example for media headers
+                      if (v === "IMAGE" || v === "VIDEO" || v === "DOCUMENT") {
+                        updateFormData("header.example", {
+                          header_handle: [""],
+                        });
+                      } else if (v === "TEXT") {
+                        updateFormData("header.example", undefined);
+                      }
+                    } else {
+                      updateFormData("header", undefined);
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select format" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="TEXT">Text</SelectItem>
+                    <SelectItem value="IMAGE">Image</SelectItem>
+                    <SelectItem value="VIDEO">Video</SelectItem>
+                    <SelectItem value="DOCUMENT">Document</SelectItem>
+                    <SelectItem value="LOCATION">Location</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {nonAuthData.header?.format === "TEXT" && (
+                <div className="space-y-2">
+                  <Label htmlFor="headerText">Header Text</Label>
+                  <Input
+                    id="headerText"
+                    value={nonAuthData.header?.text || ""}
+                    onChange={(e) =>
+                      updateFormData("header.text", e.target.value)
+                    }
+                    placeholder="Header text"
                   />
                 </div>
+              )}
 
+              {/* Example URL for media headers */}
+              {(nonAuthData.header?.format === "IMAGE" ||
+                nonAuthData.header?.format === "VIDEO" ||
+                nonAuthData.header?.format === "DOCUMENT") && (
                 <div className="space-y-2">
-                  <Label htmlFor="codeExpiration">
-                    Code Expiration (minutes)
+                  <Label htmlFor="headerExample">
+                    Example {nonAuthData.header.format.toLowerCase()} URL *
                   </Label>
                   <Input
-                    id="codeExpiration"
-                    type="number"
-                    min={1}
-                    max={90}
-                    value={authData.footer?.codeExpirationMinutes || ""}
-                    onChange={(e) =>
-                      updateFormData(
-                        "footer.codeExpirationMinutes",
-                        parseInt(e.target.value) || undefined
-                      )
+                    id="headerExample"
+                    value={
+                      nonAuthData.header?.example?.header_handle?.[0] || ""
                     }
-                    placeholder="e.g., 10"
+                    onChange={(e) =>
+                      updateFormData("header.example", {
+                        header_handle: [e.target.value],
+                      })
+                    }
+                    placeholder="https://example.com/sample-image.jpg"
                   />
                   <p className="text-xs text-gray-500">
-                    Must be between 1-90 minutes
+                    Provide a sample URL for template approval
                   </p>
                 </div>
+              )}
 
-                <div className="space-y-2">
-                  <Label>OTP Button Type</Label>
+              <div className="space-y-2">
+                <Label htmlFor="footerText">Footer Text (Optional)</Label>
+                <Input
+                  id="footerText"
+                  value={nonAuthData.footer?.text || ""}
+                  onChange={(e) =>
+                    updateFormData("footer.text", e.target.value)
+                  }
+                  placeholder="Footer text"
+                  maxLength={60}
+                />
+                <p className="text-xs text-gray-500">Max 60 characters</p>
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Buttons (Non-Auth only) */}
+          {step === 4 && !isAuth && nonAuthData && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>Buttons (Optional)</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addButton}
+                  disabled={(nonAuthData.buttons?.length || 0) >= 10}
+                >
+                  <Plus className="w-4 h-4 mr-1" /> Add Button
+                </Button>
+              </div>
+
+              {(nonAuthData.buttons || []).map((btn: any, i: number) => (
+                <Card key={i} className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Button {i + 1}</Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeButton(i)}
+                    >
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </Button>
+                  </div>
+
                   <Select
-                    value={authData.buttons?.[0]?.otp_type || "COPY_CODE"}
+                    value={btn.type}
                     onValueChange={(v) => {
-                      updateFormData("buttons", [
-                        {
-                          type: "OTP",
-                          otp_type: v,
-                          text: v === "COPY_CODE" ? "Copy code" : "Autofill",
-                          ...(v === "ONE_TAP" && {
-                            autofill_text: "Autofill",
-                            package_name: "com.example.app",
-                            signature_hash: "",
-                          }),
-                        },
-                      ]);
+                      const newBtn: any = { type: v, text: btn.text };
+                      if (v === "URL") newBtn.url = "";
+                      if (v === "PHONE_NUMBER") newBtn.phone_number = "";
+                      updateButton(i, "type", v);
+                      const buttons = [...((formData as any).buttons || [])];
+                      buttons[i] = newBtn;
+                      updateFormData("buttons", buttons);
                     }}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="COPY_CODE">Copy Code</SelectItem>
-                      <SelectItem value="ONE_TAP">One Tap</SelectItem>
+                      <SelectItem value="QUICK_REPLY">Quick Reply</SelectItem>
+                      <SelectItem value="URL">URL</SelectItem>
+                      <SelectItem value="PHONE_NUMBER">Phone Number</SelectItem>
+                      <SelectItem value="CATALOG">Catalog</SelectItem>
+                      <SelectItem value="MPM">MPM</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
 
-                {authData.buttons?.[0]?.otp_type === "ONE_TAP" && (
-                  <>
-                    <Input
-                      placeholder="Package name"
-                      value={(authData.buttons[0] as any).package_name || ""}
-                      onChange={(e) =>
-                        updateButton(0, "package_name", e.target.value)
-                      }
-                    />
-                    <Input
-                      placeholder="Signature hash"
-                      value={(authData.buttons[0] as any).signature_hash || ""}
-                      onChange={(e) =>
-                        updateButton(0, "signature_hash", e.target.value)
-                      }
-                    />
-                  </>
-                )}
-
-                <Alert>
-                  <AlertDescription>
-                    Authentication templates require exactly one OTP button.
-                  </AlertDescription>
-                </Alert>
-              </div>
-            )}
-
-            {step === 3 && !isAuth && nonAuthData && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Header Format (Optional)</Label>
-                  <Select
-                    value={nonAuthData.header?.format || ""}
-                    onValueChange={(v) =>
-                      updateFormData("header.format", v || undefined)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select format" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">None</SelectItem>
-                      <SelectItem value="TEXT">Text</SelectItem>
-                      <SelectItem value="IMAGE">Image</SelectItem>
-                      <SelectItem value="VIDEO">Video</SelectItem>
-                      <SelectItem value="DOCUMENT">Document</SelectItem>
-                      <SelectItem value="LOCATION">Location</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {nonAuthData.header?.format === "TEXT" && (
-                  <div className="space-y-2">
-                    <Label htmlFor="headerText">Header Text</Label>
-                    <Input
-                      id="headerText"
-                      value={nonAuthData.header?.text || ""}
-                      onChange={(e) =>
-                        updateFormData("header.text", e.target.value)
-                      }
-                      placeholder="Header text"
-                    />
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="footerText">Footer Text (Optional)</Label>
                   <Input
-                    id="footerText"
-                    value={nonAuthData.footer?.text || ""}
-                    onChange={(e) =>
-                      updateFormData("footer.text", e.target.value)
-                    }
-                    placeholder="Footer text"
-                    maxLength={60}
+                    value={btn.text}
+                    onChange={(e) => updateButton(i, "text", e.target.value)}
+                    placeholder="Button text"
+                    maxLength={25}
                   />
-                  <p className="text-xs text-gray-500">Max 60 characters</p>
-                </div>
-              </div>
-            )}
 
-            {/* Step 4: Buttons (Non-Auth only) */}
-            {step === 4 && !isAuth && nonAuthData && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label>Buttons (Optional)</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={addButton}
-                    disabled={(nonAuthData.buttons?.length || 0) >= 10}
-                  >
-                    <Plus className="w-4 h-4 mr-1" /> Add Button
-                  </Button>
-                </div>
-
-                {(nonAuthData.buttons || []).map((btn: any, i: number) => (
-                  <Card key={i} className="p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label>Button {i + 1}</Label>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeButton(i)}
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </Button>
-                    </div>
-
-                    <Select
-                      value={btn.type}
-                      onValueChange={(v) => {
-                        const newBtn: any = { type: v, text: btn.text };
-                        if (v === "URL") newBtn.url = "";
-                        if (v === "PHONE_NUMBER") newBtn.phone_number = "";
-                        updateButton(i, "type", v);
-                        const buttons = [...((formData as any).buttons || [])];
-                        buttons[i] = newBtn;
-                        updateFormData("buttons", buttons);
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="QUICK_REPLY">Quick Reply</SelectItem>
-                        <SelectItem value="URL">URL</SelectItem>
-                        <SelectItem value="PHONE_NUMBER">
-                          Phone Number
-                        </SelectItem>
-                        <SelectItem value="CATALOG">Catalog</SelectItem>
-                        <SelectItem value="MPM">MPM</SelectItem>
-                      </SelectContent>
-                    </Select>
-
+                  {btn.type === "URL" && (
                     <Input
-                      value={btn.text}
-                      onChange={(e) => updateButton(i, "text", e.target.value)}
-                      placeholder="Button text"
-                      maxLength={25}
+                      value={btn.url || ""}
+                      onChange={(e) => updateButton(i, "url", e.target.value)}
+                      placeholder="https://example.com"
                     />
+                  )}
 
-                    {btn.type === "URL" && (
-                      <Input
-                        value={btn.url || ""}
-                        onChange={(e) => updateButton(i, "url", e.target.value)}
-                        placeholder="https://example.com"
-                      />
-                    )}
-
-                    {btn.type === "PHONE_NUMBER" && (
-                      <Input
-                        value={btn.phone_number || ""}
-                        onChange={(e) =>
-                          updateButton(i, "phone_number", e.target.value)
-                        }
-                        placeholder="+1234567890"
-                      />
-                    )}
-                  </Card>
-                ))}
-              </div>
-            )}
-
-            {/* Navigation */}
-            <div className="flex justify-between pt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleBack}
-                disabled={step === 1}
-              >
-                <ChevronLeft className="w-4 h-4 mr-1" /> Back
-              </Button>
-              {step < maxSteps ? (
-                <Button type="button" onClick={handleNext}>
-                  Next <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              ) : (
-                <Button type="button" onClick={handleSubmit}>
-                  <Check className="w-4 h-4 mr-1" /> Create Template
-                </Button>
-              )}
+                  {btn.type === "PHONE_NUMBER" && (
+                    <Input
+                      value={btn.phone_number || ""}
+                      onChange={(e) =>
+                        updateButton(i, "phone_number", e.target.value)
+                      }
+                      placeholder="+1234567890"
+                    />
+                  )}
+                </Card>
+              ))}
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          )}
+
+          {/* Navigation */}
+          <div className="flex justify-between pt-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleBack}
+              disabled={step === 1}
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" /> Back
+            </Button>
+            {step < maxSteps ? (
+              <Button type="button" onClick={handleNext}>
+                Next <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            ) : (
+              <Button type="button" onClick={handleSubmit}>
+                <Check className="w-4 h-4 mr-1" /> Create Template
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

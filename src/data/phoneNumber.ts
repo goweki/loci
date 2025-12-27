@@ -3,12 +3,25 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/lib/prisma/generated";
 
+export type PhoneNumberGetPayload = Prisma.PhoneNumberGetPayload<{
+  include: {
+    waba: true;
+    messages: true;
+  };
+}>;
+
 /**
  * 🔍 Find a phone number by its ID.
  */
-export async function getPhoneNumberById(id: string) {
+export async function getPhoneNumberById(
+  id: string
+): Promise<PhoneNumberGetPayload | null> {
   return prisma.phoneNumber.findUnique({
     where: { id },
+    include: {
+      waba: true,
+      messages: true,
+    },
   });
 }
 

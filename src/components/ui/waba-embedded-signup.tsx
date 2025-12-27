@@ -27,7 +27,7 @@ interface FacebookProfile {
   email: string;
 }
 
-export default function FacebookLogin() {
+export default function WabaEmbeddedSignup({ label }: { label?: string }) {
   const [profile, setProfile] = useState<FacebookProfile | null>(null);
   const [sdkReady, setSdkReady] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -125,7 +125,7 @@ export default function FacebookLogin() {
         </div>
       ) : (
         <Button onClick={handleLogin} disabled={!sdkReady || loading}>
-          {loading ? <Loader /> : "Integrate new Whatsapp Number"}
+          {loading ? <Loader /> : label || "Integrate new Whatsapp Chatbot"}
         </Button>
       )}
     </div>

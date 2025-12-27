@@ -2,153 +2,15 @@
 
 import { Suspense } from "react";
 import { TemplatesClient } from "@/components/settings/waba-templates";
-import {
-  TemplateCategory,
-  type Prisma,
-  type WabaTemplate,
-} from "@/lib/prisma/generated";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import PageTitle from "@/components/ui/page-title";
 import { isValidLanguage } from "@/lib/i18n";
-
-// Static data - replace with actual query functions from data/templates
-const getTemplates = async (
-  userId: string
-): Promise<Prisma.WabaTemplateGetPayload<{ include: { waba: true } }>[]> => {
-  // Simulating async data fetch
-  // Replace this with: import { getTemplates } from '@/data/templates';
-  return [
-    {
-      id: "1",
-      name: "welcome_message",
-      status: "APPROVED",
-      category: TemplateCategory.MARKETING,
-      language: "en_US",
-      components: JSON.parse(
-        JSON.stringify([
-          {
-            type: "header",
-            format: "TEXT",
-            text: "Welcome to {{1}}!",
-          },
-          {
-            type: "body",
-            text: "Hi {{1}}, thanks for signing up. We're excited to have you on board!",
-          },
-          {
-            type: "footer",
-            text: "Reply STOP to unsubscribe",
-          },
-        ])
-      ),
-      createdAt: new Date("2024-01-15"),
-      updatedAt: new Date("2024-01-15"),
-      wabaId: "waba_123",
-      rejectedReason: null,
-      createdById: userId,
-      waba: {
-        businessId: "waba_123",
-        userId,
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-      },
-    },
-    {
-      id: "2",
-      name: "order_confirmation",
-      status: "APPROVED",
-      category: TemplateCategory.UTILITY,
-      language: "en_US",
-      components: JSON.parse(
-        JSON.stringify([
-          {
-            type: "HEADER",
-            format: "TEXT",
-            text: "Order Confirmed",
-          },
-          {
-            type: "BODY",
-            text: "Your order #{{1}} has been confirmed. Expected delivery: {{2}}",
-          },
-          {
-            type: "BUTTONS",
-            buttons: [
-              {
-                type: "URL",
-                text: "Track Order",
-                url: "https://example.com/track/{{1}}",
-              },
-            ],
-          },
-        ])
-      ),
-      createdAt: new Date("2024-02-01"),
-      updatedAt: new Date("2024-02-01"),
-      wabaId: "waba_123",
-      rejectedReason: null,
-      createdById: userId,
-      waba: {
-        businessId: "waba_123",
-        userId,
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-      },
-    },
-    {
-      id: "3",
-      name: "payment_reminder",
-      status: "PENDING",
-      category: TemplateCategory.UTILITY,
-      language: "en_US",
-      components: JSON.parse(
-        JSON.stringify([
-          {
-            type: "BODY",
-            text: "Your payment of {{1}} is due on {{2}}. Please complete the payment to avoid service interruption.",
-          },
-        ])
-      ),
-      createdAt: new Date("2024-03-10"),
-      updatedAt: new Date("2024-03-10"),
-      wabaId: "waba_123",
-      rejectedReason: null,
-      createdById: userId,
-      waba: {
-        businessId: "waba_123",
-        userId,
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-      },
-    },
-    {
-      id: "4",
-      name: "rejected_template",
-      status: "REJECTED",
-      category: TemplateCategory.MARKETING,
-      language: "en_US",
-      components: JSON.parse(
-        JSON.stringify([
-          {
-            type: "BODY",
-            text: "Check out our amazing deals!",
-          },
-        ])
-      ),
-      createdAt: new Date("2024-03-01"),
-      updatedAt: new Date("2024-03-05"),
-      wabaId: "waba_123",
-      rejectedReason: "Template content violates WhatsApp policies",
-      createdById: userId,
-      waba: {
-        businessId: "waba_123",
-        userId,
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-      },
-    },
-  ];
-};
+import {
+  WabaTemplateFilters,
+  WabaTemplateRepository,
+} from "@/data/repositories/waba-template";
+import { getUserById } from "@/data/user";
 
 function TemplatesSkeleton() {
   return (
@@ -187,7 +49,9 @@ export default async function TemplatesPage({
 
   const t = translations[lang];
 
-  const templates = await getTemplates(session.user.id);
+  const templates = await WabaTemplateRepository.findByUserId(session.user.id);
+
+  const wabaAccount = (await getUserById(session.user.id))?.waba || null;
 
   return (
     <main className="flex-1 overflow-y-auto p-6">
@@ -195,7 +59,7 @@ export default async function TemplatesPage({
         <PageTitle title={t.title} subtitle={t.subtitle} />
 
         <Suspense fallback={<TemplatesSkeleton />}>
-          <TemplatesClient initialTemplates={templates} />
+          <TemplatesClient wabaAccount={wabaAccount} />
         </Suspense>
       </div>
     </main>

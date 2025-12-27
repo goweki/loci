@@ -52,18 +52,18 @@ export function CreateTemplateButton() {
           <Plus /> Create Template
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      {/* <DialogContent className="sm:max-w-[425px] max-h-4/5 overflow-y-auto"> */}
+      <DialogContent className="sm:max-w-[425px] max-h-[90%] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create Template</DialogTitle>
-          <DialogDescription>Configure a message template</DialogDescription>
         </DialogHeader>
         <TemplateForm />
         {/* <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <Button type="submit">Save changes</Button>
-        </DialogFooter> */}
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button type="submit">Save changes</Button>
+          </DialogFooter> */}
       </DialogContent>
     </Dialog>
   );
