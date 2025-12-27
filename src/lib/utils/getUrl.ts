@@ -9,7 +9,7 @@ export const BASE_URL: string =
       ? `https://${process.env.NEXT_PUBLIC_DOMAIN}`
       : process.env.NODE_ENV === "production"
         ? `https://${process.env.NEXT_PUBLIC_DOMAIN}`
-        : "http://localhost:3000";
+        : process.env.NEXTAUTH_URL || "https://localhost:3000";
 
 /**
  * RegExp to check if a string starts with a forward slash `/`.
