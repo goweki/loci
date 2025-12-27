@@ -47,8 +47,7 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
           <span className="hidden sm:inline">Profile</span>
         </TabsTrigger>
         <TabsTrigger value="whatsapp" className="flex items-center gap-2">
-          {/* <Phone className="w-4 h-4" /> */}
-          <WhatsAppLogo className="h-5 w-5" />
+          <WhatsAppLogo className="h-4 w-4" />
           <span className="hidden sm:inline">WhatsApp</span>
         </TabsTrigger>
         <TabsTrigger value="billing" className="flex items-center gap-2">
