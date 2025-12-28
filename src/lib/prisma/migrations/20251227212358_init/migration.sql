@@ -1,4 +1,22 @@
 -- CreateEnum
+CREATE TYPE "WabaOwnership" AS ENUM ('OWNED', 'SHARED');
+
+-- CreateEnum
+CREATE TYPE "WabaCurrency" AS ENUM ('USD');
+
+-- CreateEnum
+CREATE TYPE "TemplateLanguage" AS ENUM ('en_US', 'en_GB', 'fr_FR', 'sw_KE');
+
+-- CreateEnum
+CREATE TYPE "TemplateCategory" AS ENUM ('AUTHENTICATION', 'UTILITY', 'MARKETING');
+
+-- CreateEnum
+CREATE TYPE "TemplateApprovalStatus" AS ENUM ('APPROVED', 'PENDING', 'REJECTED', 'DISABLED');
+
+-- CreateEnum
+CREATE TYPE "VerificationChannel" AS ENUM ('EMAIL', 'WHATSAPP');
+
+-- CreateEnum
 CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED', 'REVERSED');
 
 -- CreateEnum
@@ -58,6 +76,35 @@ CREATE TABLE "users" (
 );
 
 -- CreateTable
+CREATE TABLE "waba_accounts" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "ownership" "WabaOwnership" NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "waba_accounts_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "waba_templates" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "status" "TemplateApprovalStatus" NOT NULL,
+    "category" "TemplateCategory" NOT NULL,
+    "language" "TemplateLanguage" NOT NULL DEFAULT 'en_US',
+    "components" JSONB NOT NULL,
+    "rejectedReason" TEXT,
+    "wabaId" TEXT NOT NULL,
+    "createdById" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "waba_templates_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "user_sessions" (
     "id" TEXT NOT NULL,
     "sessionToken" TEXT NOT NULL,
@@ -69,9 +116,15 @@ CREATE TABLE "user_sessions" (
 
 -- CreateTable
 CREATE TABLE "verification_tokens" (
-    "identifier" TEXT NOT NULL,
+    "id" TEXT NOT NULL,
     "token" TEXT NOT NULL,
-    "expires" TIMESTAMP(3) NOT NULL
+    "expires" TIMESTAMP(3) NOT NULL,
+    "channel" "VerificationChannel",
+    "userId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "lastUsedAt" TIMESTAMP(3),
+
+    CONSTRAINT "verification_tokens_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -147,15 +200,14 @@ CREATE TABLE "phone_numbers" (
     "id" TEXT NOT NULL,
     "phoneNumberId" TEXT,
     "phoneNumber" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
     "displayName" TEXT,
     "preVerificationId" TEXT,
     "preVerificationCode" TEXT,
-    "wabaId" TEXT,
     "status" "PhoneNumberStatus" NOT NULL DEFAULT 'NOT_CLAIMED',
     "verifiedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "userId" TEXT NOT NULL,
 
     CONSTRAINT "phone_numbers_pkey" PRIMARY KEY ("id")
 );
@@ -207,9 +259,9 @@ CREATE TABLE "MessageUnprocessed" (
 );
 
 -- CreateTable
-CREATE TABLE "AutoReplyRule" (
+CREATE TABLE "autoreply_rules" (
     "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "phoneNumberId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "triggerType" "TriggerType" NOT NULL,
     "triggerValue" TEXT,
@@ -219,8 +271,9 @@ CREATE TABLE "AutoReplyRule" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
+    "createdById" TEXT NOT NULL,
 
-    CONSTRAINT "AutoReplyRule_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "autoreply_rules_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -259,13 +312,19 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE UNIQUE INDEX "users_tel_key" ON "users"("tel");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "waba_accounts_id_key" ON "waba_accounts"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "waba_accounts_userId_key" ON "waba_accounts"("userId");
+
+-- CreateIndex
+CREATE INDEX "waba_templates_status_idx" ON "waba_templates"("status");
+
+-- CreateIndex
+CREATE INDEX "waba_templates_category_idx" ON "waba_templates"("category");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "user_sessions_sessionToken_key" ON "user_sessions"("sessionToken");
-
--- CreateIndex
-CREATE UNIQUE INDEX "verification_tokens_token_key" ON "verification_tokens"("token");
-
--- CreateIndex
-CREATE UNIQUE INDEX "verification_tokens_identifier_token_key" ON "verification_tokens"("identifier", "token");
 
 -- CreateIndex
 CREATE INDEX "subscriptions_userId_idx" ON "subscriptions"("userId");
@@ -292,7 +351,19 @@ CREATE UNIQUE INDEX "contacts_userId_phoneNumber_key" ON "contacts"("userId", "p
 CREATE UNIQUE INDEX "accounts_provider_providerAccountId_key" ON "accounts"("provider", "providerAccountId");
 
 -- AddForeignKey
+ALTER TABLE "waba_accounts" ADD CONSTRAINT "waba_accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "waba_templates" ADD CONSTRAINT "waba_templates_wabaId_fkey" FOREIGN KEY ("wabaId") REFERENCES "waba_accounts"("userId") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "waba_templates" ADD CONSTRAINT "waba_templates_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "user_sessions" ADD CONSTRAINT "user_sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "verification_tokens" ADD CONSTRAINT "verification_tokens_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_planId_fkey" FOREIGN KEY ("planId") REFERENCES "plans"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -310,7 +381,7 @@ ALTER TABLE "plan_features" ADD CONSTRAINT "plan_features_featureId_fkey" FOREIG
 ALTER TABLE "plan_features" ADD CONSTRAINT "plan_features_planId_fkey" FOREIGN KEY ("planId") REFERENCES "plans"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "phone_numbers" ADD CONSTRAINT "phone_numbers_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "phone_numbers" ADD CONSTRAINT "phone_numbers_userId_fkey" FOREIGN KEY ("userId") REFERENCES "waba_accounts"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "contacts" ADD CONSTRAINT "contacts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -325,7 +396,10 @@ ALTER TABLE "messages" ADD CONSTRAINT "messages_phoneNumberId_fkey" FOREIGN KEY 
 ALTER TABLE "messages" ADD CONSTRAINT "messages_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AutoReplyRule" ADD CONSTRAINT "AutoReplyRule_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "autoreply_rules" ADD CONSTRAINT "autoreply_rules_phoneNumberId_fkey" FOREIGN KEY ("phoneNumberId") REFERENCES "phone_numbers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "autoreply_rules" ADD CONSTRAINT "autoreply_rules_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
