@@ -37,10 +37,21 @@ model User {
   @@map("users")
 }
 
+enum WabaOwnership {
+  OWNED
+  SHARED
+}
+
 model WabaAccount {
-  userId     String @id @unique
-  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  businessId String @unique
+  id        String        @id @unique
+  name      String
+  userId    String?       @unique
+  user      User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ownership WabaOwnership
+
+  currency                 String?
+  timezoneId               String?
+  messageTemplateNamespace String?
 
   phoneNumbers PhoneNumber[]
   templates    WabaTemplate[]
@@ -63,11 +74,11 @@ model WabaTemplate {
   wabaId String
   waba   WabaAccount @relation(fields: [wabaId], references: [userId], onDelete: SetNull)
 
-  createdById String
-  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime? @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([status])
   @@index([category])

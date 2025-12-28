@@ -138,8 +138,13 @@ exports.Prisma.UserScalarFieldEnum = {
 };
 
 exports.Prisma.WabaAccountScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
   userId: 'userId',
-  businessId: 'businessId',
+  ownership: 'ownership',
+  currency: 'currency',
+  timezoneId: 'timezoneId',
+  messageTemplateNamespace: 'messageTemplateNamespace',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -350,6 +355,11 @@ exports.UserStatus = exports.$Enums.UserStatus = {
   ACTIVE: 'ACTIVE',
   SUSPENDED: 'SUSPENDED',
   INACTIVE: 'INACTIVE'
+};
+
+exports.WabaOwnership = exports.$Enums.WabaOwnership = {
+  OWNED: 'OWNED',
+  SHARED: 'SHARED'
 };
 
 exports.TemplateApprovalStatus = exports.$Enums.TemplateApprovalStatus = {
