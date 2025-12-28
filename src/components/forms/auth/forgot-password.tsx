@@ -82,7 +82,7 @@ export function ForgotPasswordForm() {
 
       const messages: Record<string, string> = {
         email: `Password reset link sent to ${username}`,
-        whatsapp: `Whatsapp +777833003 to get the reset link`,
+        whatsapp: `Password reset link sent to ${username}`,
         sms: `Your reset link will be sent via sms shortly.`,
       };
 

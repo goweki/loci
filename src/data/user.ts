@@ -10,13 +10,21 @@
 
 import db from "@/lib/prisma";
 import { buildResetURL, generateResetToken } from "@/lib/utils/resetToken";
-import { Prisma, UserRole, UserStatus, User } from "@/lib/prisma/generated";
+import {
+  Prisma,
+  UserRole,
+  UserStatus,
+  User,
+  TemplateLanguage,
+} from "@/lib/prisma/generated";
 import { sendMail } from "@/lib/mail";
 import { welcomeEmail, resetPasswordEmail } from "@/lib/mail/email-render";
 import { BASE_URL } from "@/lib/utils/getUrl";
 import { compareHash, hash } from "@/lib/utils/passwordHandlers";
 import sendSms, { SMSprops } from "@/lib/sms";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
+import whatsapp from "@/lib/whatsapp";
+import { Message } from "@/lib/validations";
 
 export type UserGetPayload = Prisma.UserGetPayload<{
   include: {
@@ -141,19 +149,48 @@ export async function sendResetLink(data: {
     await updateUserPassword(user_.id, userUpdates);
 
     let sentTo_: "email" | "whatsapp" | "sms" | undefined = undefined;
-    const emailToSend = await resetPasswordEmail(user_.name || "", resetLink);
 
     if (usernameAttribute === "email" && user_.email) {
+      const emailToSend = await resetPasswordEmail(user_.name || "", resetLink);
       await sendMail({
         to: user_.email,
         subject: "Reset Password: LOCi",
         html: emailToSend.html,
         text: emailToSend.text,
       });
+
       sentTo_ = "email";
     } else if (verificationMethod === "whatsapp" && user_.tel) {
+      const message: Message = {
+        to: user_.tel,
+        type: "template",
+        template: {
+          name: "set_password",
+          language: { code: TemplateLanguage.en_US },
+          components: [
+            {
+              type: "body",
+              parameters: [
+                {
+                  type: "text",
+                  text: user_.name,
+                },
+              ],
+            },
+            {
+              type: "button",
+              sub_type: "url",
+              index: "0", // first button
+              parameters: [{ type: "text", text: resetLink }],
+            },
+          ],
+        },
+      };
+
+      await whatsapp.sendTemplate(message);
       sentTo_ = "whatsapp";
     } else if (verificationMethod === "sms" && user_.tel) {
+      const emailToSend = await resetPasswordEmail(user_.name || "", resetLink);
       const options_: SMSprops = {
         to: user_.tel,
         message: emailToSend.text,

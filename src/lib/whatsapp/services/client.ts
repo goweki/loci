@@ -74,8 +74,7 @@ export class WhatsAppClient {
   async sendMessage(input: Message) {
     const { phoneNumberId, to, type } = input;
 
-    const finalPhoneNumberId =
-      phoneNumberId ?? process.env.WHATSAPP_PHONE_NUMBER_ID;
+    const finalPhoneNumberId = phoneNumberId ?? this.env.phoneNumberId;
 
     const url = `${this.baseUrl}/${finalPhoneNumberId}/messages`;
 
@@ -104,6 +103,37 @@ export class WhatsAppClient {
     this.logger.info("Message sent successfully", json);
 
     return json;
+  }
+
+  async sendTemplate(input: Message) {
+    const { phoneNumberId, ...payload } = input;
+
+    const finalPhoneNumberId = phoneNumberId ?? this.env.phoneNumberId;
+
+    const url = `${this.baseUrl}/${finalPhoneNumberId}/messages`;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.env.wabaAccessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(`WhatsApp API error: ${JSON.stringify(data)}`);
+      }
+
+      console.log("Message sent:", data);
+      return data;
+    } catch (error) {
+      console.error("Failed to send WhatsApp message:", error);
+      throw error; // re-throw for upstream handling
+    }
   }
 
   // ---------------------------------------------------------------------
