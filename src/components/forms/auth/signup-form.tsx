@@ -82,11 +82,11 @@ export function SignUpForm() {
       });
 
       if (result.verificationMethod === "email") {
-        toast.success(`Check email for instructions to set password`);
+        toast.success(`Verification link sent to Email: ${email}`);
       } else if (result.verificationMethod === "whatsapp") {
-        toast.success(`Text 0777833003 to set your password`);
+        toast.success(`Verification link sent to WhatsApp: ${phoneNumber}`);
       } else if (result.verificationMethod === "sms") {
-        toast.success(`An sms will be sent to you in a minute`);
+        toast.success(`Verification link sent by sms: ${phoneNumber}`);
       }
 
       console.log(result);

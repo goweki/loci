@@ -62,7 +62,7 @@ export async function registerUser(
   }
 ): Promise<User & { verificationMethod: "email" | "whatsapp" | "sms" }> {
   console.log("Registering user... ", data);
-  let verificationMethod_: "email" | "whatsapp" | "sms" | undefined = undefined;
+  let tokenSentTo: "email" | "whatsapp" | "sms" | undefined = undefined;
   const { verificationMethod, ...data_ } = data;
   const { name, email, tel } = data;
 
@@ -85,8 +85,6 @@ export async function registerUser(
     });
 
     if (email) {
-      verificationMethod_ = "email";
-
       const emailToSend = await welcomeEmail(name || "", resetLink);
       await sendMail({
         to: email,
@@ -94,21 +92,46 @@ export async function registerUser(
         html: emailToSend.html,
         text: emailToSend.text,
       });
-    } else if (verificationMethod === "whatsapp" && tel) {
-      verificationMethod_ = "whatsapp";
 
-      ////send
-      //
-      //
+      tokenSentTo = "email";
+    } else if (verificationMethod === "whatsapp" && tel) {
+      const message: Message = {
+        to: tel,
+        type: "template",
+        template: {
+          name: "reset_account_password ",
+          language: { code: TemplateLanguage.en_US },
+          components: [
+            {
+              type: "body",
+              parameters: [
+                {
+                  type: "text",
+                  text: name,
+                },
+              ],
+            },
+            {
+              type: "button",
+              sub_type: "url",
+              index: "0", // first button
+              parameters: [{ type: "text", text: resetLink }],
+            },
+          ],
+        },
+      };
+      await whatsapp.sendTemplate(message);
+
+      tokenSentTo = "whatsapp";
     } else if (verificationMethod === "sms") {
-      verificationMethod_ = "sms";
+      tokenSentTo = "sms";
     }
 
-    if (!verificationMethod_) {
+    if (!tokenSentTo) {
       throw new Error(`Username not verified:${JSON.stringify(resetLink)}`);
     }
 
-    return { ...initUser, verificationMethod: verificationMethod_ };
+    return { ...initUser, verificationMethod: tokenSentTo };
   } catch (error) {
     console.error("User registration failed: ", error);
     const errorMessage = getFriendlyErrorMessage(error);

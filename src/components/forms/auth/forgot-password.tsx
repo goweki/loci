@@ -24,7 +24,7 @@ import { useRouter } from "next/navigation";
 import Loader from "@/components/ui/loaders";
 import AuthErrorHandler, { ERROR_MESSAGES } from "./_errorHandler";
 import { forgotPasswordSchema } from "@/lib/validations";
-import { registerUser, sendResetLink } from "@/data/user";
+import { sendResetLink } from "@/data/user";
 import { useI18n } from "@/lib/i18n";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import InputPhone from "@/components/ui/input-phone";
