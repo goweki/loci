@@ -77,6 +77,8 @@ export async function registerUser(
     });
 
     if (email) {
+      verificationMethod_ = "email";
+
       const emailToSend = await welcomeEmail(name || "", resetLink);
       await sendMail({
         to: email,
@@ -84,9 +86,12 @@ export async function registerUser(
         html: emailToSend.html,
         text: emailToSend.text,
       });
-      verificationMethod_ = "email";
     } else if (verificationMethod === "whatsapp" && tel) {
       verificationMethod_ = "whatsapp";
+
+      ////send
+      //
+      //
     } else if (verificationMethod === "sms") {
       verificationMethod_ = "sms";
     }

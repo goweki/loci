@@ -74,6 +74,19 @@ export async function getPhoneNumbersByUser(
 }
 
 /**
+ * 📦 Get all phone numbers
+ */
+export async function getAllPhoneNumbers(): Promise<
+  Prisma.PhoneNumberGetPayload<{ include: { messages: true; waba: true } }>[]
+> {
+  return prisma.phoneNumber.findMany({
+    where: {},
+    orderBy: { createdAt: "desc" },
+    include: { messages: true, waba: true },
+  });
+}
+
+/**
  * ➕ Create a new phone number record.
  */
 export async function createPhoneNumber(
