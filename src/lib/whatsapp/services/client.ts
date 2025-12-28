@@ -240,10 +240,13 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   // 5. TEMPLATE MANAGEMENT
   // ---------------------------------------------------------------------
-  async getTemplates(): Promise<(TemplateOptions & { id: string })[]> {
-    const url = `${this.baseUrl}/${this.env.fbAppId}/message_templates?access_token=${this.env.wabaAccessToken}`;
+  async getTemplates(
+    wabaId?: string
+  ): Promise<(TemplateOptions & { id: string })[]> {
+    const url = `${this.baseUrl}/${wabaId ?? this.env.wabaId}/message_templates?access_token=${this.env.wabaAccessToken}`;
+    //graph.facebook.com/{{Version}}/{{WABA-ID}}/message_templates
 
-    this.logger.info("Fetching templates");
+    https: this.logger.info("Fetching templates");
 
     const res = await fetch(url);
     const json = await res.json();
@@ -448,6 +451,105 @@ export class WhatsAppClient {
     }
 
     return json;
+  }
+
+  // ---------------------------------------------------------------------
+  // WABA
+  // ---------------------------------------------------------------------
+
+  async getWaba(wabaId?: string): Promise<{
+    id: string;
+    name: string;
+    timezone_id?: string;
+    message_template_namespace: string;
+  }> {
+    const url = `${this.baseUrl}/${wabaId ?? this.env.wabaId}`;
+    const _res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${this.env.wabaAccessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!_res.ok) {
+      throw new Error(`Failed to fetch WABA ${wabaId}: ${_res.statusText}`);
+    }
+    return await _res.json();
+  }
+
+  async getOwnedWabas(businessId?: string): Promise<
+    {
+      id: string;
+      name: string;
+      currency?: string;
+      timezone_id: string;
+      message_template_namespace: string;
+    }[]
+  > {
+    const url = `${this.baseUrl}/${businessId ?? this.env.fbBusinessId}/owned_whatsapp_business_accounts`;
+    const _res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${this.env.wabaAccessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!_res.ok) {
+      throw new Error(
+        `Failed to fetch owned WABAs for business ${businessId}: ${_res.statusText}`
+      );
+    }
+    const res: {
+      data: {
+        id: string;
+        name: string;
+        currency?: string;
+        timezone_id: string;
+        message_template_namespace: string;
+      }[];
+      paging: {
+        cursors: unknown;
+      };
+    } = await _res.json();
+
+    return res.data;
+  }
+
+  async getSharedWabas(businessId?: string): Promise<
+    {
+      id: string;
+      name: string;
+      currency?: string;
+      timezone_id: string;
+      message_template_namespace: string;
+    }[]
+  > {
+    const url = `${this.baseUrl}/${businessId ?? this.env.fbBusinessId}/client_whatsapp_business_accounts`;
+    const _res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${this.env.wabaAccessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!_res.ok) {
+      throw new Error(
+        `Failed to fetch shared WABAs for business ${businessId}: ${_res.statusText}`
+      );
+    }
+
+    const res: {
+      data: {
+        id: string;
+        name: string;
+        currency?: string;
+        timezone_id: string;
+        message_template_namespace: string;
+      }[];
+      paging: {
+        cursors: unknown;
+      };
+    } = await _res.json();
+
+    return res.data;
   }
 
   // ---------------------------------------------------------------------

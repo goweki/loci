@@ -339,3 +339,131 @@ export function builderToTemplate(builder: TemplateBuilder): Template {
     } as Template;
   }
 }
+
+// import z from "zod";
+
+// const headerComponentSchema = z.object({
+//   type: z.literal("HEADER"),
+//   format: z.enum(["TEXT", "IMAGE", "VIDEO", "DOCUMENT"]),
+//   text: z.string().max(60).optional(), // For TEXT format
+//   example: z
+//     .object({
+//       header_handle: z.array(z.string()).optional(), // For media
+//       header_text: z.array(z.string()).optional(), // For TEXT with variables
+//     })
+//     .optional(),
+// });
+
+// const bodyComponentSchema = z.object({
+//   type: z.literal("BODY"),
+//   text: z.string().max(1024),
+//   example: z
+//     .object({
+//       body_text: z.array(z.array(z.string())).optional(), // Variables examples
+//     })
+//     .optional(),
+// });
+
+// const footerComponentSchema = z.object({
+//   type: z.literal("FOOTER"),
+//   text: z.string().max(60),
+// });
+
+// const buttonComponentSchema = z.object({
+//   type: z.literal("BUTTONS"),
+//   buttons: z
+//     .array(
+//       z.discriminatedUnion("type", [
+//         z.object({
+//           type: z.literal("QUICK_REPLY"),
+//           text: z.string().max(25),
+//         }),
+//         z.object({
+//           type: z.literal("PHONE_NUMBER"),
+//           text: z.string().max(25),
+//           phone_number: z.string(),
+//         }),
+//         z.object({
+//           type: z.literal("URL"),
+//           text: z.string().max(25),
+//           url: z.string(),
+//           example: z.array(z.string()).optional(), // For dynamic URLs
+//         }),
+//       ])
+//     )
+//     .max(10),
+// });
+
+// // Main template creation schema
+// export const templateCreationSchema = z.object({
+//   name: z
+//     .string()
+//     .min(1)
+//     .max(512)
+//     .regex(
+//       /^[a-z0-9_]+$/,
+//       "Template name must be lowercase with underscores only"
+//     ),
+//   language: z.string().default("en_US"), // Language code
+//   category: z.enum(["AUTHENTICATION", "MARKETING", "UTILITY"]),
+//   components: z
+//     .array(
+//       z.discriminatedUnion("type", [
+//         headerComponentSchema,
+//         bodyComponentSchema,
+//         footerComponentSchema,
+//         buttonComponentSchema,
+//       ])
+//     )
+//     .min(1),
+//   allowCategoryChange: z.boolean().optional(),
+// });
+
+// // Template for sending (using existing template)
+// export const templateSendSchema = z.object({
+//   name: z.string(),
+//   language: z.object({
+//     code: z.string(),
+//   }),
+//   components: z
+//     .array(
+//       z.object({
+//         type: z.enum(["header", "body", "button"]),
+//         parameters: z.array(
+//           z.discriminatedUnion("type", [
+//             z.object({
+//               type: z.literal("text"),
+//               text: z.string(),
+//             }),
+//             z.object({
+//               type: z.literal("image"),
+//               image: z.object({
+//                 link: z.string().url(),
+//               }),
+//             }),
+//             z.object({
+//               type: z.literal("video"),
+//               video: z.object({
+//                 link: z.string().url(),
+//               }),
+//             }),
+//             z.object({
+//               type: z.literal("document"),
+//               document: z.object({
+//                 link: z.string().url(),
+//                 filename: z.string().optional(),
+//               }),
+//             }),
+//             z.object({
+//               type: z.literal("payload"),
+//               payload: z.string(),
+//             }),
+//           ])
+//         ),
+//       })
+//     )
+//     .optional(),
+// });
+
+// export type TemplateCreation = z.infer<typeof templateCreationSchema>;
+// export type TemplateSend = z.infer<typeof templateSendSchema>;

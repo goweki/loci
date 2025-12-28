@@ -96,7 +96,7 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
                       Business Account Connected
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Business ID: {user.waba.businessId}
+                      Name: {user.waba.name}
                     </p>
                   </div>
                   {getStatusBadge("ACTIVE")}

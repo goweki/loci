@@ -12,23 +12,30 @@ import {
   TemplateApprovalStatus,
   TemplateCategory,
   TemplateLanguage,
+  WabaOwnership,
+  WabaAccount,
+  Prisma,
 } from "@/lib/prisma/generated";
 import type { WhatsAppClient } from "./client";
 import whatsapp from "..";
 import { Template as WabaTemplateCreateRequest } from "../types/waba-template";
+import { WhatsAppClientEnv } from "../types/environment-variables";
+import { getAdminUsers } from "@/data/user";
+import {
+  createWabaAccount,
+  getAllWabaAccounts,
+  getWabaAccountById,
+  updateWabaAccount,
+} from "@/data/waba";
 
 /**
  * Service that syncs templates between Meta's API and our database
  * Combines WabaApiService (external API) with WabaTemplateRepository (database)
  */
 export class TemplateSyncService {
-  private userId: string;
-  private wabaAccountId: string;
   private WaClient: WhatsAppClient;
 
-  constructor(userId: string, wabaAccountId: string) {
-    this.userId = userId;
-    this.wabaAccountId = wabaAccountId;
+  constructor(private env: WhatsAppClientEnv) {
     this.WaClient = whatsapp;
   }
 
@@ -47,100 +54,135 @@ export class TemplateSyncService {
       errors: [] as string[],
     };
 
-    try {
-      // Fetch all templates from Meta
-      const metaTemplates = await this.WaClient.getTemplates();
+    //sync owned waba
+    const ownedWabaInCloud = await this.WaClient.getWaba();
+    const ownedWabaInDb = await getWabaAccountById(ownedWabaInCloud.id);
+    const adminUsers = await getAdminUsers();
 
-      for (const metaTemplate of metaTemplates) {
-        try {
-          const existingTemplate = await WabaTemplateRepository.findById(
-            metaTemplate.id
-          );
-          if (existingTemplate) {
-            // Update existing template
-            await WabaTemplateRepository.update(existingTemplate.id, {
-              status: metaTemplate.status as TemplateApprovalStatus,
-              components: metaTemplate.components,
-              rejectedReason:
-                metaTemplate.status == TemplateApprovalStatus.REJECTED
-                  ? "template rejected - shrug"
-                  : null,
-              language: metaTemplate.language as TemplateLanguage,
-              category: metaTemplate.category,
-            });
-            result.updated++;
-          } else {
-            // Create new template
-            await WabaTemplateRepository.create({
-              name: metaTemplate.name,
-              status: metaTemplate.status as TemplateApprovalStatus,
-              category: metaTemplate.category,
-              language: metaTemplate.language,
-              components: metaTemplate.components,
-              wabaId: this.wabaAccountId,
-              createdById: this.userId,
-              rejectedReason:
-                metaTemplate.status == TemplateApprovalStatus.REJECTED
-                  ? "template rejected - shrug"
-                  : null,
-            });
-            result.created++;
-          }
-        } catch (error) {
-          result.errors.push(
-            `Failed to sync template ${metaTemplate.name}: ${error instanceof Error ? error.message : "Unknown error"}`
-          );
-        }
+    try {
+      if (!ownedWabaInDb) {
+        const adminId = adminUsers[0].id;
+        const appendedWaba: Prisma.WabaAccountUncheckedCreateInput = {
+          id: ownedWabaInCloud.id,
+          name: ownedWabaInCloud.name,
+          userId: adminId,
+          ownership: WabaOwnership.OWNED,
+          timezoneId: ownedWabaInCloud.timezone_id,
+          messageTemplateNamespace: ownedWabaInCloud.message_template_namespace,
+        };
+        createWabaAccount(appendedWaba);
+        result.created++;
+      } else {
+        const adminId = ownedWabaInDb.userId ?? adminUsers[0].id;
+        const appendedWaba: Partial<WabaAccount> = {
+          name: ownedWabaInCloud.name,
+          userId: adminId,
+          ownership: WabaOwnership.OWNED,
+          timezoneId: ownedWabaInCloud.timezone_id,
+          messageTemplateNamespace: ownedWabaInCloud.message_template_namespace,
+        };
+
+        updateWabaAccount(ownedWabaInDb.id, appendedWaba);
+        result.updated++;
       }
     } catch (error) {
       result.errors.push(
-        `Failed to fetch templates from Meta: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Failed to update Waba Account ${ownedWabaInCloud.name}: ${error instanceof Error ? error.message : "Unknown error"}`
       );
     }
 
-    return result;
-  }
+    //sync shared wabas
+    const sharedWabas = await this.WaClient.getSharedWabas();
+    for (const waba of sharedWabas) {
+      try {
+        const sharedWabaInDb = await getWabaAccountById(waba.id);
+        if (!sharedWabaInDb) {
+          const appendedWaba: Prisma.WabaAccountUncheckedCreateInput = {
+            id: ownedWabaInCloud.id,
+            name: ownedWabaInCloud.name,
+            ownership: WabaOwnership.OWNED,
+            timezoneId: ownedWabaInCloud.timezone_id,
+            messageTemplateNamespace:
+              ownedWabaInCloud.message_template_namespace,
+          };
+          createWabaAccount(appendedWaba);
+          result.created++;
+        } else {
+          const appendedWaba: Partial<WabaAccount> = {
+            name: ownedWabaInCloud.name,
+            ownership: WabaOwnership.OWNED,
+            timezoneId: ownedWabaInCloud.timezone_id,
+            messageTemplateNamespace:
+              ownedWabaInCloud.message_template_namespace,
+          };
 
-  /**
-   * Create a template in Meta and save to database
-   */
-  async createTemplate(data: WabaTemplateCreateRequest): Promise<WabaTemplate> {
-    // Create in Meta first
-    const metaResponse = await this.WaClient.createTemplate(data);
-
-    // Save to database
-    const template = await WabaTemplateRepository.create({
-      name: data.name,
-      status: metaResponse.status as TemplateApprovalStatus,
-      category: metaResponse.category,
-      language: data.language as any,
-      components: data.components as any,
-      wabaId: this.wabaAccountId,
-      createdById: this.userId,
-    });
-
-    return template;
-  }
-
-  /**
-   * Delete a template from both Meta and database
-   */
-  async deleteTemplate(templateId: string): Promise<void> {
-    // Get template from database
-    const template = await WabaTemplateRepository.findByIdAndUserId(
-      templateId,
-      this.userId
-    );
-
-    if (!template) {
-      throw new Error("Template not found or access denied");
+          updateWabaAccount(sharedWabaInDb.id, appendedWaba);
+          result.updated++;
+        }
+      } catch (error) {
+        result.errors.push(
+          `Failed to update Waba Account ${waba.name}: ${error instanceof Error ? error.message : "Unknown error"}`
+        );
+      }
     }
 
-    // Delete from Meta
-    await this.WaClient.deleteTemplate(template.name);
+    // sync templates
+    const syncedWabas = await getAllWabaAccounts();
+    const templates: (Prisma.WabaTemplateUncheckedCreateInput & {
+      id: string;
+    })[] = [];
 
-    // Delete from database
-    await WabaTemplateRepository.delete(templateId);
+    for (const waba of syncedWabas) {
+      const wabaTemplates = await this.WaClient.getTemplates(waba.id);
+      if (wabaTemplates.length > 0) {
+        const appendedTemplates: (Prisma.WabaTemplateUncheckedCreateInput & {
+          id: string;
+        })[] = wabaTemplates.map(
+          ({ id, name, language, category, status, components }) => ({
+            id,
+            name,
+            wabaId: waba.id,
+            status: status as TemplateApprovalStatus,
+            category: category as TemplateCategory,
+            language: language as TemplateLanguage,
+            components,
+          })
+        );
+        templates.push(...appendedTemplates);
+      }
+    }
+
+    for (const template of templates) {
+      try {
+        const existingTemplate = await WabaTemplateRepository.findById(
+          template.id
+        );
+        if (existingTemplate) {
+          // Update existing template
+          await WabaTemplateRepository.update(existingTemplate.id, {
+            status: template.status as TemplateApprovalStatus,
+            components: template.components || undefined,
+            rejectedReason:
+              template.status == TemplateApprovalStatus.REJECTED
+                ? "template rejected - shrug"
+                : null,
+            language: template.language as TemplateLanguage,
+            category: template.category,
+          });
+          result.updated++;
+        } else {
+          // Create new template
+          await WabaTemplateRepository.create(template);
+          result.created++;
+        }
+      } catch (error) {
+        result.errors.push(
+          `Failed to sync template ${template.name}: ${error instanceof Error ? error.message : "Unknown error"}`
+        );
+      }
+    }
+
+    return result;
   }
 
   /**
@@ -148,10 +190,7 @@ export class TemplateSyncService {
    */
   async refreshTemplateStatus(templateId: string): Promise<WabaTemplate> {
     // Get template from database
-    const template = await WabaTemplateRepository.findByIdAndUserId(
-      templateId,
-      this.userId
-    );
+    const template = await WabaTemplateRepository.findById(templateId);
 
     if (!template) {
       throw new Error("Template not found or access denied");
@@ -177,16 +216,6 @@ export class TemplateSyncService {
   }
 
   /**
-   * Get all templates for this user (from database)
-   */
-  async getTemplates(): Promise<WabaTemplate[]> {
-    return WabaTemplateRepository.findMany({
-      userId: this.userId,
-      wabaAccountId: this.wabaAccountId,
-    });
-  }
-
-  /**
    * Compare local templates with Meta templates
    * Returns templates that are out of sync
    */
@@ -197,10 +226,7 @@ export class TemplateSyncService {
     onlyInMeta: string[];
   }> {
     const [localTemplates, metaTemplates] = await Promise.all([
-      WabaTemplateRepository.findMany({
-        userId: this.userId,
-        wabaAccountId: this.wabaAccountId,
-      }),
+      WabaTemplateRepository.findMany(),
       this.WaClient.getTemplates(),
     ]);
 
@@ -238,48 +264,4 @@ export class TemplateSyncService {
       onlyInMeta,
     };
   }
-}
-
-/**
- * Factory function to create TemplateSyncService
- */
-export function createTemplateSyncService(
-  userId: string,
-  wabaAccountId: string
-): TemplateSyncService {
-  return new TemplateSyncService(userId, wabaAccountId);
-}
-
-// Example usage in API routes or server actions:
-
-/**
- * Example: Sync templates for a user
- */
-export async function syncUserTemplates(userId: string, wabaAccountId: string) {
-  const syncService = createTemplateSyncService(userId, wabaAccountId);
-  return syncService.syncFromMeta();
-}
-
-/**
- * Example: Create template
- */
-export async function createUserTemplate(
-  userId: string,
-  wabaAccountId: string,
-  input: WabaTemplateCreateRequest
-) {
-  const syncService = createTemplateSyncService(userId, wabaAccountId);
-  return syncService.createTemplate(input);
-}
-
-/**
- * Example: Delete template
- */
-export async function deleteUserTemplate(
-  userId: string,
-  wabaAccountId: string,
-  templateId: string
-) {
-  const syncService = createTemplateSyncService(userId, wabaAccountId);
-  return syncService.deleteTemplate(templateId);
 }
