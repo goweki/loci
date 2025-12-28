@@ -19,7 +19,7 @@ import {
 } from "@/lib/prisma/generated";
 import { sendMail } from "@/lib/mail";
 import { welcomeEmail, resetPasswordEmail } from "@/lib/mail/email-render";
-import { BASE_URL } from "@/lib/utils/getUrl";
+import { BANNER_IMAGE_URL, BASE_URL } from "@/lib/utils/getUrl";
 import { compareHash, hash } from "@/lib/utils/passwordHandlers";
 import sendSms, { SMSprops } from "@/lib/sms";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
@@ -96,30 +96,39 @@ export async function registerUser(
       tokenSentTo = "email";
     } else if (verificationMethod === "whatsapp" && tel) {
       const message: Message = {
+        messaging_product: "whatsapp",
+        recipient_type: "INDIVIDUAL",
         to: tel,
         type: "template",
         template: {
-          name: "reset_account_password ",
+          name: "set_password",
           language: { code: TemplateLanguage.en_US },
           components: [
             {
+              type: "header",
+              parameters: [
+                { type: "image", image: { link: BANNER_IMAGE_URL } },
+              ],
+            },
+            {
               type: "body",
               parameters: [
-                {
-                  type: "text",
-                  text: name,
-                },
+                { type: "text", parameter_name: "name", text: name },
               ],
             },
             {
               type: "button",
               sub_type: "url",
-              index: "0", // first button
-              parameters: [{ type: "text", text: resetLink }],
+              index: "0",
+              parameters: [
+                { type: "text", text: resetLink }, // password reset link
+              ],
             },
           ],
         },
       };
+
+      console.log("Sending waba message template:", message);
       await whatsapp.sendTemplate(message);
 
       tokenSentTo = "whatsapp";
@@ -185,19 +194,24 @@ export async function sendResetLink(data: {
       sentTo_ = "email";
     } else if (verificationMethod === "whatsapp" && user_.tel) {
       const message: Message = {
+        messaging_product: "whatsapp",
+        recipient_type: "INDIVIDUAL",
         to: user_.tel,
         type: "template",
         template: {
-          name: "set_password",
+          name: "reset_account_password",
           language: { code: TemplateLanguage.en_US },
           components: [
             {
+              type: "header",
+              parameters: [
+                { type: "image", image: { link: BANNER_IMAGE_URL } },
+              ],
+            },
+            {
               type: "body",
               parameters: [
-                {
-                  type: "text",
-                  text: user_.name,
-                },
+                { type: "text", parameter_name: "name", text: user_.name },
               ],
             },
             {
@@ -316,7 +330,7 @@ export async function getUserByTel(tel: string): Promise<User | null> {
 export async function getUserByKey(key: string): Promise<User | null> {
   return db.user.findFirst({
     where: {
-      OR: [{ email: key }, { id: key }],
+      OR: [{ id: key }, { email: key }, { tel: key }],
     },
   });
 }

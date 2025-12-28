@@ -29,6 +29,7 @@ import { useI18n } from "@/lib/i18n";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import InputPhone from "@/components/ui/input-phone";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
+import { removePlus } from "@/lib/utils/telHandlers";
 
 const translations = {
   en: { submit: "Sign Up", orCredentials: "or use your Credentials" },
@@ -76,7 +77,7 @@ export function SignUpForm() {
         email: verificationMethod === "email" ? email : undefined,
         tel:
           verificationMethod !== "email" && phoneNumber
-            ? phoneNumber
+            ? removePlus(phoneNumber)
             : undefined,
         verificationMethod,
       });

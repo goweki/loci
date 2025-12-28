@@ -29,6 +29,7 @@ import { useI18n } from "@/lib/i18n";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import InputPhone from "@/components/ui/input-phone";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
+import { removePlus } from "@/lib/utils/telHandlers";
 
 const translations = {
   en: { submit: "Send Link", orCredentials: "or use your Credentials" },
@@ -71,7 +72,7 @@ export function ForgotPasswordForm() {
 
     try {
       const result = await sendResetLink({
-        username: email || phoneNumber,
+        username: email || removePlus(phoneNumber),
         sendTo: username,
       });
 
@@ -193,10 +194,10 @@ export function ForgotPasswordForm() {
           </Link>
 
           <Link
-            href={`/${language}/reset-password`}
+            href={`/${language}/sign-up`}
             className="flex w-fit hover:underline"
           >
-            Forgot Password? Reset
+            New here? Sign Up
           </Link>
         </div>
       </form>
