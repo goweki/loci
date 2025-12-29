@@ -20,7 +20,11 @@ export async function buildResetURL(
   token: string,
   username: string
 ) {
-  return `${baseUrl}/en/reset-password/${token}/?username=${encodeURIComponent(
-    username
-  )}`;
+  const urlTail = buildUrlTail(token, username);
+
+  return `${baseUrl}/${urlTail}`;
+}
+
+export async function buildUrlTail(token: string, username: string) {
+  return `en/reset-password/${token}/?username=${encodeURIComponent(username)}`;
 }

@@ -9,7 +9,11 @@
 "use server";
 
 import db from "@/lib/prisma";
-import { buildResetURL, generateResetToken } from "@/lib/utils/resetToken";
+import {
+  buildResetURL,
+  buildUrlTail,
+  generateResetToken,
+} from "@/lib/utils/resetToken";
 import {
   Prisma,
   UserRole,
@@ -73,7 +77,8 @@ export async function registerUser(
     throw new Error("Email or Phone No. is required");
   }
 
-  const resetLink = await buildResetURL(BASE_URL, tokenObj.plain, username);
+  const reseUrlTail = await buildUrlTail(tokenObj.plain, username);
+  const resetLink = `${BASE_URL}/${reseUrlTail}`;
 
   try {
     const initUser = await db.user.create({
@@ -120,9 +125,7 @@ export async function registerUser(
               type: "button",
               sub_type: "url",
               index: "0",
-              parameters: [
-                { type: "text", text: resetLink }, // password reset link
-              ],
+              parameters: [{ type: "text", text: reseUrlTail }],
             },
           ],
         },
