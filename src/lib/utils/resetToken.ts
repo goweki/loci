@@ -14,17 +14,6 @@ export async function generateResetToken(): Promise<{
   return { plain, hashed, expiry };
 }
 
-// utils/url.ts
-export async function buildResetURL(
-  baseUrl: string,
-  token: string,
-  username: string
-) {
-  const urlTail = buildUrlTail(token, username);
-
-  return `${baseUrl}/${urlTail}`;
-}
-
-export async function buildUrlTail(token: string, username: string) {
+export async function buildResetUrlTail(token: string, username: string) {
   return `en/reset-password/${token}/?username=${encodeURIComponent(username)}`;
 }
