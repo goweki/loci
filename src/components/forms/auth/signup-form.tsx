@@ -17,8 +17,6 @@ import { InputWithIcon } from "@/components/ui/input";
 import { Eye, EyeOff, Lock, Mail, User as UserIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import GoogleSignin from "@/components/ui/svg";
-import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/ui/loaders";
@@ -28,7 +26,6 @@ import { registerUser } from "@/data/user";
 import { useI18n } from "@/lib/i18n";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import InputPhone from "@/components/ui/input-phone";
-import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import { removePlus } from "@/lib/utils/telHandlers";
 
 const translations = {

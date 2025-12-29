@@ -9,12 +9,13 @@ import {
   Form,
   FormControl,
   FormField,
+  FormLabel,
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
 import { InputWithIcon } from "@/components/ui/input";
-import { Eye, EyeOff, Lock, User as UserIcon } from "lucide-react";
-import { useState } from "react";
+import { Eye, EyeOff, Lock, Mail, User as UserIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import GoogleSignin from "@/components/ui/svg";
 import { signIn } from "next-auth/react";
@@ -24,6 +25,9 @@ import Loader from "@/components/ui/loaders";
 import AuthErrorHandler, { ERROR_MESSAGES } from "./_errorHandler";
 import { loginSchema } from "@/lib/validations";
 import { useI18n } from "@/lib/i18n";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import InputPhone from "@/components/ui/input-phone";
+import { removePlus } from "@/lib/utils/telHandlers";
 
 const translations = {
   en: {
@@ -55,19 +59,32 @@ export function SignInForm() {
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
+      loginMethod: "whatsapp",
+      email: "",
+      phoneNumber: "",
       password: "",
     },
   });
 
+  const { watch, setValue } = form;
+  const loginMethodWatch = watch("loginMethod");
+
+  useEffect(() => {
+    if (loginMethodWatch === "whatsapp") {
+      setValue("email", "");
+    } else if (loginMethodWatch === "email") {
+      setValue("phoneNumber", "");
+    }
+  }, [loginMethodWatch, setValue]);
+
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     setLoading(true);
 
-    const { username, password } = values;
+    const { email, phoneNumber, password } = values;
 
     const result = await signIn("credentials", {
       redirect: false,
-      username,
+      username: email || removePlus(phoneNumber),
       password,
     });
 
@@ -106,20 +123,72 @@ export function SignInForm() {
         </div>
         <FormField
           control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <InputWithIcon
-                  icon={UserIcon}
-                  className="placeholder:italic placeholder:opacity-50"
-                  placeholder={t.usernamePlaceholder}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          name="loginMethod"
+          render={({ field }) => {
+            return (
+              <FormItem className="space-y-3">
+                {/* <FormLabel>Select a login method</FormLabel> */}
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-col space-y-2"
+                  >
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="email" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Email</FormLabel>
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <InputWithIcon
+                                disabled={loginMethodWatch !== "email"}
+                                icon={Mail}
+                                className="placeholder:italic placeholder:opacity-50"
+                                placeholder="loci@goweki.com"
+                                type="email"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="whatsapp" />
+                      </FormControl>
+                      <FormLabel className="font-normal">WhatsApp</FormLabel>
+                      <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <InputPhone
+                                disabled={loginMethodWatch !== "whatsapp"}
+                                // className="placeholder:italic placeholder:opacity-50"
+                                // placeholder="254 721..."
+                                value={field.value}
+                                setValue={field.onChange}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
         <FormField
           control={form.control}

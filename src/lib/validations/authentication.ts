@@ -2,7 +2,14 @@
 import { z } from "zod";
 
 export const loginSchema = z.object({
-  username: z.email({ message: "Please enter a valid email address" }),
+  loginMethod: z.enum(["email", "sms", "whatsapp"] as const, {
+    message: "Verification method must be 'email' or 'whatsapp'",
+  }),
+  email: z.email("Invalid email address").or(z.literal("")),
+  phoneNumber: z
+    .string()
+    .min(6, "PhoneNumber should have at least 6 characters")
+    .or(z.literal("")),
   password: z
     .string()
     .min(5, { message: "Password must be at least 5 characters" })
@@ -14,7 +21,7 @@ export const registerSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   phoneNumber: z
     .string()
-    .min(3, "PhoneNumber should have at least 3 characters")
+    .min(6, "PhoneNumber should have at least 6 characters")
     .or(z.literal("")),
   verificationMethod: z.enum(["email", "sms", "whatsapp"] as const, {
     message: "Verification method must be 'email' or 'whatsapp'",
