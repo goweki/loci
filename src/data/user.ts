@@ -218,7 +218,7 @@ export async function sendResetLink(data: {
               type: "button",
               sub_type: "url",
               index: "0", // first button
-              parameters: [{ type: "text", text: resetLink }],
+              parameters: [{ type: "text", text: resetLinkTail }],
             },
           ],
         },
