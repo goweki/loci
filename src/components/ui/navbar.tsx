@@ -254,12 +254,12 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                 >
                   {t.signInText}
                 </Link>
-                <Link
+                {/* <Link
                   href={"/" + language + ctaHref}
                   className={cn(buttonVariants({ variant: "default" }))}
                 >
                   {t.ctaText}
-                </Link>
+                </Link> */}
               </>
             )}
           </div>
