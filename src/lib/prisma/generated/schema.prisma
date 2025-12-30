@@ -25,14 +25,15 @@ model User {
 
   waba WabaAccount?
 
-  accounts       Account[]
-  contacts       Contact[]
-  messages       Message[]
-  subscriptions  Subscription[]
-  sessions       Session[]
-  tokens         Token[]
-  autoreplyRules AutoReplyRule[]
-  wabaTemplates  WabaTemplate[]
+  accounts        Account[]
+  contacts        Contact[]
+  messages        Message[]
+  subscriptions   Subscription[]
+  sessions        Session[]
+  tokens          Token[]
+  autoreplyRules  AutoReplyRule[]
+  wabaTemplates   WabaTemplate[]
+  promptTemplates PromptTemplate[]
 
   @@map("users")
 }
@@ -239,20 +240,25 @@ model PhoneNumber {
   userId String
   waba   WabaAccount @relation(fields: [userId], references: [userId], onDelete: Restrict)
 
+  chatbotConfig ChatbotConfig?
+
   @@map("phone_numbers")
 }
 
 model Contact {
   id            String    @id @default(cuid())
-  userId        String
   phoneNumber   String
   name          String?
   avatar        String?
   lastMessageAt DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages      Message[]
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  messages             Message[]
+  chatbotConversations ChatbotConversation[]
 
   @@unique([userId, phoneNumber])
   @@map("contacts")
@@ -410,4 +416,79 @@ enum PaymentMethod {
   OTHER
   MPESA
   CASH
+}
+
+// AI chatbot configs
+
+model ChatbotConfig {
+  id            String @id @default(cuid())
+  phoneNumberId String @unique
+
+  // Core AI Settings
+  systemPrompt String @db.Text
+  model        String @default("claude-sonnet-4-20250514")
+  temperature  Float  @default(0.7)
+  maxTokens    Int    @default(1000)
+
+  // Behavior Settings
+  isActive             Boolean  @default(true)
+  fallbackToHuman      Boolean  @default(true)
+  humanHandoffKeywords String[] // ["agent", "human", "help"]
+
+  // Response Settings
+  responseDelay   Int?    @default(1000) // ms delay to seem more human
+  typingIndicator Boolean @default(true)
+
+  // Context & Memory
+  conversationHistory Int @default(10) // last N messages to include
+  resetContextAfter   Int @default(30) // minutes of inactivity
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  phoneNumber   PhoneNumber           @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+  conversations ChatbotConversation[]
+
+  @@map("chatbot_configs")
+}
+
+model ChatbotConversation {
+  id              String @id @default(cuid())
+  chatbotConfigId String
+  contactId       String
+
+  // Conversation State
+  context          Json // Store conversation context/memory
+  messageCount     Int     @default(0)
+  isActive         Boolean @default(true)
+  handedOffToHuman Boolean @default(false)
+
+  lastMessageAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  chatbotConfig ChatbotConfig @relation(fields: [chatbotConfigId], references: [id], onDelete: Cascade)
+  contact       Contact       @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([chatbotConfigId, contactId])
+  @@index([isActive])
+  @@map("chatbot_conversations")
+}
+
+// Optional: Store prompt templates for reuse
+model PromptTemplate {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  content     String  @db.Text
+  category    String? // "customer_support", "sales", "general"
+  isPublic    Boolean @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("prompt_templates")
 }

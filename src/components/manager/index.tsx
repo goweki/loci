@@ -49,11 +49,6 @@ import { useSession } from "next-auth/react";
 import { findWabaTemplatesAction } from "./actions";
 import { getAllPhoneNumbers } from "@/data/phoneNumber";
 
-type Props = {
-  templates: WabaTemplate[];
-  phoneNumbers: PhoneNumber[];
-};
-
 export default function ManagerComponent() {
   const [activeTab, setActiveTab] = useState("templates");
   const [templates, setTemplates] = useState<WabaTemplate[]>();
@@ -71,9 +66,10 @@ export default function ManagerComponent() {
     setPhoneNumbers(phoneNos_);
   }, []);
 
-  // load templates
+  // load templates and phone numbers
   useEffect(() => {
     fetchTemplates();
+    fetchPhoneNumbers();
   }, []);
 
   // Mock data for templates

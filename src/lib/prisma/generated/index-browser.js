@@ -249,13 +249,13 @@ exports.Prisma.PhoneNumberScalarFieldEnum = {
 
 exports.Prisma.ContactScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
   phoneNumber: 'phoneNumber',
   name: 'name',
   avatar: 'avatar',
   lastMessageAt: 'lastMessageAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  userId: 'userId'
 };
 
 exports.Prisma.MessageScalarFieldEnum = {
@@ -320,6 +320,49 @@ exports.Prisma.AccountScalarFieldEnum = {
   scope: 'scope',
   id_token: 'id_token',
   session_state: 'session_state'
+};
+
+exports.Prisma.ChatbotConfigScalarFieldEnum = {
+  id: 'id',
+  phoneNumberId: 'phoneNumberId',
+  systemPrompt: 'systemPrompt',
+  model: 'model',
+  temperature: 'temperature',
+  maxTokens: 'maxTokens',
+  isActive: 'isActive',
+  fallbackToHuman: 'fallbackToHuman',
+  humanHandoffKeywords: 'humanHandoffKeywords',
+  responseDelay: 'responseDelay',
+  typingIndicator: 'typingIndicator',
+  conversationHistory: 'conversationHistory',
+  resetContextAfter: 'resetContextAfter',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ChatbotConversationScalarFieldEnum = {
+  id: 'id',
+  chatbotConfigId: 'chatbotConfigId',
+  contactId: 'contactId',
+  context: 'context',
+  messageCount: 'messageCount',
+  isActive: 'isActive',
+  handedOffToHuman: 'handedOffToHuman',
+  lastMessageAt: 'lastMessageAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PromptTemplateScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  content: 'content',
+  category: 'category',
+  isPublic: 'isPublic',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -479,7 +522,10 @@ exports.Prisma.ModelName = {
   MessageUnprocessed: 'MessageUnprocessed',
   AutoReplyRule: 'AutoReplyRule',
   WebhookEvent: 'WebhookEvent',
-  Account: 'Account'
+  Account: 'Account',
+  ChatbotConfig: 'ChatbotConfig',
+  ChatbotConversation: 'ChatbotConversation',
+  PromptTemplate: 'PromptTemplate'
 };
 
 /**
