@@ -1,7 +1,5 @@
 // lib/services/template-sync.service.ts
 
-"use server";
-
 import {
   WabaTemplateFilters,
   WabaTemplateRepository,
@@ -17,10 +15,7 @@ import {
   Prisma,
 } from "@/lib/prisma/generated";
 import type { WhatsAppClient } from "./client";
-import whatsapp from "..";
-import { Template as WabaTemplateCreateRequest } from "../types/waba-template";
-import { WhatsAppClientEnv } from "../types/environment-variables";
-import { getAdminUsers } from "@/data/user";
+import { getAdminUsers, getAllUsers } from "@/data/user";
 import {
   createWabaAccount,
   getAllWabaAccounts,
@@ -32,12 +27,8 @@ import {
  * Service that syncs templates between Meta's API and our database
  * Combines WabaApiService (external API) with WabaTemplateRepository (database)
  */
-export class TemplateSyncService {
-  private WaClient: WhatsAppClient;
-
-  constructor(private env: WhatsAppClientEnv) {
-    this.WaClient = whatsapp;
-  }
+export class MetaSyncService {
+  constructor(private WaClient: WhatsAppClient) {}
 
   /**
    * Sync all templates from Meta to local database
@@ -48,6 +39,7 @@ export class TemplateSyncService {
     updated: number;
     errors: string[];
   }> {
+    console.log("Syncronizing meta assets...");
     const result = {
       created: 0,
       updated: 0,
@@ -56,12 +48,21 @@ export class TemplateSyncService {
 
     //sync owned waba
     const ownedWabaInCloud = await this.WaClient.getWaba();
+    console.log("owned Waba In Cloud:", ownedWabaInCloud);
+
     const ownedWabaInDb = await getWabaAccountById(ownedWabaInCloud.id);
+    console.log("owned Waba In Db:", ownedWabaInDb);
+
     const adminUsers = await getAdminUsers();
+    console.log("admin users:", adminUsers);
 
     try {
       if (!ownedWabaInDb) {
+        console.log(`waba id-${ownedWabaInCloud.id} not found in db`);
+
         const adminId = adminUsers[0].id;
+        console.log(`admin id-${adminId}`);
+
         const appendedWaba: Prisma.WabaAccountUncheckedCreateInput = {
           id: ownedWabaInCloud.id,
           name: ownedWabaInCloud.name,
@@ -70,10 +71,13 @@ export class TemplateSyncService {
           timezoneId: ownedWabaInCloud.timezone_id,
           messageTemplateNamespace: ownedWabaInCloud.message_template_namespace,
         };
-        createWabaAccount(appendedWaba);
+        const newWaba = await createWabaAccount(appendedWaba);
         result.created++;
+
+        console.log(`saved waba:`, newWaba);
       } else {
         const adminId = ownedWabaInDb.userId ?? adminUsers[0].id;
+
         const appendedWaba: Partial<WabaAccount> = {
           name: ownedWabaInCloud.name,
           userId: adminId,
@@ -82,62 +86,73 @@ export class TemplateSyncService {
           messageTemplateNamespace: ownedWabaInCloud.message_template_namespace,
         };
 
-        updateWabaAccount(ownedWabaInDb.id, appendedWaba);
+        const updatedWaba = await updateWabaAccount(
+          ownedWabaInDb.id,
+          appendedWaba
+        );
         result.updated++;
+
+        console.log(`updated waba:`, updatedWaba);
       }
     } catch (error) {
       result.errors.push(
-        `Failed to update Waba Account ${ownedWabaInCloud.name}: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Failed to update Waba Account ${ownedWabaInCloud.name}: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
       );
     }
+    // // sync shared wabas
+    // const clientUsers = await getAllUsers();
+    // const sharedWabas = clientUsers
+    //   .filter(({ waba }) => waba?.id)
+    //   .map(({ waba }) => waba);
 
-    //sync shared wabas
-    const sharedWabas = await this.WaClient.getSharedWabas();
-    for (const waba of sharedWabas) {
-      try {
-        const sharedWabaInDb = await getWabaAccountById(waba.id);
-        if (!sharedWabaInDb) {
-          const appendedWaba: Prisma.WabaAccountUncheckedCreateInput = {
-            id: ownedWabaInCloud.id,
-            name: ownedWabaInCloud.name,
-            ownership: WabaOwnership.OWNED,
-            timezoneId: ownedWabaInCloud.timezone_id,
-            messageTemplateNamespace:
-              ownedWabaInCloud.message_template_namespace,
-          };
-          createWabaAccount(appendedWaba);
-          result.created++;
-        } else {
-          const appendedWaba: Partial<WabaAccount> = {
-            name: ownedWabaInCloud.name,
-            ownership: WabaOwnership.OWNED,
-            timezoneId: ownedWabaInCloud.timezone_id,
-            messageTemplateNamespace:
-              ownedWabaInCloud.message_template_namespace,
-          };
+    // for (const waba of sharedWabas) {
+    //   try {
+    //     if (!waba) continue;
+    //     const sharedWabaInDb = await getWabaAccountById(waba.id);
+    //     if (!sharedWabaInDb) {
+    //       const appendedWaba: Prisma.WabaAccountUncheckedCreateInput = {
+    //         id: ownedWabaInCloud.id,
+    //         name: ownedWabaInCloud.name,
+    //         ownership: WabaOwnership.OWNED,
+    //         timezoneId: ownedWabaInCloud.timezone_id,
+    //         messageTemplateNamespace:
+    //           ownedWabaInCloud.message_template_namespace,
+    //       };
+    //       createWabaAccount(appendedWaba);
+    //       result.created++;
+    //     } else {
+    //       const appendedWaba: Partial<WabaAccount> = {
+    //         name: ownedWabaInCloud.name,
+    //         ownership: WabaOwnership.OWNED,
+    //         timezoneId: ownedWabaInCloud.timezone_id,
+    //         messageTemplateNamespace:
+    //           ownedWabaInCloud.message_template_namespace,
+    //       };
 
-          updateWabaAccount(sharedWabaInDb.id, appendedWaba);
-          result.updated++;
-        }
-      } catch (error) {
-        result.errors.push(
-          `Failed to update Waba Account ${waba.name}: ${error instanceof Error ? error.message : "Unknown error"}`
-        );
-      }
-    }
+    //       updateWabaAccount(sharedWabaInDb.id, appendedWaba);
+    //       result.updated++;
+    //     }
+    //   } catch (error) {
+    //     result.errors.push(
+    //       `Failed to update Waba Account ${waba?.name}: ${error instanceof Error ? error.message : "Unknown error"}`
+    //     );
+    //   }
+    // }
 
     // sync templates
-    const syncedWabas = await getAllWabaAccounts();
-    const templates: (Prisma.WabaTemplateUncheckedCreateInput & {
+    const localWabas = await getAllWabaAccounts();
+    const templatesCreationArray: (Prisma.WabaTemplateUncheckedCreateInput & {
       id: string;
     })[] = [];
 
-    for (const waba of syncedWabas) {
-      const wabaTemplates = await this.WaClient.getTemplates(waba.id);
-      if (wabaTemplates.length > 0) {
+    for (const waba of localWabas) {
+      const remoteTemplates = await this.WaClient.getTemplates(waba.id);
+      if (remoteTemplates.length > 0) {
         const appendedTemplates: (Prisma.WabaTemplateUncheckedCreateInput & {
           id: string;
-        })[] = wabaTemplates.map(
+        })[] = remoteTemplates.map(
           ({ id, name, language, category, status, components }) => ({
             id,
             name,
@@ -148,11 +163,11 @@ export class TemplateSyncService {
             components,
           })
         );
-        templates.push(...appendedTemplates);
+        templatesCreationArray.push(...appendedTemplates);
       }
     }
 
-    for (const template of templates) {
+    for (const template of templatesCreationArray) {
       try {
         const existingTemplate = await WabaTemplateRepository.findById(
           template.id

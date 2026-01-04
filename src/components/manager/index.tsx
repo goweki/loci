@@ -46,7 +46,7 @@ import {
   WabaTemplate,
 } from "@/lib/prisma/generated";
 import { useSession } from "next-auth/react";
-import { findWabaTemplatesAction } from "./actions";
+import { findWabaTemplatesAction, synchronizeMeta } from "./actions";
 import { getAllPhoneNumbers } from "@/data/phoneNumber";
 
 export default function ManagerComponent() {
@@ -200,11 +200,17 @@ export default function ManagerComponent() {
                 </CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" className="flex items-center gap-2">
+                <Button
+                  onClick={async () => {
+                    await synchronizeMeta();
+                  }}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
                   <RefreshCw className="w-4 h-4" />
-                  Sync Templates
+                  Sync With Meta
                 </Button>
-                <Button className="flex items-center gap-2">
+                <Button>
                   <Plus className="w-4 h-4" />
                   New Template
                 </Button>

@@ -276,7 +276,7 @@ export class WhatsAppClient {
     const url = `${this.baseUrl}/${wabaId ?? this.env.wabaId}/message_templates?access_token=${this.env.wabaAccessToken}`;
     //graph.facebook.com/{{Version}}/{{WABA-ID}}/message_templates
 
-    https: this.logger.info("Fetching templates");
+    this.logger.info("Fetching templates");
 
     const res = await fetch(url);
     const json = await res.json();
@@ -544,7 +544,7 @@ export class WhatsAppClient {
     return res.data;
   }
 
-  async getSharedWabas(businessId?: string): Promise<
+  async getWabasByBusinessId(businessId: string): Promise<
     {
       id: string;
       name: string;

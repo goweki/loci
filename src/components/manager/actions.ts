@@ -1,6 +1,7 @@
 "use server";
 
 import { WabaTemplateRepository } from "@/data/repositories/waba-template";
+import { metaSyncService } from "@/lib/whatsapp";
 
 export async function createWabaTemplateAction(
   data: Parameters<typeof WabaTemplateRepository.create>[0]
@@ -31,4 +32,8 @@ export async function deleteWabaTemplateAction(id: string) {
 
 export async function getWabaTemplateStatsAction(userId: string) {
   return WabaTemplateRepository.getStatsByUserId(userId);
+}
+
+export async function synchronizeMeta() {
+  await metaSyncService.syncFromMeta();
 }
