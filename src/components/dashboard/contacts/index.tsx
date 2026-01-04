@@ -21,11 +21,14 @@ import {
   Bot,
 } from "lucide-react";
 import { PhoneNumberStatus, Prisma } from "@/lib/prisma/generated";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import AddWhatsappNumberModal from "./new-phone-number-modal";
 import WabaEmbeddedSignup from "@/components/ui/waba-embedded-signup";
 import Image from "next/image";
 import { getPhoneNumberById, PhoneNumberGetPayload } from "@/data/phoneNumber";
+import Link from "next/link";
+import { useI18n } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 interface Props {
   wabaAccount: Prisma.WabaAccountGetPayload<{
@@ -51,6 +54,7 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
     wabaId: "",
     phoneNumberId: "",
   });
+  const { language } = useI18n();
 
   useEffect(() => {
     if (!wabaAccount?.phoneNumbers) return;
@@ -470,6 +474,15 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
                   <p className="text-sm italic">
                     Connect your account with Meta to continue
                   </p>
+                  <Link
+                    href={`/${language}/settings?tab=whatsapp`}
+                    className={cn(
+                      buttonVariants({ variant: "secondary" }),
+                      "my-4"
+                    )}
+                  >
+                    Connect to Meta
+                  </Link>
                 </div>
               )
             ) : (

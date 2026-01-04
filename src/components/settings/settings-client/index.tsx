@@ -34,13 +34,27 @@ import { getStatusBadge } from "./get-status-badge";
 import ProfileForm from "./profile-form";
 import WabaEmbeddedSignup from "@/components/ui/waba-embedded-signup";
 import { WhatsAppLogo } from "@/components/ui/svg";
+import { useSearchParams } from "next/navigation";
 
 export default function SettingsClient({ user }: { user: UserGetPayload }) {
   const activeSubscription = user.subscriptions[0];
   const phoneNumbers = user.waba?.phoneNumbers || [];
 
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
+
+  const allowedTabs = [
+    "profile",
+    "whatsapp",
+    "billing",
+    "notifications",
+    "security",
+  ] as const;
+
+  const activeTab = allowedTabs.includes(tab as any) ? tab! : "profile";
+
   return (
-    <Tabs defaultValue="profile" className="space-y-6">
+    <Tabs value={activeTab} className="space-y-6">
       <TabsList className="grid w-full grid-cols-5 lg:w-auto">
         <TabsTrigger value="profile" className="flex items-center gap-2">
           <UserIcon className="w-4 h-4" />
