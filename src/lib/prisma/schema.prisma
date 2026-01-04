@@ -73,7 +73,7 @@ model WabaTemplate {
   rejectedReason String?
 
   wabaId String
-  waba   WabaAccount @relation(fields: [wabaId], references: [userId], onDelete: SetNull)
+  waba   WabaAccount @relation(fields: [wabaId], references: [id], onDelete: Cascade)
 
   createdById String?
   createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: Cascade)
