@@ -338,11 +338,20 @@ export async function getUserByKey(key: string): Promise<User | null> {
 /**
  * Get all users (paginated).
  */
-export async function getAllUsers(skip = 0, take = 20): Promise<User[]> {
+export async function getAllUsers(
+  skip = 0,
+  take = 20
+): Promise<UserGetPayload[]> {
   return db.user.findMany({
     skip,
     take,
     orderBy: { createdAt: "desc" },
+    include: {
+      contacts: true,
+      messages: true,
+      subscriptions: { include: { plan: true } },
+      waba: { include: { phoneNumbers: true, templates: true } },
+    },
   });
 }
 
