@@ -37,11 +37,7 @@ export default async function SettingsPage({
 
   const user = await getUserById(session.user.id);
 
-  if (!user) {
-    return null;
-  }
-
-  return (
+  return user ? (
     <main className="flex-1 overflow-y-auto p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <PageTitle title={t.title} subtitle={t.subtitle} />
@@ -51,7 +47,7 @@ export default async function SettingsPage({
         </Suspense>
       </div>
     </main>
-  );
+  ) : null;
 }
 
 function TemplatesSkeleton() {

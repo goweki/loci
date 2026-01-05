@@ -34,7 +34,7 @@ import { getStatusBadge } from "./get-status-badge";
 import ProfileForm from "./profile-form";
 import WabaEmbeddedSignup from "@/components/ui/waba-embedded-signup";
 import { WhatsAppLogo } from "@/components/ui/svg";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function SettingsClient({ user }: { user: UserGetPayload }) {
   const activeSubscription = user.subscriptions[0];
@@ -42,6 +42,13 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
 
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
+
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleTabChange = (value: string) => {
+    router.push(`${pathname}?tab=${value}`, { scroll: false });
+  };
 
   const allowedTabs = [
     "profile",
@@ -54,7 +61,11 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
   const activeTab = allowedTabs.includes(tab as any) ? tab! : "profile";
 
   return (
-    <Tabs value={activeTab} className="space-y-6">
+    <Tabs
+      value={activeTab}
+      onValueChange={handleTabChange}
+      className="space-y-6"
+    >
       <TabsList className="grid w-full grid-cols-5 lg:w-auto">
         <TabsTrigger value="profile" className="flex items-center gap-2">
           <UserIcon className="w-4 h-4" />
@@ -107,7 +118,7 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
                   <Building2 className="w-10 h-10 text-green-600" />
                   <div className="flex-1">
                     <h3 className="font-semibold">
-                      Business Account Connected
+                      Whatsapp Business Account Connected
                     </h3>
                     <p className="text-sm text-muted-foreground">
                       Name: {user.waba.name}
