@@ -14781,7 +14781,6 @@ export namespace Prisma {
 
   export type PhoneNumberMinAggregateOutputType = {
     id: string | null
-    phoneNumberId: string | null
     phoneNumber: string | null
     displayName: string | null
     preVerificationId: string | null
@@ -14790,12 +14789,11 @@ export namespace Prisma {
     verifiedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
-    userId: string | null
+    wabaId: string | null
   }
 
   export type PhoneNumberMaxAggregateOutputType = {
     id: string | null
-    phoneNumberId: string | null
     phoneNumber: string | null
     displayName: string | null
     preVerificationId: string | null
@@ -14804,12 +14802,11 @@ export namespace Prisma {
     verifiedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
-    userId: string | null
+    wabaId: string | null
   }
 
   export type PhoneNumberCountAggregateOutputType = {
     id: number
-    phoneNumberId: number
     phoneNumber: number
     displayName: number
     preVerificationId: number
@@ -14818,14 +14815,13 @@ export namespace Prisma {
     verifiedAt: number
     createdAt: number
     updatedAt: number
-    userId: number
+    wabaId: number
     _all: number
   }
 
 
   export type PhoneNumberMinAggregateInputType = {
     id?: true
-    phoneNumberId?: true
     phoneNumber?: true
     displayName?: true
     preVerificationId?: true
@@ -14834,12 +14830,11 @@ export namespace Prisma {
     verifiedAt?: true
     createdAt?: true
     updatedAt?: true
-    userId?: true
+    wabaId?: true
   }
 
   export type PhoneNumberMaxAggregateInputType = {
     id?: true
-    phoneNumberId?: true
     phoneNumber?: true
     displayName?: true
     preVerificationId?: true
@@ -14848,12 +14843,11 @@ export namespace Prisma {
     verifiedAt?: true
     createdAt?: true
     updatedAt?: true
-    userId?: true
+    wabaId?: true
   }
 
   export type PhoneNumberCountAggregateInputType = {
     id?: true
-    phoneNumberId?: true
     phoneNumber?: true
     displayName?: true
     preVerificationId?: true
@@ -14862,7 +14856,7 @@ export namespace Prisma {
     verifiedAt?: true
     createdAt?: true
     updatedAt?: true
-    userId?: true
+    wabaId?: true
     _all?: true
   }
 
@@ -14940,7 +14934,6 @@ export namespace Prisma {
 
   export type PhoneNumberGroupByOutputType = {
     id: string
-    phoneNumberId: string | null
     phoneNumber: string
     displayName: string | null
     preVerificationId: string | null
@@ -14949,7 +14942,7 @@ export namespace Prisma {
     verifiedAt: Date | null
     createdAt: Date
     updatedAt: Date
-    userId: string
+    wabaId: string
     _count: PhoneNumberCountAggregateOutputType | null
     _min: PhoneNumberMinAggregateOutputType | null
     _max: PhoneNumberMaxAggregateOutputType | null
@@ -14971,7 +14964,6 @@ export namespace Prisma {
 
   export type PhoneNumberSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    phoneNumberId?: boolean
     phoneNumber?: boolean
     displayName?: boolean
     preVerificationId?: boolean
@@ -14980,7 +14972,7 @@ export namespace Prisma {
     verifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    userId?: boolean
+    wabaId?: boolean
     messages?: boolean | PhoneNumber$messagesArgs<ExtArgs>
     autoReplyRules?: boolean | PhoneNumber$autoReplyRulesArgs<ExtArgs>
     waba?: boolean | WabaAccountDefaultArgs<ExtArgs>
@@ -14990,7 +14982,6 @@ export namespace Prisma {
 
   export type PhoneNumberSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    phoneNumberId?: boolean
     phoneNumber?: boolean
     displayName?: boolean
     preVerificationId?: boolean
@@ -14999,13 +14990,12 @@ export namespace Prisma {
     verifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    userId?: boolean
+    wabaId?: boolean
     waba?: boolean | WabaAccountDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["phoneNumber"]>
 
   export type PhoneNumberSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    phoneNumberId?: boolean
     phoneNumber?: boolean
     displayName?: boolean
     preVerificationId?: boolean
@@ -15014,13 +15004,12 @@ export namespace Prisma {
     verifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    userId?: boolean
+    wabaId?: boolean
     waba?: boolean | WabaAccountDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["phoneNumber"]>
 
   export type PhoneNumberSelectScalar = {
     id?: boolean
-    phoneNumberId?: boolean
     phoneNumber?: boolean
     displayName?: boolean
     preVerificationId?: boolean
@@ -15029,10 +15018,10 @@ export namespace Prisma {
     verifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    userId?: boolean
+    wabaId?: boolean
   }
 
-  export type PhoneNumberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "phoneNumberId" | "phoneNumber" | "displayName" | "preVerificationId" | "preVerificationCode" | "status" | "verifiedAt" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["phoneNumber"]>
+  export type PhoneNumberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "phoneNumber" | "displayName" | "preVerificationId" | "preVerificationCode" | "status" | "verifiedAt" | "createdAt" | "updatedAt" | "wabaId", ExtArgs["result"]["phoneNumber"]>
   export type PhoneNumberInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     messages?: boolean | PhoneNumber$messagesArgs<ExtArgs>
     autoReplyRules?: boolean | PhoneNumber$autoReplyRulesArgs<ExtArgs>
@@ -15057,7 +15046,6 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      phoneNumberId: string | null
       phoneNumber: string
       displayName: string | null
       preVerificationId: string | null
@@ -15066,7 +15054,7 @@ export namespace Prisma {
       verifiedAt: Date | null
       createdAt: Date
       updatedAt: Date
-      userId: string
+      wabaId: string
     }, ExtArgs["result"]["phoneNumber"]>
     composites: {}
   }
@@ -15495,7 +15483,6 @@ export namespace Prisma {
    */
   interface PhoneNumberFieldRefs {
     readonly id: FieldRef<"PhoneNumber", 'String'>
-    readonly phoneNumberId: FieldRef<"PhoneNumber", 'String'>
     readonly phoneNumber: FieldRef<"PhoneNumber", 'String'>
     readonly displayName: FieldRef<"PhoneNumber", 'String'>
     readonly preVerificationId: FieldRef<"PhoneNumber", 'String'>
@@ -15504,7 +15491,7 @@ export namespace Prisma {
     readonly verifiedAt: FieldRef<"PhoneNumber", 'DateTime'>
     readonly createdAt: FieldRef<"PhoneNumber", 'DateTime'>
     readonly updatedAt: FieldRef<"PhoneNumber", 'DateTime'>
-    readonly userId: FieldRef<"PhoneNumber", 'String'>
+    readonly wabaId: FieldRef<"PhoneNumber", 'String'>
   }
     
 
@@ -26425,7 +26412,6 @@ export namespace Prisma {
 
   export const PhoneNumberScalarFieldEnum: {
     id: 'id',
-    phoneNumberId: 'phoneNumberId',
     phoneNumber: 'phoneNumber',
     displayName: 'displayName',
     preVerificationId: 'preVerificationId',
@@ -26434,7 +26420,7 @@ export namespace Prisma {
     verifiedAt: 'verifiedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    userId: 'userId'
+    wabaId: 'wabaId'
   };
 
   export type PhoneNumberScalarFieldEnum = (typeof PhoneNumberScalarFieldEnum)[keyof typeof PhoneNumberScalarFieldEnum]
@@ -27737,7 +27723,6 @@ export namespace Prisma {
     OR?: PhoneNumberWhereInput[]
     NOT?: PhoneNumberWhereInput | PhoneNumberWhereInput[]
     id?: StringFilter<"PhoneNumber"> | string
-    phoneNumberId?: StringNullableFilter<"PhoneNumber"> | string | null
     phoneNumber?: StringFilter<"PhoneNumber"> | string
     displayName?: StringNullableFilter<"PhoneNumber"> | string | null
     preVerificationId?: StringNullableFilter<"PhoneNumber"> | string | null
@@ -27746,7 +27731,7 @@ export namespace Prisma {
     verifiedAt?: DateTimeNullableFilter<"PhoneNumber"> | Date | string | null
     createdAt?: DateTimeFilter<"PhoneNumber"> | Date | string
     updatedAt?: DateTimeFilter<"PhoneNumber"> | Date | string
-    userId?: StringFilter<"PhoneNumber"> | string
+    wabaId?: StringFilter<"PhoneNumber"> | string
     messages?: MessageListRelationFilter
     autoReplyRules?: AutoReplyRuleListRelationFilter
     waba?: XOR<WabaAccountScalarRelationFilter, WabaAccountWhereInput>
@@ -27755,7 +27740,6 @@ export namespace Prisma {
 
   export type PhoneNumberOrderByWithRelationInput = {
     id?: SortOrder
-    phoneNumberId?: SortOrderInput | SortOrder
     phoneNumber?: SortOrder
     displayName?: SortOrderInput | SortOrder
     preVerificationId?: SortOrderInput | SortOrder
@@ -27764,7 +27748,7 @@ export namespace Prisma {
     verifiedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    userId?: SortOrder
+    wabaId?: SortOrder
     messages?: MessageOrderByRelationAggregateInput
     autoReplyRules?: AutoReplyRuleOrderByRelationAggregateInput
     waba?: WabaAccountOrderByWithRelationInput
@@ -27773,7 +27757,6 @@ export namespace Prisma {
 
   export type PhoneNumberWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    phoneNumberId?: string
     phoneNumber?: string
     AND?: PhoneNumberWhereInput | PhoneNumberWhereInput[]
     OR?: PhoneNumberWhereInput[]
@@ -27785,16 +27768,15 @@ export namespace Prisma {
     verifiedAt?: DateTimeNullableFilter<"PhoneNumber"> | Date | string | null
     createdAt?: DateTimeFilter<"PhoneNumber"> | Date | string
     updatedAt?: DateTimeFilter<"PhoneNumber"> | Date | string
-    userId?: StringFilter<"PhoneNumber"> | string
+    wabaId?: StringFilter<"PhoneNumber"> | string
     messages?: MessageListRelationFilter
     autoReplyRules?: AutoReplyRuleListRelationFilter
     waba?: XOR<WabaAccountScalarRelationFilter, WabaAccountWhereInput>
     chatbotConfig?: XOR<ChatbotConfigNullableScalarRelationFilter, ChatbotConfigWhereInput> | null
-  }, "id" | "phoneNumberId" | "phoneNumber">
+  }, "id" | "phoneNumber">
 
   export type PhoneNumberOrderByWithAggregationInput = {
     id?: SortOrder
-    phoneNumberId?: SortOrderInput | SortOrder
     phoneNumber?: SortOrder
     displayName?: SortOrderInput | SortOrder
     preVerificationId?: SortOrderInput | SortOrder
@@ -27803,7 +27785,7 @@ export namespace Prisma {
     verifiedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    userId?: SortOrder
+    wabaId?: SortOrder
     _count?: PhoneNumberCountOrderByAggregateInput
     _max?: PhoneNumberMaxOrderByAggregateInput
     _min?: PhoneNumberMinOrderByAggregateInput
@@ -27814,7 +27796,6 @@ export namespace Prisma {
     OR?: PhoneNumberScalarWhereWithAggregatesInput[]
     NOT?: PhoneNumberScalarWhereWithAggregatesInput | PhoneNumberScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"PhoneNumber"> | string
-    phoneNumberId?: StringNullableWithAggregatesFilter<"PhoneNumber"> | string | null
     phoneNumber?: StringWithAggregatesFilter<"PhoneNumber"> | string
     displayName?: StringNullableWithAggregatesFilter<"PhoneNumber"> | string | null
     preVerificationId?: StringNullableWithAggregatesFilter<"PhoneNumber"> | string | null
@@ -27823,7 +27804,7 @@ export namespace Prisma {
     verifiedAt?: DateTimeNullableWithAggregatesFilter<"PhoneNumber"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"PhoneNumber"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"PhoneNumber"> | Date | string
-    userId?: StringWithAggregatesFilter<"PhoneNumber"> | string
+    wabaId?: StringWithAggregatesFilter<"PhoneNumber"> | string
   }
 
   export type ContactWhereInput = {
@@ -29426,7 +29407,6 @@ export namespace Prisma {
 
   export type PhoneNumberCreateInput = {
     id?: string
-    phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
     preVerificationId?: string | null
@@ -29443,7 +29423,6 @@ export namespace Prisma {
 
   export type PhoneNumberUncheckedCreateInput = {
     id?: string
-    phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
     preVerificationId?: string | null
@@ -29452,7 +29431,7 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    userId: string
+    wabaId: string
     messages?: MessageUncheckedCreateNestedManyWithoutPhoneNumberInput
     autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutPhoneNumberInput
     chatbotConfig?: ChatbotConfigUncheckedCreateNestedOneWithoutPhoneNumberInput
@@ -29460,7 +29439,6 @@ export namespace Prisma {
 
   export type PhoneNumberUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29477,7 +29455,6 @@ export namespace Prisma {
 
   export type PhoneNumberUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29486,7 +29463,7 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    userId?: StringFieldUpdateOperationsInput | string
+    wabaId?: StringFieldUpdateOperationsInput | string
     messages?: MessageUncheckedUpdateManyWithoutPhoneNumberNestedInput
     autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutPhoneNumberNestedInput
     chatbotConfig?: ChatbotConfigUncheckedUpdateOneWithoutPhoneNumberNestedInput
@@ -29494,7 +29471,6 @@ export namespace Prisma {
 
   export type PhoneNumberCreateManyInput = {
     id?: string
-    phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
     preVerificationId?: string | null
@@ -29503,12 +29479,11 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    userId: string
+    wabaId: string
   }
 
   export type PhoneNumberUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29521,7 +29496,6 @@ export namespace Prisma {
 
   export type PhoneNumberUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29530,7 +29504,7 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    userId?: StringFieldUpdateOperationsInput | string
+    wabaId?: StringFieldUpdateOperationsInput | string
   }
 
   export type ContactCreateInput = {
@@ -31340,7 +31314,6 @@ export namespace Prisma {
 
   export type PhoneNumberCountOrderByAggregateInput = {
     id?: SortOrder
-    phoneNumberId?: SortOrder
     phoneNumber?: SortOrder
     displayName?: SortOrder
     preVerificationId?: SortOrder
@@ -31349,12 +31322,11 @@ export namespace Prisma {
     verifiedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    userId?: SortOrder
+    wabaId?: SortOrder
   }
 
   export type PhoneNumberMaxOrderByAggregateInput = {
     id?: SortOrder
-    phoneNumberId?: SortOrder
     phoneNumber?: SortOrder
     displayName?: SortOrder
     preVerificationId?: SortOrder
@@ -31363,12 +31335,11 @@ export namespace Prisma {
     verifiedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    userId?: SortOrder
+    wabaId?: SortOrder
   }
 
   export type PhoneNumberMinOrderByAggregateInput = {
     id?: SortOrder
-    phoneNumberId?: SortOrder
     phoneNumber?: SortOrder
     displayName?: SortOrder
     preVerificationId?: SortOrder
@@ -31377,7 +31348,7 @@ export namespace Prisma {
     verifiedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    userId?: SortOrder
+    wabaId?: SortOrder
   }
 
   export type EnumPhoneNumberStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -34532,7 +34503,6 @@ export namespace Prisma {
 
   export type PhoneNumberCreateWithoutWabaInput = {
     id?: string
-    phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
     preVerificationId?: string | null
@@ -34548,7 +34518,6 @@ export namespace Prisma {
 
   export type PhoneNumberUncheckedCreateWithoutWabaInput = {
     id?: string
-    phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
     preVerificationId?: string | null
@@ -34692,7 +34661,6 @@ export namespace Prisma {
     OR?: PhoneNumberScalarWhereInput[]
     NOT?: PhoneNumberScalarWhereInput | PhoneNumberScalarWhereInput[]
     id?: StringFilter<"PhoneNumber"> | string
-    phoneNumberId?: StringNullableFilter<"PhoneNumber"> | string | null
     phoneNumber?: StringFilter<"PhoneNumber"> | string
     displayName?: StringNullableFilter<"PhoneNumber"> | string | null
     preVerificationId?: StringNullableFilter<"PhoneNumber"> | string | null
@@ -34701,7 +34669,7 @@ export namespace Prisma {
     verifiedAt?: DateTimeNullableFilter<"PhoneNumber"> | Date | string | null
     createdAt?: DateTimeFilter<"PhoneNumber"> | Date | string
     updatedAt?: DateTimeFilter<"PhoneNumber"> | Date | string
-    userId?: StringFilter<"PhoneNumber"> | string
+    wabaId?: StringFilter<"PhoneNumber"> | string
   }
 
   export type WabaTemplateUpsertWithWhereUniqueWithoutWabaInput = {
@@ -36260,7 +36228,6 @@ export namespace Prisma {
 
   export type PhoneNumberCreateWithoutMessagesInput = {
     id?: string
-    phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
     preVerificationId?: string | null
@@ -36276,7 +36243,6 @@ export namespace Prisma {
 
   export type PhoneNumberUncheckedCreateWithoutMessagesInput = {
     id?: string
-    phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
     preVerificationId?: string | null
@@ -36285,7 +36251,7 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    userId: string
+    wabaId: string
     autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutPhoneNumberInput
     chatbotConfig?: ChatbotConfigUncheckedCreateNestedOneWithoutPhoneNumberInput
   }
@@ -36400,7 +36366,6 @@ export namespace Prisma {
 
   export type PhoneNumberUpdateWithoutMessagesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36416,7 +36381,6 @@ export namespace Prisma {
 
   export type PhoneNumberUncheckedUpdateWithoutMessagesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36425,7 +36389,7 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    userId?: StringFieldUpdateOperationsInput | string
+    wabaId?: StringFieldUpdateOperationsInput | string
     autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutPhoneNumberNestedInput
     chatbotConfig?: ChatbotConfigUncheckedUpdateOneWithoutPhoneNumberNestedInput
   }
@@ -36495,7 +36459,6 @@ export namespace Prisma {
 
   export type PhoneNumberCreateWithoutAutoReplyRulesInput = {
     id?: string
-    phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
     preVerificationId?: string | null
@@ -36511,7 +36474,6 @@ export namespace Prisma {
 
   export type PhoneNumberUncheckedCreateWithoutAutoReplyRulesInput = {
     id?: string
-    phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
     preVerificationId?: string | null
@@ -36520,7 +36482,7 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    userId: string
+    wabaId: string
     messages?: MessageUncheckedCreateNestedManyWithoutPhoneNumberInput
     chatbotConfig?: ChatbotConfigUncheckedCreateNestedOneWithoutPhoneNumberInput
   }
@@ -36600,7 +36562,6 @@ export namespace Prisma {
 
   export type PhoneNumberUpdateWithoutAutoReplyRulesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36616,7 +36577,6 @@ export namespace Prisma {
 
   export type PhoneNumberUncheckedUpdateWithoutAutoReplyRulesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36625,7 +36585,7 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    userId?: StringFieldUpdateOperationsInput | string
+    wabaId?: StringFieldUpdateOperationsInput | string
     messages?: MessageUncheckedUpdateManyWithoutPhoneNumberNestedInput
     chatbotConfig?: ChatbotConfigUncheckedUpdateOneWithoutPhoneNumberNestedInput
   }
@@ -36815,7 +36775,6 @@ export namespace Prisma {
 
   export type PhoneNumberCreateWithoutChatbotConfigInput = {
     id?: string
-    phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
     preVerificationId?: string | null
@@ -36831,7 +36790,6 @@ export namespace Prisma {
 
   export type PhoneNumberUncheckedCreateWithoutChatbotConfigInput = {
     id?: string
-    phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
     preVerificationId?: string | null
@@ -36840,7 +36798,7 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    userId: string
+    wabaId: string
     messages?: MessageUncheckedCreateNestedManyWithoutPhoneNumberInput
     autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutPhoneNumberInput
   }
@@ -36897,7 +36855,6 @@ export namespace Prisma {
 
   export type PhoneNumberUpdateWithoutChatbotConfigInput = {
     id?: StringFieldUpdateOperationsInput | string
-    phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36913,7 +36870,6 @@ export namespace Prisma {
 
   export type PhoneNumberUncheckedUpdateWithoutChatbotConfigInput = {
     id?: StringFieldUpdateOperationsInput | string
-    phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36922,7 +36878,7 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    userId?: StringFieldUpdateOperationsInput | string
+    wabaId?: StringFieldUpdateOperationsInput | string
     messages?: MessageUncheckedUpdateManyWithoutPhoneNumberNestedInput
     autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutPhoneNumberNestedInput
   }
@@ -37623,7 +37579,6 @@ export namespace Prisma {
 
   export type PhoneNumberCreateManyWabaInput = {
     id?: string
-    phoneNumberId?: string | null
     phoneNumber: string
     displayName?: string | null
     preVerificationId?: string | null
@@ -37649,7 +37604,6 @@ export namespace Prisma {
 
   export type PhoneNumberUpdateWithoutWabaInput = {
     id?: StringFieldUpdateOperationsInput | string
-    phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37665,7 +37619,6 @@ export namespace Prisma {
 
   export type PhoneNumberUncheckedUpdateWithoutWabaInput = {
     id?: StringFieldUpdateOperationsInput | string
-    phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37681,7 +37634,6 @@ export namespace Prisma {
 
   export type PhoneNumberUncheckedUpdateManyWithoutWabaInput = {
     id?: StringFieldUpdateOperationsInput | string
-    phoneNumberId?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     preVerificationId?: NullableStringFieldUpdateOperationsInput | string | null

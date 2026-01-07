@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   if (!session) return new NextResponse("Unauthorized", { status: 401 });
 
   const body = await request.json();
-  const { phoneNumber, displayName } = body;
+  const { phoneNumber, displayName, wabaId } = body;
 
   const subscriptionStatus = await getSubscriptionStatusByUserId(
     session.user.id
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
   // Create phone number record
   const newPhoneNumber = await createPhoneNumber({
-    userId: session.user.id,
+    wabaId,
     phoneNumber,
     displayName,
     status: PhoneNumberStatus.NOT_VERIFIED,

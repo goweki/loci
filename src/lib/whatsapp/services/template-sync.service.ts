@@ -22,6 +22,7 @@ import {
   getWabaAccountById,
   updateWabaAccount,
 } from "@/data/waba";
+import { createPhoneNumber, getAllPhoneNumbers } from "@/data/phoneNumber";
 
 /**
  * Service that syncs templates between Meta's API and our database
@@ -47,11 +48,9 @@ export class MetaSyncService {
     };
 
     //sync owned waba
-    const ownedWabaInCloud = await this.WaClient.getWaba();
-    console.log("owned Waba In Cloud:", ownedWabaInCloud);
 
+    const ownedWabaInCloud = await this.WaClient.getWaba();
     const ownedWabaInDb = await getWabaAccountById(ownedWabaInCloud.id);
-    console.log("owned Waba In Db:", ownedWabaInDb);
 
     const adminUsers = await getAdminUsers();
     console.log("admin users:", adminUsers);
@@ -71,10 +70,10 @@ export class MetaSyncService {
           timezoneId: ownedWabaInCloud.timezone_id,
           messageTemplateNamespace: ownedWabaInCloud.message_template_namespace,
         };
-        const newWaba = await createWabaAccount(appendedWaba);
+        const ownedWabaInDb = await createWabaAccount(appendedWaba);
         result.created++;
 
-        console.log(`saved waba:`, newWaba);
+        console.log(`saved waba:`, ownedWabaInDb);
       } else {
         const adminId = ownedWabaInDb.userId ?? adminUsers[0].id;
 
@@ -140,6 +139,48 @@ export class MetaSyncService {
     //     );
     //   }
     // }
+
+    // sync phone numbers
+    const ownedWabaPhoneNumbersInCloud = (await this.WaClient.getPhoneNumbers())
+      .data;
+    const ownedWabaPhoneNumbersInDb = await getAllPhoneNumbers();
+
+    try {
+      if (!ownedWabaInDb) {
+        throw new Error("no waba account saved in db, skipping saving numbers");
+      }
+
+      if (ownedWabaPhoneNumbersInCloud.length == 0) {
+        console.log(`no owned phone numbers found in cloud`);
+        throw new Error(`no owned phone numbers found in cloud`);
+      }
+
+      const wabaId = ownedWabaInDb.id;
+      console.log(`saving phone numbers for waba id-${wabaId}`);
+
+      const appendedPhoneNumbers: Prisma.PhoneNumberUncheckedCreateInput[] =
+        ownedWabaPhoneNumbersInCloud.map(
+          ({ verified_name, display_phone_number, id }) => ({
+            id,
+            phoneNumber: display_phone_number,
+            displayName: verified_name,
+            wabaId,
+          })
+        );
+
+      for (const phoneNo of appendedPhoneNumbers) {
+        await createPhoneNumber(phoneNo);
+      }
+      result.created++;
+
+      console.log(`saved phone numbers:`, appendedPhoneNumbers);
+    } catch (error) {
+      result.errors.push(
+        `Failed to update owned Phone numbers ${JSON.stringify(ownedWabaPhoneNumbersInCloud)}: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
 
     // sync templates
     const localWabas = await getAllWabaAccounts();

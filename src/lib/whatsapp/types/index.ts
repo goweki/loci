@@ -30,14 +30,14 @@ export interface WhatsAppSendMessageResponse {
 // ------------------------------
 // PHONE NUMBERS
 // ------------------------------
-export interface WabaPhoneBumber {
+export interface WabaPhoneNumber {
   verified_name: string;
   display_phone_number: string;
   id: string;
 }
 
 export interface WabaPhoneNumberListResponse {
-  data: WabaPhoneBumber[];
+  data: WabaPhoneNumber[];
 }
 
 export interface WabaPhoneNumberDetailsResponse {

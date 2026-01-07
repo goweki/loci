@@ -311,9 +311,9 @@ export async function getPhoneNumberByNumber(phoneNumber: string) {
 /**
  * Get all phone numbers for a WABA account
  */
-export async function getPhoneNumbersByWabaId(userId: string) {
+export async function getPhoneNumbersByWabaId(wabaId: string) {
   return await prisma.phoneNumber.findMany({
-    where: { userId },
+    where: { wabaId },
     include: {
       autoReplyRules: true,
     },
@@ -365,10 +365,10 @@ export async function deletePhoneNumber(id: string) {
 /**
  * Get verified phone numbers for a WABA account
  */
-export async function getVerifiedPhoneNumbers(userId: string) {
+export async function getVerifiedPhoneNumbers(wabaId: string) {
   return await prisma.phoneNumber.findMany({
     where: {
-      userId,
+      wabaId,
       status: "VERIFIED",
     },
     orderBy: {
@@ -797,8 +797,10 @@ export async function getWabaDashboardStats(userId: string) {
     totalMessages,
     activeAutoReplyRules,
   ] = await Promise.all([
-    prisma.phoneNumber.count({ where: { userId } }),
-    prisma.phoneNumber.count({ where: { userId, status: "VERIFIED" } }),
+    prisma.phoneNumber.count({ where: { wabaId: wabaAccount.id } }),
+    prisma.phoneNumber.count({
+      where: { wabaId: wabaAccount.id, status: "VERIFIED" },
+    }),
     prisma.wabaTemplate.count({ where: { wabaId: wabaAccount.id } }),
     prisma.wabaTemplate.count({
       where: { wabaId: wabaAccount.id, status: "APPROVED" },

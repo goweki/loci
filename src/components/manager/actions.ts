@@ -35,5 +35,6 @@ export async function getWabaTemplateStatsAction(userId: string) {
 }
 
 export async function synchronizeMeta() {
-  await metaSyncService.syncFromMeta();
+  const results = await metaSyncService.syncFromMeta();
+  console.log("Meta assets synchronized:", results);
 }

@@ -223,7 +223,6 @@ model PlanFeature {
 
 model PhoneNumber {
   id                  String  @id @default(cuid())
-  phoneNumberId       String? @unique
   phoneNumber         String  @unique
   displayName         String?
   preVerificationId   String?
@@ -237,8 +236,8 @@ model PhoneNumber {
   messages       Message[]
   autoReplyRules AutoReplyRule[]
 
-  userId String
-  waba   WabaAccount @relation(fields: [userId], references: [userId], onDelete: Restrict)
+  wabaId String
+  waba   WabaAccount @relation(fields: [wabaId], references: [id], onDelete: Restrict)
 
   chatbotConfig ChatbotConfig?
 

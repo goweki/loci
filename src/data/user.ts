@@ -408,7 +408,7 @@ export async function getUserByPhoneNumberId(
       waba: {
         phoneNumbers: {
           some: {
-            phoneNumberId,
+            id: phoneNumberId,
           },
         },
       },
@@ -535,7 +535,8 @@ export async function getUserSubscriptions(userId: string) {
  * Get all phone numbers belonging to a user.
  */
 export async function getUserPhoneNumbers(userId: string) {
-  return db.phoneNumber.findMany({ where: { userId } });
+  const wabaId = (await getUserById(userId))?.id;
+  return db.phoneNumber.findMany({ where: { wabaId } });
 }
 
 /**

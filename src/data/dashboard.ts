@@ -5,6 +5,7 @@
 import { DashboardStatsProps } from "@/components/dashboard/stats";
 import { prisma } from "@/lib/prisma";
 import { cache } from "react";
+import { getUserById } from "./user";
 
 export interface DashboardStats {
   totalMessages: number;
@@ -21,6 +22,7 @@ export interface DashboardStats {
 export const getDashboardStats = cache(
   async (userId: string): Promise<DashboardStats> => {
     // Get date ranges for current and previous period (last 30 days)
+    const wabaId = (await getUserById(userId))?.id;
     const now = new Date();
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
@@ -122,7 +124,7 @@ export const getDashboardStats = cache(
     // Phone Numbers (active/verified)
     const phoneNumbers = await prisma.phoneNumber.count({
       where: {
-        userId,
+        wabaId,
         status: "VERIFIED",
       },
     });
@@ -130,7 +132,7 @@ export const getDashboardStats = cache(
     // Phone Numbers (previous count - all time before 30 days ago)
     const phoneNumbersPrevious = await prisma.phoneNumber.count({
       where: {
-        userId,
+        wabaId,
         status: "VERIFIED",
         createdAt: {
           lt: thirtyDaysAgo,

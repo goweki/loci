@@ -345,35 +345,6 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
                                     </div>
                                   </div>
                                 )}
-
-                                {phone.phoneNumberId && (
-                                  <div className="bg-muted/50 rounded-lg p-3">
-                                    <p className="text-xs text-muted-foreground mb-1">
-                                      Phone Number ID
-                                    </p>
-                                    <div className="flex items-center justify-between gap-2">
-                                      <span className="font-mono text-xs text-card-foreground truncate">
-                                        {phone.phoneNumberId}
-                                      </span>
-                                      <button
-                                        onClick={() =>
-                                          handleCopyId(
-                                            phone.phoneNumberId ?? undefined,
-                                            "phone"
-                                          )
-                                        }
-                                        className="p-1.5 hover:bg-accent rounded transition-colors flex-shrink-0"
-                                      >
-                                        {copiedId ===
-                                        `phone-${phone.phoneNumberId}` ? (
-                                          <Check className="w-3.5 h-3.5 text-green-600" />
-                                        ) : (
-                                          <Copy className="w-3.5 h-3.5 text-muted-foreground" />
-                                        )}
-                                      </button>
-                                    </div>
-                                  </div>
-                                )}
                               </div>
                             </div>
 

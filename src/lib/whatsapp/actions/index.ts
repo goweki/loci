@@ -14,7 +14,11 @@ import {
 import { InboundMessage, WabaPhoneNumberDetailsResponse } from "../types";
 import { Message } from "../../validations";
 import { createPhoneNumber } from "@/data/phoneNumber";
-import { getAdminUsers, getUserByPhoneNumberId } from "@/data/user";
+import {
+  getAdminUsers,
+  getUserById,
+  getUserByPhoneNumberId,
+} from "@/data/user";
 import whatsapp from "../";
 import { findContactByPhoneNumber } from "@/data/contact";
 import {
@@ -79,11 +83,16 @@ export async function processIncomingMessage(
       const phoneNumberDetails: WabaPhoneNumberDetailsResponse =
         await whatsapp.getPhoneNumberDetails(phoneNumberId);
       user = (await getAdminUsers())[0];
+      if (!user.waba)
+        throw new Error(
+          `No waba account found to save phone number - ${phoneNumberDetails.verified_name}`
+        );
+
       await createPhoneNumber({
-        userId: user.id,
+        wabaId: user.waba.id,
         phoneNumber: phoneNumberDetails.display_phone_number,
         displayName: phoneNumberDetails.verified_name,
-        phoneNumberId,
+        id: phoneNumberId,
         status:
           phoneNumberDetails.code_verification_status as PhoneNumberStatus,
       });
@@ -686,10 +695,17 @@ export async function createPreVerifiedNumber(
   phoneNumber: string
 ): Promise<PreVerifiedNumberResponse> {
   const session = await getServerSession(authOptions);
-  const user = session?.user;
+  const userId = session?.user.id;
+  if (!userId) {
+    throw new Error("401: Unauthorized");
+  }
 
+  const user = await getUserById(userId);
   if (!user) {
     throw new Error("401: Unauthorized");
+  }
+  if (!user.waba) {
+    throw new Error("400: No waba connected");
   }
 
   const url = `${BASE_URL}/${env_.fbBusinessId}/add_phone_numbers?phone_number=${phoneNumber}`;
@@ -714,7 +730,7 @@ export async function createPreVerifiedNumber(
   const { preverificationId }: PreVerifiedNumberResponse = await res.json();
   await createPhoneNumber({
     phoneNumber,
-    userId: user.id,
+    wabaId: user.waba.id,
     preVerificationId: preverificationId,
   });
 

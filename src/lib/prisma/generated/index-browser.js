@@ -235,7 +235,6 @@ exports.Prisma.PlanFeatureScalarFieldEnum = {
 
 exports.Prisma.PhoneNumberScalarFieldEnum = {
   id: 'id',
-  phoneNumberId: 'phoneNumberId',
   phoneNumber: 'phoneNumber',
   displayName: 'displayName',
   preVerificationId: 'preVerificationId',
@@ -244,7 +243,7 @@ exports.Prisma.PhoneNumberScalarFieldEnum = {
   verifiedAt: 'verifiedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  userId: 'userId'
+  wabaId: 'wabaId'
 };
 
 exports.Prisma.ContactScalarFieldEnum = {

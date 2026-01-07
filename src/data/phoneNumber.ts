@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/lib/prisma/generated";
+import { getUserById } from "./user";
 
 export type PhoneNumberGetPayload = Prisma.PhoneNumberGetPayload<{
   include: {
@@ -34,10 +35,11 @@ export async function validatePhoneNumberOwnership(
   phoneNumberId: string,
   userId: string
 ) {
+  const wabaId = (await getUserById(userId))?.id;
   const phoneNumber = await prisma.phoneNumber.findFirst({
     where: {
       id: phoneNumberId,
-      userId,
+      wabaId,
       status: "VERIFIED",
     },
   });
@@ -66,8 +68,9 @@ export async function getPhoneNumbersByUser(
 ): Promise<
   Prisma.PhoneNumberGetPayload<{ include: { messages: true; waba: true } }>[]
 > {
+  const wabaId = (await getUserById(userId))?.id;
   return prisma.phoneNumber.findMany({
-    where: { userId },
+    where: { wabaId },
     orderBy: { createdAt: "desc" },
     include: { messages: true, waba: true },
   });
@@ -123,9 +126,10 @@ export async function deletePhoneNumber(id: string) {
  * 📊 Count the number of verified phone numbers for a given user.
  */
 export async function countVerifiedPhoneNumbers(userId: string) {
+  const wabaId = (await getUserById(userId))?.id;
   return prisma.phoneNumber.count({
     where: {
-      userId,
+      wabaId,
       status: "VERIFIED",
     },
   });
