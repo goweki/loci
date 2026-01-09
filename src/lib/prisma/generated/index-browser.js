@@ -204,15 +204,16 @@ exports.Prisma.PaymentScalarFieldEnum = {
 
 exports.Prisma.PlanScalarFieldEnum = {
   id: 'id',
+  name: 'name',
   description: 'description',
   price: 'price',
+  popular: 'popular',
   interval: 'interval',
   maxPhoneNumbers: 'maxPhoneNumbers',
   maxMessagesPerMonth: 'maxMessagesPerMonth',
   active: 'active',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  name: 'name'
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.FeatureScalarFieldEnum = {
@@ -448,15 +449,15 @@ exports.PaymentStatus = exports.$Enums.PaymentStatus = {
   REVERSED: 'REVERSED'
 };
 
-exports.PlanInterval = exports.$Enums.PlanInterval = {
-  MONTHLY: 'MONTHLY',
-  YEARLY: 'YEARLY'
-};
-
 exports.PlanName = exports.$Enums.PlanName = {
   BASIC: 'BASIC',
   STANDARD: 'STANDARD',
   PREMIUM: 'PREMIUM'
+};
+
+exports.PlanInterval = exports.$Enums.PlanInterval = {
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY'
 };
 
 exports.PhoneNumberStatus = exports.$Enums.PhoneNumberStatus = {

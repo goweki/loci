@@ -11394,41 +11394,44 @@ export namespace Prisma {
 
   export type PlanMinAggregateOutputType = {
     id: string | null
+    name: $Enums.PlanName | null
     description: string | null
     price: number | null
+    popular: boolean | null
     interval: $Enums.PlanInterval | null
     maxPhoneNumbers: number | null
     maxMessagesPerMonth: number | null
     active: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
-    name: $Enums.PlanName | null
   }
 
   export type PlanMaxAggregateOutputType = {
     id: string | null
+    name: $Enums.PlanName | null
     description: string | null
     price: number | null
+    popular: boolean | null
     interval: $Enums.PlanInterval | null
     maxPhoneNumbers: number | null
     maxMessagesPerMonth: number | null
     active: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
-    name: $Enums.PlanName | null
   }
 
   export type PlanCountAggregateOutputType = {
     id: number
+    name: number
     description: number
     price: number
+    popular: number
     interval: number
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
     active: number
     createdAt: number
     updatedAt: number
-    name: number
     _all: number
   }
 
@@ -11447,41 +11450,44 @@ export namespace Prisma {
 
   export type PlanMinAggregateInputType = {
     id?: true
+    name?: true
     description?: true
     price?: true
+    popular?: true
     interval?: true
     maxPhoneNumbers?: true
     maxMessagesPerMonth?: true
     active?: true
     createdAt?: true
     updatedAt?: true
-    name?: true
   }
 
   export type PlanMaxAggregateInputType = {
     id?: true
+    name?: true
     description?: true
     price?: true
+    popular?: true
     interval?: true
     maxPhoneNumbers?: true
     maxMessagesPerMonth?: true
     active?: true
     createdAt?: true
     updatedAt?: true
-    name?: true
   }
 
   export type PlanCountAggregateInputType = {
     id?: true
+    name?: true
     description?: true
     price?: true
+    popular?: true
     interval?: true
     maxPhoneNumbers?: true
     maxMessagesPerMonth?: true
     active?: true
     createdAt?: true
     updatedAt?: true
-    name?: true
     _all?: true
   }
 
@@ -11573,15 +11579,16 @@ export namespace Prisma {
 
   export type PlanGroupByOutputType = {
     id: string
+    name: $Enums.PlanName
     description: string | null
     price: number
+    popular: boolean
     interval: $Enums.PlanInterval
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
     active: boolean
     createdAt: Date
     updatedAt: Date
-    name: $Enums.PlanName
     _count: PlanCountAggregateOutputType | null
     _avg: PlanAvgAggregateOutputType | null
     _sum: PlanSumAggregateOutputType | null
@@ -11605,15 +11612,16 @@ export namespace Prisma {
 
   export type PlanSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    name?: boolean
     description?: boolean
     price?: boolean
+    popular?: boolean
     interval?: boolean
     maxPhoneNumbers?: boolean
     maxMessagesPerMonth?: boolean
     active?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    name?: boolean
     features?: boolean | Plan$featuresArgs<ExtArgs>
     subscriptions?: boolean | Plan$subscriptionsArgs<ExtArgs>
     _count?: boolean | PlanCountOutputTypeDefaultArgs<ExtArgs>
@@ -11621,44 +11629,47 @@ export namespace Prisma {
 
   export type PlanSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    name?: boolean
     description?: boolean
     price?: boolean
+    popular?: boolean
     interval?: boolean
     maxPhoneNumbers?: boolean
     maxMessagesPerMonth?: boolean
     active?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    name?: boolean
   }, ExtArgs["result"]["plan"]>
 
   export type PlanSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    name?: boolean
     description?: boolean
     price?: boolean
+    popular?: boolean
     interval?: boolean
     maxPhoneNumbers?: boolean
     maxMessagesPerMonth?: boolean
     active?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    name?: boolean
   }, ExtArgs["result"]["plan"]>
 
   export type PlanSelectScalar = {
     id?: boolean
+    name?: boolean
     description?: boolean
     price?: boolean
+    popular?: boolean
     interval?: boolean
     maxPhoneNumbers?: boolean
     maxMessagesPerMonth?: boolean
     active?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    name?: boolean
   }
 
-  export type PlanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "description" | "price" | "interval" | "maxPhoneNumbers" | "maxMessagesPerMonth" | "active" | "createdAt" | "updatedAt" | "name", ExtArgs["result"]["plan"]>
+  export type PlanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "price" | "popular" | "interval" | "maxPhoneNumbers" | "maxMessagesPerMonth" | "active" | "createdAt" | "updatedAt", ExtArgs["result"]["plan"]>
   export type PlanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     features?: boolean | Plan$featuresArgs<ExtArgs>
     subscriptions?: boolean | Plan$subscriptionsArgs<ExtArgs>
@@ -11675,15 +11686,16 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      name: $Enums.PlanName
       description: string | null
       price: number
+      popular: boolean
       interval: $Enums.PlanInterval
       maxPhoneNumbers: number
       maxMessagesPerMonth: number
       active: boolean
       createdAt: Date
       updatedAt: Date
-      name: $Enums.PlanName
     }, ExtArgs["result"]["plan"]>
     composites: {}
   }
@@ -12110,15 +12122,16 @@ export namespace Prisma {
    */
   interface PlanFieldRefs {
     readonly id: FieldRef<"Plan", 'String'>
+    readonly name: FieldRef<"Plan", 'PlanName'>
     readonly description: FieldRef<"Plan", 'String'>
     readonly price: FieldRef<"Plan", 'Int'>
+    readonly popular: FieldRef<"Plan", 'Boolean'>
     readonly interval: FieldRef<"Plan", 'PlanInterval'>
     readonly maxPhoneNumbers: FieldRef<"Plan", 'Int'>
     readonly maxMessagesPerMonth: FieldRef<"Plan", 'Int'>
     readonly active: FieldRef<"Plan", 'Boolean'>
     readonly createdAt: FieldRef<"Plan", 'DateTime'>
     readonly updatedAt: FieldRef<"Plan", 'DateTime'>
-    readonly name: FieldRef<"Plan", 'PlanName'>
   }
     
 
@@ -26372,15 +26385,16 @@ export namespace Prisma {
 
   export const PlanScalarFieldEnum: {
     id: 'id',
+    name: 'name',
     description: 'description',
     price: 'price',
+    popular: 'popular',
     interval: 'interval',
     maxPhoneNumbers: 'maxPhoneNumbers',
     maxMessagesPerMonth: 'maxMessagesPerMonth',
     active: 'active',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    name: 'name'
+    updatedAt: 'updatedAt'
   };
 
   export type PlanScalarFieldEnum = (typeof PlanScalarFieldEnum)[keyof typeof PlanScalarFieldEnum]
@@ -26813,16 +26827,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'PlanInterval'
+   * Reference to a field of type 'PlanName'
    */
-  export type EnumPlanIntervalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanInterval'>
+  export type EnumPlanNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanName'>
     
 
 
   /**
-   * Reference to a field of type 'PlanInterval[]'
+   * Reference to a field of type 'PlanName[]'
    */
-  export type ListEnumPlanIntervalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanInterval[]'>
+  export type ListEnumPlanNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanName[]'>
     
 
 
@@ -26834,16 +26848,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'PlanName'
+   * Reference to a field of type 'PlanInterval'
    */
-  export type EnumPlanNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanName'>
+  export type EnumPlanIntervalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanInterval'>
     
 
 
   /**
-   * Reference to a field of type 'PlanName[]'
+   * Reference to a field of type 'PlanInterval[]'
    */
-  export type ListEnumPlanNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanName[]'>
+  export type ListEnumPlanIntervalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanInterval[]'>
     
 
 
@@ -27512,30 +27526,32 @@ export namespace Prisma {
     OR?: PlanWhereInput[]
     NOT?: PlanWhereInput | PlanWhereInput[]
     id?: StringFilter<"Plan"> | string
+    name?: EnumPlanNameFilter<"Plan"> | $Enums.PlanName
     description?: StringNullableFilter<"Plan"> | string | null
     price?: IntFilter<"Plan"> | number
+    popular?: BoolFilter<"Plan"> | boolean
     interval?: EnumPlanIntervalFilter<"Plan"> | $Enums.PlanInterval
     maxPhoneNumbers?: IntFilter<"Plan"> | number
     maxMessagesPerMonth?: IntFilter<"Plan"> | number
     active?: BoolFilter<"Plan"> | boolean
     createdAt?: DateTimeFilter<"Plan"> | Date | string
     updatedAt?: DateTimeFilter<"Plan"> | Date | string
-    name?: EnumPlanNameFilter<"Plan"> | $Enums.PlanName
     features?: PlanFeatureListRelationFilter
     subscriptions?: SubscriptionListRelationFilter
   }
 
   export type PlanOrderByWithRelationInput = {
     id?: SortOrder
+    name?: SortOrder
     description?: SortOrderInput | SortOrder
     price?: SortOrder
+    popular?: SortOrder
     interval?: SortOrder
     maxPhoneNumbers?: SortOrder
     maxMessagesPerMonth?: SortOrder
     active?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    name?: SortOrder
     features?: PlanFeatureOrderByRelationAggregateInput
     subscriptions?: SubscriptionOrderByRelationAggregateInput
   }
@@ -27548,6 +27564,7 @@ export namespace Prisma {
     NOT?: PlanWhereInput | PlanWhereInput[]
     description?: StringNullableFilter<"Plan"> | string | null
     price?: IntFilter<"Plan"> | number
+    popular?: BoolFilter<"Plan"> | boolean
     interval?: EnumPlanIntervalFilter<"Plan"> | $Enums.PlanInterval
     maxPhoneNumbers?: IntFilter<"Plan"> | number
     maxMessagesPerMonth?: IntFilter<"Plan"> | number
@@ -27560,15 +27577,16 @@ export namespace Prisma {
 
   export type PlanOrderByWithAggregationInput = {
     id?: SortOrder
+    name?: SortOrder
     description?: SortOrderInput | SortOrder
     price?: SortOrder
+    popular?: SortOrder
     interval?: SortOrder
     maxPhoneNumbers?: SortOrder
     maxMessagesPerMonth?: SortOrder
     active?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    name?: SortOrder
     _count?: PlanCountOrderByAggregateInput
     _avg?: PlanAvgOrderByAggregateInput
     _max?: PlanMaxOrderByAggregateInput
@@ -27581,15 +27599,16 @@ export namespace Prisma {
     OR?: PlanScalarWhereWithAggregatesInput[]
     NOT?: PlanScalarWhereWithAggregatesInput | PlanScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Plan"> | string
+    name?: EnumPlanNameWithAggregatesFilter<"Plan"> | $Enums.PlanName
     description?: StringNullableWithAggregatesFilter<"Plan"> | string | null
     price?: IntWithAggregatesFilter<"Plan"> | number
+    popular?: BoolWithAggregatesFilter<"Plan"> | boolean
     interval?: EnumPlanIntervalWithAggregatesFilter<"Plan"> | $Enums.PlanInterval
     maxPhoneNumbers?: IntWithAggregatesFilter<"Plan"> | number
     maxMessagesPerMonth?: IntWithAggregatesFilter<"Plan"> | number
     active?: BoolWithAggregatesFilter<"Plan"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Plan"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Plan"> | Date | string
-    name?: EnumPlanNameWithAggregatesFilter<"Plan"> | $Enums.PlanName
   }
 
   export type FeatureWhereInput = {
@@ -29180,101 +29199,108 @@ export namespace Prisma {
 
   export type PlanCreateInput = {
     id?: string
+    name: $Enums.PlanName
     description?: string | null
     price: number
+    popular?: boolean
     interval: $Enums.PlanInterval
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
     active?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    name: $Enums.PlanName
     features?: PlanFeatureCreateNestedManyWithoutPlanInput
     subscriptions?: SubscriptionCreateNestedManyWithoutPlanInput
   }
 
   export type PlanUncheckedCreateInput = {
     id?: string
+    name: $Enums.PlanName
     description?: string | null
     price: number
+    popular?: boolean
     interval: $Enums.PlanInterval
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
     active?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    name: $Enums.PlanName
     features?: PlanFeatureUncheckedCreateNestedManyWithoutPlanInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutPlanInput
   }
 
   export type PlanUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
+    popular?: BoolFieldUpdateOperationsInput | boolean
     interval?: EnumPlanIntervalFieldUpdateOperationsInput | $Enums.PlanInterval
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     features?: PlanFeatureUpdateManyWithoutPlanNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutPlanNestedInput
   }
 
   export type PlanUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
+    popular?: BoolFieldUpdateOperationsInput | boolean
     interval?: EnumPlanIntervalFieldUpdateOperationsInput | $Enums.PlanInterval
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     features?: PlanFeatureUncheckedUpdateManyWithoutPlanNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutPlanNestedInput
   }
 
   export type PlanCreateManyInput = {
     id?: string
+    name: $Enums.PlanName
     description?: string | null
     price: number
+    popular?: boolean
     interval: $Enums.PlanInterval
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
     active?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    name: $Enums.PlanName
   }
 
   export type PlanUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
+    popular?: BoolFieldUpdateOperationsInput | boolean
     interval?: EnumPlanIntervalFieldUpdateOperationsInput | $Enums.PlanInterval
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
   }
 
   export type PlanUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
+    popular?: BoolFieldUpdateOperationsInput | boolean
     interval?: EnumPlanIntervalFieldUpdateOperationsInput | $Enums.PlanInterval
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
   }
 
   export type FeatureCreateInput = {
@@ -31093,11 +31119,11 @@ export namespace Prisma {
     _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
   }
 
-  export type EnumPlanIntervalFilter<$PrismaModel = never> = {
-    equals?: $Enums.PlanInterval | EnumPlanIntervalFieldRefInput<$PrismaModel>
-    in?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
-    not?: NestedEnumPlanIntervalFilter<$PrismaModel> | $Enums.PlanInterval
+  export type EnumPlanNameFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlanName | EnumPlanNameFieldRefInput<$PrismaModel>
+    in?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlanNameFilter<$PrismaModel> | $Enums.PlanName
   }
 
   export type BoolFilter<$PrismaModel = never> = {
@@ -31105,11 +31131,11 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
-  export type EnumPlanNameFilter<$PrismaModel = never> = {
-    equals?: $Enums.PlanName | EnumPlanNameFieldRefInput<$PrismaModel>
-    in?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
-    not?: NestedEnumPlanNameFilter<$PrismaModel> | $Enums.PlanName
+  export type EnumPlanIntervalFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlanInterval | EnumPlanIntervalFieldRefInput<$PrismaModel>
+    in?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlanIntervalFilter<$PrismaModel> | $Enums.PlanInterval
   }
 
   export type PlanFeatureListRelationFilter = {
@@ -31124,15 +31150,16 @@ export namespace Prisma {
 
   export type PlanCountOrderByAggregateInput = {
     id?: SortOrder
+    name?: SortOrder
     description?: SortOrder
     price?: SortOrder
+    popular?: SortOrder
     interval?: SortOrder
     maxPhoneNumbers?: SortOrder
     maxMessagesPerMonth?: SortOrder
     active?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    name?: SortOrder
   }
 
   export type PlanAvgOrderByAggregateInput = {
@@ -31143,52 +31170,36 @@ export namespace Prisma {
 
   export type PlanMaxOrderByAggregateInput = {
     id?: SortOrder
+    name?: SortOrder
     description?: SortOrder
     price?: SortOrder
+    popular?: SortOrder
     interval?: SortOrder
     maxPhoneNumbers?: SortOrder
     maxMessagesPerMonth?: SortOrder
     active?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    name?: SortOrder
   }
 
   export type PlanMinOrderByAggregateInput = {
     id?: SortOrder
+    name?: SortOrder
     description?: SortOrder
     price?: SortOrder
+    popular?: SortOrder
     interval?: SortOrder
     maxPhoneNumbers?: SortOrder
     maxMessagesPerMonth?: SortOrder
     active?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    name?: SortOrder
   }
 
   export type PlanSumOrderByAggregateInput = {
     price?: SortOrder
     maxPhoneNumbers?: SortOrder
     maxMessagesPerMonth?: SortOrder
-  }
-
-  export type EnumPlanIntervalWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.PlanInterval | EnumPlanIntervalFieldRefInput<$PrismaModel>
-    in?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
-    not?: NestedEnumPlanIntervalWithAggregatesFilter<$PrismaModel> | $Enums.PlanInterval
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumPlanIntervalFilter<$PrismaModel>
-    _max?: NestedEnumPlanIntervalFilter<$PrismaModel>
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type EnumPlanNameWithAggregatesFilter<$PrismaModel = never> = {
@@ -31199,6 +31210,24 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPlanNameFilter<$PrismaModel>
     _max?: NestedEnumPlanNameFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type EnumPlanIntervalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlanInterval | EnumPlanIntervalFieldRefInput<$PrismaModel>
+    in?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlanIntervalWithAggregatesFilter<$PrismaModel> | $Enums.PlanInterval
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPlanIntervalFilter<$PrismaModel>
+    _max?: NestedEnumPlanIntervalFilter<$PrismaModel>
   }
 
   export type FeatureCountOrderByAggregateInput = {
@@ -32657,16 +32686,16 @@ export namespace Prisma {
     connect?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
   }
 
-  export type EnumPlanIntervalFieldUpdateOperationsInput = {
-    set?: $Enums.PlanInterval
+  export type EnumPlanNameFieldUpdateOperationsInput = {
+    set?: $Enums.PlanName
   }
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
   }
 
-  export type EnumPlanNameFieldUpdateOperationsInput = {
-    set?: $Enums.PlanName
+  export type EnumPlanIntervalFieldUpdateOperationsInput = {
+    set?: $Enums.PlanInterval
   }
 
   export type PlanFeatureUpdateManyWithoutPlanNestedInput = {
@@ -33608,18 +33637,6 @@ export namespace Prisma {
     _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
   }
 
-  export type NestedEnumPlanIntervalFilter<$PrismaModel = never> = {
-    equals?: $Enums.PlanInterval | EnumPlanIntervalFieldRefInput<$PrismaModel>
-    in?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
-    not?: NestedEnumPlanIntervalFilter<$PrismaModel> | $Enums.PlanInterval
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type NestedEnumPlanNameFilter<$PrismaModel = never> = {
     equals?: $Enums.PlanName | EnumPlanNameFieldRefInput<$PrismaModel>
     in?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
@@ -33627,22 +33644,16 @@ export namespace Prisma {
     not?: NestedEnumPlanNameFilter<$PrismaModel> | $Enums.PlanName
   }
 
-  export type NestedEnumPlanIntervalWithAggregatesFilter<$PrismaModel = never> = {
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedEnumPlanIntervalFilter<$PrismaModel = never> = {
     equals?: $Enums.PlanInterval | EnumPlanIntervalFieldRefInput<$PrismaModel>
     in?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
     notIn?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
-    not?: NestedEnumPlanIntervalWithAggregatesFilter<$PrismaModel> | $Enums.PlanInterval
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumPlanIntervalFilter<$PrismaModel>
-    _max?: NestedEnumPlanIntervalFilter<$PrismaModel>
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
+    not?: NestedEnumPlanIntervalFilter<$PrismaModel> | $Enums.PlanInterval
   }
 
   export type NestedEnumPlanNameWithAggregatesFilter<$PrismaModel = never> = {
@@ -33653,6 +33664,24 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPlanNameFilter<$PrismaModel>
     _max?: NestedEnumPlanNameFilter<$PrismaModel>
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPlanIntervalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlanInterval | EnumPlanIntervalFieldRefInput<$PrismaModel>
+    in?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlanIntervalWithAggregatesFilter<$PrismaModel> | $Enums.PlanInterval
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPlanIntervalFilter<$PrismaModel>
+    _max?: NestedEnumPlanIntervalFilter<$PrismaModel>
   }
 
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -35150,29 +35179,31 @@ export namespace Prisma {
 
   export type PlanCreateWithoutSubscriptionsInput = {
     id?: string
+    name: $Enums.PlanName
     description?: string | null
     price: number
+    popular?: boolean
     interval: $Enums.PlanInterval
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
     active?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    name: $Enums.PlanName
     features?: PlanFeatureCreateNestedManyWithoutPlanInput
   }
 
   export type PlanUncheckedCreateWithoutSubscriptionsInput = {
     id?: string
+    name: $Enums.PlanName
     description?: string | null
     price: number
+    popular?: boolean
     interval: $Enums.PlanInterval
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
     active?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    name: $Enums.PlanName
     features?: PlanFeatureUncheckedCreateNestedManyWithoutPlanInput
   }
 
@@ -35282,29 +35313,31 @@ export namespace Prisma {
 
   export type PlanUpdateWithoutSubscriptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
+    popular?: BoolFieldUpdateOperationsInput | boolean
     interval?: EnumPlanIntervalFieldUpdateOperationsInput | $Enums.PlanInterval
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     features?: PlanFeatureUpdateManyWithoutPlanNestedInput
   }
 
   export type PlanUncheckedUpdateWithoutSubscriptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
+    popular?: BoolFieldUpdateOperationsInput | boolean
     interval?: EnumPlanIntervalFieldUpdateOperationsInput | $Enums.PlanInterval
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     features?: PlanFeatureUncheckedUpdateManyWithoutPlanNestedInput
   }
 
@@ -35594,29 +35627,31 @@ export namespace Prisma {
 
   export type PlanCreateWithoutFeaturesInput = {
     id?: string
+    name: $Enums.PlanName
     description?: string | null
     price: number
+    popular?: boolean
     interval: $Enums.PlanInterval
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
     active?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    name: $Enums.PlanName
     subscriptions?: SubscriptionCreateNestedManyWithoutPlanInput
   }
 
   export type PlanUncheckedCreateWithoutFeaturesInput = {
     id?: string
+    name: $Enums.PlanName
     description?: string | null
     price: number
+    popular?: boolean
     interval: $Enums.PlanInterval
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
     active?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    name: $Enums.PlanName
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutPlanInput
   }
 
@@ -35667,29 +35702,31 @@ export namespace Prisma {
 
   export type PlanUpdateWithoutFeaturesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
+    popular?: BoolFieldUpdateOperationsInput | boolean
     interval?: EnumPlanIntervalFieldUpdateOperationsInput | $Enums.PlanInterval
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     subscriptions?: SubscriptionUpdateManyWithoutPlanNestedInput
   }
 
   export type PlanUncheckedUpdateWithoutFeaturesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
+    popular?: BoolFieldUpdateOperationsInput | boolean
     interval?: EnumPlanIntervalFieldUpdateOperationsInput | $Enums.PlanInterval
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutPlanNestedInput
   }
 

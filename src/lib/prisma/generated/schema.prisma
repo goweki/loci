@@ -181,18 +181,20 @@ enum Currency {
 }
 
 model Plan {
-  id                  String         @id @default(cuid())
+  id                  String       @id @default(cuid())
+  name                PlanName     @unique
   description         String?
   price               Int
+  popular             Boolean      @default(false)
   interval            PlanInterval
   maxPhoneNumbers     Int
   maxMessagesPerMonth Int
-  active              Boolean        @default(true)
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
-  name                PlanName       @unique
-  features            PlanFeature[]
-  subscriptions       Subscription[]
+  active              Boolean      @default(true)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  features      PlanFeature[]
+  subscriptions Subscription[]
 
   @@map("plans")
 }
