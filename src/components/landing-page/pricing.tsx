@@ -152,7 +152,7 @@ export default function PricingComponent({ t }: PricingProps) {
 
                 <div className="mt-6">
                   <div className="flex items-baseline justify-center">
-                    <span className="text-3xl font-bold underline">
+                    <span className="text-5xl lg:text-3xl font-bold underline">
                       {formatPrice(getPrice(plan))}
                     </span>
                     <span className="text-muted-foreground ml-2">
@@ -171,7 +171,7 @@ export default function PricingComponent({ t }: PricingProps) {
               </CardHeader>
 
               <CardContent className="flex-grow">
-                <ul className="space-y-3">
+                <ul className="space-y-3 w-fit m-auto">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-start">
                       <span
