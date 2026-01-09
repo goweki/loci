@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -10,6 +10,12 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Check, X } from "lucide-react";
+import { getAllActivePlans, PlanBasePayload } from "@/data/plan";
+import Loader from "../ui/loaders";
+import Link from "next/link";
+import { useI18n } from "@/lib/i18n";
+import { buttonVariants } from "../ui/button";
+import { cn } from "@/lib/utils";
 
 interface PricingProps {
   t: {
@@ -46,71 +52,19 @@ interface PricingProps {
 }
 
 export default function PricingComponent({ t }: PricingProps) {
+  const { language } = useI18n();
   const [billingInterval, setBillingInterval] = useState("monthly");
+  const [plans, setPlans] = useState<PlanBasePayload[]>();
 
-  // Static pricing data - will be replaced with DB data later
-  const plans = [
-    {
-      id: "starter",
-      name: t.plans.starter.name,
-      description: t.plans.starter.description,
-      monthlyPrice: 2500,
-      annualPrice: 25000,
-      maxPhoneNumbers: 1,
-      maxMessagesPerMonth: 1000,
-      popular: false,
-      features: [
-        { name: t.features.phoneNumbers, value: "1", enabled: true },
-        { name: t.features.messages, value: "1,000", enabled: true },
-        { name: t.features.basicTemplates, enabled: true },
-        { name: t.features.emailSupport, enabled: true },
-        { name: t.features.analytics, enabled: false },
-        { name: t.features.automation, enabled: false },
-        { name: t.features.prioritySupport, enabled: false },
-        { name: t.features.customIntegrations, enabled: false },
-      ],
-    },
-    {
-      id: "standard",
-      name: t.plans.standard.name,
-      description: t.plans.standard.description,
-      monthlyPrice: 7500,
-      annualPrice: 75000,
-      maxPhoneNumbers: 5,
-      maxMessagesPerMonth: 10000,
-      popular: true,
-      features: [
-        { name: t.features.phoneNumbers, value: "5", enabled: true },
-        { name: t.features.messages, value: "10,000", enabled: true },
-        { name: t.features.basicTemplates, enabled: true },
-        { name: t.features.emailSupport, enabled: true },
-        { name: t.features.analytics, enabled: true },
-        { name: t.features.automation, enabled: true },
-        { name: t.features.prioritySupport, enabled: false },
-        { name: t.features.customIntegrations, enabled: false },
-      ],
-    },
-    {
-      id: "enterprise",
-      name: t.plans.enterprise.name,
-      description: t.plans.enterprise.description,
-      monthlyPrice: 25000,
-      annualPrice: 250000,
-      maxPhoneNumbers: 999,
-      maxMessagesPerMonth: 100000,
-      popular: false,
-      features: [
-        { name: t.features.phoneNumbers, value: t.unlimited, enabled: true },
-        { name: t.features.messages, value: "100,000+", enabled: true },
-        { name: t.features.basicTemplates, enabled: true },
-        { name: t.features.emailSupport, enabled: true },
-        { name: t.features.analytics, enabled: true },
-        { name: t.features.automation, enabled: true },
-        { name: t.features.prioritySupport, enabled: true },
-        { name: t.features.customIntegrations, enabled: true },
-      ],
-    },
-  ];
+  const fetchPlans = useCallback(async () => {
+    const plans_ = await getAllActivePlans();
+    console.log(plans_);
+    setPlans(plans_);
+  }, []);
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE", {
@@ -120,30 +74,18 @@ export default function PricingComponent({ t }: PricingProps) {
     }).format(price);
   };
 
-  const getPrice = ({
-    monthlyPrice,
-    annualPrice,
-  }: {
-    monthlyPrice: number;
-    annualPrice: number;
-  }) => {
-    return billingInterval === "monthly" ? monthlyPrice : annualPrice;
+  const getPrice = ({ price }: { price: number }) => {
+    return billingInterval === "monthly" ? price : price * 10;
   };
 
-  const getSavings = ({
-    monthlyPrice,
-    annualPrice,
-  }: {
-    monthlyPrice: number;
-    annualPrice: number;
-  }) => {
-    const monthlyCost = monthlyPrice * 12;
-    const annualCost = annualPrice;
-    const savings = monthlyCost - annualCost;
-    return Math.round((savings / monthlyCost) * 100);
+  const getSavings = ({ price }: { price: number }) => {
+    const grossCost = price * 12;
+    const netCost = price * 10;
+    const savings = grossCost - netCost;
+    return Math.round((savings / grossCost) * 100);
   };
 
-  return (
+  return plans ? (
     <section id="pricing" className="relative py-12 md:py-20">
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6">
         {/* Section header */}
@@ -201,7 +143,7 @@ export default function PricingComponent({ t }: PricingProps) {
               )}
 
               <CardHeader className="text-center pb-8 pt-8">
-                <CardTitle className="text-2xl font-bold mb-2">
+                <CardTitle className="text-2xl font-bold mb-2 text-primary">
                   {plan.name}
                 </CardTitle>
                 <CardDescription className="text-muted-foreground">
@@ -210,7 +152,7 @@ export default function PricingComponent({ t }: PricingProps) {
 
                 <div className="mt-6">
                   <div className="flex items-baseline justify-center">
-                    <span className="text-5xl font-bold">
+                    <span className="text-3xl font-bold underline">
                       {formatPrice(getPrice(plan))}
                     </span>
                     <span className="text-muted-foreground ml-2">
@@ -250,15 +192,15 @@ export default function PricingComponent({ t }: PricingProps) {
                             : "text-muted-foreground line-through"
                         }
                       >
-                        {feature.value ? (
+                        {feature.feature.name ? (
                           <>
                             <span className="font-semibold">
-                              {feature.value}
+                              {feature.limitUse}
                             </span>{" "}
-                            {feature.name}
+                            {feature.feature.name}
                           </>
                         ) : (
-                          feature.name
+                          feature.feature.name
                         )}
                       </span>
                     </li>
@@ -267,15 +209,17 @@ export default function PricingComponent({ t }: PricingProps) {
               </CardContent>
 
               <CardFooter className="pt-6">
-                <button
-                  className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
-                    plan.popular
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "bg-muted text-foreground hover:bg-accent"
-                  }`}
+                <Link
+                  href={`/${language}/sign-up`}
+                  className={cn(
+                    "w-full",
+                    buttonVariants({
+                      variant: plan.popular ? "default" : "outline",
+                    })
+                  )}
                 >
                   {t.cta}
-                </button>
+                </Link>
               </CardFooter>
             </Card>
           ))}
@@ -292,5 +236,7 @@ export default function PricingComponent({ t }: PricingProps) {
         </div>
       </div>
     </section>
+  ) : (
+    <Loader />
   );
 }

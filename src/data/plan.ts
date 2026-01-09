@@ -3,6 +3,19 @@
 import prisma from "@/lib/prisma";
 import { Prisma } from "@/lib/prisma/generated";
 
+export type PlanBasePayload = Prisma.PlanGetPayload<{
+  include: {
+    features: { include: { feature: true } };
+  };
+}>;
+
+export type PlanWithSubscriptionsPayload = Prisma.PlanGetPayload<{
+  include: {
+    features: { include: { feature: true } };
+    subscriptions: true;
+  };
+}>;
+
 /* -------------------------------------------------------------------------- */
 /*                              PLAN OPERATIONS                               */
 /* -------------------------------------------------------------------------- */
@@ -24,14 +37,13 @@ export async function createPlan(data: Prisma.PlanCreateInput) {
 /**
  * Get a plan by ID.
  */
-export async function getPlanById(id: string) {
+export async function getPlanById(id: string): Promise<PlanBasePayload | null> {
   return prisma.plan.findUnique({
     where: { id },
     include: {
       features: {
         include: { feature: true },
       },
-      subscriptions: true,
     },
   });
 }
@@ -39,7 +51,7 @@ export async function getPlanById(id: string) {
 /**
  * Get all available (active) plans.
  */
-export async function getAllActivePlans() {
+export async function getAllActivePlans(): Promise<PlanBasePayload[]> {
   return prisma.plan.findMany({
     where: { active: true },
     orderBy: { price: "asc" },
