@@ -41,7 +41,7 @@ export default async function ManagerPage({
         <PageTitle title={t.title} subtitle={t.subtitle} />
 
         <Suspense fallback={<TemplatesSkeleton />}>
-          <ManagerComponent />;
+          <ManagerComponent />
         </Suspense>
       </div>
     </main>

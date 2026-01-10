@@ -1,27 +1,18 @@
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import prisma from "@/lib/prisma";
 import { NextAuthOptions } from "next-auth";
 import { createUser, getUserByEmail, getUserByKey } from "@/data/user";
-import {
-  PrismaClient,
-  User,
-  UserRole,
-  UserStatus,
-} from "@/lib/prisma/generated";
+import { User, UserRole, UserStatus } from "@/lib/prisma/generated";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
-import { Status as SubscriptionStatus } from "@/data/subscription";
-import { createAccount, upsertAccount } from "@/data/account";
+import { upsertAccount } from "@/data/account";
 import { compareHash } from "../utils/passwordHandlers";
-import { Adapter } from "next-auth/adapters";
+import { SubscriptionStatusEnum } from "@/types";
 
 if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("NEXTAUTH_SECRET is not set in environment variables");
 }
 
 export const authOptions: NextAuthOptions = {
-  // adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -97,7 +88,7 @@ export const authOptions: NextAuthOptions = {
           token.subscriptionPlan = subscription.plan;
         } catch (err) {
           console.error("Error fetching subscription for user:", user.id, err);
-          token.subscriptionStatus = SubscriptionStatus.INACTIVE;
+          token.subscriptionStatus = SubscriptionStatusEnum.INACTIVE;
           token.subscriptionPlan = null;
         }
       }
@@ -134,7 +125,7 @@ export const authOptions: NextAuthOptions = {
       session.user.id = token.sub!;
       session.user.role = token.role || "USER";
       session.user.subscriptionStatus =
-        token.subscriptionStatus ?? SubscriptionStatus.INACTIVE;
+        token.subscriptionStatus ?? SubscriptionStatusEnum.INACTIVE;
       session.user.subscriptionPlan = token.subscriptionPlan ?? null;
 
       return session;

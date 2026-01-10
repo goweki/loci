@@ -1,15 +1,6 @@
-import prisma from "@/lib/prisma";
 import { type NextRequest } from "next/server";
-import crypto from "crypto";
-import {
-  compareHash,
-  generateRandom,
-  hash,
-} from "@/lib/utils/passwordHandlers";
-import { BASE_URL } from "@/lib/utils/getUrl";
-import { resetPasswordEmail as resetPasswordEmailTemplate } from "@/lib/mail/email-render";
-import { sendMail } from "@/lib/mail";
-import { getUserByKey, updateUser, updateUserPassword } from "@/data/user";
+import { compareHash, hash } from "@/lib/utils/passwordHandlers";
+import { getUserByKey, updateUserPassword } from "@/data/user";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 
 //validates token

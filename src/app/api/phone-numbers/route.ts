@@ -3,7 +3,6 @@
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import db from "@/lib/prisma";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
 import { createPhoneNumber, getPhoneNumbersByUser } from "@/data/phoneNumber";
 import { PhoneNumberStatus } from "@/lib/prisma/generated";

@@ -27,8 +27,9 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx",
-    "src/lib/authRouteWrappers.js",
-    "src/app/api/auth/[...nextauth]/authOptions.js"
+    "**/*.d.ts"
+    // "src/lib/authRouteWrappers.js",
+    // "src/app/api/auth/[...nextauth]/authOptions.js"
   ],
   "exclude": ["node_modules", "prisma/generated"]
 }

@@ -1,15 +1,9 @@
 import prisma from "@/lib/prisma";
 import { Prisma, Plan, PlanInterval } from "@/lib/prisma/generated";
-
-export enum Status {
-  ACTIVE = "ACTIVE",
-  DUE = "DUE",
-  TRIALING = "TRIALING",
-  INACTIVE = "INACTIVE",
-}
+import { SubscriptionStatusEnum } from "@/types";
 
 interface SubscriptionStatus {
-  status: Status;
+  status: SubscriptionStatusEnum;
   plan?: Plan;
   expiresAt?: Date | null; // optional — useful for UI
 }
@@ -29,7 +23,7 @@ export async function getSubscriptionStatusByUserId(
 
   // Default: trialing if no subscription
   if (subscriptions.length === 0) {
-    return { status: Status.TRIALING };
+    return { status: SubscriptionStatusEnum.TRIALING };
   }
 
   const now = new Date();
@@ -60,19 +54,19 @@ export async function getSubscriptionStatusByUserId(
   }
   // INACTIVE
   if (!activeSub) {
-    return { status: Status.INACTIVE };
+    return { status: SubscriptionStatusEnum.INACTIVE };
   }
   // DUE (expires within a week)
   if (activeSub.endDate <= oneWeekFromNow) {
     return {
-      status: Status.DUE,
+      status: SubscriptionStatusEnum.DUE,
       plan: activeSub.plan,
       expiresAt: activeSub.endDate,
     };
   }
   // ACTIVE
   return {
-    status: Status.ACTIVE,
+    status: SubscriptionStatusEnum.ACTIVE,
     plan: activeSub.plan,
     expiresAt: activeSub.endDate,
   };
@@ -81,7 +75,9 @@ export async function getSubscriptionStatusByUserId(
 /**
  * only return status.
  */
-export async function isUserSubscribed(userId: string): Promise<Status> {
+export async function isUserSubscribed(
+  userId: string
+): Promise<SubscriptionStatusEnum> {
   const subStatus = await getSubscriptionStatusByUserId(userId);
   return subStatus.status;
 }
