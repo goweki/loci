@@ -1,11 +1,9 @@
-import { getAllActivePlans, PlanBasePayload } from "@/data/plan";
-import { useCallback, useEffect, useState } from "react";
+"use client";
+
+import { useState } from "react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -17,30 +15,32 @@ import { initializePayment } from "@/lib/payments";
 import { createPayment } from "@/data/payment";
 import { createSubscription } from "@/data/subscription";
 import { PlanName } from "@/lib/prisma/generated";
+import Loader from "../ui/loaders";
+import toast from "react-hot-toast";
 
 export function PaymentCheckout({
-  email,
+  _email,
   amount,
   planName,
   billingInterval,
   userId,
 }: {
-  email?: string;
+  _email?: string;
   amount: number;
   planName: PlanName;
   billingInterval: string;
   userId: string;
 }) {
-  const [paystackParams, setPaystackParams] = useState<{
-    email?: string;
-    amount: number;
-    packag: string;
-  }>({ email, amount, packag: `${planName}_${billingInterval}` });
+  const packag = `${planName}_${billingInterval}`;
+  const [email, setEmail] = useState<string | undefined>(_email || "");
 
   const [isProcessing, setIsProcessing] = useState(false);
 
-  async function initPayment(email: string, amount: number, packag: string) {
-    if (!email) return;
+  async function initPayment() {
+    if (!email) {
+      toast.error("Please provide an email");
+      return;
+    }
 
     setIsProcessing(true);
 
@@ -90,12 +90,7 @@ export function PaymentCheckout({
         <div className="grid gap-4">
           <div className="space-y-2">
             <Label htmlFor="name">Package</Label>
-            <Input
-              id="ref"
-              name="ref"
-              defaultValue={paystackParams.packag}
-              disabled
-            />
+            <Input id="ref" name="ref" defaultValue={packag} disabled />
           </div>
           <div className="space-y-2">
             <Label htmlFor="name">Amount Payable</Label>
@@ -107,21 +102,21 @@ export function PaymentCheckout({
               <Input
                 id="email"
                 type="email"
-                value={paystackParams.email || ""}
-                onChange={(e) =>
-                  setPaystackParams((prev) => ({
-                    ...prev,
-                    email: e.target.value,
-                  }))
-                }
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="flex-1"
               />
             </div>
           </div>
         </div>
         <div>
-          <Button onClick={async () => {}} disabled={!email}>
-            Checkout
+          <Button
+            onClick={async () => {
+              await initPayment();
+            }}
+            disabled={!email || isProcessing}
+          >
+            {!isProcessing ? "Checkout" : <Loader size={4} />}
           </Button>
         </div>
       </DialogContent>

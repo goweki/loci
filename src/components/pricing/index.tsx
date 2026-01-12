@@ -170,7 +170,7 @@ export default function PricingComponent({ t }: PricingProps) {
             {user && (
               <div className="mb-4 flex justify-center px-4">
                 <PaymentCheckout
-                  email={user.email || undefined}
+                  _email={user.email || undefined}
                   amount={getPrice(plan)}
                   planName={plan.name}
                   billingInterval={billingInterval}
