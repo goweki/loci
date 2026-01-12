@@ -2,14 +2,12 @@
  * Resolves the base URL depending on the Vercel environment.
  * HINT: uses Vercel system environment variables.
  */
-export const BASE_URL: string =
+export const BASE_URL =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
     ? `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
-    : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-      ? `https://${process.env.NEXT_PUBLIC_DOMAIN}`
-      : process.env.NODE_ENV === "production"
-        ? `https://${process.env.NEXT_PUBLIC_DOMAIN}`
-        : process.env.NEXTAUTH_URL || "https://localhost:3000";
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXTAUTH_URL || "http://localhost:3000";
 
 /**
  * BRAND IMAGES URL
