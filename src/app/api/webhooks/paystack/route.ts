@@ -19,6 +19,8 @@ export async function POST(req: NextRequest) {
     const rawBody = await req.text();
     const signature = req.headers.get("x-paystack-signature");
 
+    console.log("received paystack webhook:", rawBody);
+
     if (!signature) {
       console.warn("Missing Paystack signature header");
       return NextResponse.json({ error: "Missing signature" }, { status: 400 });
