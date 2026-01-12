@@ -98,7 +98,7 @@ export async function createSubscription(
     data,
     include: {
       plan: true,
-      payments: true,
+      payment: true,
       user: {
         select: { id: true, email: true, name: true },
       },
@@ -116,7 +116,7 @@ export async function getSubscriptionById(id: string) {
       plan: {
         include: { features: { include: { feature: true } } },
       },
-      payments: true,
+      payment: true,
       user: {
         select: { id: true, email: true },
       },
@@ -133,7 +133,7 @@ export async function getUserSubscriptions(userId: string) {
     orderBy: { createdAt: "desc" },
     include: {
       plan: true,
-      payments: true,
+      payment: true,
     },
   });
 }
@@ -160,7 +160,7 @@ export async function updateSubscription(
     data,
     include: {
       plan: true,
-      payments: true,
+      payment: true,
     },
   });
 }
@@ -180,7 +180,7 @@ export async function deleteSubscription(id: string) {
 export async function getSubscriptionsByPlan(planId: PlanName) {
   return prisma.subscription.findMany({
     where: { planId },
-    include: { user: true, payments: true },
+    include: { user: true, payment: true },
   });
 }
 
@@ -200,7 +200,7 @@ export async function getSubscriptionDetails(id: string) {
           },
         },
       },
-      payments: true,
+      payment: true,
     },
   });
 }

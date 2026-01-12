@@ -37,31 +37,31 @@ export async function POST(req: NextRequest) {
     }
 
     // Parse and validate payload
-    const eventRaw: unknown = JSON.parse(rawBody);
-    const parsed = parsePaystackWebhook(eventRaw);
+    const rawEvent: unknown = JSON.parse(rawBody);
+    const parsedEvent = parsePaystackWebhook(rawEvent);
 
-    console.log("✅ Parsed Paystack event:", parsed);
+    console.log("✅ Parsed Paystack event:", parsedEvent);
 
     // Handle events
-    switch (parsed.event) {
+    switch (parsedEvent.event) {
       case "charge.success":
-        await markPaymentSuccessful(parsed.reference);
+        await markPaymentSuccessful(parsedEvent.reference);
         break;
 
       case "charge.failed":
-        await markPaymentFailed(parsed.reference);
+        await markPaymentFailed(parsedEvent.reference);
         break;
 
       case "transfer.success":
-        console.log("✅ Transfer successful:", parsed);
+        console.log("✅ Transfer successful:", parsedEvent);
         break;
 
       case "transfer.failed":
-        console.warn("⚠️ Transfer failed:", parsed);
+        console.warn("⚠️ Transfer failed:", parsedEvent);
         break;
 
       default:
-        console.info("ℹ️ Unhandled Paystack event:", parsed.event);
+        console.info("ℹ️ Unhandled Paystack event:", parsedEvent.event);
     }
 
     return NextResponse.json({ received: true }, { status: 200 });
