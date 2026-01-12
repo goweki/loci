@@ -10,12 +10,14 @@ const translations = {
     settings: "Settings",
     templates: "Templates",
     brand: "Brand",
+    billing: "Billing",
   },
   sw: {
     home: "Nyumbani",
     settings: "Mipangilio",
     templates: "Templet",
     brand: "Alama",
+    billing: "Malipo",
   },
 };
 
@@ -27,9 +29,10 @@ export default function SettingsNavbar() {
     {
       href: `/${language}/settings`,
       label: t.settings,
-      active: false,
+      // active: false,
     },
     { href: `/${language}/settings/templates`, label: t.templates },
+    { href: `/${language}/settings/billing`, label: t.billing },
   ];
 
   const logo = (

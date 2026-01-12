@@ -571,13 +571,16 @@ export async function getUserMessages(
  */
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
   const sub = await db.subscription.findFirst({
-    where: { userId },
+    where: {
+      userId,
+      startDate: { not: null },
+    },
     orderBy: { startDate: "desc" },
   });
   if (!sub) return false;
 
   const now = new Date();
-  const start = new Date(sub.startDate);
+  const start = new Date(sub.startDate!);
   const end = new Date(start);
 
   end.setMonth(end.getMonth() + 1); // simplistic example — adjust for yearly plans

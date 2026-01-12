@@ -2,9 +2,6 @@
 CREATE TYPE "WabaOwnership" AS ENUM ('OWNED', 'SHARED');
 
 -- CreateEnum
-CREATE TYPE "WabaCurrency" AS ENUM ('USD');
-
--- CreateEnum
 CREATE TYPE "TemplateLanguage" AS ENUM ('en_US', 'en_GB', 'fr_FR', 'sw_KE');
 
 -- CreateEnum
@@ -79,8 +76,11 @@ CREATE TABLE "users" (
 CREATE TABLE "waba_accounts" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "userId" TEXT,
     "ownership" "WabaOwnership" NOT NULL,
+    "currency" TEXT,
+    "timezoneId" TEXT,
+    "messageTemplateNamespace" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -97,8 +97,8 @@ CREATE TABLE "waba_templates" (
     "components" JSONB NOT NULL,
     "rejectedReason" TEXT,
     "wabaId" TEXT NOT NULL,
-    "createdById" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdById" TEXT,
+    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "waba_templates_pkey" PRIMARY KEY ("id")
@@ -131,11 +131,11 @@ CREATE TABLE "verification_tokens" (
 CREATE TABLE "subscriptions" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "planId" TEXT NOT NULL,
+    "planId" "PlanName" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "cancelDate" TIMESTAMP(3),
-    "startDate" TIMESTAMP(3) NOT NULL,
+    "startDate" TIMESTAMP(3),
 
     CONSTRAINT "subscriptions_pkey" PRIMARY KEY ("id")
 );
@@ -157,16 +157,17 @@ CREATE TABLE "Payment" (
 
 -- CreateTable
 CREATE TABLE "plans" (
-    "id" TEXT NOT NULL,
+    "id" "PlanName" NOT NULL,
+    "name" "PlanName" NOT NULL,
     "description" TEXT,
     "price" INTEGER NOT NULL,
+    "popular" BOOLEAN NOT NULL DEFAULT false,
     "interval" "PlanInterval" NOT NULL,
     "maxPhoneNumbers" INTEGER NOT NULL,
     "maxMessagesPerMonth" INTEGER NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "name" "PlanName" NOT NULL,
 
     CONSTRAINT "plans_pkey" PRIMARY KEY ("id")
 );
@@ -185,7 +186,7 @@ CREATE TABLE "Feature" (
 
 -- CreateTable
 CREATE TABLE "plan_features" (
-    "planId" TEXT NOT NULL,
+    "planId" "PlanName" NOT NULL,
     "featureId" TEXT NOT NULL,
     "enabled" BOOLEAN NOT NULL DEFAULT true,
     "limitUse" INTEGER,
@@ -198,7 +199,6 @@ CREATE TABLE "plan_features" (
 -- CreateTable
 CREATE TABLE "phone_numbers" (
     "id" TEXT NOT NULL,
-    "phoneNumberId" TEXT,
     "phoneNumber" TEXT NOT NULL,
     "displayName" TEXT,
     "preVerificationId" TEXT,
@@ -207,7 +207,7 @@ CREATE TABLE "phone_numbers" (
     "verifiedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "userId" TEXT NOT NULL,
+    "wabaId" TEXT NOT NULL,
 
     CONSTRAINT "phone_numbers_pkey" PRIMARY KEY ("id")
 );
@@ -215,13 +215,13 @@ CREATE TABLE "phone_numbers" (
 -- CreateTable
 CREATE TABLE "contacts" (
     "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
     "name" TEXT,
     "avatar" TEXT,
     "lastMessageAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "userId" TEXT NOT NULL,
 
     CONSTRAINT "contacts_pkey" PRIMARY KEY ("id")
 );
@@ -305,6 +305,58 @@ CREATE TABLE "accounts" (
     CONSTRAINT "accounts_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "chatbot_configs" (
+    "id" TEXT NOT NULL,
+    "phoneNumberId" TEXT NOT NULL,
+    "systemPrompt" TEXT NOT NULL,
+    "model" TEXT NOT NULL DEFAULT 'claude-sonnet-4-20250514',
+    "temperature" DOUBLE PRECISION NOT NULL DEFAULT 0.7,
+    "maxTokens" INTEGER NOT NULL DEFAULT 1000,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "fallbackToHuman" BOOLEAN NOT NULL DEFAULT true,
+    "humanHandoffKeywords" TEXT[],
+    "responseDelay" INTEGER DEFAULT 1000,
+    "typingIndicator" BOOLEAN NOT NULL DEFAULT true,
+    "conversationHistory" INTEGER NOT NULL DEFAULT 10,
+    "resetContextAfter" INTEGER NOT NULL DEFAULT 30,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "chatbot_configs_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "chatbot_conversations" (
+    "id" TEXT NOT NULL,
+    "chatbotConfigId" TEXT NOT NULL,
+    "contactId" TEXT NOT NULL,
+    "context" JSONB NOT NULL,
+    "messageCount" INTEGER NOT NULL DEFAULT 0,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "handedOffToHuman" BOOLEAN NOT NULL DEFAULT false,
+    "lastMessageAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "chatbot_conversations_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "prompt_templates" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "content" TEXT NOT NULL,
+    "category" TEXT,
+    "isPublic" BOOLEAN NOT NULL DEFAULT false,
+    "userId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "prompt_templates_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
@@ -339,9 +391,6 @@ CREATE UNIQUE INDEX "plans_name_key" ON "plans"("name");
 CREATE UNIQUE INDEX "Feature_name_key" ON "Feature"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "phone_numbers_phoneNumberId_key" ON "phone_numbers"("phoneNumberId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "phone_numbers_phoneNumber_key" ON "phone_numbers"("phoneNumber");
 
 -- CreateIndex
@@ -350,11 +399,20 @@ CREATE UNIQUE INDEX "contacts_userId_phoneNumber_key" ON "contacts"("userId", "p
 -- CreateIndex
 CREATE UNIQUE INDEX "accounts_provider_providerAccountId_key" ON "accounts"("provider", "providerAccountId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "chatbot_configs_phoneNumberId_key" ON "chatbot_configs"("phoneNumberId");
+
+-- CreateIndex
+CREATE INDEX "chatbot_conversations_isActive_idx" ON "chatbot_conversations"("isActive");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "chatbot_conversations_chatbotConfigId_contactId_key" ON "chatbot_conversations"("chatbotConfigId", "contactId");
+
 -- AddForeignKey
 ALTER TABLE "waba_accounts" ADD CONSTRAINT "waba_accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "waba_templates" ADD CONSTRAINT "waba_templates_wabaId_fkey" FOREIGN KEY ("wabaId") REFERENCES "waba_accounts"("userId") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "waba_templates" ADD CONSTRAINT "waba_templates_wabaId_fkey" FOREIGN KEY ("wabaId") REFERENCES "waba_accounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "waba_templates" ADD CONSTRAINT "waba_templates_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -381,7 +439,7 @@ ALTER TABLE "plan_features" ADD CONSTRAINT "plan_features_featureId_fkey" FOREIG
 ALTER TABLE "plan_features" ADD CONSTRAINT "plan_features_planId_fkey" FOREIGN KEY ("planId") REFERENCES "plans"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "phone_numbers" ADD CONSTRAINT "phone_numbers_userId_fkey" FOREIGN KEY ("userId") REFERENCES "waba_accounts"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "phone_numbers" ADD CONSTRAINT "phone_numbers_wabaId_fkey" FOREIGN KEY ("wabaId") REFERENCES "waba_accounts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "contacts" ADD CONSTRAINT "contacts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -403,3 +461,15 @@ ALTER TABLE "autoreply_rules" ADD CONSTRAINT "autoreply_rules_createdById_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "chatbot_configs" ADD CONSTRAINT "chatbot_configs_phoneNumberId_fkey" FOREIGN KEY ("phoneNumberId") REFERENCES "phone_numbers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "chatbot_conversations" ADD CONSTRAINT "chatbot_conversations_chatbotConfigId_fkey" FOREIGN KEY ("chatbotConfigId") REFERENCES "chatbot_configs"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "chatbot_conversations" ADD CONSTRAINT "chatbot_conversations_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "contacts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "prompt_templates" ADD CONSTRAINT "prompt_templates_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

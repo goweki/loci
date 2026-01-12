@@ -64,100 +64,102 @@ export default function TabTemplates() {
     fetchTemplates();
   }, []);
 
-  return templates ? (
+  return (
     <TabsContent value="templates" className="space-y-4">
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <CardTitle>Message Templates</CardTitle>
-              <CardDescription>
-                Manage your WhatsApp message templates and sync with Cloud API
-              </CardDescription>
+      {templates ? (
+        <Card>
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <CardTitle>Message Templates</CardTitle>
+                <CardDescription>
+                  Manage your WhatsApp message templates and sync with Cloud API
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Button>
+                  <PlusIcon className="w-4 h-4" />
+                  New Template
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <Button>
-                <PlusIcon className="w-4 h-4" />
-                New Template
-              </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-4">
+              <div className="relative">
+                <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Search templates..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4">
-            <div className="relative">
-              <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-              <Input
-                placeholder="Search templates..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
 
-          <div className="rounded-md border overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b bg-popover">
-                  <th className="px-4 py-3 text-left text-sm font-medium">
-                    Template Name
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">
-                    Category
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">
-                    Language
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">
-                    Last Updated
-                  </th>
-                  <th className="px-4 py-3 text-right text-sm font-medium">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {templates?.map((template) => (
-                  <tr key={template.id} className="border-b hover:bg-popover">
-                    <td className="px-4 py-3 text-sm font-medium">
-                      {template.name}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge variant="outline">{template.category}</Badge>
-                    </td>
-                    <td className="px-4 py-3 text-sm">{template.language}</td>
-                    <td className="px-4 py-3">
-                      {template.status ? getStatusBadge(template.status) : ""}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      {template.updatedAt?.toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="sm">
-                          <EyeIcon className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <EditIcon className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Trash2Icon className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </td>
+            <div className="rounded-md border overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b bg-popover">
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Template Name
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Category
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Language
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Status
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Last Updated
+                    </th>
+                    <th className="px-4 py-3 text-right text-sm font-medium">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                </thead>
+                <tbody>
+                  {templates?.map((template) => (
+                    <tr key={template.id} className="border-b hover:bg-popover">
+                      <td className="px-4 py-3 text-sm font-medium">
+                        {template.name}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge variant="outline">{template.category}</Badge>
+                      </td>
+                      <td className="px-4 py-3 text-sm">{template.language}</td>
+                      <td className="px-4 py-3">
+                        {template.status ? getStatusBadge(template.status) : ""}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        {template.updatedAt?.toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm">
+                            <EyeIcon className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <EditIcon className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Trash2Icon className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Loader />
+      )}
     </TabsContent>
-  ) : (
-    <Loader />
   );
 }

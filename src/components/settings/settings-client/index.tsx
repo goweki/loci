@@ -24,13 +24,17 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
+  MessageSquareIcon,
 } from "lucide-react";
 import { getUserById, UserGetPayload } from "@/data/user";
 import { WhatsAppLogo } from "@/components/ui/svg";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import TabWhatsApp from "./tab-whatsapp";
 import TabProfile from "./tab-profile";
-import TabBilling from "./tab-billing";
+import TabSubscription from "./tab-subscription";
+import TabAutoreplyRules from "./tab-autoReply";
+import { JSX } from "react";
+import { strPascalCase } from "@/lib/utils/stringHandlers";
 
 export default function SettingsClient({ user }: { user: UserGetPayload }) {
   const searchParams = useSearchParams();
@@ -43,15 +47,17 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
     router.push(`${pathname}?tab=${value}`, { scroll: false });
   };
 
-  const allowedTabs = [
-    "profile",
-    "whatsapp",
-    "billing",
-    "notifications",
-    "security",
-  ] as const;
+  const tabs: { tabName: string; icon: React.ReactNode }[] = [
+    { tabName: "profile", icon: <UserIcon className="w-4 h-4" /> },
+    { tabName: "whatsapp", icon: <WhatsAppLogo className="h-4 w-4" /> },
+    { tabName: "subscription", icon: <CreditCard className="w-4 h-4" /> },
+    { tabName: "auto-reply", icon: <MessageSquareIcon className="w-4 h-4" /> },
+    { tabName: "security", icon: <Shield className="w-4 h-4" /> },
+  ];
 
-  const activeTab = allowedTabs.includes(tab as any) ? tab! : "profile";
+  const activeTab = tabs.map(({ tabName }) => tabName).includes(tab as any)
+    ? tab!
+    : "profile";
 
   return (
     <Tabs
@@ -60,26 +66,16 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
       className="space-y-6"
     >
       <TabsList className="grid w-full grid-cols-5 lg:w-auto">
-        <TabsTrigger value="profile" className="flex items-center gap-2">
-          <UserIcon className="w-4 h-4" />
-          <span className="hidden sm:inline">Profile</span>
-        </TabsTrigger>
-        <TabsTrigger value="whatsapp" className="flex items-center gap-2">
-          <WhatsAppLogo className="h-4 w-4" />
-          <span className="hidden sm:inline">WhatsApp</span>
-        </TabsTrigger>
-        <TabsTrigger value="billing" className="flex items-center gap-2">
-          <CreditCard className="w-4 h-4" />
-          <span className="hidden sm:inline">Billing</span>
-        </TabsTrigger>
-        <TabsTrigger value="notifications" className="flex items-center gap-2">
-          <Bell className="w-4 h-4" />
-          <span className="hidden sm:inline">Notifications</span>
-        </TabsTrigger>
-        <TabsTrigger value="security" className="flex items-center gap-2">
-          <Shield className="w-4 h-4" />
-          <span className="hidden sm:inline">Security</span>
-        </TabsTrigger>
+        {tabs.map(({ tabName, icon }) => (
+          <TabsTrigger
+            key={tabName}
+            value={tabName}
+            className="flex items-center gap-2"
+          >
+            {icon}
+            <span className="hidden sm:inline">{strPascalCase(tabName)}</span>
+          </TabsTrigger>
+        ))}
       </TabsList>
 
       {/* Profile Tab */}
@@ -89,10 +85,13 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
       <TabWhatsApp waba={user.waba} />
 
       {/* Billing Tab */}
-      <TabBilling activeSubscription={user.subscriptions[0]} />
+      <TabSubscription activeSubscription={user.subscriptions[0]} />
+
+      {/* AutoReply Tab */}
+      <TabAutoreplyRules />
 
       {/* Notifications Tab */}
-      <TabsContent value="notifications" className="space-y-6">
+      {/* <TabsContent value="notifications" className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Notification Preferences</CardTitle>
@@ -154,7 +153,7 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
             </div>
           </CardContent>
         </Card>
-      </TabsContent>
+      </TabsContent> */}
 
       {/* Security Tab */}
       <TabsContent value="security" className="space-y-6">

@@ -1,5 +1,7 @@
+"use server";
+
 import prisma from "@/lib/prisma";
-import { Prisma, Plan, PlanInterval } from "@/lib/prisma/generated";
+import { Prisma, Plan, PlanInterval, PlanName } from "@/lib/prisma/generated";
 import { SubscriptionStatusEnum } from "@/types";
 
 interface SubscriptionStatus {
@@ -35,6 +37,10 @@ export async function getSubscriptionStatusByUserId(
   } | null = null;
 
   for (const sub of subscriptions) {
+    if (!sub.startDate) {
+      break;
+    }
+
     const startDate = new Date(sub.startDate);
     const endDate = new Date(startDate);
 
@@ -86,7 +92,7 @@ export async function isUserSubscribed(
  * Create a new subscription for a user.
  */
 export async function createSubscription(
-  data: Prisma.SubscriptionUncheckedCreateInput | Prisma.SubscriptionCreateInput
+  data: Prisma.SubscriptionUncheckedCreateInput
 ) {
   return prisma.subscription.create({
     data,
@@ -171,7 +177,7 @@ export async function deleteSubscription(id: string) {
 /**
  * Get all subscriptions for a specific plan.
  */
-export async function getSubscriptionsByPlan(planId: string) {
+export async function getSubscriptionsByPlan(planId: PlanName) {
   return prisma.subscription.findMany({
     where: { planId },
     include: { user: true, payments: true },

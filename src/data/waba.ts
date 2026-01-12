@@ -1,3 +1,5 @@
+"use server";
+
 import prisma from "@/lib/prisma";
 import { Prisma } from "@/lib/prisma/generated";
 
@@ -829,5 +831,3 @@ export async function getWabaDashboardStats(userId: string) {
     },
   };
 }
-
-export default prisma;

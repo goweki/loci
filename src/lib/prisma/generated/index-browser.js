@@ -430,6 +430,12 @@ exports.VerificationChannel = exports.$Enums.VerificationChannel = {
   WHATSAPP: 'WHATSAPP'
 };
 
+exports.PlanName = exports.$Enums.PlanName = {
+  BASIC: 'BASIC',
+  STANDARD: 'STANDARD',
+  PREMIUM: 'PREMIUM'
+};
+
 exports.PaymentMethod = exports.$Enums.PaymentMethod = {
   ONLINE: 'ONLINE',
   OTHER: 'OTHER',
@@ -447,12 +453,6 @@ exports.PaymentStatus = exports.$Enums.PaymentStatus = {
   SUCCESS: 'SUCCESS',
   FAILED: 'FAILED',
   REVERSED: 'REVERSED'
-};
-
-exports.PlanName = exports.$Enums.PlanName = {
-  BASIC: 'BASIC',
-  STANDARD: 'STANDARD',
-  PREMIUM: 'PREMIUM'
 };
 
 exports.PlanInterval = exports.$Enums.PlanInterval = {

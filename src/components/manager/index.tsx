@@ -88,7 +88,7 @@ export default function ManagerComponent() {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-      <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
+      <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
         <TabsTrigger value="templates" className="flex items-center gap-2">
           <FileText className="w-4 h-4" />
           <span className="hidden sm:inline">Templates</span>
@@ -100,10 +100,6 @@ export default function ManagerComponent() {
         <TabsTrigger value="auto-reply" className="flex items-center gap-2">
           <MessageSquare className="w-4 h-4" />
           <span className="hidden sm:inline">Auto Reply</span>
-        </TabsTrigger>
-        <TabsTrigger value="contacts" className="flex items-center gap-2">
-          <Users className="w-4 h-4" />
-          <span className="hidden sm:inline">Contacts</span>
         </TabsTrigger>
         <TabsTrigger value="settings" className="flex items-center gap-2">
           <Settings className="w-4 h-4" />
@@ -121,7 +117,7 @@ export default function ManagerComponent() {
       <TabAutoreplyRules />
 
       {/* Contacts Tab */}
-      <TabsContent value="contacts" className="space-y-4">
+      {/* <TabsContent value="contacts" className="space-y-4">
         <Card>
           <CardHeader>
             <CardTitle>Contacts</CardTitle>
@@ -145,7 +141,7 @@ export default function ManagerComponent() {
             </Alert>
           </CardContent>
         </Card>
-      </TabsContent>
+      </TabsContent> */}
 
       {/* Settings Tab */}
       <TabSettings />

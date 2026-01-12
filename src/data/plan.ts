@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { Prisma } from "@/lib/prisma/generated";
+import { PlanName, Prisma } from "@/lib/prisma/generated";
 
 export type PlanBasePayload = Prisma.PlanGetPayload<{
   include: {
@@ -37,7 +37,9 @@ export async function createPlan(data: Prisma.PlanCreateInput) {
 /**
  * Get a plan by ID.
  */
-export async function getPlanById(id: string): Promise<PlanBasePayload | null> {
+export async function getPlanById(
+  id: PlanName
+): Promise<PlanBasePayload | null> {
   return prisma.plan.findUnique({
     where: { id },
     include: {
@@ -66,7 +68,7 @@ export async function getAllActivePlans(): Promise<PlanBasePayload[]> {
 /**
  * Update plan details (e.g., price, limits, description).
  */
-export async function updatePlan(id: string, data: Prisma.PlanUpdateInput) {
+export async function updatePlan(id: PlanName, data: Prisma.PlanUpdateInput) {
   return prisma.plan.update({
     where: { id },
     data,
@@ -81,7 +83,7 @@ export async function updatePlan(id: string, data: Prisma.PlanUpdateInput) {
 /**
  * Deactivate a plan (soft delete).
  */
-export async function deactivatePlan(id: string) {
+export async function deactivatePlan(id: PlanName) {
   return prisma.plan.update({
     where: { id },
     data: { active: false },
@@ -91,7 +93,7 @@ export async function deactivatePlan(id: string) {
 /**
  * Permanently delete a plan and its feature links.
  */
-export async function deletePlan(id: string) {
+export async function deletePlan(id: PlanName) {
   await prisma.planFeature.deleteMany({ where: { planId: id } });
   return prisma.plan.delete({ where: { id } });
 }
@@ -167,7 +169,7 @@ export async function deleteFeature(id: string) {
  * Link an existing feature to a plan.
  */
 export async function addFeatureToPlan(
-  planId: string,
+  planId: PlanName,
   featureId: string,
   options?: {
     enabled?: boolean;
@@ -190,7 +192,10 @@ export async function addFeatureToPlan(
 /**
  * Remove a feature from a plan.
  */
-export async function removeFeatureFromPlan(planId: string, featureId: string) {
+export async function removeFeatureFromPlan(
+  planId: PlanName,
+  featureId: string
+) {
   return prisma.planFeature.delete({
     where: { planId_featureId: { planId, featureId } },
   });
@@ -199,7 +204,7 @@ export async function removeFeatureFromPlan(planId: string, featureId: string) {
 /**
  * Get all features associated with a plan.
  */
-export async function getFeaturesForPlan(planId: string) {
+export async function getFeaturesForPlan(planId: PlanName) {
   return prisma.planFeature.findMany({
     where: { planId },
     include: { feature: true },
@@ -210,7 +215,7 @@ export async function getFeaturesForPlan(planId: string) {
  * Toggle (enable/disable) a feature for a plan.
  */
 export async function togglePlanFeature(
-  planId: string,
+  planId: PlanName,
   featureId: string,
   enabled: boolean
 ) {
@@ -224,7 +229,7 @@ export async function togglePlanFeature(
  * Update plan-feature configuration (limitUse, configValue, etc.).
  */
 export async function updatePlanFeature(
-  planId: string,
+  planId: PlanName,
   featureId: string,
   data: Prisma.PlanFeatureUpdateInput
 ) {
@@ -241,7 +246,7 @@ export async function updatePlanFeature(
 /**
  * Get plan details including its feature list and limits.
  */
-export async function getPlanDetails(planId: string) {
+export async function getPlanDetails(planId: PlanName) {
   return prisma.plan.findUnique({
     where: { id: planId },
     include: {
@@ -255,7 +260,7 @@ export async function getPlanDetails(planId: string) {
 /**
  * Check whether a given feature is enabled in a plan.
  */
-export async function isFeatureEnabled(planId: string, featureName: string) {
+export async function isFeatureEnabled(planId: PlanName, featureName: string) {
   const planFeature = await prisma.planFeature.findFirst({
     where: {
       planId,

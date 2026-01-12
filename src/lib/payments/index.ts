@@ -1,13 +1,7 @@
-// lib/payments.ts
+"use server";
 
-import { Paystack } from "paystack-sdk";
-
-const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
-if (!PAYSTACK_SECRET_KEY) {
-  throw new Error("Missing process.env.PAYSTACK_SECRET_KEY");
-}
-
-const paystack = new Paystack(PAYSTACK_SECRET_KEY);
+import { BASE_URL } from "../utils/getUrl";
+import paystack from "./client";
 
 /**
  * Initialize a payment
@@ -20,19 +14,29 @@ export async function initializePayment(
   amount: number,
   reference?: string
 ) {
+  if (!email) {
+    throw new Error("No email provided");
+  }
+
+  const callback_url =
+    process.env.NODE_ENV === "production"
+      ? `${BASE_URL}/api/payments/callback`
+      : undefined;
+
   try {
     const response = await paystack.transaction.initialize({
       email,
-      amount: (amount * 100).toString(), // Paystack expects amount in cents
+      amount: (amount * 100).toString(),
       reference,
-      currency: "NGN",
-      callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/callback`,
+      callback_url,
     });
 
-    return response.data; // returns { authorization_url, access_code, reference }
+    console.log("paystack response:", response);
+    return response.data;
   } catch (error: any) {
     console.error("Error initializing payment:", error);
-    throw new Error(error.message || "Failed to initialize payment");
+    console.error(JSON.stringify(error));
+    return null;
   }
 }
 

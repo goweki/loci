@@ -45,6 +45,7 @@ const featuresData = [
 
 const plansData = [
   {
+    id: PlanName.BASIC,
     name: PlanName.BASIC,
     description: "Best for individuals getting started",
     price: 2499,
@@ -64,6 +65,7 @@ const plansData = [
     ],
   },
   {
+    id: PlanName.STANDARD,
     name: PlanName.STANDARD,
     description: "Best for growing teams",
     price: 9999,
@@ -83,6 +85,7 @@ const plansData = [
     ],
   },
   {
+    id: PlanName.PREMIUM,
     name: PlanName.PREMIUM,
     description: "For enterprises at scale",
     price: 49999,
@@ -121,6 +124,7 @@ export async function seedPlans(prisma: PrismaClient) {
       where: { name: plan.name },
       update: {},
       create: {
+        id: plan.id,
         name: plan.name,
         description: plan.description,
         price: plan.price,

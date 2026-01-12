@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,17 +11,21 @@ import { Separator } from "@/components/ui/separator";
 import { TabsContent } from "@/components/ui/tabs";
 import { Plan, Subscription } from "@/lib/prisma/generated";
 import { CheckCircle2Icon, CreditCardIcon } from "lucide-react";
+import Link from "next/link";
+import { useI18n } from "@/lib/i18n";
 
-export default function TabBilling({
+export default function TabSubscription({
   activeSubscription,
 }: {
   activeSubscription: Subscription & { plan: Plan };
 }) {
+  const { language } = useI18n();
+
   return (
-    <TabsContent value="billing" className="space-y-6">
+    <TabsContent value="subscription" className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Subscription & Billing</CardTitle>
+          <CardTitle>Subscription & Payments</CardTitle>
           <CardDescription>
             Manage your subscription plan and billing information
           </CardDescription>
@@ -91,9 +95,10 @@ export default function TabBilling({
                       Next billing date
                     </span>
                     <span className="font-medium">
-                      {new Date(
-                        activeSubscription.startDate
-                      ).toLocaleDateString()}
+                      {activeSubscription.startDate &&
+                        new Date(
+                          activeSubscription.startDate
+                        ).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="flex items-center justify-between py-2">
@@ -115,10 +120,15 @@ export default function TabBilling({
                   No Active Subscription
                 </h3>
                 <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                  Choose a plan to start using our WhatsApp Business services
+                  Choose a plan to access paid features
                 </p>
               </div>
-              <Button>View Plans</Button>
+              <Link
+                href={`/${language}/settings/billing`}
+                className={buttonVariants({ variant: "default" })}
+              >
+                View Plans
+              </Link>
             </div>
           )}
         </CardContent>

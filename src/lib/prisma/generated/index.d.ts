@@ -9115,7 +9115,7 @@ export namespace Prisma {
   export type SubscriptionMinAggregateOutputType = {
     id: string | null
     userId: string | null
-    planId: string | null
+    planId: $Enums.PlanName | null
     createdAt: Date | null
     updatedAt: Date | null
     cancelDate: Date | null
@@ -9125,7 +9125,7 @@ export namespace Prisma {
   export type SubscriptionMaxAggregateOutputType = {
     id: string | null
     userId: string | null
-    planId: string | null
+    planId: $Enums.PlanName | null
     createdAt: Date | null
     updatedAt: Date | null
     cancelDate: Date | null
@@ -9250,11 +9250,11 @@ export namespace Prisma {
   export type SubscriptionGroupByOutputType = {
     id: string
     userId: string
-    planId: string
+    planId: $Enums.PlanName
     createdAt: Date
     updatedAt: Date
     cancelDate: Date | null
-    startDate: Date
+    startDate: Date | null
     _count: SubscriptionCountAggregateOutputType | null
     _min: SubscriptionMinAggregateOutputType | null
     _max: SubscriptionMaxAggregateOutputType | null
@@ -9348,11 +9348,11 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
-      planId: string
+      planId: $Enums.PlanName
       createdAt: Date
       updatedAt: Date
       cancelDate: Date | null
-      startDate: Date
+      startDate: Date | null
     }, ExtArgs["result"]["subscription"]>
     composites: {}
   }
@@ -9781,7 +9781,7 @@ export namespace Prisma {
   interface SubscriptionFieldRefs {
     readonly id: FieldRef<"Subscription", 'String'>
     readonly userId: FieldRef<"Subscription", 'String'>
-    readonly planId: FieldRef<"Subscription", 'String'>
+    readonly planId: FieldRef<"Subscription", 'PlanName'>
     readonly createdAt: FieldRef<"Subscription", 'DateTime'>
     readonly updatedAt: FieldRef<"Subscription", 'DateTime'>
     readonly cancelDate: FieldRef<"Subscription", 'DateTime'>
@@ -11393,7 +11393,7 @@ export namespace Prisma {
   }
 
   export type PlanMinAggregateOutputType = {
-    id: string | null
+    id: $Enums.PlanName | null
     name: $Enums.PlanName | null
     description: string | null
     price: number | null
@@ -11407,7 +11407,7 @@ export namespace Prisma {
   }
 
   export type PlanMaxAggregateOutputType = {
-    id: string | null
+    id: $Enums.PlanName | null
     name: $Enums.PlanName | null
     description: string | null
     price: number | null
@@ -11578,7 +11578,7 @@ export namespace Prisma {
   }
 
   export type PlanGroupByOutputType = {
-    id: string
+    id: $Enums.PlanName
     name: $Enums.PlanName
     description: string | null
     price: number
@@ -11685,7 +11685,7 @@ export namespace Prisma {
       subscriptions: Prisma.$SubscriptionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: string
+      id: $Enums.PlanName
       name: $Enums.PlanName
       description: string | null
       price: number
@@ -11779,8 +11779,8 @@ export namespace Prisma {
      * // Get first 10 Plans
      * const plans = await prisma.plan.findMany({ take: 10 })
      * 
-     * // Only select the `id`
-     * const planWithIdOnly = await prisma.plan.findMany({ select: { id: true } })
+     * // Only select the `description`
+     * const planWithDescriptionOnly = await prisma.plan.findMany({ select: { description: true } })
      * 
      */
     findMany<T extends PlanFindManyArgs>(args?: SelectSubset<T, PlanFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -11824,9 +11824,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Create many Plans and only return the `id`
-     * const planWithIdOnly = await prisma.plan.createManyAndReturn({
-     *   select: { id: true },
+     * // Create many Plans and only return the `description`
+     * const planWithDescriptionOnly = await prisma.plan.createManyAndReturn({
+     *   select: { description: true },
      *   data: [
      *     // ... provide data here
      *   ]
@@ -11915,9 +11915,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more Plans and only return the `id`
-     * const planWithIdOnly = await prisma.plan.updateManyAndReturn({
-     *   select: { id: true },
+     * // Update zero or more Plans and only return the `description`
+     * const planWithDescriptionOnly = await prisma.plan.updateManyAndReturn({
+     *   select: { description: true },
      *   where: {
      *     // ... provide filter here
      *   },
@@ -12121,7 +12121,7 @@ export namespace Prisma {
    * Fields of the Plan model
    */
   interface PlanFieldRefs {
-    readonly id: FieldRef<"Plan", 'String'>
+    readonly id: FieldRef<"Plan", 'PlanName'>
     readonly name: FieldRef<"Plan", 'PlanName'>
     readonly description: FieldRef<"Plan", 'String'>
     readonly price: FieldRef<"Plan", 'Int'>
@@ -13690,7 +13690,7 @@ export namespace Prisma {
   }
 
   export type PlanFeatureMinAggregateOutputType = {
-    planId: string | null
+    planId: $Enums.PlanName | null
     featureId: string | null
     enabled: boolean | null
     limitUse: number | null
@@ -13699,7 +13699,7 @@ export namespace Prisma {
   }
 
   export type PlanFeatureMaxAggregateOutputType = {
-    planId: string | null
+    planId: $Enums.PlanName | null
     featureId: string | null
     enabled: boolean | null
     limitUse: number | null
@@ -13841,7 +13841,7 @@ export namespace Prisma {
   }
 
   export type PlanFeatureGroupByOutputType = {
-    planId: string
+    planId: $Enums.PlanName
     featureId: string
     enabled: boolean
     limitUse: number | null
@@ -13931,7 +13931,7 @@ export namespace Prisma {
       plan: Prisma.$PlanPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
-      planId: string
+      planId: $Enums.PlanName
       featureId: string
       enabled: boolean
       limitUse: number | null
@@ -14020,8 +14020,8 @@ export namespace Prisma {
      * // Get first 10 PlanFeatures
      * const planFeatures = await prisma.planFeature.findMany({ take: 10 })
      * 
-     * // Only select the `planId`
-     * const planFeatureWithPlanIdOnly = await prisma.planFeature.findMany({ select: { planId: true } })
+     * // Only select the `featureId`
+     * const planFeatureWithFeatureIdOnly = await prisma.planFeature.findMany({ select: { featureId: true } })
      * 
      */
     findMany<T extends PlanFeatureFindManyArgs>(args?: SelectSubset<T, PlanFeatureFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlanFeaturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -14065,9 +14065,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Create many PlanFeatures and only return the `planId`
-     * const planFeatureWithPlanIdOnly = await prisma.planFeature.createManyAndReturn({
-     *   select: { planId: true },
+     * // Create many PlanFeatures and only return the `featureId`
+     * const planFeatureWithFeatureIdOnly = await prisma.planFeature.createManyAndReturn({
+     *   select: { featureId: true },
      *   data: [
      *     // ... provide data here
      *   ]
@@ -14156,9 +14156,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more PlanFeatures and only return the `planId`
-     * const planFeatureWithPlanIdOnly = await prisma.planFeature.updateManyAndReturn({
-     *   select: { planId: true },
+     * // Update zero or more PlanFeatures and only return the `featureId`
+     * const planFeatureWithFeatureIdOnly = await prisma.planFeature.updateManyAndReturn({
+     *   select: { featureId: true },
      *   where: {
      *     // ... provide filter here
      *   },
@@ -14362,7 +14362,7 @@ export namespace Prisma {
    * Fields of the PlanFeature model
    */
   interface PlanFeatureFieldRefs {
-    readonly planId: FieldRef<"PlanFeature", 'String'>
+    readonly planId: FieldRef<"PlanFeature", 'PlanName'>
     readonly featureId: FieldRef<"PlanFeature", 'String'>
     readonly enabled: FieldRef<"PlanFeature", 'Boolean'>
     readonly limitUse: FieldRef<"PlanFeature", 'Int'>
@@ -26771,6 +26771,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'PlanName'
+   */
+  export type EnumPlanNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanName'>
+    
+
+
+  /**
+   * Reference to a field of type 'PlanName[]'
+   */
+  export type ListEnumPlanNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanName[]'>
+    
+
+
+  /**
    * Reference to a field of type 'PaymentMethod'
    */
   export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod'>
@@ -26823,20 +26837,6 @@ export namespace Prisma {
    * Reference to a field of type 'PaymentStatus[]'
    */
   export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'PlanName'
-   */
-  export type EnumPlanNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanName'>
-    
-
-
-  /**
-   * Reference to a field of type 'PlanName[]'
-   */
-  export type ListEnumPlanNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanName[]'>
     
 
 
@@ -27379,11 +27379,11 @@ export namespace Prisma {
     NOT?: SubscriptionWhereInput | SubscriptionWhereInput[]
     id?: StringFilter<"Subscription"> | string
     userId?: StringFilter<"Subscription"> | string
-    planId?: StringFilter<"Subscription"> | string
+    planId?: EnumPlanNameFilter<"Subscription"> | $Enums.PlanName
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeFilter<"Subscription"> | Date | string
     cancelDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
-    startDate?: DateTimeFilter<"Subscription"> | Date | string
+    startDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     payments?: PaymentListRelationFilter
     plan?: XOR<PlanScalarRelationFilter, PlanWhereInput>
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -27396,7 +27396,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     cancelDate?: SortOrderInput | SortOrder
-    startDate?: SortOrder
+    startDate?: SortOrderInput | SortOrder
     payments?: PaymentOrderByRelationAggregateInput
     plan?: PlanOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
@@ -27408,11 +27408,11 @@ export namespace Prisma {
     OR?: SubscriptionWhereInput[]
     NOT?: SubscriptionWhereInput | SubscriptionWhereInput[]
     userId?: StringFilter<"Subscription"> | string
-    planId?: StringFilter<"Subscription"> | string
+    planId?: EnumPlanNameFilter<"Subscription"> | $Enums.PlanName
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeFilter<"Subscription"> | Date | string
     cancelDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
-    startDate?: DateTimeFilter<"Subscription"> | Date | string
+    startDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     payments?: PaymentListRelationFilter
     plan?: XOR<PlanScalarRelationFilter, PlanWhereInput>
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -27425,7 +27425,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     cancelDate?: SortOrderInput | SortOrder
-    startDate?: SortOrder
+    startDate?: SortOrderInput | SortOrder
     _count?: SubscriptionCountOrderByAggregateInput
     _max?: SubscriptionMaxOrderByAggregateInput
     _min?: SubscriptionMinOrderByAggregateInput
@@ -27437,11 +27437,11 @@ export namespace Prisma {
     NOT?: SubscriptionScalarWhereWithAggregatesInput | SubscriptionScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Subscription"> | string
     userId?: StringWithAggregatesFilter<"Subscription"> | string
-    planId?: StringWithAggregatesFilter<"Subscription"> | string
+    planId?: EnumPlanNameWithAggregatesFilter<"Subscription"> | $Enums.PlanName
     createdAt?: DateTimeWithAggregatesFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Subscription"> | Date | string
     cancelDate?: DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
-    startDate?: DateTimeWithAggregatesFilter<"Subscription"> | Date | string
+    startDate?: DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
   }
 
   export type PaymentWhereInput = {
@@ -27525,7 +27525,7 @@ export namespace Prisma {
     AND?: PlanWhereInput | PlanWhereInput[]
     OR?: PlanWhereInput[]
     NOT?: PlanWhereInput | PlanWhereInput[]
-    id?: StringFilter<"Plan"> | string
+    id?: EnumPlanNameFilter<"Plan"> | $Enums.PlanName
     name?: EnumPlanNameFilter<"Plan"> | $Enums.PlanName
     description?: StringNullableFilter<"Plan"> | string | null
     price?: IntFilter<"Plan"> | number
@@ -27557,7 +27557,7 @@ export namespace Prisma {
   }
 
   export type PlanWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
+    id?: $Enums.PlanName
     name?: $Enums.PlanName
     AND?: PlanWhereInput | PlanWhereInput[]
     OR?: PlanWhereInput[]
@@ -27598,7 +27598,7 @@ export namespace Prisma {
     AND?: PlanScalarWhereWithAggregatesInput | PlanScalarWhereWithAggregatesInput[]
     OR?: PlanScalarWhereWithAggregatesInput[]
     NOT?: PlanScalarWhereWithAggregatesInput | PlanScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Plan"> | string
+    id?: EnumPlanNameWithAggregatesFilter<"Plan"> | $Enums.PlanName
     name?: EnumPlanNameWithAggregatesFilter<"Plan"> | $Enums.PlanName
     description?: StringNullableWithAggregatesFilter<"Plan"> | string | null
     price?: IntWithAggregatesFilter<"Plan"> | number
@@ -27675,7 +27675,7 @@ export namespace Prisma {
     AND?: PlanFeatureWhereInput | PlanFeatureWhereInput[]
     OR?: PlanFeatureWhereInput[]
     NOT?: PlanFeatureWhereInput | PlanFeatureWhereInput[]
-    planId?: StringFilter<"PlanFeature"> | string
+    planId?: EnumPlanNameFilter<"PlanFeature"> | $Enums.PlanName
     featureId?: StringFilter<"PlanFeature"> | string
     enabled?: BoolFilter<"PlanFeature"> | boolean
     limitUse?: IntNullableFilter<"PlanFeature"> | number | null
@@ -27701,7 +27701,7 @@ export namespace Prisma {
     AND?: PlanFeatureWhereInput | PlanFeatureWhereInput[]
     OR?: PlanFeatureWhereInput[]
     NOT?: PlanFeatureWhereInput | PlanFeatureWhereInput[]
-    planId?: StringFilter<"PlanFeature"> | string
+    planId?: EnumPlanNameFilter<"PlanFeature"> | $Enums.PlanName
     featureId?: StringFilter<"PlanFeature"> | string
     enabled?: BoolFilter<"PlanFeature"> | boolean
     limitUse?: IntNullableFilter<"PlanFeature"> | number | null
@@ -27729,7 +27729,7 @@ export namespace Prisma {
     AND?: PlanFeatureScalarWhereWithAggregatesInput | PlanFeatureScalarWhereWithAggregatesInput[]
     OR?: PlanFeatureScalarWhereWithAggregatesInput[]
     NOT?: PlanFeatureScalarWhereWithAggregatesInput | PlanFeatureScalarWhereWithAggregatesInput[]
-    planId?: StringWithAggregatesFilter<"PlanFeature"> | string
+    planId?: EnumPlanNameWithAggregatesFilter<"PlanFeature"> | $Enums.PlanName
     featureId?: StringWithAggregatesFilter<"PlanFeature"> | string
     enabled?: BoolWithAggregatesFilter<"PlanFeature"> | boolean
     limitUse?: IntNullableWithAggregatesFilter<"PlanFeature"> | number | null
@@ -29047,7 +29047,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     cancelDate?: Date | string | null
-    startDate: Date | string
+    startDate?: Date | string | null
     payments?: PaymentCreateNestedManyWithoutSubscriptionInput
     plan: PlanCreateNestedOneWithoutSubscriptionsInput
     user: UserCreateNestedOneWithoutSubscriptionsInput
@@ -29056,11 +29056,11 @@ export namespace Prisma {
   export type SubscriptionUncheckedCreateInput = {
     id?: string
     userId: string
-    planId: string
+    planId: $Enums.PlanName
     createdAt?: Date | string
     updatedAt?: Date | string
     cancelDate?: Date | string | null
-    startDate: Date | string
+    startDate?: Date | string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutSubscriptionInput
   }
 
@@ -29069,7 +29069,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cancelDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUpdateManyWithoutSubscriptionNestedInput
     plan?: PlanUpdateOneRequiredWithoutSubscriptionsNestedInput
     user?: UserUpdateOneRequiredWithoutSubscriptionsNestedInput
@@ -29078,22 +29078,22 @@ export namespace Prisma {
   export type SubscriptionUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    planId?: StringFieldUpdateOperationsInput | string
+    planId?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cancelDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUncheckedUpdateManyWithoutSubscriptionNestedInput
   }
 
   export type SubscriptionCreateManyInput = {
     id?: string
     userId: string
-    planId: string
+    planId: $Enums.PlanName
     createdAt?: Date | string
     updatedAt?: Date | string
     cancelDate?: Date | string | null
-    startDate: Date | string
+    startDate?: Date | string | null
   }
 
   export type SubscriptionUpdateManyMutationInput = {
@@ -29101,17 +29101,17 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cancelDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SubscriptionUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    planId?: StringFieldUpdateOperationsInput | string
+    planId?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cancelDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type PaymentCreateInput = {
@@ -29198,7 +29198,7 @@ export namespace Prisma {
   }
 
   export type PlanCreateInput = {
-    id?: string
+    id: $Enums.PlanName
     name: $Enums.PlanName
     description?: string | null
     price: number
@@ -29214,7 +29214,7 @@ export namespace Prisma {
   }
 
   export type PlanUncheckedCreateInput = {
-    id?: string
+    id: $Enums.PlanName
     name: $Enums.PlanName
     description?: string | null
     price: number
@@ -29230,7 +29230,7 @@ export namespace Prisma {
   }
 
   export type PlanUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
+    id?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
@@ -29246,7 +29246,7 @@ export namespace Prisma {
   }
 
   export type PlanUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
+    id?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
@@ -29262,7 +29262,7 @@ export namespace Prisma {
   }
 
   export type PlanCreateManyInput = {
-    id?: string
+    id: $Enums.PlanName
     name: $Enums.PlanName
     description?: string | null
     price: number
@@ -29276,7 +29276,7 @@ export namespace Prisma {
   }
 
   export type PlanUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
+    id?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
@@ -29290,7 +29290,7 @@ export namespace Prisma {
   }
 
   export type PlanUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
+    id?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
@@ -29380,7 +29380,7 @@ export namespace Prisma {
   }
 
   export type PlanFeatureUncheckedCreateInput = {
-    planId: string
+    planId: $Enums.PlanName
     featureId: string
     enabled?: boolean
     limitUse?: number | null
@@ -29398,7 +29398,7 @@ export namespace Prisma {
   }
 
   export type PlanFeatureUncheckedUpdateInput = {
-    planId?: StringFieldUpdateOperationsInput | string
+    planId?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     featureId?: StringFieldUpdateOperationsInput | string
     enabled?: BoolFieldUpdateOperationsInput | boolean
     limitUse?: NullableIntFieldUpdateOperationsInput | number | null
@@ -29407,7 +29407,7 @@ export namespace Prisma {
   }
 
   export type PlanFeatureCreateManyInput = {
-    planId: string
+    planId: $Enums.PlanName
     featureId: string
     enabled?: boolean
     limitUse?: number | null
@@ -29423,7 +29423,7 @@ export namespace Prisma {
   }
 
   export type PlanFeatureUncheckedUpdateManyInput = {
-    planId?: StringFieldUpdateOperationsInput | string
+    planId?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     featureId?: StringFieldUpdateOperationsInput | string
     enabled?: BoolFieldUpdateOperationsInput | boolean
     limitUse?: NullableIntFieldUpdateOperationsInput | number | null
@@ -30947,6 +30947,13 @@ export namespace Prisma {
     _max?: NestedEnumVerificationChannelNullableFilter<$PrismaModel>
   }
 
+  export type EnumPlanNameFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlanName | EnumPlanNameFieldRefInput<$PrismaModel>
+    in?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlanNameFilter<$PrismaModel> | $Enums.PlanName
+  }
+
   export type PaymentListRelationFilter = {
     every?: PaymentWhereInput
     some?: PaymentWhereInput
@@ -30990,6 +30997,16 @@ export namespace Prisma {
     updatedAt?: SortOrder
     cancelDate?: SortOrder
     startDate?: SortOrder
+  }
+
+  export type EnumPlanNameWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlanName | EnumPlanNameFieldRefInput<$PrismaModel>
+    in?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlanNameWithAggregatesFilter<$PrismaModel> | $Enums.PlanName
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPlanNameFilter<$PrismaModel>
+    _max?: NestedEnumPlanNameFilter<$PrismaModel>
   }
 
   export type EnumPaymentMethodFilter<$PrismaModel = never> = {
@@ -31119,13 +31136,6 @@ export namespace Prisma {
     _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
   }
 
-  export type EnumPlanNameFilter<$PrismaModel = never> = {
-    equals?: $Enums.PlanName | EnumPlanNameFieldRefInput<$PrismaModel>
-    in?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
-    not?: NestedEnumPlanNameFilter<$PrismaModel> | $Enums.PlanName
-  }
-
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
@@ -31202,16 +31212,6 @@ export namespace Prisma {
     maxMessagesPerMonth?: SortOrder
   }
 
-  export type EnumPlanNameWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.PlanName | EnumPlanNameFieldRefInput<$PrismaModel>
-    in?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
-    not?: NestedEnumPlanNameWithAggregatesFilter<$PrismaModel> | $Enums.PlanName
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumPlanNameFilter<$PrismaModel>
-    _max?: NestedEnumPlanNameFilter<$PrismaModel>
-  }
-
   export type BoolWithAggregatesFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
@@ -31274,7 +31274,7 @@ export namespace Prisma {
   }
 
   export type PlanFeaturePlanIdFeatureIdCompoundUniqueInput = {
-    planId: string
+    planId: $Enums.PlanName
     featureId: string
   }
 
@@ -32610,6 +32610,10 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSubscriptionsInput, UserUpdateWithoutSubscriptionsInput>, UserUncheckedUpdateWithoutSubscriptionsInput>
   }
 
+  export type EnumPlanNameFieldUpdateOperationsInput = {
+    set?: $Enums.PlanName
+  }
+
   export type PaymentUncheckedUpdateManyWithoutSubscriptionNestedInput = {
     create?: XOR<PaymentCreateWithoutSubscriptionInput, PaymentUncheckedCreateWithoutSubscriptionInput> | PaymentCreateWithoutSubscriptionInput[] | PaymentUncheckedCreateWithoutSubscriptionInput[]
     connectOrCreate?: PaymentCreateOrConnectWithoutSubscriptionInput | PaymentCreateOrConnectWithoutSubscriptionInput[]
@@ -32684,10 +32688,6 @@ export namespace Prisma {
     connectOrCreate?: SubscriptionCreateOrConnectWithoutPlanInput | SubscriptionCreateOrConnectWithoutPlanInput[]
     createMany?: SubscriptionCreateManyPlanInputEnvelope
     connect?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
-  }
-
-  export type EnumPlanNameFieldUpdateOperationsInput = {
-    set?: $Enums.PlanName
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -33559,6 +33559,23 @@ export namespace Prisma {
     _max?: NestedEnumVerificationChannelNullableFilter<$PrismaModel>
   }
 
+  export type NestedEnumPlanNameFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlanName | EnumPlanNameFieldRefInput<$PrismaModel>
+    in?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlanNameFilter<$PrismaModel> | $Enums.PlanName
+  }
+
+  export type NestedEnumPlanNameWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlanName | EnumPlanNameFieldRefInput<$PrismaModel>
+    in?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlanNameWithAggregatesFilter<$PrismaModel> | $Enums.PlanName
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPlanNameFilter<$PrismaModel>
+    _max?: NestedEnumPlanNameFilter<$PrismaModel>
+  }
+
   export type NestedEnumPaymentMethodFilter<$PrismaModel = never> = {
     equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel>
     in?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel>
@@ -33637,13 +33654,6 @@ export namespace Prisma {
     _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
   }
 
-  export type NestedEnumPlanNameFilter<$PrismaModel = never> = {
-    equals?: $Enums.PlanName | EnumPlanNameFieldRefInput<$PrismaModel>
-    in?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
-    not?: NestedEnumPlanNameFilter<$PrismaModel> | $Enums.PlanName
-  }
-
   export type NestedBoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
@@ -33654,16 +33664,6 @@ export namespace Prisma {
     in?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
     notIn?: $Enums.PlanInterval[] | ListEnumPlanIntervalFieldRefInput<$PrismaModel>
     not?: NestedEnumPlanIntervalFilter<$PrismaModel> | $Enums.PlanInterval
-  }
-
-  export type NestedEnumPlanNameWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.PlanName | EnumPlanNameFieldRefInput<$PrismaModel>
-    in?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PlanName[] | ListEnumPlanNameFieldRefInput<$PrismaModel>
-    not?: NestedEnumPlanNameWithAggregatesFilter<$PrismaModel> | $Enums.PlanName
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumPlanNameFilter<$PrismaModel>
-    _max?: NestedEnumPlanNameFilter<$PrismaModel>
   }
 
   export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -33975,18 +33975,18 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     cancelDate?: Date | string | null
-    startDate: Date | string
+    startDate?: Date | string | null
     payments?: PaymentCreateNestedManyWithoutSubscriptionInput
     plan: PlanCreateNestedOneWithoutSubscriptionsInput
   }
 
   export type SubscriptionUncheckedCreateWithoutUserInput = {
     id?: string
-    planId: string
+    planId: $Enums.PlanName
     createdAt?: Date | string
     updatedAt?: Date | string
     cancelDate?: Date | string | null
-    startDate: Date | string
+    startDate?: Date | string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutSubscriptionInput
   }
 
@@ -34313,11 +34313,11 @@ export namespace Prisma {
     NOT?: SubscriptionScalarWhereInput | SubscriptionScalarWhereInput[]
     id?: StringFilter<"Subscription"> | string
     userId?: StringFilter<"Subscription"> | string
-    planId?: StringFilter<"Subscription"> | string
+    planId?: EnumPlanNameFilter<"Subscription"> | $Enums.PlanName
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeFilter<"Subscription"> | Date | string
     cancelDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
-    startDate?: DateTimeFilter<"Subscription"> | Date | string
+    startDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
   }
 
   export type SessionUpsertWithWhereUniqueWithoutUserInput = {
@@ -35178,7 +35178,7 @@ export namespace Prisma {
   }
 
   export type PlanCreateWithoutSubscriptionsInput = {
-    id?: string
+    id: $Enums.PlanName
     name: $Enums.PlanName
     description?: string | null
     price: number
@@ -35193,7 +35193,7 @@ export namespace Prisma {
   }
 
   export type PlanUncheckedCreateWithoutSubscriptionsInput = {
-    id?: string
+    id: $Enums.PlanName
     name: $Enums.PlanName
     description?: string | null
     price: number
@@ -35312,7 +35312,7 @@ export namespace Prisma {
   }
 
   export type PlanUpdateWithoutSubscriptionsInput = {
-    id?: StringFieldUpdateOperationsInput | string
+    id?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
@@ -35327,7 +35327,7 @@ export namespace Prisma {
   }
 
   export type PlanUncheckedUpdateWithoutSubscriptionsInput = {
-    id?: StringFieldUpdateOperationsInput | string
+    id?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
@@ -35409,7 +35409,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     cancelDate?: Date | string | null
-    startDate: Date | string
+    startDate?: Date | string | null
     plan: PlanCreateNestedOneWithoutSubscriptionsInput
     user: UserCreateNestedOneWithoutSubscriptionsInput
   }
@@ -35417,11 +35417,11 @@ export namespace Prisma {
   export type SubscriptionUncheckedCreateWithoutPaymentsInput = {
     id?: string
     userId: string
-    planId: string
+    planId: $Enums.PlanName
     createdAt?: Date | string
     updatedAt?: Date | string
     cancelDate?: Date | string | null
-    startDate: Date | string
+    startDate?: Date | string | null
   }
 
   export type SubscriptionCreateOrConnectWithoutPaymentsInput = {
@@ -35445,7 +35445,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cancelDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     plan?: PlanUpdateOneRequiredWithoutSubscriptionsNestedInput
     user?: UserUpdateOneRequiredWithoutSubscriptionsNestedInput
   }
@@ -35453,11 +35453,11 @@ export namespace Prisma {
   export type SubscriptionUncheckedUpdateWithoutPaymentsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    planId?: StringFieldUpdateOperationsInput | string
+    planId?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cancelDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type PlanFeatureCreateWithoutPlanInput = {
@@ -35491,7 +35491,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     cancelDate?: Date | string | null
-    startDate: Date | string
+    startDate?: Date | string | null
     payments?: PaymentCreateNestedManyWithoutSubscriptionInput
     user: UserCreateNestedOneWithoutSubscriptionsInput
   }
@@ -35502,7 +35502,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     cancelDate?: Date | string | null
-    startDate: Date | string
+    startDate?: Date | string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutSubscriptionInput
   }
 
@@ -35536,7 +35536,7 @@ export namespace Prisma {
     AND?: PlanFeatureScalarWhereInput | PlanFeatureScalarWhereInput[]
     OR?: PlanFeatureScalarWhereInput[]
     NOT?: PlanFeatureScalarWhereInput | PlanFeatureScalarWhereInput[]
-    planId?: StringFilter<"PlanFeature"> | string
+    planId?: EnumPlanNameFilter<"PlanFeature"> | $Enums.PlanName
     featureId?: StringFilter<"PlanFeature"> | string
     enabled?: BoolFilter<"PlanFeature"> | boolean
     limitUse?: IntNullableFilter<"PlanFeature"> | number | null
@@ -35569,7 +35569,7 @@ export namespace Prisma {
   }
 
   export type PlanFeatureUncheckedCreateWithoutFeatureInput = {
-    planId: string
+    planId: $Enums.PlanName
     enabled?: boolean
     limitUse?: number | null
     configValue?: string | null
@@ -35626,7 +35626,7 @@ export namespace Prisma {
   }
 
   export type PlanCreateWithoutFeaturesInput = {
-    id?: string
+    id: $Enums.PlanName
     name: $Enums.PlanName
     description?: string | null
     price: number
@@ -35641,7 +35641,7 @@ export namespace Prisma {
   }
 
   export type PlanUncheckedCreateWithoutFeaturesInput = {
-    id?: string
+    id: $Enums.PlanName
     name: $Enums.PlanName
     description?: string | null
     price: number
@@ -35701,7 +35701,7 @@ export namespace Prisma {
   }
 
   export type PlanUpdateWithoutFeaturesInput = {
-    id?: StringFieldUpdateOperationsInput | string
+    id?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
@@ -35716,7 +35716,7 @@ export namespace Prisma {
   }
 
   export type PlanUncheckedUpdateWithoutFeaturesInput = {
-    id?: StringFieldUpdateOperationsInput | string
+    id?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     name?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: IntFieldUpdateOperationsInput | number
@@ -37248,11 +37248,11 @@ export namespace Prisma {
 
   export type SubscriptionCreateManyUserInput = {
     id?: string
-    planId: string
+    planId: $Enums.PlanName
     createdAt?: Date | string
     updatedAt?: Date | string
     cancelDate?: Date | string | null
-    startDate: Date | string
+    startDate?: Date | string | null
   }
 
   export type SessionCreateManyUserInput = {
@@ -37431,28 +37431,28 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cancelDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUpdateManyWithoutSubscriptionNestedInput
     plan?: PlanUpdateOneRequiredWithoutSubscriptionsNestedInput
   }
 
   export type SubscriptionUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    planId?: StringFieldUpdateOperationsInput | string
+    planId?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cancelDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUncheckedUpdateManyWithoutSubscriptionNestedInput
   }
 
   export type SubscriptionUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    planId?: StringFieldUpdateOperationsInput | string
+    planId?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cancelDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SessionUpdateWithoutUserInput = {
@@ -37778,7 +37778,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     cancelDate?: Date | string | null
-    startDate: Date | string
+    startDate?: Date | string | null
   }
 
   export type PlanFeatureUpdateWithoutPlanInput = {
@@ -37810,7 +37810,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cancelDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUpdateManyWithoutSubscriptionNestedInput
     user?: UserUpdateOneRequiredWithoutSubscriptionsNestedInput
   }
@@ -37821,7 +37821,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cancelDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUncheckedUpdateManyWithoutSubscriptionNestedInput
   }
 
@@ -37831,11 +37831,11 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cancelDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type PlanFeatureCreateManyFeatureInput = {
-    planId: string
+    planId: $Enums.PlanName
     enabled?: boolean
     limitUse?: number | null
     configValue?: string | null
@@ -37851,7 +37851,7 @@ export namespace Prisma {
   }
 
   export type PlanFeatureUncheckedUpdateWithoutFeatureInput = {
-    planId?: StringFieldUpdateOperationsInput | string
+    planId?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     enabled?: BoolFieldUpdateOperationsInput | boolean
     limitUse?: NullableIntFieldUpdateOperationsInput | number | null
     configValue?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37859,7 +37859,7 @@ export namespace Prisma {
   }
 
   export type PlanFeatureUncheckedUpdateManyWithoutFeatureInput = {
-    planId?: StringFieldUpdateOperationsInput | string
+    planId?: EnumPlanNameFieldUpdateOperationsInput | $Enums.PlanName
     enabled?: BoolFieldUpdateOperationsInput | boolean
     limitUse?: NullableIntFieldUpdateOperationsInput | number | null
     configValue?: NullableStringFieldUpdateOperationsInput | string | null

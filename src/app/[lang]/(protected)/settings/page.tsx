@@ -28,7 +28,7 @@ export default async function SettingsPage({
   const { lang } = await params;
 
   if (!session?.user?.id) {
-    return null;
+    return "invalid session.user.id.... Log in again";
   }
 
   if (!isValidLanguage(lang)) return;

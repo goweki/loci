@@ -43,37 +43,39 @@ export default function TabSettings() {
     getUser();
   }, []);
 
-  return user ? (
+  return (
     <TabsContent value="settings" className="space-y-4">
-      <Card>
-        <CardHeader className="hidden"></CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="space-y-2 mt-4">
-              <Label htmlFor="account-name">WABA Account Name</Label>
-              <Input
-                id="waba-name"
-                placeholder="Whatsapp Business Account Name"
-                value={user.waba?.name}
-                disabled={true}
-              />
+      {user ? (
+        <Card>
+          <CardHeader className="hidden"></CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2 mt-4">
+                <Label htmlFor="account-name">WABA Account Name</Label>
+                <Input
+                  id="waba-name"
+                  placeholder="Whatsapp Business Account Name"
+                  value={user.waba?.name}
+                  disabled={true}
+                />
+              </div>
+              <Button
+                onClick={() => {
+                  setLoading("waba");
+                  syncWithMeta();
+                }}
+                disabled={loading === "waba"}
+                variant="outline"
+              >
+                Sync Waba Assets with Cloud API{" "}
+                {loading == "waba" && <Loader size={4} />}
+              </Button>
             </div>
-            <Button
-              onClick={() => {
-                setLoading("waba");
-                syncWithMeta();
-              }}
-              disabled={loading === "waba"}
-              variant="outline"
-            >
-              Sync Waba Assets with Cloud API{" "}
-              {loading == "waba" && <Loader size={4} />}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      ) : (
+        <Loader />
+      )}
     </TabsContent>
-  ) : (
-    <Loader />
   );
 }
