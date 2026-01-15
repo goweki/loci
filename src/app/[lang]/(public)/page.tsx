@@ -14,9 +14,9 @@ export default async function Landing({
 
   return (
     <main>
-      {/* <Hero />
-      <HowBlocks /> */}
-      <ComingSoon />
+      <Hero />
+      <HowBlocks />
+      {/* <ComingSoon /> */}
     </main>
   );
 }
