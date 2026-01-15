@@ -32,10 +32,9 @@ export default async function UnAuthLayout({
 
   return (
     <>
-      {/* <Navbar navigationLinks={navigationLinks} />
+      {/* <Navbar navigationLinks={navigationLinks} /> */}
       {children}
-      <Footer /> */}
-      <ComingSoon />
+      <Footer />
     </>
   );
 }
