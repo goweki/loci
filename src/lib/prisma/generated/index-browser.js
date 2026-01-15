@@ -365,6 +365,19 @@ exports.Prisma.PromptTemplateScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ContactUsScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  name: 'name',
+  subject: 'subject',
+  message: 'message',
+  phone: 'phone',
+  company: 'company',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -505,6 +518,13 @@ exports.AccountType = exports.$Enums.AccountType = {
   credentials: 'credentials'
 };
 
+exports.ContactStatus = exports.$Enums.ContactStatus = {
+  PENDING: 'PENDING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  RESOLVED: 'RESOLVED',
+  SPAM: 'SPAM'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   WabaAccount: 'WabaAccount',
@@ -525,7 +545,8 @@ exports.Prisma.ModelName = {
   Account: 'Account',
   ChatbotConfig: 'ChatbotConfig',
   ChatbotConversation: 'ChatbotConversation',
-  PromptTemplate: 'PromptTemplate'
+  PromptTemplate: 'PromptTemplate',
+  ContactUs: 'ContactUs'
 };
 
 /**

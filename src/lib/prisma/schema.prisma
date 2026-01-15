@@ -478,6 +478,7 @@ model ChatbotConversation {
 }
 
 // Optional: Store prompt templates for reuse
+
 model PromptTemplate {
   id          String  @id @default(cuid())
   name        String
@@ -493,4 +494,30 @@ model PromptTemplate {
   updatedAt DateTime @updatedAt
 
   @@map("prompt_templates")
+}
+
+// Contact Us
+
+model ContactUs {
+  id        String        @id @default(cuid())
+  email     String
+  name      String?
+  subject   String?
+  message   String        @db.Text
+  phone     String?
+  company   String?
+  status    ContactStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum ContactStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  SPAM
 }
