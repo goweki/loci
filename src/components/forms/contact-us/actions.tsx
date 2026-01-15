@@ -3,23 +3,25 @@
 import { contactUsRepository } from "@/data/repositories/contact-us";
 import { z } from "zod";
 
+const nullableToUndefined = (v: unknown) => (v === null ? undefined : v);
+
 const contactSchema = z.object({
-  name: z.string().min(1, "Name is required").optional(),
-  email: z.email("Invalid email address"),
-  phone: z.string().optional(),
-  company: z.string().optional(),
-  subject: z.string().min(1, "Subject is required").optional(),
-  message: z.string().min(10, "Message must be at least 10 characters"),
+  name: z.preprocess(nullableToUndefined, z.string().min(1).optional()),
+  email: z.string().email(),
+  phone: z.preprocess(nullableToUndefined, z.string().optional()),
+  company: z.preprocess(nullableToUndefined, z.string().optional()),
+  subject: z.preprocess(nullableToUndefined, z.string().min(1).optional()),
+  message: z.string().min(10),
 });
 
 export async function submitContactForm(formData: FormData) {
   const data = {
-    name: formData.get("name") as string,
-    email: formData.get("email") as string,
-    phone: formData.get("phone") as string,
-    company: formData.get("company") as string,
-    subject: formData.get("subject") as string,
-    message: formData.get("message") as string,
+    name: formData.get("name"),
+    email: formData.get("email"),
+    phone: formData.get("phone"),
+    company: formData.get("company"),
+    subject: formData.get("subject"),
+    message: formData.get("message"),
   };
 
   // Validate the form data
