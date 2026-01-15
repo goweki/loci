@@ -527,7 +527,7 @@ export async function deleteUser(id: string): Promise<User> {
 export async function getUserSubscriptions(userId: string) {
   return db.subscription.findMany({
     where: { userId },
-    include: { plan: true, payments: true },
+    include: { plan: true, payment: true },
   });
 }
 
@@ -612,7 +612,7 @@ export async function getUserFullProfile(userId: string) {
   return db.user.findUnique({
     where: { id: userId },
     include: {
-      subscriptions: { include: { plan: true, payments: true } },
+      subscriptions: { include: { plan: true, payment: true } },
       waba: true,
       contacts: true,
       messages: true,

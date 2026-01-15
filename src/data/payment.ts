@@ -35,9 +35,22 @@ export async function updatePaymentStatus(
   reference: string,
   status: PaymentStatus
 ) {
+  const payment_ = await prisma.payment.findFirst({
+    where: { reference },
+    include: { subscription: true },
+  });
+
+  const startDate = payment_?.subscription.startDate;
+
+  const data = {
+    status,
+    startDate:
+      !startDate && status === PaymentStatus.SUCCESS ? new Date() : undefined,
+  };
+
   return prisma.payment.updateMany({
     where: { reference },
-    data: { status },
+    data,
   });
 }
 

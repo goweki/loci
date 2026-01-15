@@ -146,26 +146,27 @@ model Subscription {
   updatedAt  DateTime  @updatedAt
   cancelDate DateTime?
   startDate  DateTime?
-  payments   Payment[]
-  plan       Plan      @relation(fields: [planId], references: [id])
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  payment Payment?
+  plan    Plan     @relation(fields: [planId], references: [id])
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("subscriptions")
 }
 
 model Payment {
-  id             String        @id @default(cuid())
-  reference      String        @unique
-  paymentMethod  PaymentMethod @default(ONLINE)
-  amount         Int
-  currency       Currency      @default(KSH)
-  status         PaymentStatus @default(PENDING)
-  subscriptionId String
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  id            String        @id @default(cuid())
+  reference     String        @unique
+  paymentMethod PaymentMethod @default(ONLINE)
+  amount        Int
+  currency      Currency      @default(KSH)
+  status        PaymentStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
-  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String       @unique
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
 }
 
 enum PaymentStatus {
@@ -477,6 +478,7 @@ model ChatbotConversation {
 }
 
 // Optional: Store prompt templates for reuse
+
 model PromptTemplate {
   id          String  @id @default(cuid())
   name        String
@@ -492,4 +494,30 @@ model PromptTemplate {
   updatedAt DateTime @updatedAt
 
   @@map("prompt_templates")
+}
+
+// Contact Us
+
+model ContactUs {
+  id        String        @id @default(cuid())
+  email     String
+  name      String?
+  subject   String?
+  message   String        @db.Text
+  phone     String?
+  company   String?
+  status    ContactStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum ContactStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  SPAM
 }
