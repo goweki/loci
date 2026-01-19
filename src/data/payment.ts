@@ -120,7 +120,7 @@ export async function getPaymentByReference(reference: string) {
 }
 
 /**
- * List all payments for a specific subscription
+ * List payments for a specific subscription
  */
 export async function getPaymentsBySubscription(subscriptionId: string) {
   return prisma.payment.findMany({

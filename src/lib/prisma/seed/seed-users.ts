@@ -1,22 +1,24 @@
 // @/lib/prisma/seed/seed-users.ts
 
+import { removePlus } from "@/lib/utils/telHandlers";
 import { PrismaClient, UserRole, UserStatus } from "../generated";
 import bcrypt from "bcryptjs";
 
 // Example users data
 const usersData = [
   {
-    name: "Admin User",
-    email: process.env.ADMIN_EMAIL || "loci@goweki.com",
-    tel: "254721334944",
-    password: process.env.ADMIN_PASSWORD || "admin1234", // ✅ Use env var for password
+    name: "System Users",
+    email: process.env.SYSTEM_EMAIL || "loci@goweki.com",
+    tel: process.env.SYSTEM_TEL
+      ? removePlus(process.env.SYSTEM_TEL)
+      : "254721334944",
+    password: process.env.SYSTEM_PASSWORD || "admin1234",
     role: UserRole.ADMIN,
     status: UserStatus.ACTIVE,
   },
   {
     name: "Demo User",
     email: "demo@goweki.com",
-    tel: "254722445566", // ✅ Added phone number
     password: "user1234",
     role: UserRole.USER,
     status: UserStatus.ACTIVE,
@@ -59,6 +61,6 @@ export async function seedUsers(prisma: PrismaClient) {
   }
 
   console.log(
-    `✅ Users seeding completed: ${createdCount} created, ${skippedCount} skipped\n`
+    `✅ Users seeding completed: ${createdCount} created, ${skippedCount} skipped\n`,
   );
 }
