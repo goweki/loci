@@ -9,9 +9,7 @@ const usersData = [
   {
     name: "System Users",
     email: process.env.SYSTEM_EMAIL || "loci@goweki.com",
-    tel: process.env.SYSTEM_TEL
-      ? removePlus(process.env.SYSTEM_TEL)
-      : "254721334944",
+    tel: process.env.SYSTEM_TEL || "254721334944",
     password: process.env.SYSTEM_PASSWORD || "admin1234",
     role: UserRole.ADMIN,
     status: UserStatus.ACTIVE,

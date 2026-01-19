@@ -12,16 +12,13 @@ import paystack from "./client";
 export async function initializePayment(
   email: string,
   amount: number,
-  reference?: string
+  reference?: string,
 ) {
   if (!email) {
     throw new Error("No email provided");
   }
 
-  const callback_url =
-    process.env.NODE_ENV === "production"
-      ? `${BASE_URL}/api/payments/callback`
-      : undefined;
+  const callback_url = `${BASE_URL}/en/settings/billing`;
 
   try {
     const response = await paystack.transaction.initialize({
