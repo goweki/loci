@@ -31,27 +31,83 @@ export async function createPayment({
 /**
  * Update the payment status (used by webhook)
  */
+// export async function updatePaymentStatus(
+//   reference: string,
+//   status: PaymentStatus
+// ) {
+//   const payment_ = await prisma.payment.findFirst({
+//     where: { reference },
+//     include: { subscription: true },
+//   });
+
+//   const startDate = payment_?.subscription.startDate;
+
+//   const data = {
+//     status,
+//     startDate:
+//       !startDate && status === PaymentStatus.SUCCESS ? new Date() : undefined,
+//   };
+
+//   return prisma.payment.updateMany({
+//     where: { reference },
+//     data,
+//   });
+// }
 export async function updatePaymentStatus(
   reference: string,
-  status: PaymentStatus
+  status: PaymentStatus,
 ) {
-  const payment_ = await prisma.payment.findFirst({
+  const payment = await prisma.payment.findFirst({
     where: { reference },
     include: { subscription: true },
   });
 
-  const startDate = payment_?.subscription.startDate;
+  if (!payment) {
+    console.warn(`[PAYMENT] No payment found for reference: ${reference}`);
+    return null;
+  }
 
-  const data = {
-    status,
-    startDate:
-      !startDate && status === PaymentStatus.SUCCESS ? new Date() : undefined,
-  };
+  const tx: any[] = [];
 
-  return prisma.payment.updateMany({
-    where: { reference },
-    data,
-  });
+  // 1️⃣ Always update payment status
+  tx.push(
+    prisma.payment.updateMany({
+      where: { reference },
+      data: { status },
+    }),
+  );
+
+  // 2️⃣ Subscription handling
+  if (status === PaymentStatus.SUCCESS) {
+    // Existing subscription — activate if not started
+    if (!payment.subscription.startDate) {
+      tx.push(
+        prisma.subscription.update({
+          where: { id: payment.subscription.id },
+          data: {
+            startDate: new Date(),
+          },
+        }),
+      );
+    }
+  } else if (status === PaymentStatus.FAILED) {
+    console.warn(
+      `[PAYMENT] Payment ${payment.id} failed. No subscription will be activated.`,
+    );
+
+    if (payment.subscription) {
+      tx.push(
+        prisma.subscription.update({
+          where: { id: payment.subscription.id },
+          data: {
+            startDate: null,
+          },
+        }),
+      );
+    }
+  }
+
+  return prisma.$transaction(tx);
 }
 
 /**

@@ -97,7 +97,7 @@ export default function TabSubscription({
                     <span className="font-medium">
                       {activeSubscription.startDate &&
                         new Date(
-                          activeSubscription.startDate
+                          activeSubscription.startDate,
                         ).toLocaleDateString()}
                     </span>
                   </div>
