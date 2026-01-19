@@ -18,7 +18,7 @@ export async function initializePayment(
     throw new Error("No email provided");
   }
 
-  const callback_url = `${BASE_URL}/en/settings/billing`;
+  const callback_url = `${BASE_URL}/en/settings?tab=subscription`;
 
   try {
     const response = await paystack.transaction.initialize({
