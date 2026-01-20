@@ -27,6 +27,7 @@ export default function TabSubscription({ userId }: { userId: string }) {
       const _subscriptionStatus = await getSubscriptionStatusByUserId(userId);
       setSubscriptionStatus(_subscriptionStatus);
     };
+    getSubStatus();
   }, [userId]);
 
   return (
