@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,7 +9,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Payment } from "@/lib/prisma/generated";
 import { CreditCardIcon } from "lucide-react";
-import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import { SubscriptionStatus } from "@/types";
