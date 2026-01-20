@@ -1,11 +1,15 @@
 // /settings/billing/page.tsx
 
-import { Suspense } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import PageTitle from "@/components/ui/page-title";
 import { isValidLanguage } from "@/lib/i18n";
 import PricingComponent from "@/components/pricing";
+import { getSubscriptionStatusByUserId } from "@/data/subscription";
+import { SubscriptionStatus } from "@/types";
+import Loader from "@/components/ui/loaders";
+import TabSubscription from "@/components/settings/settings-client/tab-subscription";
 
 function TemplatesSkeleton() {
   return (
@@ -124,18 +128,36 @@ export default async function BillingPage({
 }) {
   const { lang } = await params;
   const session = await getServerSession(authOptions);
-  if (!session) return;
-  if (!isValidLanguage(lang)) return;
+  const [subscriptionStatus, setSubscriptionStatus] =
+    useState<SubscriptionStatus>();
 
+  const getSubscription = useCallback(async () => {
+    const _subscriptionStatus = await getSubscriptionStatusByUserId(
+      sessionStorage.user.id,
+    );
+    setSubscriptionStatus(_subscriptionStatus);
+  }, []);
+
+  useEffect(() => {
+    getSubscription();
+  }, [session?.user.id]);
+
+  if (!isValidLanguage(lang)) return;
   const t = translations[lang];
 
-  return (
+  return !session?.user ? null : !subscriptionStatus ? (
+    <Loader />
+  ) : (
     <main className="flex-1 overflow-y-auto p-6 pb-16">
       <div className="max-w-7xl mx-auto space-y-6">
         <PageTitle title={t.title} subtitle={t.subtitle} />
 
         <Suspense fallback={<TemplatesSkeleton />}>
-          <PricingComponent t={t} />
+          {subscriptionStatus.plan ? (
+            <TabSubscription userId={session.user.id} />
+          ) : (
+            <PricingComponent t={t} />
+          )}
         </Suspense>
       </div>
     </main>

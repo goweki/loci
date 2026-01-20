@@ -83,7 +83,7 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
       {/* WhatsApp Tab */}
       <TabWhatsApp waba={user.waba} />
 
-      {/* Billing Tab */}
+      {/* Subscription Tab */}
       <TabSubscription userId={user.id} />
 
       {/* AutoReply Tab */}
