@@ -2,19 +2,13 @@
 
 import prisma from "@/lib/prisma";
 import { Prisma, Plan, PlanInterval, PlanName } from "@/lib/prisma/generated";
-import { SubscriptionStatusEnum } from "@/types";
-
-interface SubscriptionStatus {
-  status: SubscriptionStatusEnum;
-  plan?: Plan;
-  expiresAt?: Date | null; // optional — useful for UI
-}
+import { SubscriptionStatus, SubscriptionStatusEnum } from "@/types";
 
 /**
  * return full sunscription status info.
  */
 export async function getSubscriptionStatusByUserId(
-  userId: string
+  userId: string,
 ): Promise<SubscriptionStatus> {
   if (!userId) throw new Error("User ID is required");
 
@@ -82,7 +76,7 @@ export async function getSubscriptionStatusByUserId(
  * only return status.
  */
 export async function isUserSubscribed(
-  userId: string
+  userId: string,
 ): Promise<SubscriptionStatusEnum> {
   const subStatus = await getSubscriptionStatusByUserId(userId);
   return subStatus.status;
@@ -92,7 +86,7 @@ export async function isUserSubscribed(
  * Create a new subscription for a user.
  */
 export async function createSubscription(
-  data: Prisma.SubscriptionUncheckedCreateInput
+  data: Prisma.SubscriptionUncheckedCreateInput,
 ) {
   return prisma.subscription.create({
     data,
@@ -153,7 +147,7 @@ export async function cancelSubscription(id: string) {
  */
 export async function updateSubscription(
   id: string,
-  data: Prisma.SubscriptionUpdateInput
+  data: Prisma.SubscriptionUpdateInput,
 ) {
   return prisma.subscription.update({
     where: { id },

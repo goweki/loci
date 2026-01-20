@@ -35,6 +35,8 @@ import TabSubscription from "./tab-subscription";
 import TabAutoreplyRules from "./tab-autoReply";
 import { JSX } from "react";
 import { strPascalCase } from "@/lib/utils/stringHandlers";
+import { SubscriptionStatus } from "@/types";
+import { getSubscriptionStatusByUserId } from "@/data/subscription";
 
 export default function SettingsClient({ user }: { user: UserGetPayload }) {
   const searchParams = useSearchParams();
@@ -85,7 +87,7 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
       <TabWhatsApp waba={user.waba} />
 
       {/* Billing Tab */}
-      <TabSubscription activeSubscription={user.subscriptions[0]} />
+      <TabSubscription userId={user.id} />
 
       {/* AutoReply Tab */}
       <TabAutoreplyRules />

@@ -13,13 +13,21 @@ import { Plan, Subscription } from "@/lib/prisma/generated";
 import { CheckCircle2Icon, CreditCardIcon } from "lucide-react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
+import { useEffect, useState } from "react";
+import { SubscriptionStatus } from "@/types";
+import { getSubscriptionStatusByUserId } from "@/data/subscription";
 
-export default function TabSubscription({
-  activeSubscription,
-}: {
-  activeSubscription: Subscription & { plan: Plan };
-}) {
+export default function TabSubscription({ userId }: { userId: string }) {
   const { language } = useI18n();
+  const [subscriptionStatus, setSubscriptionStatus] =
+    useState<SubscriptionStatus>();
+
+  useEffect(() => {
+    const getSubStatus = async () => {
+      const _subscriptionStatus = await getSubscriptionStatusByUserId(userId);
+      setSubscriptionStatus(_subscriptionStatus);
+    };
+  }, [userId]);
 
   return (
     <TabsContent value="subscription" className="space-y-6">
@@ -31,29 +39,29 @@ export default function TabSubscription({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {activeSubscription ? (
+          {subscriptionStatus?.plan ? (
             <>
               <div className="p-6 border rounded-lg space-y-4 bg-gradient-to-br from-primary/5 to-primary/10">
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
                     <h3 className="text-2xl font-bold">
-                      {activeSubscription.plan.name} Plan
+                      {subscriptionStatus.plan.name} Plan
                     </h3>
                     <p className="text-muted-foreground">
-                      {activeSubscription.plan.description}
+                      {subscriptionStatus.plan.description}
                     </p>
                   </div>
                   <Badge variant="default" className="text-lg px-4 py-2">
-                    {activeSubscription.plan.interval}
+                    {subscriptionStatus.plan.interval}
                   </Badge>
                 </div>
 
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-bold">
-                    KSH {activeSubscription.plan.price.toLocaleString()}
+                    KSH {subscriptionStatus.plan.price.toLocaleString()}
                   </span>
                   <span className="text-muted-foreground">
-                    /{activeSubscription.plan.interval.toLowerCase()}
+                    /{subscriptionStatus.plan.interval.toLowerCase()}
                   </span>
                 </div>
 
@@ -63,26 +71,26 @@ export default function TabSubscription({
                   <div className="flex items-center gap-2 text-sm">
                     <CheckCircle2Icon className="w-4 h-4 text-green-500" />
                     <span>
-                      {activeSubscription.plan.maxPhoneNumbers} Phone Numbers
+                      {subscriptionStatus.plan.maxPhoneNumbers} Phone Numbers
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <CheckCircle2Icon className="w-4 h-4 text-green-500" />
                     <span>
-                      {activeSubscription.plan.maxMessagesPerMonth.toLocaleString()}{" "}
+                      {subscriptionStatus.plan.maxMessagesPerMonth.toLocaleString()}{" "}
                       Messages/month
                     </span>
                   </div>
                 </div>
 
-                <div className="flex gap-2 pt-2">
+                {/* <div className="flex gap-2 pt-2">
                   <Button variant="outline" className="flex-1">
                     Change Plan
                   </Button>
                   <Button variant="outline" className="flex-1">
                     Cancel Subscription
                   </Button>
-                </div>
+                </div> */}
               </div>
 
               <Separator />
@@ -95,9 +103,9 @@ export default function TabSubscription({
                       Next billing date
                     </span>
                     <span className="font-medium">
-                      {activeSubscription.startDate &&
+                      {subscriptionStatus.expiresAt &&
                         new Date(
-                          activeSubscription.startDate,
+                          subscriptionStatus.expiresAt,
                         ).toLocaleDateString()}
                     </span>
                   </div>
