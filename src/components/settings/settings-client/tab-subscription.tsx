@@ -16,6 +16,7 @@ import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import { SubscriptionStatus } from "@/types";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
+import Loader from "@/components/ui/loaders";
 
 export default function TabSubscription({ userId }: { userId: string }) {
   const { language } = useI18n();
@@ -40,7 +41,9 @@ export default function TabSubscription({ userId }: { userId: string }) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {subscriptionStatus?.plan ? (
+          {!subscriptionStatus ? (
+            <Loader />
+          ) : subscriptionStatus?.plan ? (
             <>
               <div className="p-6 border rounded-lg space-y-4 bg-gradient-to-br from-primary/5 to-primary/10">
                 <div className="flex items-start justify-between">
