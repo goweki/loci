@@ -33,10 +33,7 @@ import TabWhatsApp from "./tab-whatsapp";
 import TabProfile from "./tab-profile";
 import TabSubscription from "./tab-subscription";
 import TabAutoreplyRules from "./tab-autoReply";
-import { JSX } from "react";
 import { strPascalCase } from "@/lib/utils/stringHandlers";
-import { SubscriptionStatus } from "@/types";
-import { getSubscriptionStatusByUserId } from "@/data/subscription";
 
 export default function SettingsClient({ user }: { user: UserGetPayload }) {
   const searchParams = useSearchParams();
