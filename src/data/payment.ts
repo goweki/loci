@@ -28,31 +28,6 @@ export async function createPayment({
   });
 }
 
-/**
- * Update the payment status (used by webhook)
- */
-// export async function updatePaymentStatus(
-//   reference: string,
-//   status: PaymentStatus
-// ) {
-//   const payment_ = await prisma.payment.findFirst({
-//     where: { reference },
-//     include: { subscription: true },
-//   });
-
-//   const startDate = payment_?.subscription.startDate;
-
-//   const data = {
-//     status,
-//     startDate:
-//       !startDate && status === PaymentStatus.SUCCESS ? new Date() : undefined,
-//   };
-
-//   return prisma.payment.updateMany({
-//     where: { reference },
-//     data,
-//   });
-// }
 export async function updatePaymentStatus(
   reference: string,
   status: PaymentStatus,
@@ -108,6 +83,25 @@ export async function updatePaymentStatus(
   }
 
   return prisma.$transaction(tx);
+}
+
+/**
+ * List payments for a user
+ */
+export async function getPaymentsByUserId(userId: string) {
+  const subscriptions = await prisma.subscription.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (subscriptions.length === 0) return [];
+
+  const subscriptionIds = subscriptions.map(({ id }) => id);
+
+  return prisma.payment.findMany({
+    where: { subscriptionId: { in: subscriptionIds } },
+    orderBy: { createdAt: "desc" },
+  });
 }
 
 /**

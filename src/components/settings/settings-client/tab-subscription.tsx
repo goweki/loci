@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { TabsContent } from "@/components/ui/tabs";
-import { Plan, Subscription } from "@/lib/prisma/generated";
+import { Payment } from "@/lib/prisma/generated";
 import { CheckCircle2Icon, CreditCardIcon } from "lucide-react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
@@ -17,28 +17,43 @@ import { useEffect, useState } from "react";
 import { SubscriptionStatus } from "@/types";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
 import Loader from "@/components/ui/loaders";
+import { getPaymentsByUserId } from "@/data/payment";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { dateShort } from "@/lib/utils/dateHandlers";
 
 export default function TabSubscription({ userId }: { userId: string }) {
   const { language } = useI18n();
   const [subscriptionStatus, setSubscriptionStatus] =
     useState<SubscriptionStatus>();
+  const [payments, setPayments] = useState<Payment[]>();
 
   useEffect(() => {
     const getSubStatus = async () => {
       const _subscriptionStatus = await getSubscriptionStatusByUserId(userId);
       setSubscriptionStatus(_subscriptionStatus);
     };
+    const getPayments = async () => {
+      const _payments = await getPaymentsByUserId(userId);
+      setPayments(_payments);
+    };
+
     getSubStatus();
+    getPayments();
   }, [userId]);
 
   return (
     <TabsContent value="subscription" className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Subscription & Payments</CardTitle>
-          <CardDescription>
-            Manage your subscription plan and billing information
-          </CardDescription>
+          <CardTitle>Subscriptions</CardTitle>
+          <CardDescription>Your subscriptions</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {!subscriptionStatus ? (
@@ -149,12 +164,67 @@ export default function TabSubscription({ userId }: { userId: string }) {
       <Card>
         <CardHeader>
           <CardTitle>Payment History</CardTitle>
-          <CardDescription>View your past transactions</CardDescription>
+          <div className="flex flex-row justify-between">
+            <CardDescription>Your past transactions</CardDescription>
+            <Link
+              href={`/${language}/settings/billing`}
+              className={buttonVariants({ variant: "ghost" })}
+            >
+              View all Payments
+            </Link>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            No payment history available
-          </div>
+          {!payments ? (
+            <Loader />
+          ) : payments.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No payment history available
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Reference</TableHead>
+                  <TableHead>Method</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {payments.map((payment) => (
+                  <TableRow key={payment.id}>
+                    <TableCell className="font-mono text-xs">
+                      {payment.reference}
+                    </TableCell>
+
+                    <TableCell>{payment.paymentMethod}</TableCell>
+
+                    <TableCell>
+                      {payment.currency} {payment.amount.toLocaleString()}
+                    </TableCell>
+
+                    <TableCell>
+                      <Badge
+                        variant={
+                          payment.status === "SUCCESS"
+                            ? "default"
+                            : payment.status === "FAILED"
+                              ? "destructive"
+                              : "secondary"
+                        }
+                      >
+                        {payment.status}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell>{dateShort(payment.createdAt)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </TabsContent>
