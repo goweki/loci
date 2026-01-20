@@ -20,7 +20,7 @@ import { useSession } from "next-auth/react";
 import { PaymentCheckout } from "./payment-form";
 import { SubscriptionStatus, SubscriptionStatusEnum } from "@/types";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
-import TabSubscription from "../settings/settings-client/tab-subscription";
+import SubscriptionInfoWrapper from "./subscription-info";
 
 interface PricingProps {
   t: {
@@ -107,8 +107,12 @@ export default function PricingComponent({ t }: PricingProps) {
     return Math.round((savings / grossCost) * 100);
   };
 
-  return plans ? (
-    <>
+  return !plans || !subscriptionStatus ? (
+    <Loader />
+  ) : (
+    <div className="flex flex-col">
+      <SubscriptionInfoWrapper />
+
       {/* Billing interval toggle */}
       <div className="flex justify-center pb-12">
         <div className="inline-flex items-center bg-muted rounded-lg p-1">
@@ -268,8 +272,6 @@ export default function PricingComponent({ t }: PricingProps) {
           </a>
         </p>
       </div> */}
-    </>
-  ) : (
-    <Loader />
+    </div>
   );
 }

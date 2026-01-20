@@ -24,8 +24,7 @@ function TemplatesSkeleton() {
 const translations = {
   en: {
     title: "Simple, Transparent Pricing",
-    subtitle:
-      "Choose the perfect plan for your business needs. Upgrade, downgrade, or cancel anytime.",
+    subtitle: "Choose the perfect plan for your business needs.",
     popular: "Most Popular",
     unlimited: "Unlimited",
     cta: "Get Started",
@@ -71,8 +70,7 @@ const translations = {
   },
   sw: {
     title: "Bei Rahisi na Wazi",
-    subtitle:
-      "Chagua mpango kamili kwa mahitaji ya biashara yako. Ongeza daraja, punguza, au ghairi wakati wowote.",
+    subtitle: "Chagua mpango kamili kwa mahitaji ya biashara yako.",
     popular: "Inayopendelewa",
     unlimited: "Bila Kikomo",
     cta: "Anza Sasa",

@@ -31,7 +31,7 @@ import { WhatsAppLogo } from "@/components/ui/svg";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import TabWhatsApp from "./tab-whatsapp";
 import TabProfile from "./tab-profile";
-import TabSubscription from "./tab-subscription";
+import TabSubscription from "./subscription";
 import TabAutoreplyRules from "./tab-autoReply";
 import { strPascalCase } from "@/lib/utils/stringHandlers";
 
@@ -84,7 +84,9 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
       <TabWhatsApp waba={user.waba} />
 
       {/* Subscription Tab */}
-      <TabSubscription />
+      <TabsContent value="subscription" className="space-y-6">
+        <TabSubscription />
+      </TabsContent>
 
       {/* AutoReply Tab */}
       <TabAutoreplyRules />
