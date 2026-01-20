@@ -55,7 +55,7 @@ export default function SubscriptionInfoWrapper() {
   }, [userId]);
 
   return subscriptionStatus?.plan || (payments && payments?.length > 0) ? (
-    <div className="space-y-6 my-6">
+    <div className="space-y-6 my-12">
       <Card>
         <CardHeader>
           <CardTitle>Subscriptions</CardTitle>
