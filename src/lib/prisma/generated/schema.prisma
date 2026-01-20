@@ -167,6 +167,8 @@ model Payment {
 
   subscriptionId String       @unique
   subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@map("payments")
 }
 
 enum PaymentStatus {
@@ -208,6 +210,8 @@ model Feature {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   plans       PlanFeature[]
+
+  @@map("features")
 }
 
 model PlanFeature {
@@ -295,6 +299,8 @@ model MessageUnprocessed {
   nextRetry   DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@map("messages_unprocessed")
 }
 
 model AutoReplyRule {

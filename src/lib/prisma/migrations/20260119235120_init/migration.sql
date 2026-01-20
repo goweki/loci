@@ -52,6 +52,9 @@ CREATE TYPE "MessageStatus" AS ENUM ('SENT', 'DELIVERED', 'READ', 'FAILED');
 -- CreateEnum
 CREATE TYPE "PaymentMethod" AS ENUM ('ONLINE', 'OTHER', 'MPESA', 'CASH');
 
+-- CreateEnum
+CREATE TYPE "ContactStatus" AS ENUM ('PENDING', 'IN_PROGRESS', 'RESOLVED', 'SPAM');
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
@@ -141,18 +144,18 @@ CREATE TABLE "subscriptions" (
 );
 
 -- CreateTable
-CREATE TABLE "Payment" (
+CREATE TABLE "payments" (
     "id" TEXT NOT NULL,
     "reference" TEXT NOT NULL,
     "paymentMethod" "PaymentMethod" NOT NULL DEFAULT 'ONLINE',
     "amount" INTEGER NOT NULL,
     "currency" "Currency" NOT NULL DEFAULT 'KSH',
     "status" "PaymentStatus" NOT NULL DEFAULT 'PENDING',
-    "subscriptionId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "subscriptionId" TEXT NOT NULL,
 
-    CONSTRAINT "Payment_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "payments_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -173,7 +176,7 @@ CREATE TABLE "plans" (
 );
 
 -- CreateTable
-CREATE TABLE "Feature" (
+CREATE TABLE "features" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
@@ -181,7 +184,7 @@ CREATE TABLE "Feature" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Feature_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "features_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -245,7 +248,7 @@ CREATE TABLE "messages" (
 );
 
 -- CreateTable
-CREATE TABLE "MessageUnprocessed" (
+CREATE TABLE "messages_unprocessed" (
     "id" TEXT NOT NULL,
     "waMessageId" TEXT NOT NULL,
     "payload" JSONB NOT NULL,
@@ -255,7 +258,7 @@ CREATE TABLE "MessageUnprocessed" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "MessageUnprocessed_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "messages_unprocessed_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -357,6 +360,22 @@ CREATE TABLE "prompt_templates" (
     CONSTRAINT "prompt_templates_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "ContactUs" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "name" TEXT,
+    "subject" TEXT,
+    "message" TEXT NOT NULL,
+    "phone" TEXT,
+    "company" TEXT,
+    "status" "ContactStatus" NOT NULL DEFAULT 'PENDING',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ContactUs_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
@@ -382,13 +401,16 @@ CREATE UNIQUE INDEX "user_sessions_sessionToken_key" ON "user_sessions"("session
 CREATE INDEX "subscriptions_userId_idx" ON "subscriptions"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Payment_reference_key" ON "Payment"("reference");
+CREATE UNIQUE INDEX "payments_reference_key" ON "payments"("reference");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "payments_subscriptionId_key" ON "payments"("subscriptionId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "plans_name_key" ON "plans"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Feature_name_key" ON "Feature"("name");
+CREATE UNIQUE INDEX "features_name_key" ON "features"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "phone_numbers_phoneNumber_key" ON "phone_numbers"("phoneNumber");
@@ -407,6 +429,15 @@ CREATE INDEX "chatbot_conversations_isActive_idx" ON "chatbot_conversations"("is
 
 -- CreateIndex
 CREATE UNIQUE INDEX "chatbot_conversations_chatbotConfigId_contactId_key" ON "chatbot_conversations"("chatbotConfigId", "contactId");
+
+-- CreateIndex
+CREATE INDEX "ContactUs_email_idx" ON "ContactUs"("email");
+
+-- CreateIndex
+CREATE INDEX "ContactUs_status_idx" ON "ContactUs"("status");
+
+-- CreateIndex
+CREATE INDEX "ContactUs_createdAt_idx" ON "ContactUs"("createdAt");
 
 -- AddForeignKey
 ALTER TABLE "waba_accounts" ADD CONSTRAINT "waba_accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -430,10 +461,10 @@ ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_planId_fkey" FOREIGN K
 ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Payment" ADD CONSTRAINT "Payment_subscriptionId_fkey" FOREIGN KEY ("subscriptionId") REFERENCES "subscriptions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "payments" ADD CONSTRAINT "payments_subscriptionId_fkey" FOREIGN KEY ("subscriptionId") REFERENCES "subscriptions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "plan_features" ADD CONSTRAINT "plan_features_featureId_fkey" FOREIGN KEY ("featureId") REFERENCES "Feature"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "plan_features" ADD CONSTRAINT "plan_features_featureId_fkey" FOREIGN KEY ("featureId") REFERENCES "features"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "plan_features" ADD CONSTRAINT "plan_features_planId_fkey" FOREIGN KEY ("planId") REFERENCES "plans"("id") ON DELETE CASCADE ON UPDATE CASCADE;
