@@ -26,7 +26,7 @@ import {
   AlertCircle,
   MessageSquareIcon,
 } from "lucide-react";
-import { getUserById, UserGetPayload } from "@/data/user";
+import { UserGetPayload } from "@/data/user";
 import { WhatsAppLogo } from "@/components/ui/svg";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import TabWhatsApp from "./tab-whatsapp";
@@ -84,7 +84,7 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
       <TabWhatsApp waba={user.waba} />
 
       {/* Subscription Tab */}
-      <TabSubscription userId={user.id} />
+      <TabSubscription />
 
       {/* AutoReply Tab */}
       <TabAutoreplyRules />

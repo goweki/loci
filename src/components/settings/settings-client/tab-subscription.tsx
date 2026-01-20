@@ -27,14 +27,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { dateShort } from "@/lib/utils/dateHandlers";
+import { useSession } from "next-auth/react";
 
-export default function TabSubscription({ userId }: { userId: string }) {
+export default function TabSubscription() {
   const { language } = useI18n();
   const [subscriptionStatus, setSubscriptionStatus] =
     useState<SubscriptionStatus>();
   const [payments, setPayments] = useState<Payment[]>();
+  const { data: session } = useSession();
+  const userId = session?.user.id;
 
   useEffect(() => {
+    if (!userId) return;
+
     const getSubStatus = async () => {
       const _subscriptionStatus = await getSubscriptionStatusByUserId(userId);
       setSubscriptionStatus(_subscriptionStatus);

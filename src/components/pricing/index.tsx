@@ -18,6 +18,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { PaymentCheckout } from "./payment-form";
+import { SubscriptionStatus, SubscriptionStatusEnum } from "@/types";
+import { getSubscriptionStatusByUserId } from "@/data/subscription";
+import TabSubscription from "../settings/settings-client/tab-subscription";
 
 interface PricingProps {
   t: {
@@ -59,6 +62,21 @@ export default function PricingComponent({ t }: PricingProps) {
   const [plans, setPlans] = useState<PlanBasePayload[]>();
   const { data: session } = useSession();
   const user = session?.user;
+  const [subscriptionStatus, setSubscriptionStatus] =
+    useState<SubscriptionStatus>();
+
+  const getSubscriptionStatus = useCallback(async () => {
+    if (!session?.user.id) return;
+
+    const _subscriptionStatus = await getSubscriptionStatusByUserId(
+      session.user.id,
+    );
+    setSubscriptionStatus(_subscriptionStatus);
+  }, [session?.user.id]);
+
+  useEffect(() => {
+    getSubscriptionStatus();
+  }, [getSubscriptionStatus]);
 
   const fetchPlans = useCallback(async () => {
     const plans_ = await getAllActivePlans();
@@ -167,7 +185,11 @@ export default function PricingComponent({ t }: PricingProps) {
               </div>
             </CardHeader>
 
-            {user && (
+            {!subscriptionStatus ? (
+              <Loader />
+            ) : !user ||
+              subscriptionStatus.status ===
+                SubscriptionStatusEnum.ACTIVE ? null : (
               <div className="mb-4 flex justify-center px-4">
                 <PaymentCheckout
                   _email={user.email || undefined}
@@ -226,7 +248,7 @@ export default function PricingComponent({ t }: PricingProps) {
                     "w-full",
                     buttonVariants({
                       variant: plan.popular ? "default" : "outline",
-                    })
+                    }),
                   )}
                 >
                   {t.cta}

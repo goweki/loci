@@ -1,27 +1,7 @@
 "use client";
 
-import React, { JSX, useCallback, useEffect, useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import React, { useState } from "react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   RefreshCw,
   Plus,
@@ -39,11 +19,6 @@ import {
   Eye,
   RefreshCwIcon,
 } from "lucide-react";
-import {
-  AutoReplyRule,
-  PhoneNumber,
-  TriggerType,
-} from "@/lib/prisma/generated";
 import TabTemplates from "./tab-templates";
 import TabPhoneNumbers from "./tab-phoneNumbers";
 import TabAutoreplyRules from "./tab-autoReply";
@@ -51,40 +26,6 @@ import TabSettings from "./tab-settings";
 
 export default function ManagerComponent() {
   const [activeTab, setActiveTab] = useState("templates");
-  const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumber[]>();
-
-  const autoReplyRules: AutoReplyRule[] = [
-    {
-      id: "1",
-      name: "After Hours Response",
-      triggerType: TriggerType.TIME_BASED,
-      isActive: true,
-      priority: 1,
-      createdById: "01",
-      createdAt: new Date("01-01-2025"),
-      updatedAt: new Date("01-01-2025"),
-      phoneNumberId: "01",
-      triggerValue: null,
-      replyMessage:
-        "Thanks for reaching out! Your message has been received, and we’ll get back to you soon if a response is needed.",
-      active: true,
-    },
-    {
-      id: "2",
-      name: "Location shared",
-      triggerType: TriggerType.MESSAGE_TYPE,
-      isActive: true,
-      priority: 1,
-      createdById: "2",
-      createdAt: new Date("01-01-2025"),
-      updatedAt: new Date("01-01-2025"),
-      phoneNumberId: "01",
-      triggerValue: null,
-      replyMessage:
-        "Thanks for reaching out! Your message has been received, and we’ll get back to you soon if a response is needed.",
-      active: true,
-    },
-  ];
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
