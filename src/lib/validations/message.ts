@@ -20,7 +20,7 @@ const imageMessageSchema = z.object({
 const documentMessageSchema = z.object({
   type: z.literal("document"),
   document: z.object({
-    link: z.string().url(),
+    link: z.url(),
     filename: z.string().optional(),
     caption: z.string().optional(),
   }),
@@ -50,7 +50,7 @@ const contactsMessageSchema = z.object({
     z.object({
       phone: z.string(),
       name: z.object({ first_name: z.string() }),
-    })
+    }),
   ),
 });
 
