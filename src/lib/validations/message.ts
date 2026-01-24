@@ -12,7 +12,7 @@ const textMessageSchema = z.object({
 const imageMessageSchema = z.object({
   type: z.literal("image"),
   image: z.object({
-    link: z.string().url(),
+    link: z.url(),
     caption: z.string().optional(),
   }),
 });
