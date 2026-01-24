@@ -1,10 +1,7 @@
 import AuthLayout, { AuthLayoutCopy } from "@/components/layouts/authLayout";
-import { SignInForm } from "@/components/forms/auth/signin-form";
 import { Language } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n";
-import { ForgotPasswordForm } from "@/components/forms/auth/forgot-password";
 import SetPasswordForm from "@/components/forms/auth/set-password-form";
-import { verifyToken } from "@/data/user";
 import { redirect } from "next/navigation";
 
 export default async function SetPasswordPage({
