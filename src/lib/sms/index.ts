@@ -9,7 +9,7 @@ export interface SMSprops {
 
 export interface SMSMessageResponse {
   message: string;
-  receipients: {
+  recipients: {
     statusCode: number;
     number: string;
     status: "fulfilled" | "failed";
@@ -28,7 +28,7 @@ export default async function sendSms(options: SMSprops) {
     .send(smsOptions)
     .then((response) => {
       console.log("SMS sent successfully:", response);
-      return response;
+      return { message: response.Message, recipients: response.Recipients };
     })
     .catch((error) => {
       console.error("SMS sending failed:", error);

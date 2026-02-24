@@ -30,12 +30,12 @@ export async function sendOtp(props: SendOtpProps): Promise<boolean> {
         message: "Hi, your Loci authentication code is",
       };
       const smsRes: SMSMessageResponse = await sendSms(smsMessage);
-      const { message, receipients } = smsRes;
+      const { message, recipients } = smsRes;
 
-      if (receipients.status === "fulfilled") {
+      if (recipients.status === "fulfilled") {
         response = true;
       } else {
-        console.error(`Message not sent`, receipients, message);
+        console.error(`Message not sent`, recipients, message);
       }
 
       return response;
