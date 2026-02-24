@@ -26,6 +26,7 @@ import sendSms, { SMSprops } from "@/lib/sms";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import whatsapp from "@/lib/whatsapp";
 import { Message } from "@/lib/validations";
+import { hashApiKey } from "@/lib/auth/api-key";
 
 export type UserGetPayload = Prisma.UserGetPayload<{
   include: {
@@ -335,7 +336,7 @@ export async function getUserByKey(key: string): Promise<User | null> {
     },
   });
   if (!user) {
-    const hashedToken = await hash(key);
+    const hashedToken = hashApiKey(key);
     const token_user = await db.token.findUnique({
       where: {
         type: TokenType.SIGN_IN || TokenType.ONBOARDING,
