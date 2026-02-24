@@ -26,7 +26,7 @@ export default async function sendSms(options: SMSprops) {
 
   return sms
     .send(smsOptions)
-    .then((response: SMSMessageResponse) => {
+    .then((response) => {
       console.log("SMS sent successfully:", response);
       return response;
     })
