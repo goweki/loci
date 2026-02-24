@@ -2,7 +2,7 @@
 import { z } from "zod";
 
 export const loginSchema = z.object({
-  loginMethod: z.enum(["email", "sms", "whatsapp"] as const, {
+  loginMethod: z.enum(["email", "phone"] as const, {
     message: "Verification method must be 'email' or 'whatsapp'",
   }),
   email: z.email("Invalid email address").or(z.literal("")),

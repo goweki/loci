@@ -146,7 +146,7 @@ model Token {
   id      String               @id @default(cuid())
   token   String
   expires DateTime
-  channel VerificationChannel?
+  channel NotificationChannel?
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -157,9 +157,10 @@ model Token {
   @@map("verification_tokens")
 }
 
-enum VerificationChannel {
+enum NotificationChannel {
   EMAIL
   WHATSAPP
+  SMS
 }
 
 model Subscription {

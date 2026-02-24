@@ -1,252 +1,413 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useCallback, useMemo, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import toast from "react-hot-toast";
 import { z } from "zod";
+import {
+  type LucideIcon,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  Phone,
+  ArrowRight,
+  Check,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
-  FormLabel,
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { InputWithIcon } from "@/components/ui/input";
-import { Eye, EyeOff, Lock, Mail, User as UserIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import GoogleSignin from "@/components/ui/svg";
-import { signIn } from "next-auth/react";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
 import Loader from "@/components/ui/loaders";
-import AuthErrorHandler, { ERROR_MESSAGES } from "./_errorHandler";
-import { loginSchema } from "@/lib/validations";
-import { useI18n } from "@/lib/i18n";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import InputPhone from "@/components/ui/input-phone";
+import AuthErrorHandler, { ERROR_MESSAGES } from "./_errorHandler";
+import { loginSchema } from "@/lib/validations/authentication";
 import { removePlus } from "@/lib/utils/telHandlers";
+import GoogleIcon from "@/components/ui/svg";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import OtpSigninForm from "./otp-request-form";
 
-const translations = {
-  en: {
-    orCredentials: "or use your Credentials",
-    usernamePlaceholder: "email / WhatsApp",
-    password: "password",
-    submit: "Sign In",
-    forgotPassword: "Forgot Password? Reset",
-    signUp: "No account? Register",
-  },
-  sw: {
-    orCredentials: "au tumia Vitambilisho vyako",
-    usernamePlaceholder: "barua pepe / Whatsapp",
-    password: "neno-siri",
-    submit: "Ingia",
-    forgotPassword: "Weka nenosiri upya",
-    signUp: "Jisajili",
-  },
-};
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type LoginMethod = "email" | "phone";
+
+interface MethodTab {
+  value: LoginMethod;
+  label: string;
+  Icon: LucideIcon;
+}
+
+// ─── Divider ──────────────────────────────────────────────────────────────────
+
+function Divider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="h-px flex-1 bg-border" />
+      <span className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+        {label}
+      </span>
+      <div className="h-px flex-1 bg-border" />
+    </div>
+  );
+}
+
+// ─── Method Tabs ──────────────────────────────────────────────────────────────
+
+const METHOD_TABS: MethodTab[] = [
+  { value: "email", label: "Email", Icon: Mail },
+  { value: "phone", label: "Phone", Icon: Phone },
+];
+
+interface MethodTabsProps {
+  active: LoginMethod;
+  onChange: (value: LoginMethod) => void;
+}
+
+function MethodTabs({ active, onChange }: MethodTabsProps) {
+  return (
+    <div className="grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+      {METHOD_TABS.map(({ value, label, Icon }) => (
+        <button
+          key={value}
+          type="button"
+          onClick={() => onChange(value)}
+          className={cn(
+            "flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150",
+            active === value
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          <Icon className="h-4 w-4" />
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ─── Icon Input ───────────────────────────────────────────────────────────────
+
+interface IconInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  icon: LucideIcon;
+  suffix?: React.ReactNode;
+}
+
+function IconInput({
+  icon: Icon,
+  suffix,
+  className,
+  ...props
+}: IconInputProps) {
+  return (
+    <div className="relative flex items-center">
+      <Icon className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
+      <Input className={cn("pl-9", suffix && "pr-10", className)} {...props} />
+      {suffix && (
+        <div className="absolute right-0 flex h-full items-center">
+          {suffix}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Submit Button Label ──────────────────────────────────────────────────────
+
+interface SubmitLabelProps {
+  loading: boolean;
+  done: boolean;
+}
+
+function SubmitLabel({ loading, done }: SubmitLabelProps) {
+  if (loading) return <Loader />;
+  if (done)
+    return (
+      <>
+        <Check className="h-4 w-4" />
+        Signed in!
+      </>
+    );
+  return (
+    <>
+      Sign In
+      <ArrowRight className="h-4 w-4" />
+    </>
+  );
+}
+
+//
+export function OtpPopup({
+  phoneNumber,
+}: {
+  // isOpen: boolean;
+  // closeDialogue: () => void;
+  phoneNumber: string;
+}) {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button disabled={!phoneNumber} variant="secondary">
+          OTP Sign-in
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>One-Time-Password</DialogTitle>
+          <DialogDescription className="text-center">
+            Select a mode of receiving the One-Time-Password
+          </DialogDescription>
+        </DialogHeader>
+        <OtpSigninForm phoneNumber={phoneNumber} />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── Main Form ────────────────────────────────────────────────────────────────
 
 export function SignInForm() {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const { language } = useI18n();
-
-  const t = translations[language];
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      loginMethod: "whatsapp",
+      loginMethod: "email",
       email: "",
       phoneNumber: "",
       password: "",
     },
   });
 
-  const { watch, setValue } = form;
-  const loginMethodWatch = watch("loginMethod");
+  const loginMethod = useWatch({
+    control: form.control,
+    name: "loginMethod",
+  }) as LoginMethod;
 
-  useEffect(() => {
-    if (loginMethodWatch === "whatsapp") {
-      setValue("email", "");
-    } else if (loginMethodWatch === "email") {
-      setValue("phoneNumber", "");
-    }
-  }, [loginMethodWatch, setValue]);
+  const phoneNumber = useWatch({
+    control: form.control,
+    name: "phoneNumber",
+  });
 
-  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    setLoading(true);
+  const onSubmit = useCallback(
+    async (values: z.infer<typeof loginSchema>) => {
+      setLoading(true);
+      try {
+        const username =
+          values.loginMethod === "email"
+            ? values.email.trim()
+            : removePlus(values.phoneNumber);
 
-    const { email, phoneNumber, password } = values;
+        const result = await signIn("credentials", {
+          redirect: false,
+          username,
+          password: values.password,
+          callbackUrl: "/dashboard",
+        });
 
-    const result = await signIn("credentials", {
-      redirect: false,
-      username: email || removePlus(phoneNumber),
-      password,
-    });
+        if (result?.error) {
+          const message =
+            ERROR_MESSAGES[result.error as keyof typeof ERROR_MESSAGES] ??
+            "Failed to sign in";
+          toast.error(message);
+          return;
+        }
 
-    setLoading(false);
+        setDone(true);
+        setTimeout(() => {
+          router.push(result?.url ?? "/dashboard");
+        }, 600);
+      } catch {
+        toast.error("Something went wrong. Try again.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [router],
+  );
 
-    if (result?.error) {
-      const error_ =
-        typeof result.error === "string" ? result.error : undefined;
-      const errorMessage = error_
-        ? (ERROR_MESSAGES[error_ as keyof typeof ERROR_MESSAGES] ?? error_)
-        : "Failed to sign in. Try again later";
-      toast.error(errorMessage);
-    } else {
-      router.push("/dashboard");
-    }
-  };
+  const submitLabel = useMemo(
+    () => <SubmitLabel loading={loading} done={done} />,
+    [loading, done],
+  );
 
   return (
-    <Form {...form}>
-      <AuthErrorHandler />
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 text-start"
+    <>
+      {/* Google OAuth */}
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full gap-2.5 font-medium"
+        onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
       >
-        <div className="mb-8">
-          <div className="space-x-2">
-            <button
-              type="button"
-              className="hover:scale-105 transition-all duration-200 m-auto"
-              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            >
-              <GoogleSignin />
-            </button>
-          </div>
-          <p className="text-mute-foreground">{t.orCredentials}:</p>
-        </div>
-        <FormField
-          control={form.control}
-          name="loginMethod"
-          render={({ field }) => {
-            return (
-              <FormItem className="space-y-3">
-                {/* <FormLabel>Select a login method</FormLabel> */}
-                <FormControl>
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    className="flex flex-col space-y-2"
-                  >
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="email" />
-                      </FormControl>
-                      <FormLabel className="font-normal">Email</FormLabel>
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <InputWithIcon
-                                disabled={loginMethodWatch !== "email"}
-                                icon={Mail}
-                                className="placeholder:italic placeholder:opacity-50"
-                                placeholder="loci@goweki.com"
-                                type="email"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="whatsapp" />
-                      </FormControl>
-                      <FormLabel className="font-normal">WhatsApp</FormLabel>
-                      <FormField
-                        control={form.control}
-                        name="phoneNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <InputPhone
-                                disabled={loginMethodWatch !== "whatsapp"}
-                                // className="placeholder:italic placeholder:opacity-50"
-                                // placeholder="254 721..."
-                                value={field.value}
-                                setValue={field.onChange}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </FormItem>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            );
-          }}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => {
-            return (
-              <FormItem>
-                <div className="relative">
+        <GoogleIcon />
+        Continue with Google
+      </Button>
+
+      <Divider label="or sign in with" />
+
+      {/* Credential form */}
+      <Form {...form}>
+        <AuthErrorHandler />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* Login method toggle */}
+          <FormField
+            control={form.control}
+            name="loginMethod"
+            render={({ field }) => (
+              <MethodTabs
+                active={field.value as LoginMethod}
+                onChange={(v) => field.onChange(v)}
+              />
+            )}
+          />
+
+          {/* Email or Phone */}
+          {loginMethod === "email" ? (
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
                   <FormControl>
-                    <InputWithIcon
-                      icon={Lock}
-                      type={showPassword ? "text" : "password"}
-                      placeholder={t.password}
-                      className="pr-10 placeholder:italic placeholder:opacity-50"
+                    <IconInput
+                      icon={Mail}
+                      type="email"
+                      placeholder="you@company.com"
+                      autoFocus
                       {...field}
                     />
                   </FormControl>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-0 top-0 h-full px-3"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ) : (
+            <div className="flex flex-row items-start gap-2 w-full">
+              {/* Phone Number Field - Takes 2/3 of the space */}
+              <div className="w-2/3">
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <InputPhone
+                          value={field.value}
+                          setValue={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* OTP Button - Takes 1/3 of the space */}
+              <div className="w-1/3">
+                {/* <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={!phoneNumber}
+                  className="w-full"
+                  onClick={() => toast.custom("otp Logic not implemented")}
+                >
+                  OTP Sign-in
+                </Button> */}
+                <OtpPopup phoneNumber={phoneNumber} />
+              </div>
+            </div>
+          )}
+
+          {/* Password */}
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <IconInput
+                    icon={Lock}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    suffix={
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-full w-10 text-muted-foreground hover:text-foreground"
+                        onClick={() => setShowPassword((v) => !v)}
+                        tabIndex={-1}
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    }
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
-            );
-          }}
-        />
-        <div className="py-4">
-          <Button type="submit" className="w-full" disabled={loading}>
-            {!loading ? t.submit : <Loader />}
-          </Button>
-        </div>
-        <hr className="my-6 border-t" />
-        <div className="flex flex-row justify-between italic text-xs">
-          <Link
-            href={`/${language}/sign-up`}
-            className="flex w-fit hover:underline"
-          >
-            {t.signUp}
-          </Link>
+            )}
+          />
 
-          <Link
-            href={`/${language}/reset-password`}
-            className="flex w-fit hover:underline"
+          {/* Submit */}
+          <Button
+            type="submit"
+            className="w-full gap-2"
+            disabled={loading || done}
+            aria-busy={loading}
           >
-            {t.forgotPassword}
-          </Link>
-        </div>
-      </form>
-    </Form>
+            {submitLabel}
+          </Button>
+        </form>
+      </Form>
+
+      {/* Footer links */}
+      <div className="flex items-center justify-between text-xs">
+        <Link
+          href="/reset-password"
+          className="text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Forgot password?
+        </Link>
+        <Link
+          href="/sign-up"
+          className="font-bold text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Create account →
+        </Link>
+      </div>
+    </>
   );
 }
+
+export default SignInForm;

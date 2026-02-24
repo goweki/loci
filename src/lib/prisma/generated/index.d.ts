@@ -165,12 +165,13 @@ export const TemplateApprovalStatus: {
 export type TemplateApprovalStatus = (typeof TemplateApprovalStatus)[keyof typeof TemplateApprovalStatus]
 
 
-export const VerificationChannel: {
+export const NotificationChannel: {
   EMAIL: 'EMAIL',
-  WHATSAPP: 'WHATSAPP'
+  WHATSAPP: 'WHATSAPP',
+  SMS: 'SMS'
 };
 
-export type VerificationChannel = (typeof VerificationChannel)[keyof typeof VerificationChannel]
+export type NotificationChannel = (typeof NotificationChannel)[keyof typeof NotificationChannel]
 
 
 export const PaymentStatus: {
@@ -325,9 +326,9 @@ export type TemplateApprovalStatus = $Enums.TemplateApprovalStatus
 
 export const TemplateApprovalStatus: typeof $Enums.TemplateApprovalStatus
 
-export type VerificationChannel = $Enums.VerificationChannel
+export type NotificationChannel = $Enums.NotificationChannel
 
-export const VerificationChannel: typeof $Enums.VerificationChannel
+export const NotificationChannel: typeof $Enums.NotificationChannel
 
 export type PaymentStatus = $Enums.PaymentStatus
 
@@ -492,7 +493,7 @@ export class PrismaClient<
    * ])
    * ```
    * 
-   * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
+   * Read more in our [docs](https://www.prisma.io/docs/orm/prisma-client/queries/transactions).
    */
   $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
@@ -771,8 +772,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 7.2.0
-   * Query Engine version: 0c8ef2ce45c83248ab3df073180d5eda9e8be7a3
+   * Prisma Client JS version: 7.4.1
+   * Query Engine version: 55ae170b1ced7fc6ed07a15f110549408c501bb3
    */
   export type PrismaVersion = {
     client: string
@@ -9366,7 +9367,7 @@ export namespace Prisma {
     id: string | null
     token: string | null
     expires: Date | null
-    channel: $Enums.VerificationChannel | null
+    channel: $Enums.NotificationChannel | null
     userId: string | null
     createdAt: Date | null
     lastUsedAt: Date | null
@@ -9376,7 +9377,7 @@ export namespace Prisma {
     id: string | null
     token: string | null
     expires: Date | null
-    channel: $Enums.VerificationChannel | null
+    channel: $Enums.NotificationChannel | null
     userId: string | null
     createdAt: Date | null
     lastUsedAt: Date | null
@@ -9501,7 +9502,7 @@ export namespace Prisma {
     id: string
     token: string
     expires: Date
-    channel: $Enums.VerificationChannel | null
+    channel: $Enums.NotificationChannel | null
     userId: string
     createdAt: Date
     lastUsedAt: Date | null
@@ -9587,7 +9588,7 @@ export namespace Prisma {
       id: string
       token: string
       expires: Date
-      channel: $Enums.VerificationChannel | null
+      channel: $Enums.NotificationChannel | null
       userId: string
       createdAt: Date
       lastUsedAt: Date | null
@@ -10018,7 +10019,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Token", 'String'>
     readonly token: FieldRef<"Token", 'String'>
     readonly expires: FieldRef<"Token", 'DateTime'>
-    readonly channel: FieldRef<"Token", 'VerificationChannel'>
+    readonly channel: FieldRef<"Token", 'NotificationChannel'>
     readonly userId: FieldRef<"Token", 'String'>
     readonly createdAt: FieldRef<"Token", 'DateTime'>
     readonly lastUsedAt: FieldRef<"Token", 'DateTime'>
@@ -29184,16 +29185,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'VerificationChannel'
+   * Reference to a field of type 'NotificationChannel'
    */
-  export type EnumVerificationChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VerificationChannel'>
+  export type EnumNotificationChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationChannel'>
     
 
 
   /**
-   * Reference to a field of type 'VerificationChannel[]'
+   * Reference to a field of type 'NotificationChannel[]'
    */
-  export type ListEnumVerificationChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VerificationChannel[]'>
+  export type ListEnumNotificationChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationChannel[]'>
     
 
 
@@ -29837,7 +29838,7 @@ export namespace Prisma {
     id?: StringFilter<"Token"> | string
     token?: StringFilter<"Token"> | string
     expires?: DateTimeFilter<"Token"> | Date | string
-    channel?: EnumVerificationChannelNullableFilter<"Token"> | $Enums.VerificationChannel | null
+    channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
     userId?: StringFilter<"Token"> | string
     createdAt?: DateTimeFilter<"Token"> | Date | string
     lastUsedAt?: DateTimeNullableFilter<"Token"> | Date | string | null
@@ -29862,7 +29863,7 @@ export namespace Prisma {
     NOT?: TokenWhereInput | TokenWhereInput[]
     token?: StringFilter<"Token"> | string
     expires?: DateTimeFilter<"Token"> | Date | string
-    channel?: EnumVerificationChannelNullableFilter<"Token"> | $Enums.VerificationChannel | null
+    channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
     userId?: StringFilter<"Token"> | string
     createdAt?: DateTimeFilter<"Token"> | Date | string
     lastUsedAt?: DateTimeNullableFilter<"Token"> | Date | string | null
@@ -29889,7 +29890,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Token"> | string
     token?: StringWithAggregatesFilter<"Token"> | string
     expires?: DateTimeWithAggregatesFilter<"Token"> | Date | string
-    channel?: EnumVerificationChannelNullableWithAggregatesFilter<"Token"> | $Enums.VerificationChannel | null
+    channel?: EnumNotificationChannelNullableWithAggregatesFilter<"Token"> | $Enums.NotificationChannel | null
     userId?: StringWithAggregatesFilter<"Token"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Token"> | Date | string
     lastUsedAt?: DateTimeNullableWithAggregatesFilter<"Token"> | Date | string | null
@@ -31677,7 +31678,7 @@ export namespace Prisma {
     id?: string
     token: string
     expires: Date | string
-    channel?: $Enums.VerificationChannel | null
+    channel?: $Enums.NotificationChannel | null
     createdAt?: Date | string
     lastUsedAt?: Date | string | null
     user: UserCreateNestedOneWithoutTokensInput
@@ -31687,7 +31688,7 @@ export namespace Prisma {
     id?: string
     token: string
     expires: Date | string
-    channel?: $Enums.VerificationChannel | null
+    channel?: $Enums.NotificationChannel | null
     userId: string
     createdAt?: Date | string
     lastUsedAt?: Date | string | null
@@ -31697,7 +31698,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
-    channel?: NullableEnumVerificationChannelFieldUpdateOperationsInput | $Enums.VerificationChannel | null
+    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutTokensNestedInput
@@ -31707,7 +31708,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
-    channel?: NullableEnumVerificationChannelFieldUpdateOperationsInput | $Enums.VerificationChannel | null
+    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -31717,7 +31718,7 @@ export namespace Prisma {
     id?: string
     token: string
     expires: Date | string
-    channel?: $Enums.VerificationChannel | null
+    channel?: $Enums.NotificationChannel | null
     userId: string
     createdAt?: Date | string
     lastUsedAt?: Date | string | null
@@ -31727,7 +31728,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
-    channel?: NullableEnumVerificationChannelFieldUpdateOperationsInput | $Enums.VerificationChannel | null
+    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -31736,7 +31737,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
-    channel?: NullableEnumVerificationChannelFieldUpdateOperationsInput | $Enums.VerificationChannel | null
+    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -33754,11 +33755,11 @@ export namespace Prisma {
     expires?: SortOrder
   }
 
-  export type EnumVerificationChannelNullableFilter<$PrismaModel = never> = {
-    equals?: $Enums.VerificationChannel | EnumVerificationChannelFieldRefInput<$PrismaModel> | null
-    in?: $Enums.VerificationChannel[] | ListEnumVerificationChannelFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.VerificationChannel[] | ListEnumVerificationChannelFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumVerificationChannelNullableFilter<$PrismaModel> | $Enums.VerificationChannel | null
+  export type EnumNotificationChannelNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumNotificationChannelNullableFilter<$PrismaModel> | $Enums.NotificationChannel | null
   }
 
   export type TokenCountOrderByAggregateInput = {
@@ -33791,14 +33792,14 @@ export namespace Prisma {
     lastUsedAt?: SortOrder
   }
 
-  export type EnumVerificationChannelNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.VerificationChannel | EnumVerificationChannelFieldRefInput<$PrismaModel> | null
-    in?: $Enums.VerificationChannel[] | ListEnumVerificationChannelFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.VerificationChannel[] | ListEnumVerificationChannelFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumVerificationChannelNullableWithAggregatesFilter<$PrismaModel> | $Enums.VerificationChannel | null
+  export type EnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel> | $Enums.NotificationChannel | null
     _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedEnumVerificationChannelNullableFilter<$PrismaModel>
-    _max?: NestedEnumVerificationChannelNullableFilter<$PrismaModel>
+    _min?: NestedEnumNotificationChannelNullableFilter<$PrismaModel>
+    _max?: NestedEnumNotificationChannelNullableFilter<$PrismaModel>
   }
 
   export type EnumPlanNameFilter<$PrismaModel = never> = {
@@ -35494,8 +35495,8 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type NullableEnumVerificationChannelFieldUpdateOperationsInput = {
-    set?: $Enums.VerificationChannel | null
+  export type NullableEnumNotificationChannelFieldUpdateOperationsInput = {
+    set?: $Enums.NotificationChannel | null
   }
 
   export type UserUpdateOneRequiredWithoutTokensNestedInput = {
@@ -36497,21 +36498,21 @@ export namespace Prisma {
     _max?: NestedEnumTemplateLanguageFilter<$PrismaModel>
   }
 
-  export type NestedEnumVerificationChannelNullableFilter<$PrismaModel = never> = {
-    equals?: $Enums.VerificationChannel | EnumVerificationChannelFieldRefInput<$PrismaModel> | null
-    in?: $Enums.VerificationChannel[] | ListEnumVerificationChannelFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.VerificationChannel[] | ListEnumVerificationChannelFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumVerificationChannelNullableFilter<$PrismaModel> | $Enums.VerificationChannel | null
+  export type NestedEnumNotificationChannelNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumNotificationChannelNullableFilter<$PrismaModel> | $Enums.NotificationChannel | null
   }
 
-  export type NestedEnumVerificationChannelNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.VerificationChannel | EnumVerificationChannelFieldRefInput<$PrismaModel> | null
-    in?: $Enums.VerificationChannel[] | ListEnumVerificationChannelFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.VerificationChannel[] | ListEnumVerificationChannelFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumVerificationChannelNullableWithAggregatesFilter<$PrismaModel> | $Enums.VerificationChannel | null
+  export type NestedEnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel> | $Enums.NotificationChannel | null
     _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedEnumVerificationChannelNullableFilter<$PrismaModel>
-    _max?: NestedEnumVerificationChannelNullableFilter<$PrismaModel>
+    _min?: NestedEnumNotificationChannelNullableFilter<$PrismaModel>
+    _max?: NestedEnumNotificationChannelNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumPlanNameFilter<$PrismaModel = never> = {
@@ -37021,7 +37022,7 @@ export namespace Prisma {
     id?: string
     token: string
     expires: Date | string
-    channel?: $Enums.VerificationChannel | null
+    channel?: $Enums.NotificationChannel | null
     createdAt?: Date | string
     lastUsedAt?: Date | string | null
   }
@@ -37030,7 +37031,7 @@ export namespace Prisma {
     id?: string
     token: string
     expires: Date | string
-    channel?: $Enums.VerificationChannel | null
+    channel?: $Enums.NotificationChannel | null
     createdAt?: Date | string
     lastUsedAt?: Date | string | null
   }
@@ -37397,7 +37398,7 @@ export namespace Prisma {
     id?: StringFilter<"Token"> | string
     token?: StringFilter<"Token"> | string
     expires?: DateTimeFilter<"Token"> | Date | string
-    channel?: EnumVerificationChannelNullableFilter<"Token"> | $Enums.VerificationChannel | null
+    channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
     userId?: StringFilter<"Token"> | string
     createdAt?: DateTimeFilter<"Token"> | Date | string
     lastUsedAt?: DateTimeNullableFilter<"Token"> | Date | string | null
@@ -40467,7 +40468,7 @@ export namespace Prisma {
     id?: string
     token: string
     expires: Date | string
-    channel?: $Enums.VerificationChannel | null
+    channel?: $Enums.NotificationChannel | null
     createdAt?: Date | string
     lastUsedAt?: Date | string | null
   }
@@ -40718,7 +40719,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
-    channel?: NullableEnumVerificationChannelFieldUpdateOperationsInput | $Enums.VerificationChannel | null
+    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -40727,7 +40728,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
-    channel?: NullableEnumVerificationChannelFieldUpdateOperationsInput | $Enums.VerificationChannel | null
+    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -40736,7 +40737,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
-    channel?: NullableEnumVerificationChannelFieldUpdateOperationsInput | $Enums.VerificationChannel | null
+    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
