@@ -142,11 +142,18 @@ model Session {
   @@map("user_sessions")
 }
 
+enum TokenType {
+  SIGN_IN
+  RESET
+  ONBOARDING
+}
+
 model Token {
-  id      String               @id @default(cuid())
-  token   String
-  expires DateTime
-  channel NotificationChannel?
+  id          String               @id @default(cuid())
+  type        TokenType
+  hashedToken String               @unique
+  expires     DateTime
+  channel     NotificationChannel?
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -154,7 +161,9 @@ model Token {
   createdAt  DateTime  @default(now())
   lastUsedAt DateTime?
 
-  @@map("verification_tokens")
+  @@unique([type, userId])
+  @@index([type, hashedToken])
+  @@map("auth_tokens")
 }
 
 enum NotificationChannel {

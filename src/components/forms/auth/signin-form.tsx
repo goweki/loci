@@ -37,8 +37,10 @@ import { removePlus } from "@/lib/utils/telHandlers";
 import GoogleIcon from "@/components/ui/svg";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -85,20 +87,15 @@ function MethodTabs({ active, onChange }: MethodTabsProps) {
   return (
     <div className="grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
       {METHOD_TABS.map(({ value, label, Icon }) => (
-        <button
+        <Button
           key={value}
           type="button"
           onClick={() => onChange(value)}
-          className={cn(
-            "flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150",
-            active === value
-              ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground",
-          )}
+          variant={active === value ? "secondary" : "ghost"}
         >
           <Icon className="h-4 w-4" />
           {label}
-        </button>
+        </Button>
       ))}
     </div>
   );
@@ -170,14 +167,16 @@ export function OtpPopup({
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="bg-popover text-popover-foreground">
         <DialogHeader>
           <DialogTitle>One-Time-Password</DialogTitle>
-          <DialogDescription className="text-center">
-            Select a mode of receiving the One-Time-Password
-          </DialogDescription>
         </DialogHeader>
         <OtpSigninForm phoneNumber={phoneNumber} />
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="destructive">Cancel</Button>
+          </DialogClose>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
@@ -258,7 +257,7 @@ export function SignInForm() {
       {/* Google OAuth */}
       <Button
         type="button"
-        variant="outline"
+        variant="secondary"
         className="w-full gap-2.5 font-medium"
         onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
       >

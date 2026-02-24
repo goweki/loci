@@ -165,6 +165,15 @@ export const TemplateApprovalStatus: {
 export type TemplateApprovalStatus = (typeof TemplateApprovalStatus)[keyof typeof TemplateApprovalStatus]
 
 
+export const TokenType: {
+  SIGN_IN: 'SIGN_IN',
+  RESET: 'RESET',
+  ONBOARDING: 'ONBOARDING'
+};
+
+export type TokenType = (typeof TokenType)[keyof typeof TokenType]
+
+
 export const NotificationChannel: {
   EMAIL: 'EMAIL',
   WHATSAPP: 'WHATSAPP',
@@ -325,6 +334,10 @@ export const TemplateCategory: typeof $Enums.TemplateCategory
 export type TemplateApprovalStatus = $Enums.TemplateApprovalStatus
 
 export const TemplateApprovalStatus: typeof $Enums.TemplateApprovalStatus
+
+export type TokenType = $Enums.TokenType
+
+export const TokenType: typeof $Enums.TokenType
 
 export type NotificationChannel = $Enums.NotificationChannel
 
@@ -9365,7 +9378,8 @@ export namespace Prisma {
 
   export type TokenMinAggregateOutputType = {
     id: string | null
-    token: string | null
+    type: $Enums.TokenType | null
+    hashedToken: string | null
     expires: Date | null
     channel: $Enums.NotificationChannel | null
     userId: string | null
@@ -9375,7 +9389,8 @@ export namespace Prisma {
 
   export type TokenMaxAggregateOutputType = {
     id: string | null
-    token: string | null
+    type: $Enums.TokenType | null
+    hashedToken: string | null
     expires: Date | null
     channel: $Enums.NotificationChannel | null
     userId: string | null
@@ -9385,7 +9400,8 @@ export namespace Prisma {
 
   export type TokenCountAggregateOutputType = {
     id: number
-    token: number
+    type: number
+    hashedToken: number
     expires: number
     channel: number
     userId: number
@@ -9397,7 +9413,8 @@ export namespace Prisma {
 
   export type TokenMinAggregateInputType = {
     id?: true
-    token?: true
+    type?: true
+    hashedToken?: true
     expires?: true
     channel?: true
     userId?: true
@@ -9407,7 +9424,8 @@ export namespace Prisma {
 
   export type TokenMaxAggregateInputType = {
     id?: true
-    token?: true
+    type?: true
+    hashedToken?: true
     expires?: true
     channel?: true
     userId?: true
@@ -9417,7 +9435,8 @@ export namespace Prisma {
 
   export type TokenCountAggregateInputType = {
     id?: true
-    token?: true
+    type?: true
+    hashedToken?: true
     expires?: true
     channel?: true
     userId?: true
@@ -9500,7 +9519,8 @@ export namespace Prisma {
 
   export type TokenGroupByOutputType = {
     id: string
-    token: string
+    type: $Enums.TokenType
+    hashedToken: string
     expires: Date
     channel: $Enums.NotificationChannel | null
     userId: string
@@ -9527,7 +9547,8 @@ export namespace Prisma {
 
   export type TokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    token?: boolean
+    type?: boolean
+    hashedToken?: boolean
     expires?: boolean
     channel?: boolean
     userId?: boolean
@@ -9538,7 +9559,8 @@ export namespace Prisma {
 
   export type TokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    token?: boolean
+    type?: boolean
+    hashedToken?: boolean
     expires?: boolean
     channel?: boolean
     userId?: boolean
@@ -9549,7 +9571,8 @@ export namespace Prisma {
 
   export type TokenSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    token?: boolean
+    type?: boolean
+    hashedToken?: boolean
     expires?: boolean
     channel?: boolean
     userId?: boolean
@@ -9560,7 +9583,8 @@ export namespace Prisma {
 
   export type TokenSelectScalar = {
     id?: boolean
-    token?: boolean
+    type?: boolean
+    hashedToken?: boolean
     expires?: boolean
     channel?: boolean
     userId?: boolean
@@ -9568,7 +9592,7 @@ export namespace Prisma {
     lastUsedAt?: boolean
   }
 
-  export type TokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "token" | "expires" | "channel" | "userId" | "createdAt" | "lastUsedAt", ExtArgs["result"]["token"]>
+  export type TokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "hashedToken" | "expires" | "channel" | "userId" | "createdAt" | "lastUsedAt", ExtArgs["result"]["token"]>
   export type TokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -9586,7 +9610,8 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      token: string
+      type: $Enums.TokenType
+      hashedToken: string
       expires: Date
       channel: $Enums.NotificationChannel | null
       userId: string
@@ -10017,7 +10042,8 @@ export namespace Prisma {
    */
   interface TokenFieldRefs {
     readonly id: FieldRef<"Token", 'String'>
-    readonly token: FieldRef<"Token", 'String'>
+    readonly type: FieldRef<"Token", 'TokenType'>
+    readonly hashedToken: FieldRef<"Token", 'String'>
     readonly expires: FieldRef<"Token", 'DateTime'>
     readonly channel: FieldRef<"Token", 'NotificationChannel'>
     readonly userId: FieldRef<"Token", 'String'>
@@ -28749,7 +28775,8 @@ export namespace Prisma {
 
   export const TokenScalarFieldEnum: {
     id: 'id',
-    token: 'token',
+    type: 'type',
+    hashedToken: 'hashedToken',
     expires: 'expires',
     channel: 'channel',
     userId: 'userId',
@@ -29181,6 +29208,20 @@ export namespace Prisma {
    * Reference to a field of type 'TemplateLanguage[]'
    */
   export type ListEnumTemplateLanguageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TemplateLanguage[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'TokenType'
+   */
+  export type EnumTokenTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TokenType'>
+    
+
+
+  /**
+   * Reference to a field of type 'TokenType[]'
+   */
+  export type ListEnumTokenTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TokenType[]'>
     
 
 
@@ -29836,7 +29877,8 @@ export namespace Prisma {
     OR?: TokenWhereInput[]
     NOT?: TokenWhereInput | TokenWhereInput[]
     id?: StringFilter<"Token"> | string
-    token?: StringFilter<"Token"> | string
+    type?: EnumTokenTypeFilter<"Token"> | $Enums.TokenType
+    hashedToken?: StringFilter<"Token"> | string
     expires?: DateTimeFilter<"Token"> | Date | string
     channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
     userId?: StringFilter<"Token"> | string
@@ -29847,7 +29889,8 @@ export namespace Prisma {
 
   export type TokenOrderByWithRelationInput = {
     id?: SortOrder
-    token?: SortOrder
+    type?: SortOrder
+    hashedToken?: SortOrder
     expires?: SortOrder
     channel?: SortOrderInput | SortOrder
     userId?: SortOrder
@@ -29858,21 +29901,24 @@ export namespace Prisma {
 
   export type TokenWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    hashedToken?: string
+    type_userId?: TokenTypeUserIdCompoundUniqueInput
     AND?: TokenWhereInput | TokenWhereInput[]
     OR?: TokenWhereInput[]
     NOT?: TokenWhereInput | TokenWhereInput[]
-    token?: StringFilter<"Token"> | string
+    type?: EnumTokenTypeFilter<"Token"> | $Enums.TokenType
     expires?: DateTimeFilter<"Token"> | Date | string
     channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
     userId?: StringFilter<"Token"> | string
     createdAt?: DateTimeFilter<"Token"> | Date | string
     lastUsedAt?: DateTimeNullableFilter<"Token"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id">
+  }, "id" | "hashedToken" | "type_userId">
 
   export type TokenOrderByWithAggregationInput = {
     id?: SortOrder
-    token?: SortOrder
+    type?: SortOrder
+    hashedToken?: SortOrder
     expires?: SortOrder
     channel?: SortOrderInput | SortOrder
     userId?: SortOrder
@@ -29888,7 +29934,8 @@ export namespace Prisma {
     OR?: TokenScalarWhereWithAggregatesInput[]
     NOT?: TokenScalarWhereWithAggregatesInput | TokenScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Token"> | string
-    token?: StringWithAggregatesFilter<"Token"> | string
+    type?: EnumTokenTypeWithAggregatesFilter<"Token"> | $Enums.TokenType
+    hashedToken?: StringWithAggregatesFilter<"Token"> | string
     expires?: DateTimeWithAggregatesFilter<"Token"> | Date | string
     channel?: EnumNotificationChannelNullableWithAggregatesFilter<"Token"> | $Enums.NotificationChannel | null
     userId?: StringWithAggregatesFilter<"Token"> | string
@@ -31676,7 +31723,8 @@ export namespace Prisma {
 
   export type TokenCreateInput = {
     id?: string
-    token: string
+    type: $Enums.TokenType
+    hashedToken: string
     expires: Date | string
     channel?: $Enums.NotificationChannel | null
     createdAt?: Date | string
@@ -31686,7 +31734,8 @@ export namespace Prisma {
 
   export type TokenUncheckedCreateInput = {
     id?: string
-    token: string
+    type: $Enums.TokenType
+    hashedToken: string
     expires: Date | string
     channel?: $Enums.NotificationChannel | null
     userId: string
@@ -31696,7 +31745,8 @@ export namespace Prisma {
 
   export type TokenUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    token?: StringFieldUpdateOperationsInput | string
+    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
+    hashedToken?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31706,7 +31756,8 @@ export namespace Prisma {
 
   export type TokenUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    token?: StringFieldUpdateOperationsInput | string
+    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
+    hashedToken?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     userId?: StringFieldUpdateOperationsInput | string
@@ -31716,7 +31767,8 @@ export namespace Prisma {
 
   export type TokenCreateManyInput = {
     id?: string
-    token: string
+    type: $Enums.TokenType
+    hashedToken: string
     expires: Date | string
     channel?: $Enums.NotificationChannel | null
     userId: string
@@ -31726,7 +31778,8 @@ export namespace Prisma {
 
   export type TokenUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    token?: StringFieldUpdateOperationsInput | string
+    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
+    hashedToken?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31735,7 +31788,8 @@ export namespace Prisma {
 
   export type TokenUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    token?: StringFieldUpdateOperationsInput | string
+    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
+    hashedToken?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     userId?: StringFieldUpdateOperationsInput | string
@@ -33755,6 +33809,13 @@ export namespace Prisma {
     expires?: SortOrder
   }
 
+  export type EnumTokenTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TokenType | EnumTokenTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTokenTypeFilter<$PrismaModel> | $Enums.TokenType
+  }
+
   export type EnumNotificationChannelNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
     in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
@@ -33762,9 +33823,15 @@ export namespace Prisma {
     not?: NestedEnumNotificationChannelNullableFilter<$PrismaModel> | $Enums.NotificationChannel | null
   }
 
+  export type TokenTypeUserIdCompoundUniqueInput = {
+    type: $Enums.TokenType
+    userId: string
+  }
+
   export type TokenCountOrderByAggregateInput = {
     id?: SortOrder
-    token?: SortOrder
+    type?: SortOrder
+    hashedToken?: SortOrder
     expires?: SortOrder
     channel?: SortOrder
     userId?: SortOrder
@@ -33774,7 +33841,8 @@ export namespace Prisma {
 
   export type TokenMaxOrderByAggregateInput = {
     id?: SortOrder
-    token?: SortOrder
+    type?: SortOrder
+    hashedToken?: SortOrder
     expires?: SortOrder
     channel?: SortOrder
     userId?: SortOrder
@@ -33784,12 +33852,23 @@ export namespace Prisma {
 
   export type TokenMinOrderByAggregateInput = {
     id?: SortOrder
-    token?: SortOrder
+    type?: SortOrder
+    hashedToken?: SortOrder
     expires?: SortOrder
     channel?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     lastUsedAt?: SortOrder
+  }
+
+  export type EnumTokenTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TokenType | EnumTokenTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTokenTypeWithAggregatesFilter<$PrismaModel> | $Enums.TokenType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTokenTypeFilter<$PrismaModel>
+    _max?: NestedEnumTokenTypeFilter<$PrismaModel>
   }
 
   export type EnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -35495,6 +35574,10 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type EnumTokenTypeFieldUpdateOperationsInput = {
+    set?: $Enums.TokenType
+  }
+
   export type NullableEnumNotificationChannelFieldUpdateOperationsInput = {
     set?: $Enums.NotificationChannel | null
   }
@@ -36498,11 +36581,28 @@ export namespace Prisma {
     _max?: NestedEnumTemplateLanguageFilter<$PrismaModel>
   }
 
+  export type NestedEnumTokenTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TokenType | EnumTokenTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTokenTypeFilter<$PrismaModel> | $Enums.TokenType
+  }
+
   export type NestedEnumNotificationChannelNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
     in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
     notIn?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
     not?: NestedEnumNotificationChannelNullableFilter<$PrismaModel> | $Enums.NotificationChannel | null
+  }
+
+  export type NestedEnumTokenTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TokenType | EnumTokenTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTokenTypeWithAggregatesFilter<$PrismaModel> | $Enums.TokenType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTokenTypeFilter<$PrismaModel>
+    _max?: NestedEnumTokenTypeFilter<$PrismaModel>
   }
 
   export type NestedEnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -37020,7 +37120,8 @@ export namespace Prisma {
 
   export type TokenCreateWithoutUserInput = {
     id?: string
-    token: string
+    type: $Enums.TokenType
+    hashedToken: string
     expires: Date | string
     channel?: $Enums.NotificationChannel | null
     createdAt?: Date | string
@@ -37029,7 +37130,8 @@ export namespace Prisma {
 
   export type TokenUncheckedCreateWithoutUserInput = {
     id?: string
-    token: string
+    type: $Enums.TokenType
+    hashedToken: string
     expires: Date | string
     channel?: $Enums.NotificationChannel | null
     createdAt?: Date | string
@@ -37396,7 +37498,8 @@ export namespace Prisma {
     OR?: TokenScalarWhereInput[]
     NOT?: TokenScalarWhereInput | TokenScalarWhereInput[]
     id?: StringFilter<"Token"> | string
-    token?: StringFilter<"Token"> | string
+    type?: EnumTokenTypeFilter<"Token"> | $Enums.TokenType
+    hashedToken?: StringFilter<"Token"> | string
     expires?: DateTimeFilter<"Token"> | Date | string
     channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
     userId?: StringFilter<"Token"> | string
@@ -40466,7 +40569,8 @@ export namespace Prisma {
 
   export type TokenCreateManyUserInput = {
     id?: string
-    token: string
+    type: $Enums.TokenType
+    hashedToken: string
     expires: Date | string
     channel?: $Enums.NotificationChannel | null
     createdAt?: Date | string
@@ -40717,7 +40821,8 @@ export namespace Prisma {
 
   export type TokenUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    token?: StringFieldUpdateOperationsInput | string
+    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
+    hashedToken?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -40726,7 +40831,8 @@ export namespace Prisma {
 
   export type TokenUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    token?: StringFieldUpdateOperationsInput | string
+    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
+    hashedToken?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -40735,7 +40841,8 @@ export namespace Prisma {
 
   export type TokenUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    token?: StringFieldUpdateOperationsInput | string
+    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
+    hashedToken?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

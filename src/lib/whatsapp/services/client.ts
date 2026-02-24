@@ -26,6 +26,7 @@ import {
   PreVerifiedNumberResponse,
   RequestCodeResponse,
   VerifyNumberResponse,
+  SendResponse as WhatsappSendResponse,
 } from "../types/waba-api-reponses";
 import {
   createPreVerifiedNumber as _createPreVerifiedNumber,
@@ -71,7 +72,7 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   // 2. SEND MESSAGE
   // ---------------------------------------------------------------------
-  async sendMessage(input: Message) {
+  async sendMessage(input: Message): Promise<WhatsappSendResponse> {
     const { phoneNumberId, to, type } = input;
 
     const finalPhoneNumberId = phoneNumberId ?? this.env.phoneNumberId;
@@ -100,12 +101,12 @@ export class WhatsAppClient {
       throw normalizeWhatsAppError(res.status, json);
     }
 
-    this.logger.info("Message sent successfully", json);
+    this.logger.info("WABA response:", json);
 
     return json;
   }
 
-  async sendTemplate(input: Message) {
+  async sendTemplate(input: Message): Promise<WhatsappSendResponse> {
     const { phoneNumberId, ...payload } = input;
 
     const finalPhoneNumberId = phoneNumberId ?? this.env.phoneNumberId;
@@ -122,7 +123,7 @@ export class WhatsAppClient {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      const data: WhatsappSendResponse = await response.json();
 
       if (!response.ok) {
         throw new Error(`WhatsApp API error: ${JSON.stringify(data)}`);
@@ -141,7 +142,7 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   async markMessageAsRead(
     messageId: string,
-    phoneNumberId: string
+    phoneNumberId: string,
   ): Promise<WabaMarkReadResponse> {
     const url = `${this.baseUrl}/${phoneNumberId}/messages`;
 
@@ -196,7 +197,7 @@ export class WhatsAppClient {
   }
 
   async getPhoneNumberDetails(
-    phoneNumberId: string
+    phoneNumberId: string,
   ): Promise<WabaPhoneNumberDetailsResponse> {
     const url = `${this.baseUrl}/${phoneNumberId}`;
 
@@ -218,7 +219,7 @@ export class WhatsAppClient {
   }
 
   async requestPhoneVerificationCode(
-    phoneNumberId: string
+    phoneNumberId: string,
   ): Promise<WabaRequestCodeResponse> {
     const url = `${this.baseUrl}/${phoneNumberId}/request_code`;
 
@@ -242,7 +243,7 @@ export class WhatsAppClient {
 
   async verifyPhoneCode(
     phoneNumberId: string,
-    code: string
+    code: string,
   ): Promise<WabaVerifyCodeResponse> {
     const url = `${this.baseUrl}/${phoneNumberId}/verify_code`;
 
@@ -271,7 +272,7 @@ export class WhatsAppClient {
   // 5. TEMPLATE MANAGEMENT
   // ---------------------------------------------------------------------
   async getTemplates(
-    wabaId?: string
+    wabaId?: string,
   ): Promise<(TemplateOptions & { id: string })[]> {
     const url = `${this.baseUrl}/${wabaId ?? this.env.wabaId}/message_templates?access_token=${this.env.wabaAccessToken}`;
     //graph.facebook.com/{{Version}}/{{WABA-ID}}/message_templates
@@ -310,7 +311,7 @@ export class WhatsAppClient {
   }
 
   async createTemplate(
-    template: TemplateOptions
+    template: TemplateOptions,
   ): Promise<WabaTemplateCreateResponse> {
     const url = `${this.baseUrl}/${this.env.wabaId}/message_templates`;
 
@@ -363,14 +364,14 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   async uploadMedia(
     file: Buffer,
-    mimeType: string
+    mimeType: string,
   ): Promise<WabaUploadMediaResponse> {
     const url = `${this.baseUrl}/${this.env.fbAppId}/media`;
     const form = new FormData();
     form.append(
       "file",
       new Blob([new Uint8Array(file)], { type: mimeType }),
-      "upload.bin"
+      "upload.bin",
     );
     form.append("type", mimeType);
 
@@ -525,7 +526,7 @@ export class WhatsAppClient {
 
     if (!_res.ok) {
       throw new Error(
-        `Failed to fetch owned WABAs for business ${businessId}: ${_res.statusText}`
+        `Failed to fetch owned WABAs for business ${businessId}: ${_res.statusText}`,
       );
     }
     const res: {
@@ -562,7 +563,7 @@ export class WhatsAppClient {
     });
     if (!_res.ok) {
       throw new Error(
-        `Failed to fetch shared WABAs for business ${businessId}: ${_res.statusText}`
+        `Failed to fetch shared WABAs for business ${businessId}: ${_res.statusText}`,
       );
     }
 
@@ -589,7 +590,7 @@ export class WhatsAppClient {
    * Create a pre-verified business phone number in your portfolio
    */
   async createPreVerifiedNumber(
-    phoneNumber: string
+    phoneNumber: string,
   ): Promise<PreVerifiedNumberResponse> {
     return _createPreVerifiedNumber(phoneNumber);
   }
@@ -598,7 +599,7 @@ export class WhatsAppClient {
    * Request a verification code (OTP) for a pre-verified number
    */
   async requestVerificationCode(
-    preVerifiedNumberId: string
+    preVerifiedNumberId: string,
   ): Promise<RequestCodeResponse> {
     return _requestVerificationCode(this.baseUrl, preVerifiedNumberId);
   }
@@ -608,24 +609,24 @@ export class WhatsAppClient {
    */
   async verifyPreVerifiedNumber(
     preVerifiedNumberId: string,
-    otpCode: string
+    otpCode: string,
   ): Promise<VerifyNumberResponse> {
     return _verifyPreVerifiedNumber(
       this.baseUrl,
       preVerifiedNumberId,
       otpCode,
-      this.env.wabaAccessToken
+      this.env.wabaAccessToken,
     );
   }
 
   async getTokenUsingWabaAuthCode(
-    code: string
+    code: string,
   ): Promise<GetTokenUsingWabaAuthCodeResult> {
     return _getTokenUsingWabaAuthCode(
       this.baseUrl,
       code,
       this.env.fbAppId,
-      this.env.appSecret
+      this.env.appSecret,
     );
   }
 }

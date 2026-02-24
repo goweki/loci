@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       {
         error: "Invalid request body",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
   // Validate phone number ownership
   const phoneNumber = await validatePhoneNumberOwnership(
     phoneNumberId,
-    session.user.id
+    session.user.id,
   );
 
   if (!phoneNumber) {
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
   let messageLimit = 0;
 
   const subscriptionStatus = await getSubscriptionStatusByUserId(
-    session.user.id
+    session.user.id,
   );
 
   if (!subscriptionStatus.plan) {
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     } else
       return NextResponse.json(
         { error: "No active subscription found" },
-        { status: 402 }
+        { status: 402 },
       );
   } else {
     const { plan } = subscriptionStatus;
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
         limit: messageLimit,
         used: sentMessages,
       },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -108,6 +108,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const waResponse = await whatsapp.sendMessage(body);
+
+    if ("error" in waResponse) {
+      throw new Error(`Error sending whatsapp message: ${waResponse.error}`);
+    }
 
     const contact = await findOrCreateContact(session.user.id, to);
 
@@ -118,7 +122,7 @@ export async function POST(request: NextRequest) {
       phoneNumberId: phoneNumber.id,
       waMessageId: waResponse.messaging_product,
       type: body.type.toUpperCase() as MessageType,
-      content: waResponse.sentMessage,
+      content: waResponse.messages,
       direction: "OUTBOUND",
       status: "SENT",
       timestamp: new Date(),

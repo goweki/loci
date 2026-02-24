@@ -186,7 +186,8 @@ exports.Prisma.SessionScalarFieldEnum = {
 
 exports.Prisma.TokenScalarFieldEnum = {
   id: 'id',
-  token: 'token',
+  type: 'type',
+  hashedToken: 'hashedToken',
   expires: 'expires',
   channel: 'channel',
   userId: 'userId',
@@ -450,6 +451,12 @@ exports.TemplateLanguage = exports.$Enums.TemplateLanguage = {
   en_GB: 'en_GB',
   fr_FR: 'fr_FR',
   sw_KE: 'sw_KE'
+};
+
+exports.TokenType = exports.$Enums.TokenType = {
+  SIGN_IN: 'SIGN_IN',
+  RESET: 'RESET',
+  ONBOARDING: 'ONBOARDING'
 };
 
 exports.NotificationChannel = exports.$Enums.NotificationChannel = {

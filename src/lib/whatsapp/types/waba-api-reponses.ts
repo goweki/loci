@@ -15,3 +15,30 @@ export interface GetTokenUsingWabaAuthCodeResult {
   businessToken?: string;
   error?: string;
 }
+
+export interface SendResponseOk {
+  messaging_product: "whatsapp";
+
+  contacts: {
+    input: string;
+    wa_id: string;
+  }[];
+
+  messages: {
+    id: string;
+  }[];
+}
+
+export interface SendResponseError {
+  error: {
+    message: string;
+    type: string;
+    code: number;
+    error_data?: {
+      details?: string;
+    };
+    fbtrace_id?: string;
+  };
+}
+
+export type SendResponse = SendResponseOk | SendResponseError;

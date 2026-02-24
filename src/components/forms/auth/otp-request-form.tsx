@@ -6,7 +6,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 
-import { MessageCircle, Smartphone, ArrowRight, Check } from "lucide-react";
+import {
+  MessageCircle,
+  Smartphone,
+  ArrowRight,
+  Check,
+  MessageSquare,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +27,13 @@ import { Input } from "@/components/ui/input";
 import Loader from "@/components/ui/loaders";
 import { cn } from "@/lib/utils";
 import { NotificationChannel } from "@/lib/prisma/generated";
+import { WhatsAppLogo } from "@/components/ui/svg";
+import { getUserByKey } from "@/data/user";
+import { removePlus } from "@/lib/utils/telHandlers";
+import { sendOtp } from "./_actions";
+import { InputOTP } from "./_input-otp";
+import { signIn } from "next-auth/react";
+import { ERROR_MESSAGES } from "./_errorHandler";
 
 // ─────────────────────────────────────
 // Types
@@ -59,16 +72,16 @@ function ModeSelector({
         onClick={() => onChange("WHATSAPP")}
         variant={value === "WHATSAPP" ? "secondary" : "outline"}
       >
-        <MessageCircle className="h-4 w-4" />
+        <WhatsAppLogo className="h-4 w-4" />
         WhatsApp
       </Button>
 
       <Button
         type="button"
         onClick={() => onChange("SMS")}
-        variant={value === "SMS" ? "secondary" : "ghost"}
+        variant={value === "SMS" ? "secondary" : "outline"}
       >
-        <Smartphone className="h-4 w-4" />
+        <MessageSquare className="h-4 w-4" />
         SMS
       </Button>
     </div>
@@ -112,51 +125,57 @@ function SubmitLabel({
 
 export function OtpSigninForm({ phoneNumber }: Props) {
   const [step, setStep] = useState(1);
-
   const [loading, setLoading] = useState(false);
-
   const [done, setDone] = useState(false);
+  const [otpChannel, setOtpChannel] = useState<OtpMode>("WHATSAPP");
+  const [otpVal, setOtpVal] = useState<string>("");
 
-  const form = useForm<z.infer<typeof otpSchema>>({
-    resolver: zodResolver(otpSchema),
-    defaultValues: {
-      mode: "WHATSAPP",
-      code: "",
-    },
-  });
-
-  const sendOtp = useCallback(async (mode: OtpMode) => {
+  const verifyUserAndSendOtp = useCallback(async () => {
     setLoading(true);
 
     try {
-      // TODO replace with API
+      const user = await getUserByKey(removePlus(phoneNumber));
 
-      await new Promise((r) => setTimeout(r, 800));
+      if (!user) {
+        toast.error("User not found. Verify contact provided.");
+        return;
+      }
 
-      toast.success(`OTP sent via ${mode}`);
+      const sendRes = await sendOtp({
+        notificationChannel: otpChannel,
+        contact: phoneNumber,
+      });
+      if (!sendRes) {
+        toast.error("OTP not sent");
+        return;
+      }
 
       setStep(2);
     } catch {
-      toast.error("Failed to send OTP");
+      toast.error("Failed to verify user");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const verifyOtp = useCallback(async (values: z.infer<typeof otpSchema>) => {
+  const verifyOtpAndSignin = useCallback(async () => {
     setLoading(true);
 
     try {
-      // TODO replace with API
+      const result = await signIn("credentials", {
+        redirect: false,
+        username: removePlus(phoneNumber),
+        password: otpVal,
+        callbackUrl: "/dashboard",
+      });
 
-      await new Promise((r) => setTimeout(r, 800));
-
-      if (values.code !== "1234") {
-        toast.error("Invalid code");
-
+      if (result?.error) {
+        const message =
+          ERROR_MESSAGES[result.error as keyof typeof ERROR_MESSAGES] ??
+          "Failed to sign in";
+        toast.error(message);
         return;
       }
-
       setDone(true);
 
       toast.success("Signed in");
@@ -167,16 +186,13 @@ export function OtpSigninForm({ phoneNumber }: Props) {
     }
   }, []);
 
-  const onSubmit = useCallback(
-    async (values: z.infer<typeof otpSchema>) => {
-      if (step === 1) {
-        return sendOtp(values.mode);
-      }
+  const onSubmit = useCallback(async () => {
+    if (step === 1) {
+      return verifyUserAndSendOtp();
+    }
 
-      return verifyOtp(values);
-    },
-    [step, sendOtp, verifyOtp],
-  );
+    return verifyOtpAndSignin();
+  }, [step, verifyUserAndSendOtp, verifyOtpAndSignin]);
 
   const submitLabel = useMemo(
     () => <SubmitLabel loading={loading} done={done} step={step} />,
@@ -184,65 +200,44 @@ export function OtpSigninForm({ phoneNumber }: Props) {
   );
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-        {/* Phone Display */}
+    <form className="space-y-4 pt-4">
+      {/* Phone Display */}
 
-        <div className="text-center text-sm text-muted-foreground">
-          <div className="font-medium text-foreground mb-6">{phoneNumber}</div>
-        </div>
+      <div className="text-center text-sm text-muted-foreground">
+        {step === 1
+          ? "Select a channel to receive the One-Time-Password"
+          : `One-Time-Passcode sent via ${otpChannel}`}
+        <div className="font-medium text-foreground mb-6">{phoneNumber}</div>
+      </div>
 
-        {/* Step 1 */}
+      {/* Step 1 */}
 
-        {step === 1 && (
-          <FormField
-            control={form.control}
-            name="mode"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <ModeSelector value={field.value} onChange={field.onChange} />
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
+      {step === 1 && (
+        <div>
+          <ModeSelector
+            value={otpChannel}
+            onChange={(mode) => setOtpChannel(mode)}
           />
-        )}
-
-        {/* Step 2 */}
-
-        {step === 2 && (
-          <FormField
-            control={form.control}
-            name="code"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    placeholder="1234"
-                    maxLength={4}
-                    className="text-center text-lg tracking-widest"
-                    autoFocus
-                    {...field}
-                  />
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
-
-        {/* Submit */}
-
-        <div className="py-4">
-          <Button className="w-full" disabled={loading || done}>
-            {submitLabel}
-          </Button>
         </div>
-      </form>
-    </Form>
+      )}
+
+      {/* Step 2 */}
+
+      {step === 2 && <InputOTP value={otpVal} setValue={setOtpVal} />}
+
+      {/* Submit */}
+
+      <div className="pt-4">
+        <Button
+          type="button"
+          className={`w-full`}
+          disabled={loading || done}
+          onClick={onSubmit}
+        >
+          {submitLabel}
+        </Button>
+      </div>
+    </form>
   );
 }
 

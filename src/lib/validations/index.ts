@@ -1,3 +1,3 @@
 export * from "./authentication";
-export * from "./message";
+export * from "./waba-message";
 export * from "./phone-number";

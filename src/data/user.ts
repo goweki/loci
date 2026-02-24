@@ -16,6 +16,7 @@ import {
   UserStatus,
   User,
   TemplateLanguage,
+  TokenType,
 } from "@/lib/prisma/generated";
 import { sendMail } from "@/lib/mail";
 import { welcomeEmail, resetPasswordEmail } from "@/lib/mail/email-render";
@@ -39,7 +40,7 @@ export type UserGetPayload = Prisma.UserGetPayload<{
  * Creates a new user (doesnt send Welcome email)
  */
 export async function createUser(
-  data: Prisma.UserCreateInput | Prisma.UserUncheckedCreateInput
+  data: Prisma.UserCreateInput | Prisma.UserUncheckedCreateInput,
 ): Promise<
   Prisma.UserGetPayload<{
     select: { id: true; name: true; email: true; tel: true };
@@ -59,7 +60,7 @@ export async function createUser(
 export async function registerUser(
   data: (Prisma.UserCreateInput | Prisma.UserUncheckedCreateInput) & {
     verificationMethod?: "email" | "whatsapp" | "sms";
-  }
+  },
 ): Promise<User & { verificationMethod: "email" | "whatsapp" | "sms" }> {
   console.log("Registering user... ", data);
   let tokenSentTo: "email" | "whatsapp" | "sms" | undefined = undefined;
@@ -328,11 +329,29 @@ export async function getUserByTel(tel: string): Promise<User | null> {
  * Find a user by key attribute.
  */
 export async function getUserByKey(key: string): Promise<User | null> {
-  return db.user.findFirst({
+  let user = db.user.findFirst({
     where: {
       OR: [{ id: key }, { email: key }, { tel: key }],
     },
   });
+  if (!user) {
+    const hashedToken = await hash(key);
+    const token_user = await db.token.findUnique({
+      where: {
+        type: TokenType.SIGN_IN || TokenType.ONBOARDING,
+        hashedToken,
+      },
+      include: { user: true },
+    });
+    if (token_user?.user) {
+      user = db.user.findUnique({
+        where: {
+          id: token_user.user.id,
+        },
+      });
+    }
+  }
+  return user;
 }
 
 /**
@@ -340,7 +359,7 @@ export async function getUserByKey(key: string): Promise<User | null> {
  */
 export async function getAllUsers(
   skip = 0,
-  take = 20
+  take = 20,
 ): Promise<UserGetPayload[]> {
   return db.user.findMany({
     skip,
@@ -401,7 +420,7 @@ export async function countUsers(): Promise<number> {
  * Find a user by a phoneNumberId (from the PhoneNumber model).
  */
 export async function getUserByPhoneNumberId(
-  phoneNumberId: string
+  phoneNumberId: string,
 ): Promise<Prisma.UserGetPayload<{ include: { waba: true } }> | null> {
   return db.user.findFirst({
     where: {
@@ -430,7 +449,7 @@ export async function updateUser(
   id: string,
   data: Partial<
     Pick<User, "name" | "email" | "tel" | "image" | "role" | "status">
-  >
+  >,
 ): Promise<Partial<User>> {
   return db.user.update({
     where: { id },
@@ -457,7 +476,7 @@ export async function updateUserPassword(
     password?: string;
     resetToken?: string | null;
     resetTokenExpiry?: Date | null;
-  }
+  },
 ): Promise<Partial<User>> {
   if (passwordAttributes.password) {
     passwordAttributes.password = await hash(passwordAttributes.password);
@@ -475,7 +494,7 @@ export async function updateUserPassword(
  */
 export async function updateUserStatus(
   id: string,
-  status: UserStatus
+  status: UserStatus,
 ): Promise<User> {
   return db.user.update({
     where: { id },
@@ -488,7 +507,7 @@ export async function updateUserStatus(
  */
 export async function updateUserRole(
   id: string,
-  role: UserRole
+  role: UserRole,
 ): Promise<User> {
   return db.user.update({
     where: { id },
@@ -554,7 +573,7 @@ export async function getUserContacts(userId: string) {
  */
 export async function getUserMessages(
   userId: string,
-  filter?: { direction?: string; status?: string }
+  filter?: { direction?: string; status?: string },
 ) {
   return db.message.findMany({
     where: {
