@@ -1,28 +1,38 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const gmailAccountUser = process.env.GMAIL_ACCOUNT_USER;
-const gmailAccountKey = process.env.GMAIL_APP_KEY;
-
-if (!gmailAccountUser || !gmailAccountKey) {
-  throw new Error(
-    "❌ Missing Africa's Talking credentials. Please set AFRICASTALKING_KEY and AFRICASTALKING_USERNAME in your .env.local file."
-  );
+export interface SendMailOptions {
+  to: string | string[];
+  subject: string;
+  message: { html: string; text: string };
+  from?: string;
 }
 
-// export const mailTransporter = nodemailer.createTransport({
-//   host: process.env.SMTP_HOST,
-//   port: Number(process.env.SMTP_PORT),
-//   secure: false,
-//   auth: {
-//     user: process.env.SMTP_USER,
-//     pass: process.env.SMTP_PASS,
-//   },
-// });
+export class EmailService {
+  private resend: Resend;
+  private defaultFrom: string;
 
-export const mailTransporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: gmailAccountUser,
-    pass: gmailAccountKey,
-  },
-});
+  constructor() {
+    if (!process.env.RESEND_API_KEY || !process.env.RESEND_SYSTEM_SENDER) {
+      throw new Error("RESEND_API_KEY or RESEND_SYSTEM_SENDER is not defined");
+    }
+
+    this.resend = new Resend(process.env.RESEND_API_KEY);
+    this.defaultFrom = process.env.RESEND_SYSTEM_SENDER;
+  }
+
+  async sendMail(options: SendMailOptions) {
+    const { to, subject, message, from } = options;
+    const html = message.html;
+
+    return await this.resend.emails.send({
+      from: from ?? this.defaultFrom,
+      to,
+      subject,
+      html,
+    });
+  }
+}
+
+const emailService = new EmailService();
+
+export default emailService;
