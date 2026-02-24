@@ -137,6 +137,20 @@ exports.Prisma.UserScalarFieldEnum = {
   resetTokenExpiry: 'resetTokenExpiry'
 };
 
+exports.Prisma.ApiKeyScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  keyHash: 'keyHash',
+  description: 'description',
+  permissions: 'permissions',
+  isActive: 'isActive',
+  expiresAt: 'expiresAt',
+  lastUsedAt: 'lastUsedAt',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.WabaAccountScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -527,6 +541,7 @@ exports.ContactStatus = exports.$Enums.ContactStatus = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  ApiKey: 'ApiKey',
   WabaAccount: 'WabaAccount',
   WabaTemplate: 'WabaTemplate',
   Session: 'Session',

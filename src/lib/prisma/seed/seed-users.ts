@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 // Example users data
 const usersData = [
   {
-    name: "System Users",
+    name: "System User",
     email: process.env.SYSTEM_EMAIL || "loci@goweki.com",
     tel: process.env.SYSTEM_TEL || "254721334944",
     password: process.env.SYSTEM_PASSWORD || "admin1234",

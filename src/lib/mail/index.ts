@@ -1,4 +1,4 @@
-import { mailTransporter } from "./transporter";
+import mailService, { SendMailOptions } from "./transporter";
 
 export async function sendMail({
   to,
@@ -11,13 +11,12 @@ export async function sendMail({
   html: string;
   text: string;
 }) {
-  const mailOptions = {
+  const mailOptions: SendMailOptions = {
     from: process.env.MAIL_FROM || "no-reply@example.com",
     to,
     subject,
-    html,
-    text,
+    message: { html, text },
   };
 
-  return await mailTransporter.sendMail(mailOptions);
+  return await mailService.sendMail(mailOptions);
 }

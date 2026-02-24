@@ -107,11 +107,11 @@ export default function PricingComponent({ t }: PricingProps) {
     return Math.round((savings / grossCost) * 100);
   };
 
-  return !plans || !subscriptionStatus ? (
+  return !plans ? (
     <Loader />
   ) : (
     <div className="flex flex-col">
-      <SubscriptionInfoWrapper />
+      {!subscriptionStatus ? null : <SubscriptionInfoWrapper />}
 
       {/* Billing interval toggle */}
       <div className="flex justify-center pb-12">
@@ -189,9 +189,7 @@ export default function PricingComponent({ t }: PricingProps) {
               </div>
             </CardHeader>
 
-            {!subscriptionStatus ? (
-              <Loader />
-            ) : !user ||
+            {!subscriptionStatus ? null : !user ||
               subscriptionStatus.status ===
                 SubscriptionStatusEnum.ACTIVE ? null : (
               <div className="mb-4 flex justify-center px-4">
