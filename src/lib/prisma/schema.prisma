@@ -151,7 +151,7 @@ enum TokenType {
 model Token {
   id          String               @id @default(cuid())
   type        TokenType
-  hashedToken String               @unique
+  hashedToken String
   expires     DateTime
   channel     NotificationChannel?
 

@@ -54,38 +54,43 @@ export function hoursDifference(date1: Date, date2: Date): number {
 }
 
 /**
- * Adds a given number of days and/or months to a date.
+ * Adds a given number of days, months, and/or hours to a date.
  * Returns a new Date instance (does not mutate the original).
  *
  * @param {Object} options
  * @param {number} [options.days] - Number of days to add (can be negative).
  * @param {number} [options.months] - Number of months to add (can be negative).
+ * @param {number} [options.hours] - Number of hours to add (can be negative).
  * @param {Date} [baseDate] - The starting date (defaults to now).
  * @returns {Date} - The updated date.
  */
 export function addToDate(
-  options: { days?: number; months?: number },
+  options: { days?: number; months?: number; hours?: number },
   baseDate: Date = new Date(),
 ): Date {
-  const { days = 0, months = 0 } = options;
+  const { days = 0, months = 0, hours = 0 } = options;
 
   const result = new Date(baseDate.getTime());
 
-  // Handle months first (avoids rollover issues)
+  // 1. Handle months first (avoids calendar rollover issues)
   if (months !== 0) {
     const originalDay = result.getDate();
-
     result.setMonth(result.getMonth() + months);
 
-    // Fix month overflow (e.g., Jan 31 → Feb 28)
+    // Fix month overflow (e.g., Jan 31 + 1 month → Feb 28/29)
     if (result.getDate() < originalDay) {
       result.setDate(0);
     }
   }
 
-  // Add days
+  // 2. Add days
   if (days !== 0) {
     result.setDate(result.getDate() + days);
+  }
+
+  // 3. Add hours
+  if (hours !== 0) {
+    result.setHours(result.getHours() + hours);
   }
 
   return result;

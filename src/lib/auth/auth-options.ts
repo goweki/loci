@@ -7,6 +7,8 @@ import { getSubscriptionStatusByUserId } from "@/data/subscription";
 import { upsertAccount } from "@/data/account";
 import { compareHash } from "../utils/passwordHandlers";
 import { SubscriptionStatusEnum } from "@/types";
+import prisma from "../prisma";
+import { hashApiKey } from "./api-key";
 
 if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("NEXTAUTH_SECRET is not set in environment variables");
@@ -30,10 +32,40 @@ export const authOptions: NextAuthOptions = {
         if (user.status === UserStatus.SUSPENDED)
           throw new Error("Account suspended");
 
-        if (!user.password) throw new Error("Create a password first");
+        // auth password
+        let isPasswordValid = false;
 
-        const isValid = await compareHash(credentials.password, user.password);
-        if (!isValid) throw new Error("Invalid password");
+        const validTokens = await prisma.token.findMany({
+          where: {
+            userId: user.id,
+          },
+        });
+
+        if (validTokens.length < 1 && !user.password) {
+          throw new Error("Create a password/passcode first");
+        }
+
+        if (user.password) {
+          isPasswordValid = await compareHash(
+            credentials.password,
+            user.password,
+          );
+        }
+        if (!isPasswordValid) {
+          const hashedPassword = hashApiKey(credentials.password);
+          const validOtp = validTokens.find(
+            ({ hashedToken }) => hashedToken === hashedPassword,
+          );
+          if (validOtp) {
+            console.log(`User-${user.id} authenticated using OTP Token`);
+            isPasswordValid = true;
+            await prisma.token.delete({
+              where: { id: validOtp.id },
+            });
+          }
+        }
+
+        if (!isPasswordValid) throw new Error("Invalid password/passcode");
 
         const subscription = await getSubscriptionStatusByUserId(user.id);
 
@@ -139,7 +171,7 @@ export const authOptions: NextAuthOptions = {
         "SIGN IN ATTEMPT....",
         ` >> user.email - ${user.email}`,
         ` >> account.provider - ${account?.provider}`,
-        ` >> profile.email - ${profile?.email}`
+        ` >> profile.email - ${profile?.email}`,
       );
 
       try {
@@ -177,7 +209,7 @@ export const authOptions: NextAuthOptions = {
 
           // 3️⃣ Load subscription details and attach to session user
           const subscription = await getSubscriptionStatusByUserId(
-            localUser.id
+            localUser.id,
           );
 
           user.id = localUser.id;
