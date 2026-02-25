@@ -330,30 +330,11 @@ export async function getUserByTel(tel: string): Promise<User | null> {
  * Find a user by key attribute.
  */
 export async function getUserByKey(key: string): Promise<User | null> {
-  const user = db.user.findFirst({
+  return db.user.findFirst({
     where: {
       OR: [{ id: key }, { email: key }, { tel: key }],
     },
   });
-
-  if (user) {
-    return user;
-  }
-
-  const hashedToken = hashApiKey(key);
-  const token_user = await db.token.findUnique({
-    where: {
-      hashedToken,
-      expires: { gt: new Date() },
-    },
-    include: { user: true },
-  });
-
-  if (token_user?.user) {
-    return token_user.user;
-  }
-
-  return null;
 }
 
 /**
