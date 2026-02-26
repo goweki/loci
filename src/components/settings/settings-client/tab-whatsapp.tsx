@@ -19,7 +19,7 @@ interface Waba extends WabaAccount {
 
 export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
   return (
-    <TabsContent value="chatbots" className="space-y-6">
+    <>
       <Card>
         <CardHeader>
           <CardTitle>WhatsApp Business Account</CardTitle>
@@ -97,6 +97,6 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
           )}
         </CardContent>
       </Card>
-    </TabsContent>
+    </>
   );
 }

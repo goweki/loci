@@ -184,28 +184,37 @@ export async function sendResetLink(data: {
   if (!user_) {
     throw new Error(`User not found - ${username}`);
   }
+
   const usernameAttribute = user_.email === username ? "email" : "tel";
   const tokenObj = await generateResetToken();
   const resetLinkTail = await buildResetUrlTail(tokenObj.plain, username);
   const resetLink = `${BASE_URL}/${resetLinkTail}`;
 
   try {
-    const userUpdates = {
+    const passUpdates = {
       resetToken: tokenObj.hashed,
       resetTokenExpiry: tokenObj.expiry,
     };
-    await updateUserPassword(user_.id, userUpdates);
+    await updateUserPassword(user_.id, passUpdates);
 
     let sentTo_: NotificationChannel | undefined = undefined;
 
     if (usernameAttribute === "email" && user_.email) {
       const emailToSend = await resetPasswordEmail(user_.name || "", resetLink);
-      await sendMail({
+      const sendmailRes = await sendMail({
         to: user_.email,
         subject: "Reset Password: LOCi",
         html: emailToSend.html,
         text: emailToSend.text,
       });
+
+      const { data, error } = sendmailRes;
+
+      if (error) {
+        console.error("Resend ERROR:", error);
+        throw new Error(error.message);
+      }
+      console.log("Email sent successfully:", data);
 
       sentTo_ = NotificationChannel.EMAIL;
     } else if (

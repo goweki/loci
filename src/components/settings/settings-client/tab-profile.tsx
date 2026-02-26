@@ -17,7 +17,7 @@ import { UserGetPayload } from "@/data/user";
 
 export default function TabProfile({ user }: { user: UserGetPayload }) {
   return (
-    <TabsContent value="profile" className="space-y-6">
+    <>
       <Card>
         <CardHeader>
           <CardTitle>Profile Information</CardTitle>
@@ -27,7 +27,69 @@ export default function TabProfile({ user }: { user: UserGetPayload }) {
         </CardHeader>
         <ProfileForm />
       </Card>
-    </TabsContent>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Notification Preferences</CardTitle>
+          <CardDescription>
+            Configure how you receive notifications
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Email Notifications</Label>
+                <p className="text-sm text-muted-foreground">
+                  Receive notifications via email
+                </p>
+              </div>
+              <input type="checkbox" className="toggle" defaultChecked />
+            </div>
+
+            <Separator />
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>WhatsApp Notifications</Label>
+                <p className="text-sm text-muted-foreground">
+                  Get updates on WhatsApp
+                </p>
+              </div>
+              <input type="checkbox" className="toggle" />
+            </div>
+
+            <Separator />
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>New Message Alerts</Label>
+                <p className="text-sm text-muted-foreground">
+                  Alert when you receive new messages
+                </p>
+              </div>
+              <input type="checkbox" className="toggle" defaultChecked />
+            </div>
+
+            <Separator />
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Billing Reminders</Label>
+                <p className="text-sm text-muted-foreground">
+                  Reminders for upcoming payments
+                </p>
+              </div>
+              <input type="checkbox" className="toggle" defaultChecked />
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <Button>Save Preferences</Button>
+          </div>
+        </CardContent>
+      </Card>
+    </>
   );
 
   function ProfileForm() {

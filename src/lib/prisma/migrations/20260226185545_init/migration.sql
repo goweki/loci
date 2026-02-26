@@ -11,7 +11,10 @@ CREATE TYPE "TemplateCategory" AS ENUM ('AUTHENTICATION', 'UTILITY', 'MARKETING'
 CREATE TYPE "TemplateApprovalStatus" AS ENUM ('APPROVED', 'PENDING', 'REJECTED', 'DISABLED');
 
 -- CreateEnum
-CREATE TYPE "VerificationChannel" AS ENUM ('EMAIL', 'WHATSAPP');
+CREATE TYPE "TokenType" AS ENUM ('SIGN_IN', 'RESET', 'ONBOARDING');
+
+-- CreateEnum
+CREATE TYPE "NotificationChannel" AS ENUM ('EMAIL', 'WHATSAPP', 'SMS');
 
 -- CreateEnum
 CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED', 'REVERSED');
@@ -76,6 +79,23 @@ CREATE TABLE "users" (
 );
 
 -- CreateTable
+CREATE TABLE "api_keys" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "keyHash" TEXT NOT NULL,
+    "description" TEXT,
+    "permissions" JSONB NOT NULL DEFAULT '{"read": true, "write": true}',
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "expires_at" TIMESTAMP(3) NOT NULL,
+    "last_used_at" TIMESTAMP(3),
+    "created_by_id" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "api_keys_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "waba_accounts" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -118,16 +138,17 @@ CREATE TABLE "user_sessions" (
 );
 
 -- CreateTable
-CREATE TABLE "verification_tokens" (
+CREATE TABLE "auth_tokens" (
     "id" TEXT NOT NULL,
-    "token" TEXT NOT NULL,
+    "type" "TokenType" NOT NULL,
+    "hashedToken" TEXT NOT NULL,
     "expires" TIMESTAMP(3) NOT NULL,
-    "channel" "VerificationChannel",
+    "channel" "NotificationChannel",
     "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "lastUsedAt" TIMESTAMP(3),
 
-    CONSTRAINT "verification_tokens_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "auth_tokens_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -383,6 +404,12 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE UNIQUE INDEX "users_tel_key" ON "users"("tel");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "api_keys_keyHash_key" ON "api_keys"("keyHash");
+
+-- CreateIndex
+CREATE INDEX "api_keys_created_by_id_idx" ON "api_keys"("created_by_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "waba_accounts_id_key" ON "waba_accounts"("id");
 
 -- CreateIndex
@@ -395,7 +422,16 @@ CREATE INDEX "waba_templates_status_idx" ON "waba_templates"("status");
 CREATE INDEX "waba_templates_category_idx" ON "waba_templates"("category");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "waba_templates_name_wabaId_key" ON "waba_templates"("name", "wabaId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "user_sessions_sessionToken_key" ON "user_sessions"("sessionToken");
+
+-- CreateIndex
+CREATE INDEX "auth_tokens_type_hashedToken_idx" ON "auth_tokens"("type", "hashedToken");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "auth_tokens_type_userId_key" ON "auth_tokens"("type", "userId");
 
 -- CreateIndex
 CREATE INDEX "subscriptions_userId_idx" ON "subscriptions"("userId");
@@ -440,6 +476,9 @@ CREATE INDEX "ContactUs_status_idx" ON "ContactUs"("status");
 CREATE INDEX "ContactUs_createdAt_idx" ON "ContactUs"("createdAt");
 
 -- AddForeignKey
+ALTER TABLE "api_keys" ADD CONSTRAINT "api_keys_created_by_id_fkey" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "waba_accounts" ADD CONSTRAINT "waba_accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -452,7 +491,7 @@ ALTER TABLE "waba_templates" ADD CONSTRAINT "waba_templates_createdById_fkey" FO
 ALTER TABLE "user_sessions" ADD CONSTRAINT "user_sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "verification_tokens" ADD CONSTRAINT "verification_tokens_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "auth_tokens" ADD CONSTRAINT "auth_tokens_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_planId_fkey" FOREIGN KEY ("planId") REFERENCES "plans"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

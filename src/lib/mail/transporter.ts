@@ -24,12 +24,15 @@ export class EmailService {
     const { to, subject, message, from } = options;
     const html = message.html;
 
-    return await this.resend.emails.send({
-      from: from ?? this.defaultFrom,
+    const resendOptions = {
+      from: from || this.defaultFrom,
       to,
       subject,
       html,
-    });
+    };
+    console.log("resend options:", resendOptions);
+
+    return this.resend.emails.send(resendOptions);
   }
 }
 

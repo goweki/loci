@@ -8,14 +8,7 @@
       "title": "Create Your Account",
       "subtitle": "Join us today and get started"
     },
-    "forgotPassword": {
-      "title": "Forgot Password?",
-      "subtitle": "Enter your email to receive a reset link",
-      "setPassword": {
-        "title": "New Password",
-        "subTitle": "Create a unique password"
-      }
-    },
+
     "resetPassword": {
       "title": "Reset Your Password",
       "subtitle": "Enter a new password below"

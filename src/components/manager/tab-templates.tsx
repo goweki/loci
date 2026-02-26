@@ -62,7 +62,7 @@ export default function TabTemplates() {
 
   useEffect(() => {
     fetchTemplates();
-  }, []);
+  }, [fetchTemplates]);
 
   return (
     <TabsContent value="templates" className="space-y-4">

@@ -1,5 +1,7 @@
 // lib/services/template-sync.service.ts
 
+import "server-only";
+
 import {
   WabaTemplateFilters,
   WabaTemplateRepository,
@@ -15,7 +17,7 @@ import {
   Prisma,
 } from "@/lib/prisma/generated";
 import type { WhatsAppClient } from "./client";
-import { getAdminUsers, getAllUsers } from "@/data/user";
+import { getAdminUsers } from "@/data/user";
 import {
   createWabaAccount,
   getAllWabaAccounts,
@@ -87,7 +89,7 @@ export class MetaSyncService {
 
         const updatedWaba = await updateWabaAccount(
           ownedWabaInDb.id,
-          appendedWaba
+          appendedWaba,
         );
         result.updated++;
 
@@ -97,7 +99,7 @@ export class MetaSyncService {
       result.errors.push(
         `Failed to update Waba Account ${ownedWabaInCloud.name}: ${
           error instanceof Error ? error.message : "Unknown error"
-        }`
+        }`,
       );
     }
     // // sync shared wabas
@@ -165,7 +167,7 @@ export class MetaSyncService {
             phoneNumber: display_phone_number,
             displayName: verified_name,
             wabaId,
-          })
+          }),
         );
 
       for (const phoneNo of appendedPhoneNumbers) {
@@ -178,7 +180,7 @@ export class MetaSyncService {
       result.errors.push(
         `Failed to update owned Phone numbers ${JSON.stringify(ownedWabaPhoneNumbersInCloud)}: ${
           error instanceof Error ? error.message : "Unknown error"
-        }`
+        }`,
       );
     }
 
@@ -202,7 +204,7 @@ export class MetaSyncService {
             category: category as TemplateCategory,
             language: language as TemplateLanguage,
             components,
-          })
+          }),
         );
         templatesCreationArray.push(...appendedTemplates);
       }
@@ -211,7 +213,7 @@ export class MetaSyncService {
     for (const template of templatesCreationArray) {
       try {
         const existingTemplate = await WabaTemplateRepository.findById(
-          template.id
+          template.id,
         );
         if (existingTemplate) {
           // Update existing template
@@ -233,7 +235,7 @@ export class MetaSyncService {
         }
       } catch (error) {
         result.errors.push(
-          `Failed to sync template ${template.name}: ${error instanceof Error ? error.message : "Unknown error"}`
+          `Failed to sync template ${template.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
         );
       }
     }
@@ -302,7 +304,7 @@ export class MetaSyncService {
 
     for (const localTemplate of localTemplates) {
       const metaTemplate = metaTemplates.find(
-        (t) => t.name === localTemplate.name
+        (t) => t.name === localTemplate.name,
       );
       if (metaTemplate) {
         if (localTemplate.status === metaTemplate.status) {

@@ -4,7 +4,7 @@ import { WabaTemplateRepository } from "@/data/repositories/waba-template";
 import { metaSyncService } from "@/lib/whatsapp";
 
 export async function createWabaTemplateAction(
-  data: Parameters<typeof WabaTemplateRepository.create>[0]
+  data: Parameters<typeof WabaTemplateRepository.create>[0],
 ) {
   return WabaTemplateRepository.create(data);
 }
@@ -14,14 +14,14 @@ export async function findWabaTemplateByIdAction(id: string) {
 }
 
 export async function findWabaTemplatesAction(
-  filters?: Parameters<typeof WabaTemplateRepository.findMany>[0]
+  filters?: Parameters<typeof WabaTemplateRepository.findMany>[0],
 ) {
   return WabaTemplateRepository.findMany(filters);
 }
 
 export async function updateWabaTemplateAction(
   id: string,
-  data: Parameters<typeof WabaTemplateRepository.update>[1]
+  data: Parameters<typeof WabaTemplateRepository.update>[1],
 ) {
   return WabaTemplateRepository.update(id, data);
 }

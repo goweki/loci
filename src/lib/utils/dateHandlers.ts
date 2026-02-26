@@ -31,6 +31,29 @@ export function dateLong(theDate: Date): string {
 }
 
 /**
+ * Formats a given date (defaults to now) into a compact string: "DD/MM/YY HH:mm"
+ * Example: 26/02/26 13:40
+ */
+export function datetimeStamp(theDate: Date = new Date()): string {
+  const formatter = new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(theDate);
+
+  // Simple helper to find parts and avoid repetition
+  const getPart = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((p) => p.type === type)?.value || "00";
+
+  return `${getPart("day")}/${getPart("month")}/${getPart("year")} ${getPart("hour")}:${getPart("minute")}`;
+}
+
+/**
  * Determines whether a given date has already passed (compared to current time).
  *
  * @param {Date} aDate - The date to check.

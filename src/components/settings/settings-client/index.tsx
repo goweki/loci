@@ -34,6 +34,7 @@ import TabProfile from "./tab-profile";
 import TabSubscription from "./subscription";
 import TabAutoreplyRules from "./tab-autoReply";
 import { strPascalCase } from "@/lib/utils/stringHandlers";
+import { TabSecurity } from "./tab-security";
 
 export default function SettingsClient({ user }: { user: UserGetPayload }) {
   const searchParams = useSearchParams();
@@ -78,10 +79,14 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
       </TabsList>
 
       {/* Profile Tab */}
-      <TabProfile user={user} />
+      <TabsContent value="profile" className="space-y-6">
+        <TabProfile user={user} />
+      </TabsContent>
 
       {/* WhatsApp Tab */}
-      <TabWhatsApp waba={user.waba} />
+      <TabsContent value="chatbots" className="space-y-6">
+        <TabWhatsApp waba={user.waba} />
+      </TabsContent>
 
       {/* Subscription Tab */}
       <TabsContent value="subscription" className="space-y-6">
@@ -89,124 +94,13 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
       </TabsContent>
 
       {/* AutoReply Tab */}
-      <TabAutoreplyRules />
-
-      {/* Notifications Tab */}
-      {/* <TabsContent value="notifications" className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Notification Preferences</CardTitle>
-            <CardDescription>
-              Configure how you receive notifications
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Email Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive notifications via email
-                  </p>
-                </div>
-                <input type="checkbox" className="toggle" defaultChecked />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>WhatsApp Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Get updates on WhatsApp
-                  </p>
-                </div>
-                <input type="checkbox" className="toggle" />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>New Message Alerts</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Alert when you receive new messages
-                  </p>
-                </div>
-                <input type="checkbox" className="toggle" defaultChecked />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Billing Reminders</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Reminders for upcoming payments
-                  </p>
-                </div>
-                <input type="checkbox" className="toggle" defaultChecked />
-              </div>
-            </div>
-
-            <div className="flex justify-end">
-              <Button>Save Preferences</Button>
-            </div>
-          </CardContent>
-        </Card>
-      </TabsContent> */}
+      <TabsContent value="auto-reply" className="space-y-4">
+        <TabAutoreplyRules />
+      </TabsContent>
 
       {/* Security Tab */}
       <TabsContent value="security" className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Security Settings</CardTitle>
-            <CardDescription>
-              Manage your password and security preferences
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="current-password">Current Password</Label>
-                <Input id="current-password" type="password" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
-                <Input id="new-password" type="password" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm New Password</Label>
-                <Input id="confirm-password" type="password" />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline">Cancel</Button>
-              <Button>Update Password</Button>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-4">
-              <h3 className="font-semibold">Two-Factor Authentication</h3>
-              <p className="text-sm text-muted-foreground">
-                Add an extra layer of security to your account
-              </p>
-              <Button variant="outline">Enable 2FA</Button>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-4">
-              <h3 className="font-semibold text-destructive">Danger Zone</h3>
-              <p className="text-sm text-muted-foreground">
-                Permanently delete your account and all associated data
-              </p>
-              <Button variant="destructive">Delete Account</Button>
-            </div>
-          </CardContent>
-        </Card>
+        <TabSecurity />
       </TabsContent>
     </Tabs>
   );

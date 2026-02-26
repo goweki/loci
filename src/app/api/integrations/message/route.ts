@@ -12,6 +12,7 @@ import { createMessage } from "@/data/message";
 import { MessageType } from "@/lib/prisma/generated";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
 import { SubscriptionStatusEnum } from "@/types";
+import z from "zod";
 
 const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
   try {
@@ -20,20 +21,22 @@ const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
 
     if (!parse.success) {
       return NextResponse.json(
-        { error: "Invalid request body", details: parse.error.format() },
+        { error: "Invalid request body", details: z.treeifyError(parse.error) },
         { status: 400 },
       );
     }
 
     const message = parse.data;
-    const user = apiKey.user;
+    const userId = apiKey.user.id;
+
+    console.log("New Message for sending...", message);
 
     // 1. Concurrent Security & Limit Checks
     const [subscription, limits] = await Promise.all([
-      getSubscriptionStatusByUserId(user.id),
-      checkMessageLimits(user.id),
+      getSubscriptionStatusByUserId(userId),
+      checkMessageLimits(userId),
       message.phoneNumberId
-        ? validatePhoneNumberOwnership(message.phoneNumberId, user.id)
+        ? validatePhoneNumberOwnership(message.phoneNumberId, userId)
         : Promise.resolve(),
     ]);
 
@@ -56,7 +59,7 @@ const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
     }
 
     // 3. Prepare Contact before external call (Ensures DB integrity)
-    const contact = await findOrCreateContact(user.id, message.to);
+    const contact = await findOrCreateContact(userId, message.to);
 
     // 4. Dispatch to Meta (External API)
     const waResponse = await whatsapp.sendMessage(message);
@@ -70,7 +73,7 @@ const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
     const metaMessageId = waResponse.messages?.[0]?.id;
 
     await createMessage({
-      userId: user.id,
+      userId: userId,
       contactId: contact.id,
       phoneNumberId:
         message.phoneNumberId || process.env.WHATSAPP_PHONE_NUMBER_ID || "",
@@ -87,7 +90,7 @@ const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
       messageId: metaMessageId,
     });
   } catch (error: any) {
-    console.error(`[WABA_DISPATCH_ERROR]: ${error.message}`);
+    console.error(`[WABA_DISPATCH_ERROR]:`, error);
 
     return NextResponse.json(
       { error: "Failed to dispatch WhatsApp message", details: error.message },

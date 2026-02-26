@@ -86,7 +86,7 @@ export default function PricingComponent({ t }: PricingProps) {
 
   useEffect(() => {
     fetchPlans();
-  }, []);
+  }, [fetchPlans]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE", {

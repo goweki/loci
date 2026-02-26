@@ -94,7 +94,11 @@ const templateMessageSchema = z.object({
   type: z.literal("template"),
   template: z.object({
     name: z.string(),
-    language: z.object({ code: z.string() }),
+    language: z
+      .object({
+        code: z.string().default("en_US"),
+      })
+      .default({ code: "en_US" }),
     components: z.array(z.any()).optional(),
   }),
 });

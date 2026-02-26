@@ -17,8 +17,9 @@ export async function countMessagesThisMonthByUserId(userId: string) {
 }
 
 export async function createMessage(
-  data: Prisma.MessageCreateInput | Prisma.MessageUncheckedCreateInput
+  data: Prisma.MessageCreateInput | Prisma.MessageUncheckedCreateInput,
 ) {
+  console.log("saving message:", data);
   return prisma.message.create({
     data,
     include: {

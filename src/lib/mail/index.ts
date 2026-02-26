@@ -12,11 +12,11 @@ export async function sendMail({
   text: string;
 }) {
   const mailOptions: SendMailOptions = {
-    from: process.env.MAIL_FROM || "no-reply@example.com",
+    from: process.env.RESEND_SYSTEM_SENDER || "no-reply@example.com",
     to,
     subject,
     message: { html, text },
   };
 
-  return await mailService.sendMail(mailOptions);
+  return mailService.sendMail(mailOptions);
 }

@@ -3,14 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import db from "@/lib/prisma";
-import whatsapp from "@/lib/whatsapp";
-import { getSubscriptionStatusByUserId } from "@/data/subscription";
-import { countMessagesThisMonthByUserId, createMessage } from "@/data/message";
-import { validatePhoneNumberOwnership } from "@/data/phoneNumber";
-import { MessageSchema } from "@/lib/validations";
-import { findOrCreateContact } from "@/data/contact";
-import { MessageType } from "@/lib/prisma/generated";
-import { checkMessageLimits } from "@/lib/usage/limits";
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { ApiKey } from "../prisma/generated";
 import { addToDate } from "../utils/dateHandlers";
+import { getUserById } from "@/data/user";
 
 export type ApiKeyAuth = {
   id: string;
@@ -17,8 +18,8 @@ export type ApiKeyValidationResult = ApiKeyAuth | NextResponse;
 /**
  * Generate secure API key string
  */
-export function generateApiKeyString() {
-  return "ak_" + crypto.randomBytes(32).toString("hex");
+function generateApiKeyString() {
+  return "loc_i_" + crypto.randomBytes(32).toString("hex");
 }
 
 /**
@@ -39,6 +40,11 @@ export async function createApiKey(options: {
   expiresAt?: Date;
   createdById: string;
 }) {
+  const user = await getUserById(options.createdById);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
   const rawKey = generateApiKeyString();
 
   const keyHash = hashApiKey(rawKey);
@@ -88,7 +94,7 @@ export async function validateApiKey(
   }
 
   if (!record.isActive) {
-    return NextResponse.json({ error: "API key inactive" }, { status: 401 });
+    return NextResponse.json({ error: "API key revoked" }, { status: 401 });
   }
 
   if (record.expiresAt && record.expiresAt < new Date()) {
