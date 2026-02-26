@@ -105,6 +105,7 @@ model WabaTemplate {
   createdAt DateTime? @default(now())
   updatedAt DateTime  @updatedAt
 
+  @@unique([name, wabaId])
   @@index([status])
   @@index([category])
   @@map("waba_templates")

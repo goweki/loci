@@ -29771,6 +29771,7 @@ export namespace Prisma {
 
   export type WabaTemplateWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    name_wabaId?: WabaTemplateNameWabaIdCompoundUniqueInput
     AND?: WabaTemplateWhereInput | WabaTemplateWhereInput[]
     OR?: WabaTemplateWhereInput[]
     NOT?: WabaTemplateWhereInput | WabaTemplateWhereInput[]
@@ -29786,7 +29787,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"WabaTemplate"> | Date | string
     waba?: XOR<WabaAccountScalarRelationFilter, WabaAccountWhereInput>
     createdBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-  }, "id">
+  }, "id" | "name_wabaId">
 
   export type WabaTemplateOrderByWithAggregationInput = {
     id?: SortOrder
@@ -29901,19 +29902,19 @@ export namespace Prisma {
 
   export type TokenWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    hashedToken?: string
     type_userId?: TokenTypeUserIdCompoundUniqueInput
     AND?: TokenWhereInput | TokenWhereInput[]
     OR?: TokenWhereInput[]
     NOT?: TokenWhereInput | TokenWhereInput[]
     type?: EnumTokenTypeFilter<"Token"> | $Enums.TokenType
+    hashedToken?: StringFilter<"Token"> | string
     expires?: DateTimeFilter<"Token"> | Date | string
     channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
     userId?: StringFilter<"Token"> | string
     createdAt?: DateTimeFilter<"Token"> | Date | string
     lastUsedAt?: DateTimeNullableFilter<"Token"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id" | "hashedToken" | "type_userId">
+  }, "id" | "type_userId">
 
   export type TokenOrderByWithAggregationInput = {
     id?: SortOrder
@@ -33716,6 +33717,11 @@ export namespace Prisma {
   export type WabaAccountScalarRelationFilter = {
     is?: WabaAccountWhereInput
     isNot?: WabaAccountWhereInput
+  }
+
+  export type WabaTemplateNameWabaIdCompoundUniqueInput = {
+    name: string
+    wabaId: string
   }
 
   export type WabaTemplateCountOrderByAggregateInput = {

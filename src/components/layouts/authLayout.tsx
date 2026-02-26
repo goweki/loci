@@ -60,12 +60,8 @@ export default async function AuthLayout({
             <div className="m-auto w-fit">
               <BrandSymbol height={24} />
             </div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Sign in to your account
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Choose how you&apos;d like to continue
-            </p>
+            <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
           </div>
           {children}
         </div>

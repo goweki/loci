@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@/lib/prisma/generated";
+import { PhoneNumber, Prisma } from "@/lib/prisma/generated";
 import { getUserById } from "./user";
 
 export type PhoneNumberGetPayload = Prisma.PhoneNumberGetPayload<{
@@ -15,7 +15,7 @@ export type PhoneNumberGetPayload = Prisma.PhoneNumberGetPayload<{
  * 🔍 Find a phone number by its ID.
  */
 export async function getPhoneNumberById(
-  id: string
+  id: string,
 ): Promise<PhoneNumberGetPayload | null> {
   return prisma.phoneNumber.findUnique({
     where: { id },
@@ -33,8 +33,8 @@ export async function getPhoneNumberById(
  */
 export async function validatePhoneNumberOwnership(
   phoneNumberId: string,
-  userId: string
-) {
+  userId: string,
+): Promise<PhoneNumber> {
   const wabaId = (await getUserById(userId))?.id;
   const phoneNumber = await prisma.phoneNumber.findFirst({
     where: {
@@ -64,7 +64,7 @@ export async function getPhoneNumberByNumber(phoneNumber: string) {
  * 📦 Get all phone numbers for a given user.
  */
 export async function getPhoneNumbersByUser(
-  userId: string
+  userId: string,
 ): Promise<
   Prisma.PhoneNumberGetPayload<{ include: { messages: true; waba: true } }>[]
 > {
@@ -93,7 +93,7 @@ export async function getAllPhoneNumbers(): Promise<
  * ➕ Create a new phone number record.
  */
 export async function createPhoneNumber(
-  data: Prisma.PhoneNumberCreateInput | Prisma.PhoneNumberUncheckedCreateInput
+  data: Prisma.PhoneNumberCreateInput | Prisma.PhoneNumberUncheckedCreateInput,
 ): Promise<Prisma.PhoneNumberGetPayload<{}>> {
   return prisma.phoneNumber.create({
     data,
@@ -105,7 +105,7 @@ export async function createPhoneNumber(
  */
 export async function updatePhoneNumber(
   id: string,
-  data: Prisma.PhoneNumberUpdateInput
+  data: Prisma.PhoneNumberUpdateInput,
 ) {
   return prisma.phoneNumber.update({
     where: { id },

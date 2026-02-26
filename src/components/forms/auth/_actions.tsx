@@ -1,6 +1,6 @@
 "use server";
 
-import { getUserByKey } from "@/data/user";
+import { getUserByKey, updateUserPassword, verifyToken } from "@/data/user";
 import { hashApiKey } from "@/lib/auth/api-key";
 import prisma from "@/lib/prisma";
 import { NotificationChannel, TokenType } from "@/lib/prisma/generated";
@@ -105,4 +105,30 @@ export async function verifyAndClearOtp({
     console.error("OTP Verification Error:", error);
     return false;
   }
+}
+
+interface SetPasswordProps {
+  username: string;
+  token: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export async function setNewPassword(
+  props: SetPasswordProps,
+): Promise<boolean> {
+  const { username, token, password, confirmPassword } = props;
+
+  const user = await getUserByKey(username);
+  if (!user) {
+    throw new Error(`User not found: ${username}`);
+  }
+
+  const tokenValidation = await verifyToken({ token, username });
+  if (!tokenValidation.verification) {
+    throw new Error(`Invalid token`);
+  }
+
+  const updatedUser_ = await updateUserPassword(user.id, { password });
+  return !!updatedUser_;
 }

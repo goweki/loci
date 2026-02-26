@@ -17,6 +17,7 @@ import {
   User,
   TemplateLanguage,
   TokenType,
+  NotificationChannel,
 } from "@/lib/prisma/generated";
 import { sendMail } from "@/lib/mail";
 import { welcomeEmail, resetPasswordEmail } from "@/lib/mail/email-render";
@@ -60,25 +61,38 @@ export async function createUser(
  */
 export async function registerUser(
   data: (Prisma.UserCreateInput | Prisma.UserUncheckedCreateInput) & {
-    verificationMethod?: "email" | "whatsapp" | "sms";
+    verificationMethod?: NotificationChannel;
   },
-): Promise<User & { verificationMethod: "email" | "whatsapp" | "sms" }> {
+): Promise<User & { verificationMethod: NotificationChannel }> {
   console.log("Registering user... ", data);
-  let tokenSentTo: "email" | "whatsapp" | "sms" | undefined = undefined;
-  const { verificationMethod, ...data_ } = data;
-  const { name, email, tel } = data;
-
-  const tokenObj = await generateResetToken();
-
-  const username = email || tel;
-  if (!username) {
-    throw new Error("Email or Phone No. is required");
-  }
-
-  const reseUrlTail = await buildResetUrlTail(tokenObj.plain, username);
-  const resetLink = `${BASE_URL}/${reseUrlTail}`;
+  let tokenSentTo: NotificationChannel | undefined = undefined;
+  const { verificationMethod, name, email, tel, ...data_ } = data;
 
   try {
+    if (!email && !tel) {
+      throw new Error("Email or Phone No. is required");
+    }
+
+    const notificationChannel: NotificationChannel = verificationMethod
+      ? verificationMethod
+      : email
+        ? NotificationChannel.EMAIL
+        : NotificationChannel.SMS;
+    let username: string;
+
+    if (notificationChannel === NotificationChannel.EMAIL) {
+      if (!email) throw new Error("No email provided");
+      username = email;
+    } else {
+      if (!tel) throw new Error("No phone number provided");
+      username = tel;
+    }
+
+    const tokenObj = await generateResetToken();
+
+    const reseUrlTail = await buildResetUrlTail(tokenObj.plain, username);
+    const resetLink = `${BASE_URL}/${reseUrlTail}`;
+
     const initUser = await db.user.create({
       data: {
         ...data_,
@@ -87,17 +101,17 @@ export async function registerUser(
       },
     });
 
-    if (email) {
+    if (notificationChannel === NotificationChannel.EMAIL) {
       const emailToSend = await welcomeEmail(name || "", resetLink);
       await sendMail({
-        to: email,
+        to: email!,
         subject: "Welcome to Loci",
         html: emailToSend.html,
         text: emailToSend.text,
       });
 
-      tokenSentTo = "email";
-    } else if (verificationMethod === "whatsapp" && tel) {
+      tokenSentTo = NotificationChannel.EMAIL;
+    } else if (verificationMethod === NotificationChannel.WHATSAPP && tel) {
       const message: Message = {
         messaging_product: "whatsapp",
         recipient_type: "INDIVIDUAL",
@@ -132,9 +146,9 @@ export async function registerUser(
       console.log("Sending waba message template:", message);
       await whatsapp.sendTemplate(message);
 
-      tokenSentTo = "whatsapp";
-    } else if (verificationMethod === "sms") {
-      tokenSentTo = "sms";
+      tokenSentTo = NotificationChannel.WHATSAPP;
+    } else if (verificationMethod === NotificationChannel.SMS) {
+      tokenSentTo = NotificationChannel.SMS;
     }
 
     if (!tokenSentTo) {
@@ -154,10 +168,10 @@ export async function registerUser(
  */
 export async function sendResetLink(data: {
   username: string;
-  sendTo?: "email" | "whatsapp" | "sms";
+  sendTo?: NotificationChannel;
 }): Promise<{
   username: string;
-  sentTo: "email" | "whatsapp" | "sms";
+  sentTo: NotificationChannel;
 }> {
   const { username, sendTo: verificationMethod } = data;
   console.log(`Generating ResetToken for: ${username}`);
@@ -182,7 +196,7 @@ export async function sendResetLink(data: {
     };
     await updateUserPassword(user_.id, userUpdates);
 
-    let sentTo_: "email" | "whatsapp" | "sms" | undefined = undefined;
+    let sentTo_: NotificationChannel | undefined = undefined;
 
     if (usernameAttribute === "email" && user_.email) {
       const emailToSend = await resetPasswordEmail(user_.name || "", resetLink);
@@ -193,8 +207,11 @@ export async function sendResetLink(data: {
         text: emailToSend.text,
       });
 
-      sentTo_ = "email";
-    } else if (verificationMethod === "whatsapp" && user_.tel) {
+      sentTo_ = NotificationChannel.EMAIL;
+    } else if (
+      verificationMethod === NotificationChannel.WHATSAPP &&
+      user_.tel
+    ) {
       const message: Message = {
         messaging_product: "whatsapp",
         recipient_type: "INDIVIDUAL",
@@ -227,15 +244,15 @@ export async function sendResetLink(data: {
       };
 
       await whatsapp.sendTemplate(message);
-      sentTo_ = "whatsapp";
-    } else if (verificationMethod === "sms" && user_.tel) {
+      sentTo_ = NotificationChannel.WHATSAPP;
+    } else if (verificationMethod === NotificationChannel.SMS && user_.tel) {
       const emailToSend = await resetPasswordEmail(user_.name || "", resetLink);
       const options_: SMSprops = {
         to: user_.tel,
         message: emailToSend.text,
       };
       await sendSms(options_);
-      sentTo_ = "sms";
+      sentTo_ = NotificationChannel.SMS;
     }
 
     if (!sentTo_) {
@@ -460,14 +477,18 @@ export async function updateUserPassword(
     resetToken?: string | null;
     resetTokenExpiry?: Date | null;
   },
-): Promise<Partial<User>> {
+): Promise<{ id: string; email: string | null; tel: string | null }> {
+  const update = passwordAttributes;
+
   if (passwordAttributes.password) {
-    passwordAttributes.password = await hash(passwordAttributes.password);
+    update.password = await hash(passwordAttributes.password);
+    update.resetToken = null;
+    update.resetToken = null;
   }
 
   return db.user.update({
     where: { id },
-    data: passwordAttributes,
+    data: update,
     select: { id: true, email: true, tel: true },
   });
 }

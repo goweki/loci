@@ -1,216 +1,241 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { Input, InputWithIcon } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import Loader from "@/components/ui/loaders";
-import { SideBanner } from "./_banner";
-import { useForm } from "react-hook-form";
-import z from "zod";
-import { setPasswordSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { updateUserPassword, verifyToken } from "@/data/user";
+import { useCallback, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useRouter, useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
+import { z } from "zod";
+import {
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Check,
+  ShieldCheck,
+  AlertCircle,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import AuthErrorHandler from "./_errorHandler";
+import Loader from "@/components/ui/loaders";
+import { Divider, IconInput } from "./_shared";
+import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
-import { Lock, User as UserIcon } from "lucide-react";
-import { type User } from "@/lib/prisma/generated";
-import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
+import { setPasswordSchema } from "@/lib/validations";
+import { verifyToken } from "@/data/user";
+import { setNewPassword } from "./_actions";
+import Link from "next/link";
 
 export default function SetPasswordForm({
-  error,
   token,
   username,
 }: {
-  error?: string;
-  token?: string;
-  username?: string;
+  token: string;
+  username: string;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { language } = useI18n();
-  const [loading, setLoading] = useState(false);
+
+  const [isValidating, setIsValidating] = useState(true);
+  const [isTokenValid, setIsTokenValid] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof setPasswordSchema>>({
     resolver: zodResolver(setPasswordSchema),
     defaultValues: {
-      username,
-      token,
+      username: searchParams.get("username") || "",
+      token: searchParams.get("token") || "",
       password: "",
       confirmPassword: "",
     },
   });
 
-  // onMount
+  // 00 - Initial Token Validation
   useEffect(() => {
-    (async () => {
-      if (!token || !username) {
-        const errorMessage = !token ? "no token provided" : "no email provided";
-        console.error("error mounting page - ", errorMessage);
-        toast.error(errorMessage);
-      } else {
-        const verif_ = await verifyToken({ token, username });
+    const checkToken = async () => {
+      if (!username || !token) {
+        setIsTokenValid(false);
+        setIsValidating(false);
+        return;
+      }
 
-        if (!verif_.verification) {
-          toast.error(verif_.message);
-          router.push(`/${language}/reset-password`);
-          return;
+      try {
+        const isValid = await verifyToken({ username, token });
+        setIsTokenValid(isValid.verification);
+      } catch {
+        setIsTokenValid(false);
+      } finally {
+        setIsValidating(false);
+      }
+    };
+
+    checkToken();
+  }, [searchParams]);
+
+  // 2. Form Submission
+  const onSubmit = useCallback(
+    async (values: z.infer<typeof setPasswordSchema>) => {
+      setIsUpdating(true);
+      try {
+        const res_ = await setNewPassword(values);
+        if (res_) {
+          toast.success("Password updated successfully");
+          setTimeout(() => router.push(`/${language}/sign-in`), 1500);
+        } else {
+          throw new Error("Failed to update password");
         }
-        console.log(verif_.message);
-        toast.success("Set New password");
+      } catch (error: any) {
+        toast.error(error.message);
+        setIsUpdating(false);
       }
-    })();
-  }, [token, username, router]);
+    },
+    [router, language],
+  );
 
-  // if error
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
-  }, [error]);
-
-  async function onSubmit(values: z.infer<typeof setPasswordSchema>) {
-    const { username, token, password } = values;
-
-    setLoading(true);
-    try {
-      const { verification, user, message } = await verifyToken({
-        token,
-        username,
-      });
-      if (!verification || !user) {
-        toast.error(message);
-        setLoading(false);
-        return;
-      }
-
-      console.log(`Request to update password for user - ${user}`);
-
-      const userUpdates_ = {
-        password,
-        resetToken: null,
-        resetTokenExpiry: null,
-      };
-      const updateUser = updateUserPassword(user.id, userUpdates_);
-
-      if (!updateUser) {
-        toast.error("Error updating password. Try again later");
-        setLoading(false);
-        return;
-      }
-
-      toast.success("Password updated");
-      router.push(`/sign-in`);
-    } catch (error) {
-      let errorMessage = "Error updating password";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      toast.error(errorMessage);
-    }
+  // Loading State
+  if (isValidating) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 space-y-4">
+        <Loader />
+        <p className="text-sm text-muted-foreground animate-pulse">
+          Validating security token...
+        </p>
+      </div>
+    );
   }
 
-  return username && token ? (
-    <Form {...form}>
-      <AuthErrorHandler />
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="sm:w-2/3 w-full px-4 space-y-4 lg:px-0 mx-auto my-4 mt-8"
-      >
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <InputWithIcon
-                  icon={UserIcon}
-                  className="placeholder:italic placeholder:opacity-50"
-                  placeholder="Your Username"
-                  disabled
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => {
-            return (
-              <FormItem>
-                <FormControl>
-                  <InputWithIcon
-                    icon={Lock}
-                    type="password"
-                    placeholder="Your New Password"
-                    className="pr-10 placeholder:italic placeholder:opacity-50"
-                    {...field}
-                  />
-                </FormControl>
+  // Invalid Token State
+  if (!isTokenValid) {
+    return (
+      <div className="text-center space-y-4 py-6">
+        <div className="mx-auto w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
+          <AlertCircle className="h-6 w-6 text-destructive" />
+        </div>
+        <h2 className="text-xl font-bold">Invalid or Expired Link</h2>
+        <p className="text-sm text-muted-foreground">
+          This password reset link is no longer valid. Please request a new one.
+        </p>
+        <Button asChild variant="outline" className="w-full">
+          <Link href={`/${language}/forgot-password`}>Go Back</Link>
+        </Button>
+      </div>
+    );
+  }
 
+  return (
+    <>
+      <div className="space-y-2 text-center mb-6">
+        <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+          <ShieldCheck className="h-6 w-6 text-primary" />
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight">Set New Password</h1>
+        <p className="text-sm text-muted-foreground">
+          Create a strong password for your account.
+        </p>
+      </div>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* Read-Only Username */}
+          <div className="flex flex-row items-center gap-3 px-1 py-2 rounded-lg bg-muted/30 border border-dashed border-border/60">
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground w-16 shrink-0 ml-2">
+              Account
+            </span>
+            <span className="text-xs font-mono font-medium truncate">
+              {form.getValues("username")}
+            </span>
+          </div>
+
+          <Divider label="Security Details" />
+
+          {/* New Password */}
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center gap-3 space-y-0">
+                <FormLabel className="text-[11px] uppercase tracking-widest text-muted-foreground w-16 shrink-0">
+                  New
+                </FormLabel>
+                <div className="flex-1">
+                  <FormControl>
+                    <IconInput
+                      icon={Lock}
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      suffix={
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-full w-10 text-muted-foreground"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      }
+                      {...field}
+                    />
+                  </FormControl>
+                </div>
                 <FormMessage />
               </FormItem>
-            );
-          }}
-        />
-        <FormField
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => {
-            return (
-              <FormItem>
-                <FormControl>
-                  <InputWithIcon
-                    icon={Lock}
-                    type="password"
-                    placeholder="Confirm New Password"
-                    className="pr-10 placeholder:italic placeholder:opacity-50"
-                    {...field}
-                  />
-                </FormControl>
+            )}
+          />
 
+          {/* Confirm Password */}
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center gap-3 space-y-0">
+                <FormLabel className="text-[11px] uppercase tracking-widest text-muted-foreground w-16 shrink-0">
+                  Confirm
+                </FormLabel>
+                <div className="flex-1">
+                  <FormControl>
+                    <IconInput
+                      icon={Lock}
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      {...field}
+                    />
+                  </FormControl>
+                </div>
                 <FormMessage />
               </FormItem>
-            );
-          }}
-        />
+            )}
+          />
 
-        <div className="px-4 pb-2 pt-4">
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? (
-              <div className="animate-pulse flex flex-row gap-x-4">
-                <Loader />
-                Loading...
-              </div>
+          <Button
+            type="submit"
+            className="w-full gap-2 mt-4"
+            disabled={isUpdating}
+          >
+            {isUpdating ? (
+              <Loader />
             ) : (
-              "Set New Password"
+              <>
+                Update Password <ArrowRight className="h-4 w-4" />
+              </>
             )}
           </Button>
-        </div>
-        <hr className="my-6 border-t" />
-        <div className="text-center grid grid-cols-1 gap-y-1 text-xs italic">
-          <Link href="/reset-password" className="hover:underline">
-            Forgot Password? Reset
-          </Link>
-          <Link href="/sign-in" className="hover:underline">
-            Already have an account? Login
-          </Link>
-        </div>
-        <div className="p-4 text-center right-0 left-0 flex justify-center space-x-4 mt-16 lg:hidden ">
-          <SideBanner />
-        </div>
-      </form>
-    </Form>
-  ) : null;
+        </form>
+      </Form>
+    </>
+  );
 }

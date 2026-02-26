@@ -9,6 +9,7 @@ import { addToDate } from "../utils/dateHandlers";
 export type ApiKeyAuth = {
   id: string;
   permissions: any;
+  user: { id: string };
 };
 
 export type ApiKeyValidationResult = ApiKeyAuth | NextResponse;
@@ -79,6 +80,7 @@ export async function validateApiKey(
     where: {
       keyHash,
     },
+    include: { createdBy: { select: { id: true } } },
   });
 
   if (!record) {
@@ -106,6 +108,7 @@ export async function validateApiKey(
   return {
     id: record.id,
     permissions: record.permissions,
+    user: record.createdBy,
   };
 }
 
@@ -150,7 +153,7 @@ export function extractApiKey(req: Request): string {
 
 export type AuthenticatedHandler = (
   request: NextRequest,
-  auth: Pick<ApiKey, "id" | "permissions">,
+  apiKey: { id: string; permissions: string[]; user: { id: string } },
 ) => Promise<Response | NextResponse> | Response | NextResponse;
 
 export function apiKeyMiddleware(handler: AuthenticatedHandler) {

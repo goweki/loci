@@ -48,7 +48,7 @@ export default function SettingsClient({ user }: { user: UserGetPayload }) {
 
   const tabs: { tabName: string; icon: React.ReactNode }[] = [
     { tabName: "profile", icon: <UserIcon className="w-4 h-4" /> },
-    { tabName: "whatsapp", icon: <WhatsAppLogo className="h-4 w-4" /> },
+    { tabName: "chatbots", icon: <WhatsAppLogo className="h-4 w-4" /> },
     { tabName: "subscription", icon: <CreditCard className="w-4 h-4" /> },
     { tabName: "auto-reply", icon: <MessageSquareIcon className="w-4 h-4" /> },
     { tabName: "security", icon: <Shield className="w-4 h-4" /> },

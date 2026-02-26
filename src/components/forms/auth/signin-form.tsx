@@ -46,6 +46,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import OtpSigninForm from "./otp-request-form";
+import { Divider, IconInput } from "./_shared";
+import { useI18n } from "@/lib/i18n";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -55,20 +57,6 @@ interface MethodTab {
   value: LoginMethod;
   label: string;
   Icon: LucideIcon;
-}
-
-// ─── Divider ──────────────────────────────────────────────────────────────────
-
-function Divider({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="h-px flex-1 bg-border" />
-      <span className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-        {label}
-      </span>
-      <div className="h-px flex-1 bg-border" />
-    </div>
-  );
 }
 
 // ─── Method Tabs ──────────────────────────────────────────────────────────────
@@ -97,32 +85,6 @@ function MethodTabs({ active, onChange }: MethodTabsProps) {
           {label}
         </Button>
       ))}
-    </div>
-  );
-}
-
-// ─── Icon Input ───────────────────────────────────────────────────────────────
-
-interface IconInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  icon: LucideIcon;
-  suffix?: React.ReactNode;
-}
-
-function IconInput({
-  icon: Icon,
-  suffix,
-  className,
-  ...props
-}: IconInputProps) {
-  return (
-    <div className="relative flex items-center">
-      <Icon className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
-      <Input className={cn("pl-9", suffix && "pr-10", className)} {...props} />
-      {suffix && (
-        <div className="absolute right-0 flex h-full items-center">
-          {suffix}
-        </div>
-      )}
     </div>
   );
 }
@@ -189,6 +151,7 @@ export function SignInForm() {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { language } = useI18n();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -393,13 +356,13 @@ export function SignInForm() {
       {/* Footer links */}
       <div className="flex items-center justify-between text-xs">
         <Link
-          href="/reset-password"
+          href={`/${language}/reset-password`}
           className="text-muted-foreground transition-colors hover:text-foreground"
         >
           Forgot password?
         </Link>
         <Link
-          href="/sign-up"
+          href={`/${language}/sign-up`}
           className="font-bold text-muted-foreground transition-colors hover:text-foreground"
         >
           Create account →

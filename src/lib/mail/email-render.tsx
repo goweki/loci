@@ -31,10 +31,10 @@ async function renderEmailHtml(component: React.ReactElement): Promise<string> {
 
 export const welcomeEmail = async (
   name: string,
-  onboardLink: string
+  onboardLink: string,
 ): Promise<{ html: string; text: string }> => {
   const emailHtml = await renderEmailHtml(
-    <WelcomeEmail name={name} onboardLink={onboardLink} />
+    <WelcomeEmail name={name} onboardLink={onboardLink} />,
   );
   const emailText = welcomeEmailText({ name, onboardLink });
 
@@ -43,10 +43,10 @@ export const welcomeEmail = async (
 
 export const resetPasswordEmail = async (
   name: string,
-  resetPasswordLink: string
+  resetPasswordLink: string,
 ) => {
   const emailHtml = await renderEmailHtml(
-    <ResetPasswordHtml name={name} resetPasswordLink={resetPasswordLink} />
+    <ResetPasswordHtml name={name} resetPasswordLink={resetPasswordLink} />,
   );
   const emailText = resetPasswordText({
     name,
@@ -58,10 +58,10 @@ export const resetPasswordEmail = async (
 
 export const messageConfirmationEmail = async (
   name: string,
-  message: string
+  message: string,
 ) => {
   const emailHtml = await renderEmailHtml(
-    <ConfirmEmail name={name} message={message} />
+    <ConfirmEmail name={name} message={message} />,
   );
   const emailText = confirmEmailText({ name, message });
 
