@@ -35,8 +35,7 @@ import { forgotPasswordSchema } from "@/lib/validations";
 import { NotificationChannel } from "@/lib/prisma/generated";
 import { sendResetLink } from "@/data/user";
 import { removePlus } from "@/lib/utils/telHandlers";
-
-type RecoveryMethod = "email" | "phone";
+import { _sendResetLink } from "./_actions";
 
 export function ForgotPasswordForm() {
   const router = useRouter();
@@ -77,16 +76,14 @@ export function ForgotPasswordForm() {
 
         console.log("Requesting reset for:", values);
 
-        const result = await sendResetLink({
+        const res = await _sendResetLink({
           username: values.email || removePlus(values.phoneNumber),
           sendTo: values.notificationChannel,
         });
 
-        if (!result) {
-          throw new Error("Error sending reset link");
+        if (!res.success || !res.sentTo) {
+          throw new Error("Failed to send link");
         }
-
-        const sentTo = result.sentTo;
 
         const messages: Record<string, string> = {
           email: `Password reset link sent to ${values.notificationChannel}`,
@@ -94,7 +91,7 @@ export function ForgotPasswordForm() {
           sms: `Your reset link will be sent via sms shortly.`,
         };
 
-        const message = messages[sentTo];
+        const message = messages[res.sentTo];
         toast.success(message);
         router.push(`/${language}/`);
 
@@ -106,7 +103,7 @@ export function ForgotPasswordForm() {
         setLoading(false);
       }
     },
-    [],
+    [language],
   );
 
   return (

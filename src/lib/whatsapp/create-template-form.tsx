@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Plus, Trash2, Send } from "lucide-react";
 
 type ComponentType = "HEADER" | "BODY" | "FOOTER" | "BUTTONS";
@@ -67,12 +67,12 @@ export default function TemplateBuilder() {
   const updateComponent = (
     index: number,
     field: keyof TemplateComponent,
-    value: string | HeaderFormat
+    value: string | HeaderFormat,
   ) => {
     setTemplate((prev) => ({
       ...prev,
       components: prev.components.map((comp, i) =>
-        i === index ? { ...comp, [field]: value } : comp
+        i === index ? { ...comp, [field]: value } : comp,
       ),
     }));
   };
@@ -89,7 +89,7 @@ export default function TemplateBuilder() {
                 { type: "QUICK_REPLY", text: "" },
               ],
             }
-          : comp
+          : comp,
       ),
     }));
   };
@@ -98,7 +98,7 @@ export default function TemplateBuilder() {
     componentIndex: number,
     buttonIndex: number,
     field: keyof Button,
-    value: string | ButtonType
+    value: string | ButtonType,
   ) => {
     setTemplate((prev) => ({
       ...prev,
@@ -107,10 +107,10 @@ export default function TemplateBuilder() {
           ? {
               ...comp,
               buttons: comp.buttons?.map((btn, j) =>
-                j === buttonIndex ? { ...btn, [field]: value } : btn
+                j === buttonIndex ? { ...btn, [field]: value } : btn,
               ),
             }
-          : comp
+          : comp,
       ),
     }));
   };
@@ -137,7 +137,7 @@ export default function TemplateBuilder() {
     }
   };
 
-  const generatePreview = () => {
+  const generatePreview = useCallback(() => {
     let text = "";
     template.components.forEach((comp) => {
       if (comp.type === "HEADER" && comp.format === "TEXT") {
@@ -153,11 +153,11 @@ export default function TemplateBuilder() {
       }
     });
     setPreview(text);
-  };
+  }, []);
 
   React.useEffect(() => {
     generatePreview();
-  }, [template]);
+  }, [template, generatePreview]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -300,7 +300,7 @@ export default function TemplateBuilder() {
                               updateComponent(
                                 index,
                                 "format",
-                                e.target.value as HeaderFormat
+                                e.target.value as HeaderFormat,
                               )
                             }
                             className="w-full px-2 py-1 text-sm border rounded mb-2"
@@ -365,7 +365,7 @@ export default function TemplateBuilder() {
                                     index,
                                     btnIndex,
                                     "type",
-                                    e.target.value as ButtonType
+                                    e.target.value as ButtonType,
                                   )
                                 }
                                 className="px-2 py-1 text-xs border rounded"
@@ -382,7 +382,7 @@ export default function TemplateBuilder() {
                                     index,
                                     btnIndex,
                                     "text",
-                                    e.target.value
+                                    e.target.value,
                                   )
                                 }
                                 placeholder="Button text"
@@ -398,7 +398,7 @@ export default function TemplateBuilder() {
                                       index,
                                       btnIndex,
                                       "url",
-                                      e.target.value
+                                      e.target.value,
                                     )
                                   }
                                   placeholder="https://..."
@@ -414,7 +414,7 @@ export default function TemplateBuilder() {
                                       index,
                                       btnIndex,
                                       "phone_number",
-                                      e.target.value
+                                      e.target.value,
                                     )
                                   }
                                   placeholder="+1234567890"

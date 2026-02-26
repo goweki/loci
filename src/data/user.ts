@@ -6,7 +6,7 @@
  * ============================================================
  */
 
-"use server";
+import "server-only";
 
 import db from "@/lib/prisma";
 import { buildResetUrlTail, generateResetToken } from "@/lib/utils/resetToken";
@@ -27,7 +27,6 @@ import sendSms, { SMSprops } from "@/lib/sms";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import whatsapp from "@/lib/whatsapp";
 import { Message } from "@/lib/validations";
-import { hashApiKey } from "@/lib/auth/api-key";
 
 export type UserGetPayload = Prisma.UserGetPayload<{
   include: {

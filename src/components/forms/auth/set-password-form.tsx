@@ -30,8 +30,8 @@ import { Divider, IconInput } from "./_shared";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import { setPasswordSchema } from "@/lib/validations";
-import { verifyToken } from "@/data/user";
-import { setNewPassword } from "./_actions";
+// import { verifyToken } from "@/data/user";
+import { _verifyToken, setNewPassword } from "./_actions";
 import Link from "next/link";
 
 export default function SetPasswordForm({
@@ -70,7 +70,7 @@ export default function SetPasswordForm({
       }
 
       try {
-        const isValid = await verifyToken({ username, token });
+        const isValid = await _verifyToken({ username, token });
         setIsTokenValid(isValid.verification);
       } catch {
         setIsTokenValid(false);

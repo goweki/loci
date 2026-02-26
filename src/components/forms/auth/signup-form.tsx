@@ -35,6 +35,7 @@ import { cn } from "@/lib/utils";
 import { registerUser } from "@/data/user";
 import { removePlus } from "@/lib/utils/telHandlers";
 import { useI18n } from "@/lib/i18n";
+import { signUpUser } from "./_actions";
 
 // Mocking the enum if not imported
 enum NotificationChannel {
@@ -84,21 +85,16 @@ export function SignUpForm() {
           return toast.error("Phone Number ERROR");
         }
 
-        const signupRes = await registerUser({
+        const signupRes = await signUpUser({
           name,
           email: verificationMethod === "EMAIL" ? email : undefined,
           tel: phoneNumber ? removePlus(phoneNumber) : undefined,
           verificationMethod,
         });
 
-        if (signupRes.verificationMethod === NotificationChannel.EMAIL) {
-          toast.success(`Verification link sent to Email: ${email}`);
-        } else if (
-          signupRes.verificationMethod === NotificationChannel.WHATSAPP
-        ) {
-          toast.success(`Verification link sent to WhatsApp: ${phoneNumber}`);
-        } else if (signupRes.verificationMethod === NotificationChannel.SMS) {
-          toast.success(`Verification link sent by sms: ${phoneNumber}`);
+        if (!signupRes.success) {
+          toast.error(signupRes.message);
+          return;
         }
 
         setDone(true);

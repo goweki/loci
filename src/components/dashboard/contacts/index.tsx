@@ -39,7 +39,7 @@ interface Props {
 
 export default function ContactsComponent({ wabaAccount, contacts }: Props) {
   const [activeTab, setActiveTab] = useState<"phone-numbers" | "contacts">(
-    "phone-numbers"
+    "phone-numbers",
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumberGetPayload[]>([]);
@@ -71,7 +71,7 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
     };
 
     fetchPhoneNos();
-  }, [wabaAccount?.phoneNumbers]);
+  }, [phoneNumbers, wabaAccount?.phoneNumbers]);
 
   const stats = [
     {
@@ -157,7 +157,7 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
   const filteredContacts = contacts.filter(
     (c) =>
       c.phoneNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      c.name?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const formatDate = (dateString: string | null) => {
@@ -330,7 +330,7 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
                                         onClick={() =>
                                           handleCopyId(
                                             phone.waba.userId ?? undefined,
-                                            "waba"
+                                            "waba",
                                           )
                                         }
                                         className="p-1.5 hover:bg-accent rounded transition-colors flex-shrink-0"
@@ -449,7 +449,7 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
                     href={`/${language}/settings?tab=whatsapp`}
                     className={cn(
                       buttonVariants({ variant: "secondary" }),
-                      "my-4"
+                      "my-4",
                     )}
                   >
                     Connect to Meta
@@ -524,7 +524,7 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
                                 Last message{" "}
                                 {formatDate(
                                   contact.lastMessageAt?.toLocaleDateString() ||
-                                    null
+                                    null,
                                 )}
                               </span>
                             </div>

@@ -28,9 +28,9 @@ import Loader from "@/components/ui/loaders";
 import { cn } from "@/lib/utils";
 import { NotificationChannel } from "@/lib/prisma/generated";
 import { WhatsAppLogo } from "@/components/ui/svg";
-import { getUserByKey } from "@/data/user";
+
 import { removePlus } from "@/lib/utils/telHandlers";
-import { sendOtp } from "./_actions";
+import { _getUserByKey, sendOtp } from "./_actions";
 import { InputOTP } from "./_input-otp";
 import { signIn } from "next-auth/react";
 import { ERROR_MESSAGES } from "./_errorHandler";
@@ -134,7 +134,7 @@ export function OtpSigninForm({ phoneNumber }: Props) {
     setLoading(true);
 
     try {
-      const user = await getUserByKey(removePlus(phoneNumber));
+      const user = await _getUserByKey(removePlus(phoneNumber));
 
       if (!user) {
         toast.error("User not found. Verify contact provided.");
@@ -184,7 +184,7 @@ export function OtpSigninForm({ phoneNumber }: Props) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [otpVal, phoneNumber]);
 
   const onSubmit = useCallback(async () => {
     if (step === 1) {

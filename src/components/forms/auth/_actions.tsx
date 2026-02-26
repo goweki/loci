@@ -1,11 +1,19 @@
 "use server";
 
-import { getUserByKey, updateUserPassword, verifyToken } from "@/data/user";
+import {
+  getUserById,
+  getUserByKey,
+  registerUser,
+  sendResetLink,
+  updateUserPassword,
+  verifyToken,
+} from "@/data/user";
 import { hashApiKey } from "@/lib/auth/api-key";
 import prisma from "@/lib/prisma";
 import { NotificationChannel, TokenType } from "@/lib/prisma/generated";
 import sendSms from "@/lib/sms";
 import { addToDate } from "@/lib/utils/dateHandlers";
+import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import { generateRandom } from "@/lib/utils/passwordHandlers";
 import { removePlus } from "@/lib/utils/telHandlers";
 import whatsapp from "@/lib/whatsapp";
@@ -131,4 +139,66 @@ export async function setNewPassword(
 
   const updatedUser_ = await updateUserPassword(user.id, { password });
   return !!updatedUser_;
+}
+
+interface SignUpProps {
+  name: string;
+  email?: string;
+  tel?: string;
+  verificationMethod: NotificationChannel;
+}
+
+export async function signUpUser(
+  props: SignUpProps,
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const signupRes = await registerUser(props);
+
+    if (signupRes.verificationMethod === NotificationChannel.EMAIL) {
+      const message = `Verification link sent to Email: ${props.email}`;
+      return { success: true, message };
+    } else if (signupRes.verificationMethod === NotificationChannel.WHATSAPP) {
+      const message = `Verification link sent to WhatsApp: ${props.tel}`;
+      return { success: true, message };
+    } else if (signupRes.verificationMethod === NotificationChannel.SMS) {
+      const message = `Verification link sent by sms: ${props.tel}`;
+      return { success: true, message };
+    }
+    return { success: false, message: "Unknown error" };
+  } catch (error) {
+    const errMessage = getFriendlyErrorMessage(error);
+    return { success: false, message: errMessage };
+  }
+}
+
+interface SendResetLinkProps {
+  username: string;
+  sendTo: NotificationChannel;
+}
+export async function _sendResetLink(
+  props: SendResetLinkProps,
+): Promise<{ success: boolean; sentTo?: NotificationChannel }> {
+  try {
+    const result = await sendResetLink({
+      username: props.username,
+      sendTo: props.sendTo,
+    });
+
+    if (result) {
+      return { success: false, sentTo: result.sentTo };
+    }
+    throw new Error("Error sending reset link");
+  } catch (error) {
+    console.log("ERROR: ", error);
+    return { success: false };
+  }
+}
+
+export async function _verifyToken(props: { username: string; token: string }) {
+  const { username, token } = props;
+  return verifyToken({ username, token });
+}
+
+export async function _getUserByKey(userId: string) {
+  return getUserByKey(userId);
 }

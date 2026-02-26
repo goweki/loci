@@ -9,13 +9,13 @@ import {
 } from "../ui/card";
 import { TabsContent } from "../ui/tabs";
 import { useCallback, useEffect, useState } from "react";
-import { synchronizeMeta } from "./actions";
+import { _getUserById, synchronizeMeta } from "./actions";
 import Loader from "../ui/loaders";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Alert, AlertDescription } from "../ui/alert";
 import { useSession } from "next-auth/react";
-import { getUserById, UserGetPayload } from "@/data/user";
+import { type UserGetPayload } from "@/data/user";
 
 export default function TabSettings() {
   const [user, setUser] = useState<UserGetPayload>();
@@ -27,7 +27,7 @@ export default function TabSettings() {
     if (!session?.user) return;
 
     console.log(`Fetching user: id-${session.user.id}`);
-    const _user = await getUserById(session.user.id);
+    const _user = await _getUserById(session.user.id);
     if (_user) setUser(_user);
   }, []);
 

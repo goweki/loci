@@ -1,6 +1,7 @@
 "use server";
 
 import { WabaTemplateRepository } from "@/data/repositories/waba-template";
+import { getUserById } from "@/data/user";
 import { metaSyncService } from "@/lib/whatsapp";
 
 export async function createWabaTemplateAction(
@@ -37,4 +38,8 @@ export async function getWabaTemplateStatsAction(userId: string) {
 export async function synchronizeMeta() {
   const results = await metaSyncService.syncFromMeta();
   console.log("Meta assets synchronized:", results);
+}
+
+export async function _getUserById(userId: string) {
+  return getUserById(userId);
 }
