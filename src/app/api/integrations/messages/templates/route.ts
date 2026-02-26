@@ -1,91 +1,97 @@
 import { NextRequest, NextResponse } from "next/server";
-
-// Assuming these types/utils exist in your project
-// import { validateTemplatePayload } from "@/lib/validators/waba";
-// import { Message } from "@/lib/validations";
 import whatsapp from "@/lib/whatsapp";
 import { MessageSchema } from "@/lib/validations";
-import { ApiKeyAuth, apiKeyMiddleware } from "@/lib/auth/api-key";
+import {
+  apiKeyMiddleware,
+  type AuthenticatedHandler,
+} from "@/lib/auth/api-key";
 import { validatePhoneNumberOwnership } from "@/data/phoneNumber";
 import { checkMessageLimits } from "@/lib/usage/limits";
 import { findOrCreateContact } from "@/data/contact";
 import { createMessage } from "@/data/message";
 import { MessageType } from "@/lib/prisma/generated";
+import { getSubscriptionStatusByUserId } from "@/data/subscription";
+import { SubscriptionStatusEnum } from "@/types";
 
-export type AuthenticatedHandler = (
-  request: NextRequest,
-  apiKey: ApiKeyAuth,
-) => Promise<Response | NextResponse> | Response | NextResponse;
-
-/**
- * Handler for sending WABA templates via the Loci API
- */
 const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
   try {
     const rawBody = await request.json();
+    const parse = MessageSchema.safeParse(rawBody);
 
-    // Validate the payload
-    const body = MessageSchema.safeParse(rawBody);
-    if (!body.success) {
-      console.error("Error parsing incoming request body:", body);
+    if (!parse.success) {
       return NextResponse.json(
-        {
-          error: "Invalid request body",
-        },
+        { error: "Invalid request body", details: parse.error.format() },
         { status: 400 },
       );
     }
-    const message = body.data;
-    const { phoneNumberId, to } = message;
+
+    const message = parse.data;
     const user = apiKey.user;
 
-    if (phoneNumberId) {
-      await validatePhoneNumberOwnership(phoneNumberId, user.id);
-    }
+    // 1. Concurrent Security & Limit Checks
+    const [subscription, limits] = await Promise.all([
+      getSubscriptionStatusByUserId(user.id),
+      checkMessageLimits(user.id),
+      message.phoneNumberId
+        ? validatePhoneNumberOwnership(message.phoneNumberId, user.id)
+        : Promise.resolve(),
+    ]);
 
-    const limitCheck = await checkMessageLimits(user.id);
-    if (!limitCheck.allowed) {
-      const response_ =
-        limitCheck.allowed ||
-        NextResponse.json(
-          {
-            error: "API Usage may have exceeded limit",
-          },
+    // 2. Authorization Logic
+    if (subscription.status !== SubscriptionStatusEnum.ACTIVE) {
+      // Logic: Only allow Templates for non-active users (if that is your intent)
+      if (message.type.toUpperCase() !== MessageType.TEMPLATE) {
+        return NextResponse.json(
+          { error: "Active subscription required for non-template messages" },
           { status: 403 },
         );
-      return response_; // Returns the 402 or 403 response directly
+      }
     }
 
+    if (!limits.allowed) {
+      return NextResponse.json(
+        { error: "Usage limit exceeded or billing issue" },
+        { status: 403 },
+      );
+    }
+
+    // 3. Prepare Contact before external call (Ensures DB integrity)
+    const contact = await findOrCreateContact(user.id, message.to);
+
+    // 4. Dispatch to Meta (External API)
     const waResponse = await whatsapp.sendMessage(message);
 
     if ("error" in waResponse) {
-      throw new Error(`Error sending whatsapp message: ${waResponse.error}`);
-    } else {
-      console.log(`SENT whatsapp message:`, waResponse);
+      throw new Error(`Meta API Error: ${JSON.stringify(waResponse.error)}`);
     }
 
-    const contact = await findOrCreateContact(user.id, to);
+    // 5. Async Log to Database (Don't block response if not strictly necessary)
+    // We get the ID from messages[0].id in the standard WABA response
+    const metaMessageId = waResponse.messages?.[0]?.id;
 
     await createMessage({
       userId: user.id,
       contactId: contact.id,
       phoneNumberId:
-        phoneNumberId || process.env.WHATSAPP_PHONE_NUMBER_ID || "",
-      waMessageId: waResponse.messaging_product,
+        message.phoneNumberId || process.env.WHATSAPP_PHONE_NUMBER_ID || "",
+      waMessageId: metaMessageId,
       type: message.type.toUpperCase() as MessageType,
-      content: waResponse.messages,
+      content: message, // Usually better to store what you SENT rather than Meta's confirmation
       direction: "OUTBOUND",
       status: "SENT",
       timestamp: new Date(),
     });
 
-    return NextResponse.json({ data: message });
+    return NextResponse.json({
+      success: true,
+      messageId: metaMessageId,
+    });
   } catch (error: any) {
-    console.error(`ERROR - Failed sending WabaTemplate: ${error.message}`);
+    console.error(`[WABA_DISPATCH_ERROR]: ${error.message}`);
 
     return NextResponse.json(
       { error: "Failed to dispatch WhatsApp message", details: error.message },
-      { status: 502 }, // Bad Gateway (Meta was down or rejected the request)
+      { status: error.status || 502 },
     );
   }
 };
