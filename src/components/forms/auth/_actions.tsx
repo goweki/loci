@@ -177,7 +177,7 @@ interface SendResetLinkProps {
 }
 export async function _sendResetLink(
   props: SendResetLinkProps,
-): Promise<{ success: boolean; sentTo?: NotificationChannel }> {
+): Promise<{ sentTo?: NotificationChannel; error?: string }> {
   try {
     const result = await sendResetLink({
       username: props.username,
@@ -185,12 +185,13 @@ export async function _sendResetLink(
     });
 
     if (result) {
-      return { success: false, sentTo: result.sentTo };
+      return { sentTo: result.sentTo };
     }
     throw new Error("Error sending reset link");
   } catch (error) {
     console.log("ERROR: ", error);
-    return { success: false };
+    const errorMessage = getFriendlyErrorMessage(error);
+    return { error: errorMessage };
   }
 }
 

@@ -81,8 +81,8 @@ export function ForgotPasswordForm() {
           sendTo: values.notificationChannel,
         });
 
-        if (!res.success || !res.sentTo) {
-          throw new Error("Failed to send link");
+        if (!res.error || !res.sentTo) {
+          throw new Error(res.error || "Unknown error");
         }
 
         const messages: Record<string, string> = {
