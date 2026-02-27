@@ -98,7 +98,7 @@ export function ForgotPasswordForm() {
         router.push(`/${language}/`);
 
         setDone(true);
-        toast.success(`Reset link sent via ${values.notificationChannel}`);
+        // toast.success(`Reset link sent via ${values.notificationChannel}`);
       } catch (error: any) {
         toast.error(error.message || "Failed to request reset");
       } finally {
