@@ -133,109 +133,97 @@ export default function SetPasswordForm({
   }
 
   return (
-    <>
-      <div className="space-y-2 text-center mb-6">
-        <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-          <ShieldCheck className="h-6 w-6 text-primary" />
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {/* Read-Only Username */}
+        <div className="flex flex-row items-center gap-3 px-1 py-2 rounded-lg bg-muted/30 border border-dashed border-border/60">
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground w-16 shrink-0 ml-2">
+            Account
+          </span>
+          <span className="text-xs font-mono font-medium truncate">
+            {form.getValues("username")}
+          </span>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight">Set New Password</h1>
-        <p className="text-sm text-muted-foreground">
-          Create a strong password for your account.
-        </p>
-      </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {/* Read-Only Username */}
-          <div className="flex flex-row items-center gap-3 px-1 py-2 rounded-lg bg-muted/30 border border-dashed border-border/60">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground w-16 shrink-0 ml-2">
-              Account
-            </span>
-            <span className="text-xs font-mono font-medium truncate">
-              {form.getValues("username")}
-            </span>
-          </div>
+        <Divider label="Security Details" />
 
-          <Divider label="Security Details" />
+        {/* New Password */}
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center gap-3 space-y-0">
+              <FormLabel className="text-[11px] uppercase tracking-widest text-muted-foreground w-16 shrink-0">
+                New
+              </FormLabel>
+              <div className="flex-1">
+                <FormControl>
+                  <IconInput
+                    icon={Lock}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    suffix={
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-full w-10 text-muted-foreground"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    }
+                    {...field}
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          {/* New Password */}
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center gap-3 space-y-0">
-                <FormLabel className="text-[11px] uppercase tracking-widest text-muted-foreground w-16 shrink-0">
-                  New
-                </FormLabel>
-                <div className="flex-1">
-                  <FormControl>
-                    <IconInput
-                      icon={Lock}
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      suffix={
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-full w-10 text-muted-foreground"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </Button>
-                      }
-                      {...field}
-                    />
-                  </FormControl>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        {/* Confirm Password */}
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center gap-3 space-y-0">
+              <FormLabel className="text-[11px] uppercase tracking-widest text-muted-foreground w-16 shrink-0">
+                Confirm
+              </FormLabel>
+              <div className="flex-1">
+                <FormControl>
+                  <IconInput
+                    icon={Lock}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    {...field}
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          {/* Confirm Password */}
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center gap-3 space-y-0">
-                <FormLabel className="text-[11px] uppercase tracking-widest text-muted-foreground w-16 shrink-0">
-                  Confirm
-                </FormLabel>
-                <div className="flex-1">
-                  <FormControl>
-                    <IconInput
-                      icon={Lock}
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      {...field}
-                    />
-                  </FormControl>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Button
-            type="submit"
-            className="w-full gap-2 mt-4"
-            disabled={isUpdating}
-          >
-            {isUpdating ? (
-              <Loader />
-            ) : (
-              <>
-                Update Password <ArrowRight className="h-4 w-4" />
-              </>
-            )}
-          </Button>
-        </form>
-      </Form>
-    </>
+        <Button
+          type="submit"
+          className="w-full gap-2 mt-4"
+          disabled={isUpdating}
+        >
+          {isUpdating ? (
+            <Loader />
+          ) : (
+            <>
+              Update Password <ArrowRight className="h-4 w-4" />
+            </>
+          )}
+        </Button>
+      </form>
+    </Form>
   );
 }
