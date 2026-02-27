@@ -9,13 +9,17 @@ interface ErrorHandlerOptions {
 
 export function getFriendlyErrorMessage(
   error: unknown,
-  options: ErrorHandlerOptions = {}
+  options: ErrorHandlerOptions = {},
 ): string {
   const { isDev = false, logErrors = true } = options;
 
   // Log the original error for debugging (in development or if explicitly enabled)
   if (logErrors && (isDev || process.env.NODE_ENV === "development")) {
     console.error("ERROR:", error);
+  }
+
+  if (error instanceof Error) {
+    return error.message;
   }
 
   // Handle Prisma "known" errors
@@ -237,7 +241,7 @@ export function handlePrismaError(error: unknown): never {
 
 // Type guard helper
 export function isPrismaError(
-  error: unknown
+  error: unknown,
 ): error is Prisma.PrismaClientKnownRequestError {
   return error instanceof Prisma.PrismaClientKnownRequestError;
 }
