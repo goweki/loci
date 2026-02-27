@@ -3,7 +3,9 @@ import type { NextRequest } from "next/server";
 
 const LAUNCH_DATE = new Date("2026-04-01T00:00:00Z");
 const DEFAULT_LOCALE = "en";
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const IS_PRODUCTION: boolean =
+  process.env.NODE_ENV === "production" ||
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
