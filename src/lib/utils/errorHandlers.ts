@@ -18,10 +18,6 @@ export function getFriendlyErrorMessage(
     console.error("ERROR:", error);
   }
 
-  if (error instanceof Error) {
-    return error.message;
-  }
-
   // Handle Prisma "known" errors
   if (
     !!Prisma.PrismaClientKnownRequestError &&
@@ -211,20 +207,18 @@ export function getFriendlyErrorMessage(
   // Generic JavaScript/TypeScript errors
   if (error instanceof Error) {
     if (isDev) {
-      return `Application error: ${error.message}`;
+      return `${error.message}`;
     }
     // In production, be more careful about exposing error details
     return error.message.includes("ECONNREFUSED") ||
       error.message.includes("ETIMEDOUT")
       ? "Database connection failed. Please try again later."
-      : "An unexpected error occurred. Please try again later.";
+      : `${error.message}`;
   }
 
   // Handle string errors or other unknown error types
   if (typeof error === "string") {
-    return isDev
-      ? `String error: ${error}`
-      : "An unexpected error occurred. Please try again later.";
+    return isDev ? `ERROR [string]: ${error}` : error;
   }
 
   // Last resort fallback
