@@ -83,7 +83,7 @@ export function ForgotPasswordForm() {
 
         console.log("reset response:", res);
 
-        if (!res.error || !res.sentTo) {
+        if (res.error || !res.sentTo) {
           throw new Error(res.error || "Unknown error");
         }
 
