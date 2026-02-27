@@ -4,7 +4,6 @@ import type { NextRequest } from "next/server";
 const LAUNCH_DATE = new Date("2026-04-01T00:00:00Z");
 const DEFAULT_LOCALE = "en";
 const IS_PRODUCTION: boolean =
-  process.env.NODE_ENV === "production" ||
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
 
 export function middleware(request: NextRequest) {
@@ -15,10 +14,6 @@ export function middleware(request: NextRequest) {
   if (pathname === "/") {
     return NextResponse.redirect(new URL(`/${DEFAULT_LOCALE}`, request.url));
   }
-
-  console.log("NEXT_PUBLIC_VERCEL_ENV: " + process.env.NEXT_PUBLIC_VERCEL_ENV);
-  console.log("NODE_ENV: " + process.env.NODE_ENV);
-  console.log("IS_PRODUCTION: " + IS_PRODUCTION);
 
   // 2. Production-only "Coming Soon" Rewrite
   if (IS_PRODUCTION && now < LAUNCH_DATE) {
