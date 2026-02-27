@@ -12,11 +12,12 @@ export default async function Landing({
   if (!isValidLanguage(lang)) return null;
   const dict = await getDictionary(lang);
 
+  const launchDate = new Date("2026-04-01T00:00:00");
+
   return (
     <main>
       <Hero />
-      <HowBlocks />
-      {/* <ComingSoon /> */}
+      {true ? <HowBlocks /> : <ComingSoon />}
     </main>
   );
 }

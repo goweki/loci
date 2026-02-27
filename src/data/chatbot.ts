@@ -11,7 +11,7 @@ import { ChatbotConfig, Prisma } from "@/lib/prisma/generated";
 export async function createChatbotConfig(
   data:
     | Prisma.ChatbotConfigCreateInput
-    | Prisma.ChatbotConfigUncheckedCreateInput
+    | Prisma.ChatbotConfigUncheckedCreateInput,
 ) {
   return await prisma.chatbotConfig.create({
     data,
@@ -38,7 +38,7 @@ export async function getChatbotConfig(phoneNumberId: string) {
  */
 export async function updateChatbotConfig(
   phoneNumberId: string,
-  data: Partial<ChatbotConfig>
+  data: Partial<ChatbotConfig>,
 ) {
   return await prisma.chatbotConfig.update({
     where: { phoneNumberId },
@@ -60,7 +60,7 @@ export async function deleteChatbotConfig(phoneNumberId: string) {
  */
 export async function toggleChatbotStatus(
   phoneNumberId: string,
-  isActive: boolean
+  isActive: boolean,
 ) {
   return await prisma.chatbotConfig.update({
     where: { phoneNumberId },
@@ -75,7 +75,7 @@ export async function toggleChatbotStatus(
  */
 export async function getOrCreateConversation(
   chatbotConfigId: string,
-  contactId: string
+  contactId: string,
 ) {
   // Try to find existing active conversation
   let conversation = await prisma.chatbotConversation.findUnique({
@@ -145,7 +145,7 @@ export async function updateConversation(
     messageCount?: number;
     isActive?: boolean;
     handedOffToHuman?: boolean;
-  }
+  },
 ) {
   return await prisma.chatbotConversation.update({
     where: { id: conversationId },
@@ -162,7 +162,7 @@ export async function updateConversation(
 export async function getConversationHistory(
   contactId: string,
   phoneNumberId: string,
-  limit: number = 10
+  limit: number = 10,
 ) {
   return await prisma.message.findMany({
     where: {
@@ -282,7 +282,7 @@ export async function updatePromptTemplate(
     content?: string;
     category?: string;
     isPublic?: boolean;
-  }
+  },
 ) {
   return await prisma.promptTemplate.update({
     where: { id },
@@ -321,11 +321,11 @@ export async function searchPromptTemplates(userId: string, category?: string) {
  */
 export function shouldHandoffToHuman(
   message: string,
-  keywords: string[]
+  keywords: string[],
 ): boolean {
   const lowerMessage = message.toLowerCase();
   return keywords.some((keyword) =>
-    lowerMessage.includes(keyword.toLowerCase())
+    lowerMessage.includes(keyword.toLowerCase()),
   );
 }
 
@@ -335,12 +335,12 @@ export function shouldHandoffToHuman(
 export async function buildConversationContext(
   contactId: string,
   phoneNumberId: string,
-  conversationHistory: number
+  conversationHistory: number,
 ) {
   const messages = await getConversationHistory(
     contactId,
     phoneNumberId,
-    conversationHistory
+    conversationHistory,
   );
 
   // Reverse to get chronological order
@@ -359,7 +359,7 @@ export async function buildConversationContext(
  */
 export function formatSystemPrompt(
   systemPrompt: string,
-  variables: Record<string, string>
+  variables: Record<string, string>,
 ): string {
   let formatted = systemPrompt;
 
@@ -383,11 +383,11 @@ export async function getChatbotStats(chatbotConfigId: string) {
   const totalConversations = conversations.length;
   const activeConversations = conversations.filter((c) => c.isActive).length;
   const handedOffConversations = conversations.filter(
-    (c) => c.handedOffToHuman
+    (c) => c.handedOffToHuman,
   ).length;
   const totalMessages = conversations.reduce(
     (sum, c) => sum + c.messageCount,
-    0
+    0,
   );
 
   return {
@@ -404,7 +404,7 @@ export async function getChatbotStats(chatbotConfigId: string) {
   };
 }
 
-export default {
+const defaultExport = {
   createChatbotConfig,
   getChatbotConfig,
   updateChatbotConfig,
@@ -427,3 +427,5 @@ export default {
   formatSystemPrompt,
   getChatbotStats,
 };
+
+export default defaultExport;

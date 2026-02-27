@@ -19,7 +19,7 @@ export default function ComingSoon() {
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const targetDate = new Date("2026-03-01T00:00:00").getTime();
+      const targetDate = new Date("2026-04-01T00:00:00").getTime();
       const now = new Date().getTime();
       const difference = targetDate - now;
 
@@ -27,7 +27,7 @@ export default function ComingSoon() {
         setTimeLeft({
           days: Math.floor(difference / (1000 * 60 * 60 * 24)),
           hours: Math.floor(
-            (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+            (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
           ),
           minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
           seconds: Math.floor((difference % (1000 * 60)) / 1000),
