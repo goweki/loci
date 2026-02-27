@@ -74,7 +74,7 @@ export function ForgotPasswordForm() {
           throw new Error("Phone number value missing");
         }
 
-        console.log("Requesting reset for:", values);
+        // console.log("Requesting reset for:", values);
 
         const res = await _sendResetLink({
           username: values.email || removePlus(values.phoneNumber),
