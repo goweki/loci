@@ -16,6 +16,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${DEFAULT_LOCALE}`, request.url));
   }
 
+  console.log("NODE_ENV: " + process.env.NODE_ENV);
+  console.log("NEXT_PUBLIC_VERCEL_ENV: " + process.env.NEXT_PUBLIC_VERCEL_ENV);
+
   // 2. Production-only "Coming Soon" Rewrite
   if (IS_PRODUCTION && now < LAUNCH_DATE) {
     const isApiOrStatic =
