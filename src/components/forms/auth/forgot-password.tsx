@@ -88,17 +88,16 @@ export function ForgotPasswordForm() {
         }
 
         const messages: Record<string, string> = {
-          email: `Password reset link sent to ${values.notificationChannel}`,
-          whatsapp: `Password reset link sent to ${values.notificationChannel}`,
-          sms: `Your reset link will be sent via sms shortly.`,
+          EMAIL: `Password reset link sent to ${values.notificationChannel}`,
+          WHATSAPP: `Password reset link sent to ${values.notificationChannel}`,
+          SMS: `Your reset link will be sent via sms shortly.`,
         };
 
         const message = messages[res.sentTo];
         toast.success(message);
-        router.push(`/${language}/`);
-
         setDone(true);
-        // toast.success(`Reset link sent via ${values.notificationChannel}`);
+
+        router.push(`/${language}/`);
       } catch (error: any) {
         toast.error(error.message || "Failed to request reset");
       } finally {
