@@ -190,7 +190,7 @@ export async function _sendResetLink(
     throw new Error("Error sending reset link");
   } catch (error) {
     const errorMessage = getFriendlyErrorMessage(error);
-    console.log("Error-Message: ", errorMessage);
+    // console.log("Error-Message: ", errorMessage);
     return { error: errorMessage };
   }
 }

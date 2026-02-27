@@ -181,7 +181,7 @@ export async function sendResetLink(data: {
 
   const user_ = await getUserByKey(username);
   if (!user_) {
-    throw new Error(`User not found - ${username}`);
+    throw new Error(`User not found`);
   }
 
   const usernameAttribute = user_.email === username ? "email" : "tel";
