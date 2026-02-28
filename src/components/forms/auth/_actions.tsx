@@ -119,26 +119,25 @@ interface SetPasswordProps {
   username: string;
   token: string;
   password: string;
-  confirmPassword: string;
 }
 
 export async function setNewPassword(
   props: SetPasswordProps,
-): Promise<boolean> {
-  const { username, token, password, confirmPassword } = props;
+): Promise<{ success?: string; error?: string }> {
+  const { username, token, password } = props;
 
   const user = await getUserByKey(username);
   if (!user) {
-    throw new Error(`User not found: ${username}`);
+    return { error: "User not found" };
   }
 
   const tokenValidation = await verifyToken({ token, username });
   if (!tokenValidation.verification) {
-    throw new Error(`Invalid token`);
+    return { error: "Invalid token" };
   }
 
   const updatedUser_ = await updateUserPassword(user.id, { password });
-  return !!updatedUser_;
+  return { success: `Password updated` };
 }
 
 interface SignUpProps {

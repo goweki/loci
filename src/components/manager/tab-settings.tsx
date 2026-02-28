@@ -29,7 +29,7 @@ export default function TabSettings() {
     console.log(`Fetching user: id-${session.user.id}`);
     const _user = await _getUserById(session.user.id);
     if (_user) setUser(_user);
-  }, []);
+  }, [session?.user]);
 
   const syncWithMeta = useCallback(async () => {
     await synchronizeMeta();
@@ -41,7 +41,7 @@ export default function TabSettings() {
   useEffect(() => {
     console.log(`Fetching User...`);
     getUser();
-  }, []);
+  }, [getUser]);
 
   return (
     <TabsContent value="settings" className="space-y-4">

@@ -24,7 +24,7 @@ export default function TabPhoneNumbers() {
   // load templates and phone numbers
   useEffect(() => {
     fetchPhoneNumbers();
-  }, []);
+  }, [fetchPhoneNumbers]);
 
   return (
     <TabsContent value="phone-numbers" className="space-y-4">

@@ -107,7 +107,7 @@ export function SignUpForm() {
         setLoading(false);
       }
     },
-    [router],
+    [router, language],
   );
 
   return (

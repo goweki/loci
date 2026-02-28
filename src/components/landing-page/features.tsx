@@ -1,5 +1,6 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 interface TransitionProps {
   show: boolean;
@@ -60,7 +61,7 @@ export default function Features() {
   const [tab, setTab] = useState(1);
   const tabs = useRef<HTMLDivElement | null>(null);
 
-  const heightFix = () => {
+  const heightFix = useCallback(() => {
     if (
       tabs.current &&
       tabs.current.children &&
@@ -69,11 +70,11 @@ export default function Features() {
       const child = tabs.current.children[tab - 1] as HTMLElement;
       tabs.current.style.height = child.offsetHeight + "px";
     }
-  };
+  }, [tab]);
 
   useEffect(() => {
     heightFix();
-  }, [tab]);
+  }, [tab, heightFix]);
 
   const tabData = [
     {
@@ -223,7 +224,7 @@ export default function Features() {
                       id={`tabpanel-${item.id}`}
                       aria-labelledby={`tab-${item.id}`}
                     >
-                      <img
+                      <Image
                         className="md:max-w-none mx-auto rounded"
                         src={item.image}
                         width="500"

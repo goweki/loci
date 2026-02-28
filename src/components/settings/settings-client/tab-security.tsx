@@ -50,7 +50,7 @@ export function TabSecurity() {
     if (session?.user) {
       fetchApiKeys();
     }
-  }, [session?.user]);
+  }, [session?.user, fetchApiKeys]);
 
   return (
     <>

@@ -35,7 +35,7 @@ export default function TabAutoreplyRules() {
   // load templates and phone numbers
   useEffect(() => {
     fetchPhoneNumbers();
-  }, []);
+  }, [fetchPhoneNumbers]);
 
   return (
     <TabsContent value="auto-reply" className="space-y-4">

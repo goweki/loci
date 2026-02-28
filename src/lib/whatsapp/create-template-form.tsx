@@ -153,7 +153,7 @@ export default function TemplateBuilder() {
       }
     });
     setPreview(text);
-  }, []);
+  }, [template.components]);
 
   React.useEffect(() => {
     generatePreview();

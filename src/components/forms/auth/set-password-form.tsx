@@ -80,7 +80,7 @@ export default function SetPasswordForm({
     };
 
     checkToken();
-  }, [searchParams]);
+  }, [searchParams, token, username]);
 
   // 2. Form Submission
   const onSubmit = useCallback(
@@ -88,12 +88,12 @@ export default function SetPasswordForm({
       setIsUpdating(true);
       try {
         const res_ = await setNewPassword(values);
-        if (res_) {
-          toast.success("Password updated successfully");
-          setTimeout(() => router.push(`/${language}/sign-in`), 1500);
-        } else {
-          throw new Error("Failed to update password");
+        if (res_.success) {
+          toast.success(res_.success);
+          return router.push(`/${language}/sign-in`);
         }
+
+        toast.error(res_.error || "Failed to update password");
       } catch (error: any) {
         toast.error(error.message);
         setIsUpdating(false);

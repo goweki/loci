@@ -102,7 +102,7 @@ export function I18nProvider({
       localStorage.setItem(LS_KEY, defaultLng);
       router.replace(`/${defaultLng}${pathname}`);
     }
-  }, [_lang]);
+  }, [_lang, pathname, router]);
 
   // toggles language & updates both state and localStorage
   const setLanguage = (newLang: Language) => {

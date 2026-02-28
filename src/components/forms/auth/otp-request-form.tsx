@@ -156,7 +156,7 @@ export function OtpSigninForm({ phoneNumber }: Props) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [otpChannel, phoneNumber]);
 
   const verifyOtpAndSignin = useCallback(async () => {
     setLoading(true);

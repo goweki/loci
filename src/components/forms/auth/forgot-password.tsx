@@ -104,7 +104,7 @@ export function ForgotPasswordForm() {
         setLoading(false);
       }
     },
-    [language],
+    [language, router],
   );
 
   return (
@@ -256,20 +256,20 @@ export function ForgotPasswordForm() {
               </>
             ) : (
               <>
-                Recover Account <ArrowRight className="h-4 w-4" />
+                Send Recovery Link <ArrowRight className="h-4 w-4" />
               </>
             )}
           </Button>
         </form>
       </Form>
 
-      <div className="mt-6 text-center">
+      {/* Footer links */}
+      <div className="flex justify-end text-sm">
         <Link
           href={`/${language}/sign-in`}
-          className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+          className="font-bold text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ChevronLeft className="h-3 w-3" />
-          Back to sign in
+          Back to sign in →
         </Link>
       </div>
     </>
