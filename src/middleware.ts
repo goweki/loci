@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { Language } from "./lib/i18n";
 
-const LAUNCH_DATE = new Date("2026-04-01");
+const LAUNCH_DATE = new Date("2026-02-01");
 const DEFAULT_LOCALE = "en";
 const IS_PRODUCTION: boolean =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
@@ -15,8 +16,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${DEFAULT_LOCALE}`, request.url));
   }
 
-  console.log(`IS_PRODUCTION: ${IS_PRODUCTION}`);
-  console.log(`now < LAUNCH_DATE: ${now < LAUNCH_DATE}`);
+  // console.log(`IS_PRODUCTION: ${IS_PRODUCTION}`);
+  // console.log(`now < LAUNCH_DATE: ${now < LAUNCH_DATE}`);
 
   // 2. Production-only "Coming Soon" Rewrite
   if (IS_PRODUCTION && now < LAUNCH_DATE) {
@@ -27,7 +28,7 @@ export function middleware(request: NextRequest) {
 
     if (!isApiOrStatic) {
       const url = request.nextUrl.clone();
-      const locale = pathname.split("/")[1] || DEFAULT_LOCALE;
+      const locale = (pathname.split("/")[1] as Language) || DEFAULT_LOCALE;
 
       // Internally route to the coming-soon page
       url.pathname = `/${locale}/coming-soon`;
