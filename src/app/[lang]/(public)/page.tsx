@@ -17,7 +17,7 @@ export default async function Landing({
   return (
     <main>
       <Hero />
-      {true ? <HowBlocks /> : <ComingSoon />}
+      <HowBlocks />
     </main>
   );
 }
