@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const LAUNCH_DATE = new Date("2026-04-01T00:00:00Z");
+const LAUNCH_DATE = new Date("2026-02-01T00:00:00Z");
 const DEFAULT_LOCALE = "en";
 const IS_PRODUCTION: boolean =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
