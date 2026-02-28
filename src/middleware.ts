@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Language } from "./lib/i18n";
 
-const LAUNCH_DATE = new Date("2026-02-01");
+const LAUNCH_DATE = new Date("2026-04-01");
 const DEFAULT_LOCALE = "en";
 const IS_PRODUCTION: boolean =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
