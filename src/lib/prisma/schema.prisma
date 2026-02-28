@@ -1,0 +1,564 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id               String     @id @default(cuid())
+  name             String?
+  email            String?    @unique
+  emailVerified    DateTime?
+  tel              String?    @unique
+  telVerified      DateTime?
+  image            String?
+  password         String?
+  role             UserRole   @default(USER)
+  status           UserStatus @default(ACTIVE)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  resetToken       String?
+  resetTokenExpiry DateTime?
+
+  waba WabaAccount?
+
+  accounts        Account[]
+  contacts        Contact[]
+  messages        Message[]
+  subscriptions   Subscription[]
+  sessions        Session[]
+  apiKeys         ApiKey[]
+  tokens          Token[]
+  autoreplyRules  AutoReplyRule[]
+  wabaTemplates   WabaTemplate[]
+  promptTemplates PromptTemplate[]
+
+  @@map("users")
+}
+
+model ApiKey {
+  id          String  @id @default(uuid())
+  name        String
+  keyHash     String  @unique
+  description String?
+
+  permissions Json @default("{\"read\": true, \"write\": true}")
+
+  isActive   Boolean   @default(true) @map("is_active")
+  expiresAt  DateTime  @map("expires_at")
+  lastUsedAt DateTime? @map("last_used_at")
+
+  createdById String @map("created_by_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  createdBy User @relation(fields: [createdById], references: [id])
+
+  @@index([createdById])
+  @@map("api_keys")
+}
+
+enum WabaOwnership {
+  OWNED
+  SHARED
+}
+
+model WabaAccount {
+  id        String        @id @unique
+  name      String
+  userId    String?       @unique
+  user      User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ownership WabaOwnership
+
+  currency                 String?
+  timezoneId               String?
+  messageTemplateNamespace String?
+
+  phoneNumbers PhoneNumber[]
+  templates    WabaTemplate[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("waba_accounts")
+}
+
+model WabaTemplate {
+  id             String                 @id @default(cuid())
+  name           String
+  status         TemplateApprovalStatus
+  category       TemplateCategory
+  language       TemplateLanguage       @default(en_US)
+  components     Json
+  rejectedReason String?
+
+  wabaId String
+  waba   WabaAccount @relation(fields: [wabaId], references: [id], onDelete: Cascade)
+
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([name, wabaId])
+  @@index([status])
+  @@index([category])
+  @@map("waba_templates")
+}
+
+enum TemplateLanguage {
+  en_US
+  en_GB
+  fr_FR
+  sw_KE
+}
+
+enum TemplateCategory {
+  AUTHENTICATION
+  UTILITY
+  MARKETING
+}
+
+enum TemplateApprovalStatus {
+  APPROVED
+  PENDING
+  REJECTED
+  DISABLED
+}
+
+// 
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+enum TokenType {
+  SIGN_IN
+  RESET
+  ONBOARDING
+}
+
+model Token {
+  id          String               @id @default(cuid())
+  type        TokenType
+  hashedToken String
+  expires     DateTime
+  channel     NotificationChannel?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+
+  @@unique([type, userId])
+  @@index([type, hashedToken])
+  @@map("auth_tokens")
+}
+
+enum NotificationChannel {
+  EMAIL
+  WHATSAPP
+  SMS
+}
+
+model Subscription {
+  id         String    @id @default(cuid())
+  userId     String
+  planId     PlanName
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  cancelDate DateTime?
+  startDate  DateTime?
+
+  payment Payment?
+  plan    Plan     @relation(fields: [planId], references: [id])
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("subscriptions")
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  reference     String        @unique
+  paymentMethod PaymentMethod @default(ONLINE)
+  amount        Int
+  currency      Currency      @default(KSH)
+  status        PaymentStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  subscriptionId String       @unique
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REVERSED
+}
+
+enum Currency {
+  KSH
+  US
+}
+
+model Plan {
+  id                  PlanName     @id
+  name                PlanName     @unique
+  description         String?
+  price               Int
+  popular             Boolean      @default(false)
+  interval            PlanInterval
+  maxPhoneNumbers     Int
+  maxMessagesPerMonth Int
+  active              Boolean      @default(true)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  features      PlanFeature[]
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model Feature {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  description String
+  useMetric   String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  plans       PlanFeature[]
+
+  @@map("features")
+}
+
+model PlanFeature {
+  planId      PlanName
+  featureId   String
+  enabled     Boolean  @default(true)
+  limitUse    Int?
+  configValue String?
+  createdAt   DateTime @default(now())
+  feature     Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  plan        Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@id([planId, featureId])
+  @@map("plan_features")
+}
+
+model PhoneNumber {
+  id                  String  @id @default(cuid())
+  phoneNumber         String  @unique
+  displayName         String?
+  preVerificationId   String?
+  preVerificationCode String?
+
+  status     PhoneNumberStatus @default(NOT_CLAIMED)
+  verifiedAt DateTime?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  messages       Message[]
+  autoReplyRules AutoReplyRule[]
+
+  wabaId String
+  waba   WabaAccount @relation(fields: [wabaId], references: [id], onDelete: Restrict)
+
+  chatbotConfig ChatbotConfig?
+
+  @@map("phone_numbers")
+}
+
+model Contact {
+  id            String    @id @default(cuid())
+  phoneNumber   String
+  name          String?
+  avatar        String?
+  lastMessageAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  messages             Message[]
+  chatbotConversations ChatbotConversation[]
+
+  @@unique([userId, phoneNumber])
+  @@map("contacts")
+}
+
+model Message {
+  id            String           @id @default(cuid())
+  userId        String
+  contactId     String
+  phoneNumberId String
+  waMessageId   String?
+  type          MessageType      @default(TEXT)
+  content       Json
+  direction     MessageDirection
+  status        MessageStatus    @default(SENT)
+  timestamp     DateTime
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  contact       Contact          @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  phoneNumber   PhoneNumber      @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model MessageUnprocessed {
+  id          String   @id @default(cuid())
+  waMessageId String
+  payload     Json
+  error       String
+  retryCount  Int      @default(0)
+  nextRetry   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("messages_unprocessed")
+}
+
+model AutoReplyRule {
+  id            String      @id @default(cuid())
+  phoneNumberId String
+  name          String
+  triggerType   TriggerType
+  triggerValue  String?
+  replyMessage  String
+  isActive      Boolean     @default(true)
+  priority      Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  active        Boolean     @default(true)
+  phoneNumber   PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@map("autoreply_rules")
+}
+
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  type      String
+  payload   Json
+  processed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("webhook_events")
+}
+
+model Account {
+  id                String      @id @default(cuid())
+  userId            String
+  type              AccountType
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+enum TriggerType {
+  KEYWORD
+  MESSAGE_TYPE
+  TIME_BASED
+  DEFAULT
+}
+
+enum PlanName {
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+enum AccountType {
+  oauth
+  oidc
+  email
+  credentials
+}
+
+enum PlanInterval {
+  MONTHLY
+  YEARLY
+}
+
+enum PhoneNumberStatus {
+  NOT_CLAIMED
+  NOT_VERIFIED
+  VERIFIED
+  EXPIRED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  DOCUMENT
+  AUDIO
+  VIDEO
+  LOCATION
+  CONTACT
+  TEMPLATE
+  OTHER
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+enum PaymentMethod {
+  ONLINE
+  OTHER
+  MPESA
+  CASH
+}
+
+// AI chatbot configs
+
+model ChatbotConfig {
+  id            String @id @default(cuid())
+  phoneNumberId String @unique
+
+  // Core AI Settings
+  systemPrompt String @db.Text
+  model        String @default("claude-sonnet-4-20250514")
+  temperature  Float  @default(0.7)
+  maxTokens    Int    @default(1000)
+
+  // Behavior Settings
+  isActive             Boolean  @default(true)
+  fallbackToHuman      Boolean  @default(true)
+  humanHandoffKeywords String[] // ["agent", "human", "help"]
+
+  // Response Settings
+  responseDelay   Int?    @default(1000) // ms delay to seem more human
+  typingIndicator Boolean @default(true)
+
+  // Context & Memory
+  conversationHistory Int @default(10) // last N messages to include
+  resetContextAfter   Int @default(30) // minutes of inactivity
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  phoneNumber   PhoneNumber           @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+  conversations ChatbotConversation[]
+
+  @@map("chatbot_configs")
+}
+
+model ChatbotConversation {
+  id              String @id @default(cuid())
+  chatbotConfigId String
+  contactId       String
+
+  // Conversation State
+  context          Json // Store conversation context/memory
+  messageCount     Int     @default(0)
+  isActive         Boolean @default(true)
+  handedOffToHuman Boolean @default(false)
+
+  lastMessageAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  chatbotConfig ChatbotConfig @relation(fields: [chatbotConfigId], references: [id], onDelete: Cascade)
+  contact       Contact       @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([chatbotConfigId, contactId])
+  @@index([isActive])
+  @@map("chatbot_conversations")
+}
+
+// Optional: Store prompt templates for reuse
+
+model PromptTemplate {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  content     String  @db.Text
+  category    String? // "customer_support", "sales", "general"
+  isPublic    Boolean @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("prompt_templates")
+}
+
+// Contact Us
+
+model ContactUs {
+  id        String        @id @default(cuid())
+  email     String
+  name      String?
+  subject   String?
+  message   String        @db.Text
+  phone     String?
+  company   String?
+  status    ContactStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum ContactStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  SPAM
+}

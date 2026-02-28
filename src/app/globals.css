@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "react-phone-number-input/style.css";
+
+:root {
+  /* Light Theme */
+  --background: 0 0% 100%;
+  --foreground: 200 0% 10%;
+
+  --card: 200 50% 95%;
+  --card-foreground: 200 0% 10%;
+
+  --popover: 200 50% 90%;
+  --popover-foreground: 200 0% 10%;
+
+  --primary: 200 50% 50%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 200 0% 10;
+  --secondary-foreground: 200 0% 90%;
+
+  --muted: 200 0% 90%;
+  --muted-foreground: 200 0% 20%;
+
+  --accent: 180 50% 50%;
+  --accent-foreground: 200 0% 10%;
+
+  --destructive: 0 80% 40%;
+  --destructive-foreground: 200 0% 90%;
+
+  --border: 200 10% 75%;
+  --input: 200 50% 10;
+  --ring: 200 75% 75%;
+
+  /* Charts */
+  --chart-1: 15 80% 65%;
+  --chart-2: 165 50% 33%;
+  --chart-3: 45 85% 54%;
+  --chart-4: 200 70% 27%;
+  --chart-5: 25 85% 60%;
+
+  /* Radius */
+  --radius: 0.5rem;
+}
+
+/* Dark Theme */
+html.dark {
+  --background: 0 0% 0%;
+  --foreground: 200 0% 95%;
+
+  --card: 200 50% 10%;
+  --card-foreground: 200 0% 95%;
+
+  --popover: 200 50% 20%;
+  --popover-foreground: 200 0% 95%;
+
+  --primary: 200 50% 50%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 200 0% 90;
+  --secondary-foreground: 200 0% 10%;
+
+  --muted: 200 0% 20%;
+  --muted-foreground: 200 0% 80%;
+
+  --accent: 180 50% 50%;
+  --accent-foreground: 200 0% 10%;
+
+  --destructive: 0 80% 90%;
+  --destructive-foreground: 0, 80%, 25%;
+
+  --border: 200 0% 50%;
+  --input: 200 0% 25%;
+  --ring: 200 75% 75%;
+
+  --chart-1: 15 80% 65%;
+  --chart-2: 165 50% 33%;
+  --chart-3: 45 85% 54%;
+  --chart-4: 200 70% 27%;
+  --chart-5: 25 85% 60%;
+
+  --radius: 0.5rem;
+}
+
+/* Base styles */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    @apply bg-background text-foreground min-h-screen overflow-x-hidden antialiased;
+  }
+
+  h1 {
+    @apply text-5xl mb-4 md:text-6xl font-bold;
+  }
+
+  h2 {
+    @apply text-3xl mb-4 md:text-4xl font-semibold;
+  }
+
+  h3 {
+    @apply text-xl mb-4 opacity-80;
+  }
+
+  h4 {
+    @apply text-lg font-bold;
+  }
+}

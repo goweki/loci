@@ -1,0 +1,27 @@
+{
+  "name": "loci: Supercharging Engagements",
+  "short_name": "loci",
+  "start_url": "/",
+  "description": "Supercharging Engagement. Seamlessly integrate and manage customer relations.",
+  "icons": [
+    {
+      "src": "/brand/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/brand/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/brand/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0C4A6E",
+  "background_color": "#E0F2F7",
+  "display": "standalone",
+  "orientation": "portrait"
+}
