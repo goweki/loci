@@ -72,6 +72,9 @@ export default function SetPasswordForm({
       try {
         const isValid = await _verifyToken({ username, token });
         setIsTokenValid(isValid.verification);
+        if (isValid.verification) {
+          toast.success("Token validated");
+        }
       } catch {
         setIsTokenValid(false);
       } finally {
