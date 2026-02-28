@@ -42,7 +42,6 @@ export default function SetPasswordForm({
   username: string;
 }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { language } = useI18n();
 
   const [isValidating, setIsValidating] = useState(true);
@@ -53,8 +52,8 @@ export default function SetPasswordForm({
   const form = useForm<z.infer<typeof setPasswordSchema>>({
     resolver: zodResolver(setPasswordSchema),
     defaultValues: {
-      username: searchParams.get("username") || "",
-      token: searchParams.get("token") || "",
+      username,
+      token,
       password: "",
       confirmPassword: "",
     },
@@ -83,11 +82,12 @@ export default function SetPasswordForm({
     };
 
     checkToken();
-  }, [searchParams, token, username]);
+  }, [token, username]);
 
   // 2. Form Submission
   const onSubmit = useCallback(
     async (values: z.infer<typeof setPasswordSchema>) => {
+      console.log("Submitting");
       setIsUpdating(true);
       try {
         const res_ = await setNewPassword(values);
@@ -137,7 +137,12 @@ export default function SetPasswordForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form
+        onSubmit={form.handleSubmit(onSubmit, (errors) =>
+          console.error("Validation Errors:", errors),
+        )}
+        className="space-y-4"
+      >
         {/* Read-Only Username */}
         <div className="flex flex-row items-center gap-3 px-1 py-2 rounded-lg bg-muted/30 border border-dashed border-border/60">
           <span className="text-[10px] uppercase tracking-widest text-muted-foreground w-16 shrink-0 ml-2">

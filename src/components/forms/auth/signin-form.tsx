@@ -190,10 +190,7 @@ export function SignInForm() {
         });
 
         if (result?.error) {
-          const message =
-            ERROR_MESSAGES[result.error as keyof typeof ERROR_MESSAGES] ??
-            "Failed to sign in";
-          toast.error(message);
+          toast.error(result.error);
           return;
         }
 

@@ -65,7 +65,7 @@ export const authOptions: NextAuthOptions = {
           }
         }
 
-        if (!isPasswordValid) throw new Error("Invalid password/passcode");
+        if (!isPasswordValid) throw new Error("Invalid credentials");
 
         const subscription = await getSubscriptionStatusByUserId(user.id);
 
