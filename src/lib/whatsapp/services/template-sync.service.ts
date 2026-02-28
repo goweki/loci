@@ -55,14 +55,14 @@ export class MetaSyncService {
     const ownedWabaInDb = await getWabaAccountById(ownedWabaInCloud.id);
 
     const adminUsers = await getAdminUsers();
-    console.log("admin users:", adminUsers);
+    // console.log(`${adminUsers.length} admin users fetched`);
 
     try {
       if (!ownedWabaInDb) {
         console.log(`waba id-${ownedWabaInCloud.id} not found in db`);
 
         const adminId = adminUsers[0].id;
-        console.log(`admin id-${adminId}`);
+        console.log(` >> assigning to admin id-${adminId}`);
 
         const appendedWaba: Prisma.WabaAccountUncheckedCreateInput = {
           id: ownedWabaInCloud.id,
@@ -75,7 +75,7 @@ export class MetaSyncService {
         const ownedWabaInDb = await createWabaAccount(appendedWaba);
         result.created++;
 
-        console.log(`saved waba:`, ownedWabaInDb);
+        console.log(` >> saved waba:`, ownedWabaInDb);
       } else {
         const adminId = ownedWabaInDb.userId ?? adminUsers[0].id;
 
@@ -93,11 +93,11 @@ export class MetaSyncService {
         );
         result.updated++;
 
-        console.log(`updated waba:`, updatedWaba);
+        console.log(`. >> updated waba:`, updatedWaba);
       }
     } catch (error) {
       result.errors.push(
-        `Failed to update Waba Account ${ownedWabaInCloud.name}: ${
+        ` >> Failed to update Waba Account ${ownedWabaInCloud.name}: ${
           error instanceof Error ? error.message : "Unknown error"
         }`,
       );
