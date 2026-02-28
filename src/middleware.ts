@@ -15,6 +15,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${DEFAULT_LOCALE}`, request.url));
   }
 
+  console.log(`IS_PRODUCTION: ${IS_PRODUCTION}`);
+  console.log(`now < LAUNCH_DATE: ${now < LAUNCH_DATE}`);
+
   // 2. Production-only "Coming Soon" Rewrite
   if (IS_PRODUCTION && now < LAUNCH_DATE) {
     const isApiOrStatic =
