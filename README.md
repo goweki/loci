@@ -1,81 +1,33 @@
-# LOCi security portal - webapp
+# Loci — Omni-channel Messaging & CRM
 
-LOCi security portal webapp.
+Lightweight omni-channel communication platform focused on sending and receiving messages.
 
-## Preview link to webapp
+## Key features
 
-- LOCi: [`loci.goweki.com`](https://loci.goweki.com).
+- Unified inbox & conversation view for messages across channels (WhatsApp, SMS, email).
+- Phone number and webhook management, API keys and integrations.
+- Message templates, auto-replies, and simple automation rules.
+- Subscription / billing scaffolding and embedded signup flows.
 
-#### Public Pages
+## Quick start
 
-- Home: [`/`](https://loci.goweki.com/)
-- Blog: [`/blog`](https://loci.goweki.com/blog)
-- Contacts: [`/contacts`](https://loci.goweki.com/contacts)
+1. Install dependencies: `pnpm install` or `npm install`
+2. Copy `.env.example` → `.env` and set credentials (DB, messaging providers, mail).
+3. Run DB migrations: `npx prisma migrate dev` (uses `prisma/schema.prisma`)
+4. Start dev server: `pnpm dev` or `npm run dev`
 
-#### User Pages
+## Project layout (high level)
 
-- User Home: [`/user`](https://loci.goweki.com/user)
-- User Devices: [`/user/devices`](https://loci.goweki.com/user/devices)
-- User Forum: [`/user/forum`](https://loci.goweki.com/user/forum)
-- User Blog: [`/user/blog`](https://loci.goweki.com/blog)
+- `src/app/` — Next.js app routes, layouts and pages.
+- `src/components/` — UI components and dashboard pieces.
+- `src/lib/` — auth, prisma client, mail, payments and utilities.
+- `src/api/` — server endpoints for auth, messages, phone-numbers, webhooks.
+- `prisma/` — schema and migrations.
 
-#### Backend routes
+## Contributing
 
-- Authentication: [`/api/auth`] - authentication
-- Mailing: [`/api/mailer`] - emailing function using nodemailer
-- etc
+Keep changes small and focused. Open issues for features or bugs and submit PRs against `main`.
 
-## Toolchain
+## License
 
-- Next js 14: bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-- css: [`Tailwind`](https://tailwindcss.com/) v3.
-- Hosting: [`Vercel`](https://vercel.com/).
-- Mail: [`nodemailer`](https://nodemailer.com/).
-- Authentication: [`Next.js Auth`](https://next-auth.js.org).
-
-### Running App
-
-1. Clone this repo in your local directory:
-
-   ```bash
-   git clone https://github.com/goweki/loci.git
-   ```
-
-2. Populate the environment variables as detailed in the `.env.template` file.
-
-3. Navigate into the local repo and install dependencies:
-
-   ```bash
-   npm i
-   ```
-
-4. To seed data, run the `scripts/seed.mjs` script:
-
-   ```bash
-   npm run seed
-   ```
-
-5. To run the development server, within the cloned repo:
-
-   ```bash
-   npm run dev
-   ```
-
-   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-### To build the production-ready optimized build.
-
-```bash
-npm run build
-```
-
-- The output of the build process is stored in the `/.next` directory by default.
-
-To start the server in production mode:
-
-```bash
-npm run start
-```
-
-- serves the previously built and optimized version of your application.
-- Next js runs the server on port `3000` by default
+See LICENSE or contact the project owner.
