@@ -102,24 +102,6 @@ const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
 const getMessages: AuthenticatedHandler = async (_request, apiKey) => {
   try {
     const userId = apiKey.user.id;
-
-    // Fetch last 50 messages for the user, newest first
-    // const messages = await prisma.message.findMany({
-    //   where: { userId },
-    //   orderBy: { timestamp: "desc" },
-    //   take: 50,
-    //   select: {
-    //     id: true,
-    //     contactId: true,
-    //     phoneNumberId: true,
-    //     waMessageId: true,
-    //     type: true,
-    //     content: true,
-    //     direction: true,
-    //     status: true,
-    //     timestamp: true,
-    //   },
-    // });
     const messages = await getMessagesByUserId(userId);
 
     return NextResponse.json({ success: true, messages });
