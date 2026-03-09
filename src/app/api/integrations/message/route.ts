@@ -8,7 +8,7 @@ import {
 import { validatePhoneNumberOwnership } from "@/data/phoneNumber";
 import { checkMessageLimits } from "@/lib/usage/limits";
 import { findOrCreateContact } from "@/data/contact";
-import { createMessage } from "@/data/message";
+import { createMessage, getMessagesByUserId } from "@/data/message";
 import { MessageType } from "@/lib/prisma/generated";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
 import { SubscriptionStatusEnum } from "@/types";
@@ -99,4 +99,20 @@ const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
   }
 };
 
+const getMessages: AuthenticatedHandler = async (_request, apiKey) => {
+  try {
+    const userId = apiKey.user.id;
+    const messages = await getMessagesByUserId(userId);
+
+    return NextResponse.json({ success: true, messages });
+  } catch (error: any) {
+    console.error(`[FETCH_MESSAGES_ERROR]:`, error);
+    return NextResponse.json(
+      { error: "Failed to fetch messages", details: error.message },
+      { status: 500 },
+    );
+  }
+};
+
 export const POST = apiKeyMiddleware(postTemplateMessage);
+export const GET = apiKeyMiddleware(getMessages);

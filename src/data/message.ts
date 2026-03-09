@@ -3,6 +3,18 @@
 import prisma from "@/lib/prisma";
 import { Prisma } from "@/lib/prisma/generated";
 
+export async function getMessagesByUserId(userId: string, limit = 50) {
+  return prisma.message.findMany({
+    where: { userId },
+    orderBy: { timestamp: "desc" },
+    take: limit,
+    include: {
+      contact: true,
+      phoneNumber: true,
+    },
+  });
+}
+
 export async function countMessagesThisMonthByUserId(userId: string) {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
