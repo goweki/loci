@@ -17,7 +17,7 @@ const usersData = [
   {
     name: "Demo User",
     email: "demo@goweki.com",
-    password: "user1234",
+    password: "pass1234",
     role: UserRole.USER,
     status: UserStatus.ACTIVE,
   },

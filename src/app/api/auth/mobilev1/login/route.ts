@@ -6,9 +6,10 @@ import { hashToken } from "@/lib/auth/token-handlers";
 import { getUserByKey } from "@/data/user";
 import { compareHash } from "@/lib/utils/passwordHandlers";
 import { generateUserApiKey } from "@/actions";
+import { addToDate } from "@/lib/utils/dateHandlers";
 
 const LoginSchema = z.object({
-  email: z.email(),
+  username: z.string().min(6),
   password: z.string().min(6),
 });
 
@@ -31,9 +32,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password } = parse.data;
+    const { username, password } = parse.data;
 
-    const user = await getUserByKey(email);
+    const user = await getUserByKey(username);
 
     if (!user) {
       return NextResponse.json(
@@ -62,49 +63,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Retrieve or Create API Key Token
-    // return the existing key if it exists,
-    // or generate a new one if it doesn't.
-    let activeToken = user.tokens.find(
-      ({ type, expiresAt }) =>
-        type === TokenType.API_KEY && new Date(expiresAt) > new Date(),
-    );
-
-    if (!activeToken) {
-      // Generate a new secure random string
-      const rawToken = await generateUserApiKey(
-        user.id,
-        "generated-over-api-login",
-      );
-
-      // Note: In your repo, you store 'hashedToken'.
-      // For the mobile client, return the RAW token once, then hash it for the DB.
-      activeToken = await tokenRepository.upsertToken({
-        userId: user.id,
-        type: TokenType.API_KEY,
-        hashedToken: hashToken(rawToken),
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
-      });
-
-      // Attach the raw token to the response object so the mobile app can save it
-      (activeToken as any).raw = rawToken;
-    }
-
-    // 5. Audit log usage
-    await tokenRepository.touch(activeToken.id);
+    const apiKeyString = await generateUserApiKey(user.id);
+    const updatedToken = await tokenRepository.upsertToken({
+      userId: user.id,
+      type: TokenType.API_KEY,
+      hashedToken: hashToken(apiKeyString),
+      expiresAt: addToDate({ days: 1 }),
+    });
 
     return NextResponse.json({
       success: true,
       data: {
-        token: (activeToken as any).raw || activeToken.hashedToken,
-        type: activeToken.type,
-        expiresAt: activeToken.expiresAt,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
+        apiKey: apiKeyString,
+        expiresAt: updatedToken.expiresAt,
       },
     });
   } catch (error: any) {
