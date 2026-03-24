@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { tokenRepository } from "@/data/repositories/token.repository";
 import {
   apiKeyMiddleware,
   AuthenticatedHandler,
-  hashToken,
 } from "@/lib/auth/token-handlers";
-import { TokenType } from "@/lib/prisma/generated";
 import { getUserById } from "@/data/user";
-import { excludeFields } from "@/lib/utils/dataHandlers";
 
 /**
  * Route: GET
