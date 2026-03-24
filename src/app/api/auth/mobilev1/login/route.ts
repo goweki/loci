@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { tokenRepository } from "@/data/repositories/token.repository";
 import z from "zod";
-import { TokenType } from "@/lib/prisma/generated";
+import { TokenType, UserRole } from "@/lib/prisma/generated";
 import { hashToken } from "@/lib/auth/token-handlers";
 import { getUserByKey } from "@/data/user";
 import { compareHash } from "@/lib/utils/passwordHandlers";
 import { generateUserApiKey } from "@/actions";
 import { addToDate } from "@/lib/utils/dateHandlers";
+import { excludeFields } from "@/lib/utils/dataHandlers";
 
 const LoginSchema = z.object({
   username: z.string().min(6),
@@ -76,6 +77,16 @@ export async function POST(request: NextRequest) {
       data: {
         apiKey: apiKeyString,
         expiresAt: updatedToken.expiresAt,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          tel: user.tel,
+          image: user.image,
+          role: user.role,
+          status: user.status,
+          createdAt: user.createdAt,
+        },
       },
     });
   } catch (error: any) {
