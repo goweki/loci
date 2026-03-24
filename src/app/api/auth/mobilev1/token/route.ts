@@ -1,40 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { tokenRepository } from "@/data/repositories/token.repository";
+import {
+  apiKeyMiddleware,
+  AuthenticatedHandler,
+  hashToken,
+} from "@/lib/auth/token-handlers";
+import { TokenType } from "@/lib/prisma/generated";
+import { getUserById } from "@/data/user";
+import { excludeFields } from "@/lib/utils/dataHandlers";
 
-const secret = process.env.NEXTAUTH_SECRET;
-if (!secret) {
-  throw new Error("missing process.env.NEXTAUTH_SECRET");
-}
+/**
+ * Route: GET
+ * Validate API key and return user data
+ */
+const getMe: AuthenticatedHandler = async (_request, apiKey) => {
+  try {
+    const _user = await getUserById(apiKey.user.id);
+    const user = _user!;
 
-export async function POST(req: NextRequest) {
-  if (!secret) {
-    console.error("missing process.env.NEXTAUTH_SECRET");
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: user!.id,
+        name: user.name,
+        email: user.email,
+        tel: user.tel,
+        image: user.image,
+        role: user.role,
+        status: user.status,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (error: any) {
+    console.error(`[GET_ME_ERROR]:`, error);
     return NextResponse.json(
-      { error: "Internal server error." },
-      { status: 500 }
+      { error: "Failed to fetch user data", details: error.message },
+      { status: 500 },
     );
   }
+};
 
-  // Use Promise.all to concurrently execute both getToken calls
-  const [accessToken, user] = await Promise.all([
-    getToken({
-      req,
-      secret,
-      raw: true,
-    }),
-
-    getToken({
-      req,
-      secret,
-      raw: false,
-    }),
-  ]);
-
-  console.log(`accessToken - ${accessToken} \nuser - ${user} \n...`);
-
-  if (accessToken && user) {
-    return NextResponse.json({ accessToken, user });
-  } else {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
-}
+export const GET = apiKeyMiddleware(getMe);
