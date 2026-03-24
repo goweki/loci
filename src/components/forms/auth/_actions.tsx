@@ -1,5 +1,6 @@
 "use server";
 
+import { tokenRepository } from "@/data/repositories/token.repository";
 import {
   getUserById,
   getUserByKey,
@@ -8,7 +9,7 @@ import {
   updateUserPassword,
   verifyToken,
 } from "@/data/user";
-import { hashApiKey } from "@/lib/auth/api-key";
+import { hashToken } from "@/lib/auth/token-handlers";
 import prisma from "@/lib/prisma";
 import { NotificationChannel, TokenType } from "@/lib/prisma/generated";
 import sendSms from "@/lib/sms";
@@ -37,16 +38,14 @@ export async function sendOtp({
 
   if (!user) throw new Error("User not found");
 
-  // Generate  OTP and save it to the DB here
+  // Generate  OTP and save it to the DB
   const otpCode = await generateRandom(6);
-  const hashedToken = hashApiKey(otpCode);
-  await prisma.token.create({
-    data: {
-      hashedToken,
-      type: TokenType.SIGN_IN,
-      expires: addToDate({ hours: 1 }),
-      userId: user.id,
-    },
+  const hashedToken = hashToken(otpCode);
+  await tokenRepository.upsertToken({
+    hashedToken,
+    type: TokenType.SIGN_IN,
+    expiresAt: addToDate({ hours: 1 }),
+    userId: user.id,
   });
 
   console.log(`New token generated for user-${user.id}`);
@@ -97,14 +96,14 @@ export async function verifyAndClearOtp({
 }: VerifyOtpProps): Promise<boolean> {
   if (!otpVal) return false;
 
-  const hashedToken = hashApiKey(otpVal);
+  const hashedToken = hashToken(otpVal);
 
   try {
     const deleteResult = await prisma.token.deleteMany({
       where: {
         hashedToken,
         userId,
-        expires: { gt: new Date() },
+        expiresAt: { gt: new Date() },
       },
     });
 

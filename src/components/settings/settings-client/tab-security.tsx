@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Loader from "@/components/ui/loaders";
 import { Separator } from "@/components/ui/separator";
-import { ApiKey, Prisma } from "@/lib/prisma/generated";
 import {
   CheckIcon,
   CopyIcon,
@@ -26,18 +25,18 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import {
-  _revokeApiKey,
-  generateUserApiKey,
-  getUserApiKeys,
-  MinimalApiKey,
-} from "./_actions";
 import { useSession } from "next-auth/react";
 import { dateLong, datetimeStamp } from "@/lib/utils/dateHandlers";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  ApiKey,
+  generateUserApiKey,
+  getUserApiKeys,
+  revokeApiKey,
+} from "@/actions";
 
 export function TabSecurity() {
-  const [apiKeys, setApiKeys] = useState<MinimalApiKey[]>();
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>();
   const { data: session } = useSession();
 
   const fetchApiKeys = useCallback(async () => {
@@ -193,7 +192,7 @@ export function TabSecurity() {
     existingKeys,
     refreshKeys,
   }: {
-    existingKeys: MinimalApiKey[];
+    existingKeys: ApiKey[];
     refreshKeys: Function;
   }) {
     const [isGenerating, setIsGenerating] = useState(false);
@@ -227,7 +226,7 @@ export function TabSecurity() {
     const handleRevoke = async (id: string) => {
       if (!confirm("Are you sure? This action cannot be undone.")) return;
       try {
-        const delkeyName = await _revokeApiKey(id);
+        const delkeyName = await revokeApiKey(id);
         toast.success(`Key revoked: ${delkeyName}`);
         refreshKeys();
       } catch (err) {
@@ -317,9 +316,9 @@ export function TabSecurity() {
                 >
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold tracking-tight">
+                      {/* <span className="text-sm font-semibold tracking-tight">
                         {key.name}
-                      </span>
+                      </span> */}
                       <Badge
                         variant={
                           !key.isActive || key.expiresAt < new Date()

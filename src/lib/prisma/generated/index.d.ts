@@ -19,10 +19,10 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
- * Model ApiKey
+ * Model Token
  * 
  */
-export type ApiKey = $Result.DefaultSelection<Prisma.$ApiKeyPayload>
+export type Token = $Result.DefaultSelection<Prisma.$TokenPayload>
 /**
  * Model WabaAccount
  * 
@@ -38,11 +38,6 @@ export type WabaTemplate = $Result.DefaultSelection<Prisma.$WabaTemplatePayload>
  * 
  */
 export type Session = $Result.DefaultSelection<Prisma.$SessionPayload>
-/**
- * Model Token
- * 
- */
-export type Token = $Result.DefaultSelection<Prisma.$TokenPayload>
 /**
  * Model Subscription
  * 
@@ -128,7 +123,17 @@ export type ContactUs = $Result.DefaultSelection<Prisma.$ContactUsPayload>
  * Enums
  */
 export namespace $Enums {
-  export const WabaOwnership: {
+  export const TokenType: {
+  SIGN_IN: 'SIGN_IN',
+  RESET: 'RESET',
+  ONBOARDING: 'ONBOARDING',
+  API_KEY: 'API_KEY'
+};
+
+export type TokenType = (typeof TokenType)[keyof typeof TokenType]
+
+
+export const WabaOwnership: {
   OWNED: 'OWNED',
   SHARED: 'SHARED'
 };
@@ -163,15 +168,6 @@ export const TemplateApprovalStatus: {
 };
 
 export type TemplateApprovalStatus = (typeof TemplateApprovalStatus)[keyof typeof TemplateApprovalStatus]
-
-
-export const TokenType: {
-  SIGN_IN: 'SIGN_IN',
-  RESET: 'RESET',
-  ONBOARDING: 'ONBOARDING'
-};
-
-export type TokenType = (typeof TokenType)[keyof typeof TokenType]
 
 
 export const NotificationChannel: {
@@ -319,6 +315,10 @@ export type ContactStatus = (typeof ContactStatus)[keyof typeof ContactStatus]
 
 }
 
+export type TokenType = $Enums.TokenType
+
+export const TokenType: typeof $Enums.TokenType
+
 export type WabaOwnership = $Enums.WabaOwnership
 
 export const WabaOwnership: typeof $Enums.WabaOwnership
@@ -334,10 +334,6 @@ export const TemplateCategory: typeof $Enums.TemplateCategory
 export type TemplateApprovalStatus = $Enums.TemplateApprovalStatus
 
 export const TemplateApprovalStatus: typeof $Enums.TemplateApprovalStatus
-
-export type TokenType = $Enums.TokenType
-
-export const TokenType: typeof $Enums.TokenType
 
 export type NotificationChannel = $Enums.NotificationChannel
 
@@ -531,14 +527,14 @@ export class PrismaClient<
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.apiKey`: Exposes CRUD operations for the **ApiKey** model.
+   * `prisma.token`: Exposes CRUD operations for the **Token** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more ApiKeys
-    * const apiKeys = await prisma.apiKey.findMany()
+    * // Fetch zero or more Tokens
+    * const tokens = await prisma.token.findMany()
     * ```
     */
-  get apiKey(): Prisma.ApiKeyDelegate<ExtArgs, ClientOptions>;
+  get token(): Prisma.TokenDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.wabaAccount`: Exposes CRUD operations for the **WabaAccount** model.
@@ -569,16 +565,6 @@ export class PrismaClient<
     * ```
     */
   get session(): Prisma.SessionDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.token`: Exposes CRUD operations for the **Token** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more Tokens
-    * const tokens = await prisma.token.findMany()
-    * ```
-    */
-  get token(): Prisma.TokenDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.subscription`: Exposes CRUD operations for the **Subscription** model.
@@ -1174,11 +1160,10 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
-    ApiKey: 'ApiKey',
+    Token: 'Token',
     WabaAccount: 'WabaAccount',
     WabaTemplate: 'WabaTemplate',
     Session: 'Session',
-    Token: 'Token',
     Subscription: 'Subscription',
     Payment: 'Payment',
     Plan: 'Plan',
@@ -1210,7 +1195,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "apiKey" | "wabaAccount" | "wabaTemplate" | "session" | "token" | "subscription" | "payment" | "plan" | "feature" | "planFeature" | "phoneNumber" | "contact" | "message" | "messageUnprocessed" | "autoReplyRule" | "webhookEvent" | "account" | "chatbotConfig" | "chatbotConversation" | "promptTemplate" | "contactUs"
+      modelProps: "user" | "token" | "wabaAccount" | "wabaTemplate" | "session" | "subscription" | "payment" | "plan" | "feature" | "planFeature" | "phoneNumber" | "contact" | "message" | "messageUnprocessed" | "autoReplyRule" | "webhookEvent" | "account" | "chatbotConfig" | "chatbotConversation" | "promptTemplate" | "contactUs"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1288,77 +1273,77 @@ export namespace Prisma {
           }
         }
       }
-      ApiKey: {
-        payload: Prisma.$ApiKeyPayload<ExtArgs>
-        fields: Prisma.ApiKeyFieldRefs
+      Token: {
+        payload: Prisma.$TokenPayload<ExtArgs>
+        fields: Prisma.TokenFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.ApiKeyFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ApiKeyPayload> | null
+            args: Prisma.TokenFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.ApiKeyFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ApiKeyPayload>
+            args: Prisma.TokenFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPayload>
           }
           findFirst: {
-            args: Prisma.ApiKeyFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ApiKeyPayload> | null
+            args: Prisma.TokenFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.ApiKeyFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ApiKeyPayload>
+            args: Prisma.TokenFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPayload>
           }
           findMany: {
-            args: Prisma.ApiKeyFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ApiKeyPayload>[]
+            args: Prisma.TokenFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPayload>[]
           }
           create: {
-            args: Prisma.ApiKeyCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ApiKeyPayload>
+            args: Prisma.TokenCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPayload>
           }
           createMany: {
-            args: Prisma.ApiKeyCreateManyArgs<ExtArgs>
+            args: Prisma.TokenCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.ApiKeyCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ApiKeyPayload>[]
+            args: Prisma.TokenCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPayload>[]
           }
           delete: {
-            args: Prisma.ApiKeyDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ApiKeyPayload>
+            args: Prisma.TokenDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPayload>
           }
           update: {
-            args: Prisma.ApiKeyUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ApiKeyPayload>
+            args: Prisma.TokenUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPayload>
           }
           deleteMany: {
-            args: Prisma.ApiKeyDeleteManyArgs<ExtArgs>
+            args: Prisma.TokenDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.ApiKeyUpdateManyArgs<ExtArgs>
+            args: Prisma.TokenUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateManyAndReturn: {
-            args: Prisma.ApiKeyUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ApiKeyPayload>[]
+            args: Prisma.TokenUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPayload>[]
           }
           upsert: {
-            args: Prisma.ApiKeyUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ApiKeyPayload>
+            args: Prisma.TokenUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPayload>
           }
           aggregate: {
-            args: Prisma.ApiKeyAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateApiKey>
+            args: Prisma.TokenAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateToken>
           }
           groupBy: {
-            args: Prisma.ApiKeyGroupByArgs<ExtArgs>
-            result: $Utils.Optional<ApiKeyGroupByOutputType>[]
+            args: Prisma.TokenGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TokenGroupByOutputType>[]
           }
           count: {
-            args: Prisma.ApiKeyCountArgs<ExtArgs>
-            result: $Utils.Optional<ApiKeyCountAggregateOutputType> | number
+            args: Prisma.TokenCountArgs<ExtArgs>
+            result: $Utils.Optional<TokenCountAggregateOutputType> | number
           }
         }
       }
@@ -1581,80 +1566,6 @@ export namespace Prisma {
           count: {
             args: Prisma.SessionCountArgs<ExtArgs>
             result: $Utils.Optional<SessionCountAggregateOutputType> | number
-          }
-        }
-      }
-      Token: {
-        payload: Prisma.$TokenPayload<ExtArgs>
-        fields: Prisma.TokenFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.TokenFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$TokenPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.TokenFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$TokenPayload>
-          }
-          findFirst: {
-            args: Prisma.TokenFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$TokenPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.TokenFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$TokenPayload>
-          }
-          findMany: {
-            args: Prisma.TokenFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$TokenPayload>[]
-          }
-          create: {
-            args: Prisma.TokenCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$TokenPayload>
-          }
-          createMany: {
-            args: Prisma.TokenCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.TokenCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$TokenPayload>[]
-          }
-          delete: {
-            args: Prisma.TokenDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$TokenPayload>
-          }
-          update: {
-            args: Prisma.TokenUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$TokenPayload>
-          }
-          deleteMany: {
-            args: Prisma.TokenDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.TokenUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.TokenUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$TokenPayload>[]
-          }
-          upsert: {
-            args: Prisma.TokenUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$TokenPayload>
-          }
-          aggregate: {
-            args: Prisma.TokenAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateToken>
-          }
-          groupBy: {
-            args: Prisma.TokenGroupByArgs<ExtArgs>
-            result: $Utils.Optional<TokenGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.TokenCountArgs<ExtArgs>
-            result: $Utils.Optional<TokenCountAggregateOutputType> | number
           }
         }
       }
@@ -2951,11 +2862,10 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
-    apiKey?: ApiKeyOmit
+    token?: TokenOmit
     wabaAccount?: WabaAccountOmit
     wabaTemplate?: WabaTemplateOmit
     session?: SessionOmit
-    token?: TokenOmit
     subscription?: SubscriptionOmit
     payment?: PaymentOmit
     plan?: PlanOmit
@@ -3057,7 +2967,6 @@ export namespace Prisma {
     messages: number
     subscriptions: number
     sessions: number
-    apiKeys: number
     tokens: number
     autoreplyRules: number
     wabaTemplates: number
@@ -3070,7 +2979,6 @@ export namespace Prisma {
     messages?: boolean | UserCountOutputTypeCountMessagesArgs
     subscriptions?: boolean | UserCountOutputTypeCountSubscriptionsArgs
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
-    apiKeys?: boolean | UserCountOutputTypeCountApiKeysArgs
     tokens?: boolean | UserCountOutputTypeCountTokensArgs
     autoreplyRules?: boolean | UserCountOutputTypeCountAutoreplyRulesArgs
     wabaTemplates?: boolean | UserCountOutputTypeCountWabaTemplatesArgs
@@ -3121,13 +3029,6 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SessionWhereInput
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountApiKeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ApiKeyWhereInput
   }
 
   /**
@@ -3627,7 +3528,6 @@ export namespace Prisma {
     messages?: boolean | User$messagesArgs<ExtArgs>
     subscriptions?: boolean | User$subscriptionsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
-    apiKeys?: boolean | User$apiKeysArgs<ExtArgs>
     tokens?: boolean | User$tokensArgs<ExtArgs>
     autoreplyRules?: boolean | User$autoreplyRulesArgs<ExtArgs>
     wabaTemplates?: boolean | User$wabaTemplatesArgs<ExtArgs>
@@ -3694,7 +3594,6 @@ export namespace Prisma {
     messages?: boolean | User$messagesArgs<ExtArgs>
     subscriptions?: boolean | User$subscriptionsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
-    apiKeys?: boolean | User$apiKeysArgs<ExtArgs>
     tokens?: boolean | User$tokensArgs<ExtArgs>
     autoreplyRules?: boolean | User$autoreplyRulesArgs<ExtArgs>
     wabaTemplates?: boolean | User$wabaTemplatesArgs<ExtArgs>
@@ -3713,7 +3612,6 @@ export namespace Prisma {
       messages: Prisma.$MessagePayload<ExtArgs>[]
       subscriptions: Prisma.$SubscriptionPayload<ExtArgs>[]
       sessions: Prisma.$SessionPayload<ExtArgs>[]
-      apiKeys: Prisma.$ApiKeyPayload<ExtArgs>[]
       tokens: Prisma.$TokenPayload<ExtArgs>[]
       autoreplyRules: Prisma.$AutoReplyRulePayload<ExtArgs>[]
       wabaTemplates: Prisma.$WabaTemplatePayload<ExtArgs>[]
@@ -4134,7 +4032,6 @@ export namespace Prisma {
     messages<T extends User$messagesArgs<ExtArgs> = {}>(args?: Subset<T, User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     subscriptions<T extends User$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, User$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    apiKeys<T extends User$apiKeysArgs<ExtArgs> = {}>(args?: Subset<T, User$apiKeysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     tokens<T extends User$tokensArgs<ExtArgs> = {}>(args?: Subset<T, User$tokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     autoreplyRules<T extends User$autoreplyRulesArgs<ExtArgs> = {}>(args?: Subset<T, User$autoreplyRulesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AutoReplyRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     wabaTemplates<T extends User$wabaTemplatesArgs<ExtArgs> = {}>(args?: Subset<T, User$wabaTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4709,30 +4606,6 @@ export namespace Prisma {
   }
 
   /**
-   * User.apiKeys
-   */
-  export type User$apiKeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ApiKey
-     */
-    select?: ApiKeySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the ApiKey
-     */
-    omit?: ApiKeyOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ApiKeyInclude<ExtArgs> | null
-    where?: ApiKeyWhereInput
-    orderBy?: ApiKeyOrderByWithRelationInput | ApiKeyOrderByWithRelationInput[]
-    cursor?: ApiKeyWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: ApiKeyScalarFieldEnum | ApiKeyScalarFieldEnum[]
-  }
-
-  /**
    * User.tokens
    */
   export type User$tokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4848,418 +4721,410 @@ export namespace Prisma {
 
 
   /**
-   * Model ApiKey
+   * Model Token
    */
 
-  export type AggregateApiKey = {
-    _count: ApiKeyCountAggregateOutputType | null
-    _min: ApiKeyMinAggregateOutputType | null
-    _max: ApiKeyMaxAggregateOutputType | null
+  export type AggregateToken = {
+    _count: TokenCountAggregateOutputType | null
+    _min: TokenMinAggregateOutputType | null
+    _max: TokenMaxAggregateOutputType | null
   }
 
-  export type ApiKeyMinAggregateOutputType = {
+  export type TokenMinAggregateOutputType = {
     id: string | null
-    name: string | null
-    keyHash: string | null
-    description: string | null
-    isActive: boolean | null
+    type: $Enums.TokenType | null
+    hashedToken: string | null
     expiresAt: Date | null
-    lastUsedAt: Date | null
-    createdById: string | null
+    channel: $Enums.NotificationChannel | null
+    description: string | null
+    userId: string | null
+    isActive: boolean | null
     createdAt: Date | null
-    updatedAt: Date | null
+    lastUsedAt: Date | null
   }
 
-  export type ApiKeyMaxAggregateOutputType = {
+  export type TokenMaxAggregateOutputType = {
     id: string | null
-    name: string | null
-    keyHash: string | null
-    description: string | null
-    isActive: boolean | null
+    type: $Enums.TokenType | null
+    hashedToken: string | null
     expiresAt: Date | null
-    lastUsedAt: Date | null
-    createdById: string | null
+    channel: $Enums.NotificationChannel | null
+    description: string | null
+    userId: string | null
+    isActive: boolean | null
     createdAt: Date | null
-    updatedAt: Date | null
+    lastUsedAt: Date | null
   }
 
-  export type ApiKeyCountAggregateOutputType = {
+  export type TokenCountAggregateOutputType = {
     id: number
-    name: number
-    keyHash: number
-    description: number
-    permissions: number
-    isActive: number
+    type: number
+    hashedToken: number
     expiresAt: number
-    lastUsedAt: number
-    createdById: number
+    channel: number
+    description: number
+    userId: number
+    isActive: number
     createdAt: number
-    updatedAt: number
+    lastUsedAt: number
     _all: number
   }
 
 
-  export type ApiKeyMinAggregateInputType = {
+  export type TokenMinAggregateInputType = {
     id?: true
-    name?: true
-    keyHash?: true
-    description?: true
-    isActive?: true
+    type?: true
+    hashedToken?: true
     expiresAt?: true
-    lastUsedAt?: true
-    createdById?: true
+    channel?: true
+    description?: true
+    userId?: true
+    isActive?: true
     createdAt?: true
-    updatedAt?: true
+    lastUsedAt?: true
   }
 
-  export type ApiKeyMaxAggregateInputType = {
+  export type TokenMaxAggregateInputType = {
     id?: true
-    name?: true
-    keyHash?: true
-    description?: true
-    isActive?: true
+    type?: true
+    hashedToken?: true
     expiresAt?: true
-    lastUsedAt?: true
-    createdById?: true
+    channel?: true
+    description?: true
+    userId?: true
+    isActive?: true
     createdAt?: true
-    updatedAt?: true
+    lastUsedAt?: true
   }
 
-  export type ApiKeyCountAggregateInputType = {
+  export type TokenCountAggregateInputType = {
     id?: true
-    name?: true
-    keyHash?: true
-    description?: true
-    permissions?: true
-    isActive?: true
+    type?: true
+    hashedToken?: true
     expiresAt?: true
-    lastUsedAt?: true
-    createdById?: true
+    channel?: true
+    description?: true
+    userId?: true
+    isActive?: true
     createdAt?: true
-    updatedAt?: true
+    lastUsedAt?: true
     _all?: true
   }
 
-  export type ApiKeyAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which ApiKey to aggregate.
+     * Filter which Token to aggregate.
      */
-    where?: ApiKeyWhereInput
+    where?: TokenWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of ApiKeys to fetch.
+     * Determine the order of Tokens to fetch.
      */
-    orderBy?: ApiKeyOrderByWithRelationInput | ApiKeyOrderByWithRelationInput[]
+    orderBy?: TokenOrderByWithRelationInput | TokenOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: ApiKeyWhereUniqueInput
+    cursor?: TokenWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` ApiKeys from the position of the cursor.
+     * Take `±n` Tokens from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` ApiKeys.
+     * Skip the first `n` Tokens.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned ApiKeys
+     * Count returned Tokens
     **/
-    _count?: true | ApiKeyCountAggregateInputType
+    _count?: true | TokenCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: ApiKeyMinAggregateInputType
+    _min?: TokenMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: ApiKeyMaxAggregateInputType
+    _max?: TokenMaxAggregateInputType
   }
 
-  export type GetApiKeyAggregateType<T extends ApiKeyAggregateArgs> = {
-        [P in keyof T & keyof AggregateApiKey]: P extends '_count' | 'count'
+  export type GetTokenAggregateType<T extends TokenAggregateArgs> = {
+        [P in keyof T & keyof AggregateToken]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateApiKey[P]>
-      : GetScalarType<T[P], AggregateApiKey[P]>
+        : GetScalarType<T[P], AggregateToken[P]>
+      : GetScalarType<T[P], AggregateToken[P]>
   }
 
 
 
 
-  export type ApiKeyGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ApiKeyWhereInput
-    orderBy?: ApiKeyOrderByWithAggregationInput | ApiKeyOrderByWithAggregationInput[]
-    by: ApiKeyScalarFieldEnum[] | ApiKeyScalarFieldEnum
-    having?: ApiKeyScalarWhereWithAggregatesInput
+  export type TokenGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TokenWhereInput
+    orderBy?: TokenOrderByWithAggregationInput | TokenOrderByWithAggregationInput[]
+    by: TokenScalarFieldEnum[] | TokenScalarFieldEnum
+    having?: TokenScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: ApiKeyCountAggregateInputType | true
-    _min?: ApiKeyMinAggregateInputType
-    _max?: ApiKeyMaxAggregateInputType
+    _count?: TokenCountAggregateInputType | true
+    _min?: TokenMinAggregateInputType
+    _max?: TokenMaxAggregateInputType
   }
 
-  export type ApiKeyGroupByOutputType = {
+  export type TokenGroupByOutputType = {
     id: string
-    name: string
-    keyHash: string
-    description: string | null
-    permissions: JsonValue
-    isActive: boolean
+    type: $Enums.TokenType
+    hashedToken: string
     expiresAt: Date
-    lastUsedAt: Date | null
-    createdById: string
+    channel: $Enums.NotificationChannel | null
+    description: string | null
+    userId: string
+    isActive: boolean
     createdAt: Date
-    updatedAt: Date
-    _count: ApiKeyCountAggregateOutputType | null
-    _min: ApiKeyMinAggregateOutputType | null
-    _max: ApiKeyMaxAggregateOutputType | null
+    lastUsedAt: Date | null
+    _count: TokenCountAggregateOutputType | null
+    _min: TokenMinAggregateOutputType | null
+    _max: TokenMaxAggregateOutputType | null
   }
 
-  type GetApiKeyGroupByPayload<T extends ApiKeyGroupByArgs> = Prisma.PrismaPromise<
+  type GetTokenGroupByPayload<T extends TokenGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<ApiKeyGroupByOutputType, T['by']> &
+      PickEnumerable<TokenGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof ApiKeyGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof TokenGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], ApiKeyGroupByOutputType[P]>
-            : GetScalarType<T[P], ApiKeyGroupByOutputType[P]>
+              : GetScalarType<T[P], TokenGroupByOutputType[P]>
+            : GetScalarType<T[P], TokenGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type ApiKeySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type TokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    name?: boolean
-    keyHash?: boolean
-    description?: boolean
-    permissions?: boolean
-    isActive?: boolean
+    type?: boolean
+    hashedToken?: boolean
     expiresAt?: boolean
-    lastUsedAt?: boolean
-    createdById?: boolean
+    channel?: boolean
+    description?: boolean
+    userId?: boolean
+    isActive?: boolean
     createdAt?: boolean
-    updatedAt?: boolean
-    createdBy?: boolean | UserDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["apiKey"]>
+    lastUsedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["token"]>
 
-  export type ApiKeySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type TokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    name?: boolean
-    keyHash?: boolean
-    description?: boolean
-    permissions?: boolean
-    isActive?: boolean
+    type?: boolean
+    hashedToken?: boolean
     expiresAt?: boolean
-    lastUsedAt?: boolean
-    createdById?: boolean
+    channel?: boolean
+    description?: boolean
+    userId?: boolean
+    isActive?: boolean
     createdAt?: boolean
-    updatedAt?: boolean
-    createdBy?: boolean | UserDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["apiKey"]>
+    lastUsedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["token"]>
 
-  export type ApiKeySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type TokenSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    name?: boolean
-    keyHash?: boolean
-    description?: boolean
-    permissions?: boolean
-    isActive?: boolean
+    type?: boolean
+    hashedToken?: boolean
     expiresAt?: boolean
-    lastUsedAt?: boolean
-    createdById?: boolean
+    channel?: boolean
+    description?: boolean
+    userId?: boolean
+    isActive?: boolean
     createdAt?: boolean
-    updatedAt?: boolean
-    createdBy?: boolean | UserDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["apiKey"]>
+    lastUsedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["token"]>
 
-  export type ApiKeySelectScalar = {
+  export type TokenSelectScalar = {
     id?: boolean
-    name?: boolean
-    keyHash?: boolean
-    description?: boolean
-    permissions?: boolean
-    isActive?: boolean
+    type?: boolean
+    hashedToken?: boolean
     expiresAt?: boolean
-    lastUsedAt?: boolean
-    createdById?: boolean
+    channel?: boolean
+    description?: boolean
+    userId?: boolean
+    isActive?: boolean
     createdAt?: boolean
-    updatedAt?: boolean
+    lastUsedAt?: boolean
   }
 
-  export type ApiKeyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "keyHash" | "description" | "permissions" | "isActive" | "expiresAt" | "lastUsedAt" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["apiKey"]>
-  export type ApiKeyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    createdBy?: boolean | UserDefaultArgs<ExtArgs>
+  export type TokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "hashedToken" | "expiresAt" | "channel" | "description" | "userId" | "isActive" | "createdAt" | "lastUsedAt", ExtArgs["result"]["token"]>
+  export type TokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
-  export type ApiKeyIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    createdBy?: boolean | UserDefaultArgs<ExtArgs>
+  export type TokenIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
-  export type ApiKeyIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    createdBy?: boolean | UserDefaultArgs<ExtArgs>
+  export type TokenIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
 
-  export type $ApiKeyPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "ApiKey"
+  export type $TokenPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Token"
     objects: {
-      createdBy: Prisma.$UserPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      name: string
-      keyHash: string
-      description: string | null
-      permissions: Prisma.JsonValue
-      isActive: boolean
+      type: $Enums.TokenType
+      hashedToken: string
       expiresAt: Date
-      lastUsedAt: Date | null
-      createdById: string
+      channel: $Enums.NotificationChannel | null
+      description: string | null
+      userId: string
+      isActive: boolean
       createdAt: Date
-      updatedAt: Date
-    }, ExtArgs["result"]["apiKey"]>
+      lastUsedAt: Date | null
+    }, ExtArgs["result"]["token"]>
     composites: {}
   }
 
-  type ApiKeyGetPayload<S extends boolean | null | undefined | ApiKeyDefaultArgs> = $Result.GetResult<Prisma.$ApiKeyPayload, S>
+  type TokenGetPayload<S extends boolean | null | undefined | TokenDefaultArgs> = $Result.GetResult<Prisma.$TokenPayload, S>
 
-  type ApiKeyCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<ApiKeyFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: ApiKeyCountAggregateInputType | true
+  type TokenCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TokenFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TokenCountAggregateInputType | true
     }
 
-  export interface ApiKeyDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ApiKey'], meta: { name: 'ApiKey' } }
+  export interface TokenDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Token'], meta: { name: 'Token' } }
     /**
-     * Find zero or one ApiKey that matches the filter.
-     * @param {ApiKeyFindUniqueArgs} args - Arguments to find a ApiKey
+     * Find zero or one Token that matches the filter.
+     * @param {TokenFindUniqueArgs} args - Arguments to find a Token
      * @example
-     * // Get one ApiKey
-     * const apiKey = await prisma.apiKey.findUnique({
+     * // Get one Token
+     * const token = await prisma.token.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends ApiKeyFindUniqueArgs>(args: SelectSubset<T, ApiKeyFindUniqueArgs<ExtArgs>>): Prisma__ApiKeyClient<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findUnique<T extends TokenFindUniqueArgs>(args: SelectSubset<T, TokenFindUniqueArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one ApiKey that matches the filter or throw an error with `error.code='P2025'`
+     * Find one Token that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
-     * @param {ApiKeyFindUniqueOrThrowArgs} args - Arguments to find a ApiKey
+     * @param {TokenFindUniqueOrThrowArgs} args - Arguments to find a Token
      * @example
-     * // Get one ApiKey
-     * const apiKey = await prisma.apiKey.findUniqueOrThrow({
+     * // Get one Token
+     * const token = await prisma.token.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends ApiKeyFindUniqueOrThrowArgs>(args: SelectSubset<T, ApiKeyFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ApiKeyClient<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findUniqueOrThrow<T extends TokenFindUniqueOrThrowArgs>(args: SelectSubset<T, TokenFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first ApiKey that matches the filter.
+     * Find the first Token that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ApiKeyFindFirstArgs} args - Arguments to find a ApiKey
+     * @param {TokenFindFirstArgs} args - Arguments to find a Token
      * @example
-     * // Get one ApiKey
-     * const apiKey = await prisma.apiKey.findFirst({
+     * // Get one Token
+     * const token = await prisma.token.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends ApiKeyFindFirstArgs>(args?: SelectSubset<T, ApiKeyFindFirstArgs<ExtArgs>>): Prisma__ApiKeyClient<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findFirst<T extends TokenFindFirstArgs>(args?: SelectSubset<T, TokenFindFirstArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first ApiKey that matches the filter or
+     * Find the first Token that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ApiKeyFindFirstOrThrowArgs} args - Arguments to find a ApiKey
+     * @param {TokenFindFirstOrThrowArgs} args - Arguments to find a Token
      * @example
-     * // Get one ApiKey
-     * const apiKey = await prisma.apiKey.findFirstOrThrow({
+     * // Get one Token
+     * const token = await prisma.token.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends ApiKeyFindFirstOrThrowArgs>(args?: SelectSubset<T, ApiKeyFindFirstOrThrowArgs<ExtArgs>>): Prisma__ApiKeyClient<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findFirstOrThrow<T extends TokenFindFirstOrThrowArgs>(args?: SelectSubset<T, TokenFindFirstOrThrowArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find zero or more ApiKeys that matches the filter.
+     * Find zero or more Tokens that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ApiKeyFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {TokenFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all ApiKeys
-     * const apiKeys = await prisma.apiKey.findMany()
+     * // Get all Tokens
+     * const tokens = await prisma.token.findMany()
      * 
-     * // Get first 10 ApiKeys
-     * const apiKeys = await prisma.apiKey.findMany({ take: 10 })
+     * // Get first 10 Tokens
+     * const tokens = await prisma.token.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const apiKeyWithIdOnly = await prisma.apiKey.findMany({ select: { id: true } })
+     * const tokenWithIdOnly = await prisma.token.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends ApiKeyFindManyArgs>(args?: SelectSubset<T, ApiKeyFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+    findMany<T extends TokenFindManyArgs>(args?: SelectSubset<T, TokenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
-     * Create a ApiKey.
-     * @param {ApiKeyCreateArgs} args - Arguments to create a ApiKey.
+     * Create a Token.
+     * @param {TokenCreateArgs} args - Arguments to create a Token.
      * @example
-     * // Create one ApiKey
-     * const ApiKey = await prisma.apiKey.create({
+     * // Create one Token
+     * const Token = await prisma.token.create({
      *   data: {
-     *     // ... data to create a ApiKey
+     *     // ... data to create a Token
      *   }
      * })
      * 
      */
-    create<T extends ApiKeyCreateArgs>(args: SelectSubset<T, ApiKeyCreateArgs<ExtArgs>>): Prisma__ApiKeyClient<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    create<T extends TokenCreateArgs>(args: SelectSubset<T, TokenCreateArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Create many ApiKeys.
-     * @param {ApiKeyCreateManyArgs} args - Arguments to create many ApiKeys.
+     * Create many Tokens.
+     * @param {TokenCreateManyArgs} args - Arguments to create many Tokens.
      * @example
-     * // Create many ApiKeys
-     * const apiKey = await prisma.apiKey.createMany({
+     * // Create many Tokens
+     * const token = await prisma.token.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends ApiKeyCreateManyArgs>(args?: SelectSubset<T, ApiKeyCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends TokenCreateManyArgs>(args?: SelectSubset<T, TokenCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many ApiKeys and returns the data saved in the database.
-     * @param {ApiKeyCreateManyAndReturnArgs} args - Arguments to create many ApiKeys.
+     * Create many Tokens and returns the data saved in the database.
+     * @param {TokenCreateManyAndReturnArgs} args - Arguments to create many Tokens.
      * @example
-     * // Create many ApiKeys
-     * const apiKey = await prisma.apiKey.createManyAndReturn({
+     * // Create many Tokens
+     * const token = await prisma.token.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many ApiKeys and only return the `id`
-     * const apiKeyWithIdOnly = await prisma.apiKey.createManyAndReturn({
+     * // Create many Tokens and only return the `id`
+     * const tokenWithIdOnly = await prisma.token.createManyAndReturn({
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -5269,28 +5134,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends ApiKeyCreateManyAndReturnArgs>(args?: SelectSubset<T, ApiKeyCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+    createManyAndReturn<T extends TokenCreateManyAndReturnArgs>(args?: SelectSubset<T, TokenCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Delete a ApiKey.
-     * @param {ApiKeyDeleteArgs} args - Arguments to delete one ApiKey.
+     * Delete a Token.
+     * @param {TokenDeleteArgs} args - Arguments to delete one Token.
      * @example
-     * // Delete one ApiKey
-     * const ApiKey = await prisma.apiKey.delete({
+     * // Delete one Token
+     * const Token = await prisma.token.delete({
      *   where: {
-     *     // ... filter to delete one ApiKey
+     *     // ... filter to delete one Token
      *   }
      * })
      * 
      */
-    delete<T extends ApiKeyDeleteArgs>(args: SelectSubset<T, ApiKeyDeleteArgs<ExtArgs>>): Prisma__ApiKeyClient<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    delete<T extends TokenDeleteArgs>(args: SelectSubset<T, TokenDeleteArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Update one ApiKey.
-     * @param {ApiKeyUpdateArgs} args - Arguments to update one ApiKey.
+     * Update one Token.
+     * @param {TokenUpdateArgs} args - Arguments to update one Token.
      * @example
-     * // Update one ApiKey
-     * const apiKey = await prisma.apiKey.update({
+     * // Update one Token
+     * const token = await prisma.token.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -5300,30 +5165,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends ApiKeyUpdateArgs>(args: SelectSubset<T, ApiKeyUpdateArgs<ExtArgs>>): Prisma__ApiKeyClient<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    update<T extends TokenUpdateArgs>(args: SelectSubset<T, TokenUpdateArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Delete zero or more ApiKeys.
-     * @param {ApiKeyDeleteManyArgs} args - Arguments to filter ApiKeys to delete.
+     * Delete zero or more Tokens.
+     * @param {TokenDeleteManyArgs} args - Arguments to filter Tokens to delete.
      * @example
-     * // Delete a few ApiKeys
-     * const { count } = await prisma.apiKey.deleteMany({
+     * // Delete a few Tokens
+     * const { count } = await prisma.token.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends ApiKeyDeleteManyArgs>(args?: SelectSubset<T, ApiKeyDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends TokenDeleteManyArgs>(args?: SelectSubset<T, TokenDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more ApiKeys.
+     * Update zero or more Tokens.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ApiKeyUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {TokenUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many ApiKeys
-     * const apiKey = await prisma.apiKey.updateMany({
+     * // Update many Tokens
+     * const token = await prisma.token.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -5333,14 +5198,14 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends ApiKeyUpdateManyArgs>(args: SelectSubset<T, ApiKeyUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends TokenUpdateManyArgs>(args: SelectSubset<T, TokenUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more ApiKeys and returns the data updated in the database.
-     * @param {ApiKeyUpdateManyAndReturnArgs} args - Arguments to update many ApiKeys.
+     * Update zero or more Tokens and returns the data updated in the database.
+     * @param {TokenUpdateManyAndReturnArgs} args - Arguments to update many Tokens.
      * @example
-     * // Update many ApiKeys
-     * const apiKey = await prisma.apiKey.updateManyAndReturn({
+     * // Update many Tokens
+     * const token = await prisma.token.updateManyAndReturn({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -5349,8 +5214,8 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more ApiKeys and only return the `id`
-     * const apiKeyWithIdOnly = await prisma.apiKey.updateManyAndReturn({
+     * // Update zero or more Tokens and only return the `id`
+     * const tokenWithIdOnly = await prisma.token.updateManyAndReturn({
      *   select: { id: true },
      *   where: {
      *     // ... provide filter here
@@ -5363,56 +5228,56 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    updateManyAndReturn<T extends ApiKeyUpdateManyAndReturnArgs>(args: SelectSubset<T, ApiKeyUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+    updateManyAndReturn<T extends TokenUpdateManyAndReturnArgs>(args: SelectSubset<T, TokenUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Create or update one ApiKey.
-     * @param {ApiKeyUpsertArgs} args - Arguments to update or create a ApiKey.
+     * Create or update one Token.
+     * @param {TokenUpsertArgs} args - Arguments to update or create a Token.
      * @example
-     * // Update or create a ApiKey
-     * const apiKey = await prisma.apiKey.upsert({
+     * // Update or create a Token
+     * const token = await prisma.token.upsert({
      *   create: {
-     *     // ... data to create a ApiKey
+     *     // ... data to create a Token
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the ApiKey we want to update
+     *     // ... the filter for the Token we want to update
      *   }
      * })
      */
-    upsert<T extends ApiKeyUpsertArgs>(args: SelectSubset<T, ApiKeyUpsertArgs<ExtArgs>>): Prisma__ApiKeyClient<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    upsert<T extends TokenUpsertArgs>(args: SelectSubset<T, TokenUpsertArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
-     * Count the number of ApiKeys.
+     * Count the number of Tokens.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ApiKeyCountArgs} args - Arguments to filter ApiKeys to count.
+     * @param {TokenCountArgs} args - Arguments to filter Tokens to count.
      * @example
-     * // Count the number of ApiKeys
-     * const count = await prisma.apiKey.count({
+     * // Count the number of Tokens
+     * const count = await prisma.token.count({
      *   where: {
-     *     // ... the filter for the ApiKeys we want to count
+     *     // ... the filter for the Tokens we want to count
      *   }
      * })
     **/
-    count<T extends ApiKeyCountArgs>(
-      args?: Subset<T, ApiKeyCountArgs>,
+    count<T extends TokenCountArgs>(
+      args?: Subset<T, TokenCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], ApiKeyCountAggregateOutputType>
+          : GetScalarType<T['select'], TokenCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a ApiKey.
+     * Allows you to perform aggregations operations on a Token.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ApiKeyAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {TokenAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -5432,13 +5297,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends ApiKeyAggregateArgs>(args: Subset<T, ApiKeyAggregateArgs>): Prisma.PrismaPromise<GetApiKeyAggregateType<T>>
+    aggregate<T extends TokenAggregateArgs>(args: Subset<T, TokenAggregateArgs>): Prisma.PrismaPromise<GetTokenAggregateType<T>>
 
     /**
-     * Group by ApiKey.
+     * Group by Token.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ApiKeyGroupByArgs} args - Group by arguments.
+     * @param {TokenGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -5453,14 +5318,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends ApiKeyGroupByArgs,
+      T extends TokenGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: ApiKeyGroupByArgs['orderBy'] }
-        : { orderBy?: ApiKeyGroupByArgs['orderBy'] },
+        ? { orderBy: TokenGroupByArgs['orderBy'] }
+        : { orderBy?: TokenGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -5509,22 +5374,22 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, ApiKeyGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetApiKeyGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, TokenGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTokenGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the ApiKey model
+   * Fields of the Token model
    */
-  readonly fields: ApiKeyFieldRefs;
+  readonly fields: TokenFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for ApiKey.
+   * The delegate class that acts as a "Promise-like" for Token.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__ApiKeyClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__TokenClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    createdBy<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5551,431 +5416,430 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the ApiKey model
+   * Fields of the Token model
    */
-  interface ApiKeyFieldRefs {
-    readonly id: FieldRef<"ApiKey", 'String'>
-    readonly name: FieldRef<"ApiKey", 'String'>
-    readonly keyHash: FieldRef<"ApiKey", 'String'>
-    readonly description: FieldRef<"ApiKey", 'String'>
-    readonly permissions: FieldRef<"ApiKey", 'Json'>
-    readonly isActive: FieldRef<"ApiKey", 'Boolean'>
-    readonly expiresAt: FieldRef<"ApiKey", 'DateTime'>
-    readonly lastUsedAt: FieldRef<"ApiKey", 'DateTime'>
-    readonly createdById: FieldRef<"ApiKey", 'String'>
-    readonly createdAt: FieldRef<"ApiKey", 'DateTime'>
-    readonly updatedAt: FieldRef<"ApiKey", 'DateTime'>
+  interface TokenFieldRefs {
+    readonly id: FieldRef<"Token", 'String'>
+    readonly type: FieldRef<"Token", 'TokenType'>
+    readonly hashedToken: FieldRef<"Token", 'String'>
+    readonly expiresAt: FieldRef<"Token", 'DateTime'>
+    readonly channel: FieldRef<"Token", 'NotificationChannel'>
+    readonly description: FieldRef<"Token", 'String'>
+    readonly userId: FieldRef<"Token", 'String'>
+    readonly isActive: FieldRef<"Token", 'Boolean'>
+    readonly createdAt: FieldRef<"Token", 'DateTime'>
+    readonly lastUsedAt: FieldRef<"Token", 'DateTime'>
   }
     
 
   // Custom InputTypes
   /**
-   * ApiKey findUnique
+   * Token findUnique
    */
-  export type ApiKeyFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ApiKey
+     * Select specific fields to fetch from the Token
      */
-    select?: ApiKeySelect<ExtArgs> | null
+    select?: TokenSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ApiKey
+     * Omit specific fields from the Token
      */
-    omit?: ApiKeyOmit<ExtArgs> | null
+    omit?: TokenOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ApiKeyInclude<ExtArgs> | null
+    include?: TokenInclude<ExtArgs> | null
     /**
-     * Filter, which ApiKey to fetch.
+     * Filter, which Token to fetch.
      */
-    where: ApiKeyWhereUniqueInput
+    where: TokenWhereUniqueInput
   }
 
   /**
-   * ApiKey findUniqueOrThrow
+   * Token findUniqueOrThrow
    */
-  export type ApiKeyFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ApiKey
+     * Select specific fields to fetch from the Token
      */
-    select?: ApiKeySelect<ExtArgs> | null
+    select?: TokenSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ApiKey
+     * Omit specific fields from the Token
      */
-    omit?: ApiKeyOmit<ExtArgs> | null
+    omit?: TokenOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ApiKeyInclude<ExtArgs> | null
+    include?: TokenInclude<ExtArgs> | null
     /**
-     * Filter, which ApiKey to fetch.
+     * Filter, which Token to fetch.
      */
-    where: ApiKeyWhereUniqueInput
+    where: TokenWhereUniqueInput
   }
 
   /**
-   * ApiKey findFirst
+   * Token findFirst
    */
-  export type ApiKeyFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ApiKey
+     * Select specific fields to fetch from the Token
      */
-    select?: ApiKeySelect<ExtArgs> | null
+    select?: TokenSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ApiKey
+     * Omit specific fields from the Token
      */
-    omit?: ApiKeyOmit<ExtArgs> | null
+    omit?: TokenOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ApiKeyInclude<ExtArgs> | null
+    include?: TokenInclude<ExtArgs> | null
     /**
-     * Filter, which ApiKey to fetch.
+     * Filter, which Token to fetch.
      */
-    where?: ApiKeyWhereInput
+    where?: TokenWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of ApiKeys to fetch.
+     * Determine the order of Tokens to fetch.
      */
-    orderBy?: ApiKeyOrderByWithRelationInput | ApiKeyOrderByWithRelationInput[]
+    orderBy?: TokenOrderByWithRelationInput | TokenOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for ApiKeys.
+     * Sets the position for searching for Tokens.
      */
-    cursor?: ApiKeyWhereUniqueInput
+    cursor?: TokenWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` ApiKeys from the position of the cursor.
+     * Take `±n` Tokens from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` ApiKeys.
+     * Skip the first `n` Tokens.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of ApiKeys.
+     * Filter by unique combinations of Tokens.
      */
-    distinct?: ApiKeyScalarFieldEnum | ApiKeyScalarFieldEnum[]
+    distinct?: TokenScalarFieldEnum | TokenScalarFieldEnum[]
   }
 
   /**
-   * ApiKey findFirstOrThrow
+   * Token findFirstOrThrow
    */
-  export type ApiKeyFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ApiKey
+     * Select specific fields to fetch from the Token
      */
-    select?: ApiKeySelect<ExtArgs> | null
+    select?: TokenSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ApiKey
+     * Omit specific fields from the Token
      */
-    omit?: ApiKeyOmit<ExtArgs> | null
+    omit?: TokenOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ApiKeyInclude<ExtArgs> | null
+    include?: TokenInclude<ExtArgs> | null
     /**
-     * Filter, which ApiKey to fetch.
+     * Filter, which Token to fetch.
      */
-    where?: ApiKeyWhereInput
+    where?: TokenWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of ApiKeys to fetch.
+     * Determine the order of Tokens to fetch.
      */
-    orderBy?: ApiKeyOrderByWithRelationInput | ApiKeyOrderByWithRelationInput[]
+    orderBy?: TokenOrderByWithRelationInput | TokenOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for ApiKeys.
+     * Sets the position for searching for Tokens.
      */
-    cursor?: ApiKeyWhereUniqueInput
+    cursor?: TokenWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` ApiKeys from the position of the cursor.
+     * Take `±n` Tokens from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` ApiKeys.
+     * Skip the first `n` Tokens.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of ApiKeys.
+     * Filter by unique combinations of Tokens.
      */
-    distinct?: ApiKeyScalarFieldEnum | ApiKeyScalarFieldEnum[]
+    distinct?: TokenScalarFieldEnum | TokenScalarFieldEnum[]
   }
 
   /**
-   * ApiKey findMany
+   * Token findMany
    */
-  export type ApiKeyFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ApiKey
+     * Select specific fields to fetch from the Token
      */
-    select?: ApiKeySelect<ExtArgs> | null
+    select?: TokenSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ApiKey
+     * Omit specific fields from the Token
      */
-    omit?: ApiKeyOmit<ExtArgs> | null
+    omit?: TokenOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ApiKeyInclude<ExtArgs> | null
+    include?: TokenInclude<ExtArgs> | null
     /**
-     * Filter, which ApiKeys to fetch.
+     * Filter, which Tokens to fetch.
      */
-    where?: ApiKeyWhereInput
+    where?: TokenWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of ApiKeys to fetch.
+     * Determine the order of Tokens to fetch.
      */
-    orderBy?: ApiKeyOrderByWithRelationInput | ApiKeyOrderByWithRelationInput[]
+    orderBy?: TokenOrderByWithRelationInput | TokenOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing ApiKeys.
+     * Sets the position for listing Tokens.
      */
-    cursor?: ApiKeyWhereUniqueInput
+    cursor?: TokenWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` ApiKeys from the position of the cursor.
+     * Take `±n` Tokens from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` ApiKeys.
+     * Skip the first `n` Tokens.
      */
     skip?: number
-    distinct?: ApiKeyScalarFieldEnum | ApiKeyScalarFieldEnum[]
+    distinct?: TokenScalarFieldEnum | TokenScalarFieldEnum[]
   }
 
   /**
-   * ApiKey create
+   * Token create
    */
-  export type ApiKeyCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ApiKey
+     * Select specific fields to fetch from the Token
      */
-    select?: ApiKeySelect<ExtArgs> | null
+    select?: TokenSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ApiKey
+     * Omit specific fields from the Token
      */
-    omit?: ApiKeyOmit<ExtArgs> | null
+    omit?: TokenOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ApiKeyInclude<ExtArgs> | null
+    include?: TokenInclude<ExtArgs> | null
     /**
-     * The data needed to create a ApiKey.
+     * The data needed to create a Token.
      */
-    data: XOR<ApiKeyCreateInput, ApiKeyUncheckedCreateInput>
+    data: XOR<TokenCreateInput, TokenUncheckedCreateInput>
   }
 
   /**
-   * ApiKey createMany
+   * Token createMany
    */
-  export type ApiKeyCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many ApiKeys.
+     * The data used to create many Tokens.
      */
-    data: ApiKeyCreateManyInput | ApiKeyCreateManyInput[]
+    data: TokenCreateManyInput | TokenCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * ApiKey createManyAndReturn
+   * Token createManyAndReturn
    */
-  export type ApiKeyCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ApiKey
+     * Select specific fields to fetch from the Token
      */
-    select?: ApiKeySelectCreateManyAndReturn<ExtArgs> | null
+    select?: TokenSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the ApiKey
+     * Omit specific fields from the Token
      */
-    omit?: ApiKeyOmit<ExtArgs> | null
+    omit?: TokenOmit<ExtArgs> | null
     /**
-     * The data used to create many ApiKeys.
+     * The data used to create many Tokens.
      */
-    data: ApiKeyCreateManyInput | ApiKeyCreateManyInput[]
+    data: TokenCreateManyInput | TokenCreateManyInput[]
     skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ApiKeyIncludeCreateManyAndReturn<ExtArgs> | null
+    include?: TokenIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * ApiKey update
+   * Token update
    */
-  export type ApiKeyUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ApiKey
+     * Select specific fields to fetch from the Token
      */
-    select?: ApiKeySelect<ExtArgs> | null
+    select?: TokenSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ApiKey
+     * Omit specific fields from the Token
      */
-    omit?: ApiKeyOmit<ExtArgs> | null
+    omit?: TokenOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ApiKeyInclude<ExtArgs> | null
+    include?: TokenInclude<ExtArgs> | null
     /**
-     * The data needed to update a ApiKey.
+     * The data needed to update a Token.
      */
-    data: XOR<ApiKeyUpdateInput, ApiKeyUncheckedUpdateInput>
+    data: XOR<TokenUpdateInput, TokenUncheckedUpdateInput>
     /**
-     * Choose, which ApiKey to update.
+     * Choose, which Token to update.
      */
-    where: ApiKeyWhereUniqueInput
+    where: TokenWhereUniqueInput
   }
 
   /**
-   * ApiKey updateMany
+   * Token updateMany
    */
-  export type ApiKeyUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update ApiKeys.
+     * The data used to update Tokens.
      */
-    data: XOR<ApiKeyUpdateManyMutationInput, ApiKeyUncheckedUpdateManyInput>
+    data: XOR<TokenUpdateManyMutationInput, TokenUncheckedUpdateManyInput>
     /**
-     * Filter which ApiKeys to update
+     * Filter which Tokens to update
      */
-    where?: ApiKeyWhereInput
+    where?: TokenWhereInput
     /**
-     * Limit how many ApiKeys to update.
+     * Limit how many Tokens to update.
      */
     limit?: number
   }
 
   /**
-   * ApiKey updateManyAndReturn
+   * Token updateManyAndReturn
    */
-  export type ApiKeyUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ApiKey
+     * Select specific fields to fetch from the Token
      */
-    select?: ApiKeySelectUpdateManyAndReturn<ExtArgs> | null
+    select?: TokenSelectUpdateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the ApiKey
+     * Omit specific fields from the Token
      */
-    omit?: ApiKeyOmit<ExtArgs> | null
+    omit?: TokenOmit<ExtArgs> | null
     /**
-     * The data used to update ApiKeys.
+     * The data used to update Tokens.
      */
-    data: XOR<ApiKeyUpdateManyMutationInput, ApiKeyUncheckedUpdateManyInput>
+    data: XOR<TokenUpdateManyMutationInput, TokenUncheckedUpdateManyInput>
     /**
-     * Filter which ApiKeys to update
+     * Filter which Tokens to update
      */
-    where?: ApiKeyWhereInput
+    where?: TokenWhereInput
     /**
-     * Limit how many ApiKeys to update.
+     * Limit how many Tokens to update.
      */
     limit?: number
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ApiKeyIncludeUpdateManyAndReturn<ExtArgs> | null
+    include?: TokenIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * ApiKey upsert
+   * Token upsert
    */
-  export type ApiKeyUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ApiKey
+     * Select specific fields to fetch from the Token
      */
-    select?: ApiKeySelect<ExtArgs> | null
+    select?: TokenSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ApiKey
+     * Omit specific fields from the Token
      */
-    omit?: ApiKeyOmit<ExtArgs> | null
+    omit?: TokenOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ApiKeyInclude<ExtArgs> | null
+    include?: TokenInclude<ExtArgs> | null
     /**
-     * The filter to search for the ApiKey to update in case it exists.
+     * The filter to search for the Token to update in case it exists.
      */
-    where: ApiKeyWhereUniqueInput
+    where: TokenWhereUniqueInput
     /**
-     * In case the ApiKey found by the `where` argument doesn't exist, create a new ApiKey with this data.
+     * In case the Token found by the `where` argument doesn't exist, create a new Token with this data.
      */
-    create: XOR<ApiKeyCreateInput, ApiKeyUncheckedCreateInput>
+    create: XOR<TokenCreateInput, TokenUncheckedCreateInput>
     /**
-     * In case the ApiKey was found with the provided `where` argument, update it with this data.
+     * In case the Token was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<ApiKeyUpdateInput, ApiKeyUncheckedUpdateInput>
+    update: XOR<TokenUpdateInput, TokenUncheckedUpdateInput>
   }
 
   /**
-   * ApiKey delete
+   * Token delete
    */
-  export type ApiKeyDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ApiKey
+     * Select specific fields to fetch from the Token
      */
-    select?: ApiKeySelect<ExtArgs> | null
+    select?: TokenSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ApiKey
+     * Omit specific fields from the Token
      */
-    omit?: ApiKeyOmit<ExtArgs> | null
+    omit?: TokenOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ApiKeyInclude<ExtArgs> | null
+    include?: TokenInclude<ExtArgs> | null
     /**
-     * Filter which ApiKey to delete.
+     * Filter which Token to delete.
      */
-    where: ApiKeyWhereUniqueInput
+    where: TokenWhereUniqueInput
   }
 
   /**
-   * ApiKey deleteMany
+   * Token deleteMany
    */
-  export type ApiKeyDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which ApiKeys to delete
+     * Filter which Tokens to delete
      */
-    where?: ApiKeyWhereInput
+    where?: TokenWhereInput
     /**
-     * Limit how many ApiKeys to delete.
+     * Limit how many Tokens to delete.
      */
     limit?: number
   }
 
   /**
-   * ApiKey without action
+   * Token without action
    */
-  export type ApiKeyDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TokenDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ApiKey
+     * Select specific fields to fetch from the Token
      */
-    select?: ApiKeySelect<ExtArgs> | null
+    select?: TokenSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ApiKey
+     * Omit specific fields from the Token
      */
-    omit?: ApiKeyOmit<ExtArgs> | null
+    omit?: TokenOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ApiKeyInclude<ExtArgs> | null
+    include?: TokenInclude<ExtArgs> | null
   }
 
 
@@ -9367,1103 +9231,6 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: SessionInclude<ExtArgs> | null
-  }
-
-
-  /**
-   * Model Token
-   */
-
-  export type AggregateToken = {
-    _count: TokenCountAggregateOutputType | null
-    _min: TokenMinAggregateOutputType | null
-    _max: TokenMaxAggregateOutputType | null
-  }
-
-  export type TokenMinAggregateOutputType = {
-    id: string | null
-    type: $Enums.TokenType | null
-    hashedToken: string | null
-    expires: Date | null
-    channel: $Enums.NotificationChannel | null
-    userId: string | null
-    createdAt: Date | null
-    lastUsedAt: Date | null
-  }
-
-  export type TokenMaxAggregateOutputType = {
-    id: string | null
-    type: $Enums.TokenType | null
-    hashedToken: string | null
-    expires: Date | null
-    channel: $Enums.NotificationChannel | null
-    userId: string | null
-    createdAt: Date | null
-    lastUsedAt: Date | null
-  }
-
-  export type TokenCountAggregateOutputType = {
-    id: number
-    type: number
-    hashedToken: number
-    expires: number
-    channel: number
-    userId: number
-    createdAt: number
-    lastUsedAt: number
-    _all: number
-  }
-
-
-  export type TokenMinAggregateInputType = {
-    id?: true
-    type?: true
-    hashedToken?: true
-    expires?: true
-    channel?: true
-    userId?: true
-    createdAt?: true
-    lastUsedAt?: true
-  }
-
-  export type TokenMaxAggregateInputType = {
-    id?: true
-    type?: true
-    hashedToken?: true
-    expires?: true
-    channel?: true
-    userId?: true
-    createdAt?: true
-    lastUsedAt?: true
-  }
-
-  export type TokenCountAggregateInputType = {
-    id?: true
-    type?: true
-    hashedToken?: true
-    expires?: true
-    channel?: true
-    userId?: true
-    createdAt?: true
-    lastUsedAt?: true
-    _all?: true
-  }
-
-  export type TokenAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Token to aggregate.
-     */
-    where?: TokenWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Tokens to fetch.
-     */
-    orderBy?: TokenOrderByWithRelationInput | TokenOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: TokenWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Tokens from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Tokens.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned Tokens
-    **/
-    _count?: true | TokenCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: TokenMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: TokenMaxAggregateInputType
-  }
-
-  export type GetTokenAggregateType<T extends TokenAggregateArgs> = {
-        [P in keyof T & keyof AggregateToken]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateToken[P]>
-      : GetScalarType<T[P], AggregateToken[P]>
-  }
-
-
-
-
-  export type TokenGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: TokenWhereInput
-    orderBy?: TokenOrderByWithAggregationInput | TokenOrderByWithAggregationInput[]
-    by: TokenScalarFieldEnum[] | TokenScalarFieldEnum
-    having?: TokenScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: TokenCountAggregateInputType | true
-    _min?: TokenMinAggregateInputType
-    _max?: TokenMaxAggregateInputType
-  }
-
-  export type TokenGroupByOutputType = {
-    id: string
-    type: $Enums.TokenType
-    hashedToken: string
-    expires: Date
-    channel: $Enums.NotificationChannel | null
-    userId: string
-    createdAt: Date
-    lastUsedAt: Date | null
-    _count: TokenCountAggregateOutputType | null
-    _min: TokenMinAggregateOutputType | null
-    _max: TokenMaxAggregateOutputType | null
-  }
-
-  type GetTokenGroupByPayload<T extends TokenGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<TokenGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof TokenGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], TokenGroupByOutputType[P]>
-            : GetScalarType<T[P], TokenGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type TokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    type?: boolean
-    hashedToken?: boolean
-    expires?: boolean
-    channel?: boolean
-    userId?: boolean
-    createdAt?: boolean
-    lastUsedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["token"]>
-
-  export type TokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    type?: boolean
-    hashedToken?: boolean
-    expires?: boolean
-    channel?: boolean
-    userId?: boolean
-    createdAt?: boolean
-    lastUsedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["token"]>
-
-  export type TokenSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    type?: boolean
-    hashedToken?: boolean
-    expires?: boolean
-    channel?: boolean
-    userId?: boolean
-    createdAt?: boolean
-    lastUsedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["token"]>
-
-  export type TokenSelectScalar = {
-    id?: boolean
-    type?: boolean
-    hashedToken?: boolean
-    expires?: boolean
-    channel?: boolean
-    userId?: boolean
-    createdAt?: boolean
-    lastUsedAt?: boolean
-  }
-
-  export type TokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "hashedToken" | "expires" | "channel" | "userId" | "createdAt" | "lastUsedAt", ExtArgs["result"]["token"]>
-  export type TokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }
-  export type TokenIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }
-  export type TokenIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }
-
-  export type $TokenPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "Token"
-    objects: {
-      user: Prisma.$UserPayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      type: $Enums.TokenType
-      hashedToken: string
-      expires: Date
-      channel: $Enums.NotificationChannel | null
-      userId: string
-      createdAt: Date
-      lastUsedAt: Date | null
-    }, ExtArgs["result"]["token"]>
-    composites: {}
-  }
-
-  type TokenGetPayload<S extends boolean | null | undefined | TokenDefaultArgs> = $Result.GetResult<Prisma.$TokenPayload, S>
-
-  type TokenCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<TokenFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: TokenCountAggregateInputType | true
-    }
-
-  export interface TokenDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Token'], meta: { name: 'Token' } }
-    /**
-     * Find zero or one Token that matches the filter.
-     * @param {TokenFindUniqueArgs} args - Arguments to find a Token
-     * @example
-     * // Get one Token
-     * const token = await prisma.token.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends TokenFindUniqueArgs>(args: SelectSubset<T, TokenFindUniqueArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one Token that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {TokenFindUniqueOrThrowArgs} args - Arguments to find a Token
-     * @example
-     * // Get one Token
-     * const token = await prisma.token.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends TokenFindUniqueOrThrowArgs>(args: SelectSubset<T, TokenFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Token that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {TokenFindFirstArgs} args - Arguments to find a Token
-     * @example
-     * // Get one Token
-     * const token = await prisma.token.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends TokenFindFirstArgs>(args?: SelectSubset<T, TokenFindFirstArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Token that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {TokenFindFirstOrThrowArgs} args - Arguments to find a Token
-     * @example
-     * // Get one Token
-     * const token = await prisma.token.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends TokenFindFirstOrThrowArgs>(args?: SelectSubset<T, TokenFindFirstOrThrowArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more Tokens that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {TokenFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all Tokens
-     * const tokens = await prisma.token.findMany()
-     * 
-     * // Get first 10 Tokens
-     * const tokens = await prisma.token.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const tokenWithIdOnly = await prisma.token.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends TokenFindManyArgs>(args?: SelectSubset<T, TokenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a Token.
-     * @param {TokenCreateArgs} args - Arguments to create a Token.
-     * @example
-     * // Create one Token
-     * const Token = await prisma.token.create({
-     *   data: {
-     *     // ... data to create a Token
-     *   }
-     * })
-     * 
-     */
-    create<T extends TokenCreateArgs>(args: SelectSubset<T, TokenCreateArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many Tokens.
-     * @param {TokenCreateManyArgs} args - Arguments to create many Tokens.
-     * @example
-     * // Create many Tokens
-     * const token = await prisma.token.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends TokenCreateManyArgs>(args?: SelectSubset<T, TokenCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many Tokens and returns the data saved in the database.
-     * @param {TokenCreateManyAndReturnArgs} args - Arguments to create many Tokens.
-     * @example
-     * // Create many Tokens
-     * const token = await prisma.token.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many Tokens and only return the `id`
-     * const tokenWithIdOnly = await prisma.token.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends TokenCreateManyAndReturnArgs>(args?: SelectSubset<T, TokenCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a Token.
-     * @param {TokenDeleteArgs} args - Arguments to delete one Token.
-     * @example
-     * // Delete one Token
-     * const Token = await prisma.token.delete({
-     *   where: {
-     *     // ... filter to delete one Token
-     *   }
-     * })
-     * 
-     */
-    delete<T extends TokenDeleteArgs>(args: SelectSubset<T, TokenDeleteArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one Token.
-     * @param {TokenUpdateArgs} args - Arguments to update one Token.
-     * @example
-     * // Update one Token
-     * const token = await prisma.token.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends TokenUpdateArgs>(args: SelectSubset<T, TokenUpdateArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more Tokens.
-     * @param {TokenDeleteManyArgs} args - Arguments to filter Tokens to delete.
-     * @example
-     * // Delete a few Tokens
-     * const { count } = await prisma.token.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends TokenDeleteManyArgs>(args?: SelectSubset<T, TokenDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Tokens.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {TokenUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many Tokens
-     * const token = await prisma.token.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends TokenUpdateManyArgs>(args: SelectSubset<T, TokenUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Tokens and returns the data updated in the database.
-     * @param {TokenUpdateManyAndReturnArgs} args - Arguments to update many Tokens.
-     * @example
-     * // Update many Tokens
-     * const token = await prisma.token.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more Tokens and only return the `id`
-     * const tokenWithIdOnly = await prisma.token.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends TokenUpdateManyAndReturnArgs>(args: SelectSubset<T, TokenUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one Token.
-     * @param {TokenUpsertArgs} args - Arguments to update or create a Token.
-     * @example
-     * // Update or create a Token
-     * const token = await prisma.token.upsert({
-     *   create: {
-     *     // ... data to create a Token
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the Token we want to update
-     *   }
-     * })
-     */
-    upsert<T extends TokenUpsertArgs>(args: SelectSubset<T, TokenUpsertArgs<ExtArgs>>): Prisma__TokenClient<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of Tokens.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {TokenCountArgs} args - Arguments to filter Tokens to count.
-     * @example
-     * // Count the number of Tokens
-     * const count = await prisma.token.count({
-     *   where: {
-     *     // ... the filter for the Tokens we want to count
-     *   }
-     * })
-    **/
-    count<T extends TokenCountArgs>(
-      args?: Subset<T, TokenCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], TokenCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a Token.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {TokenAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends TokenAggregateArgs>(args: Subset<T, TokenAggregateArgs>): Prisma.PrismaPromise<GetTokenAggregateType<T>>
-
-    /**
-     * Group by Token.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {TokenGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends TokenGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: TokenGroupByArgs['orderBy'] }
-        : { orderBy?: TokenGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, TokenGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTokenGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the Token model
-   */
-  readonly fields: TokenFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for Token.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__TokenClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the Token model
-   */
-  interface TokenFieldRefs {
-    readonly id: FieldRef<"Token", 'String'>
-    readonly type: FieldRef<"Token", 'TokenType'>
-    readonly hashedToken: FieldRef<"Token", 'String'>
-    readonly expires: FieldRef<"Token", 'DateTime'>
-    readonly channel: FieldRef<"Token", 'NotificationChannel'>
-    readonly userId: FieldRef<"Token", 'String'>
-    readonly createdAt: FieldRef<"Token", 'DateTime'>
-    readonly lastUsedAt: FieldRef<"Token", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * Token findUnique
-   */
-  export type TokenFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Token
-     */
-    select?: TokenSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Token
-     */
-    omit?: TokenOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TokenInclude<ExtArgs> | null
-    /**
-     * Filter, which Token to fetch.
-     */
-    where: TokenWhereUniqueInput
-  }
-
-  /**
-   * Token findUniqueOrThrow
-   */
-  export type TokenFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Token
-     */
-    select?: TokenSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Token
-     */
-    omit?: TokenOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TokenInclude<ExtArgs> | null
-    /**
-     * Filter, which Token to fetch.
-     */
-    where: TokenWhereUniqueInput
-  }
-
-  /**
-   * Token findFirst
-   */
-  export type TokenFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Token
-     */
-    select?: TokenSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Token
-     */
-    omit?: TokenOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TokenInclude<ExtArgs> | null
-    /**
-     * Filter, which Token to fetch.
-     */
-    where?: TokenWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Tokens to fetch.
-     */
-    orderBy?: TokenOrderByWithRelationInput | TokenOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Tokens.
-     */
-    cursor?: TokenWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Tokens from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Tokens.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Tokens.
-     */
-    distinct?: TokenScalarFieldEnum | TokenScalarFieldEnum[]
-  }
-
-  /**
-   * Token findFirstOrThrow
-   */
-  export type TokenFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Token
-     */
-    select?: TokenSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Token
-     */
-    omit?: TokenOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TokenInclude<ExtArgs> | null
-    /**
-     * Filter, which Token to fetch.
-     */
-    where?: TokenWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Tokens to fetch.
-     */
-    orderBy?: TokenOrderByWithRelationInput | TokenOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Tokens.
-     */
-    cursor?: TokenWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Tokens from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Tokens.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Tokens.
-     */
-    distinct?: TokenScalarFieldEnum | TokenScalarFieldEnum[]
-  }
-
-  /**
-   * Token findMany
-   */
-  export type TokenFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Token
-     */
-    select?: TokenSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Token
-     */
-    omit?: TokenOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TokenInclude<ExtArgs> | null
-    /**
-     * Filter, which Tokens to fetch.
-     */
-    where?: TokenWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Tokens to fetch.
-     */
-    orderBy?: TokenOrderByWithRelationInput | TokenOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing Tokens.
-     */
-    cursor?: TokenWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Tokens from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Tokens.
-     */
-    skip?: number
-    distinct?: TokenScalarFieldEnum | TokenScalarFieldEnum[]
-  }
-
-  /**
-   * Token create
-   */
-  export type TokenCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Token
-     */
-    select?: TokenSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Token
-     */
-    omit?: TokenOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TokenInclude<ExtArgs> | null
-    /**
-     * The data needed to create a Token.
-     */
-    data: XOR<TokenCreateInput, TokenUncheckedCreateInput>
-  }
-
-  /**
-   * Token createMany
-   */
-  export type TokenCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many Tokens.
-     */
-    data: TokenCreateManyInput | TokenCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * Token createManyAndReturn
-   */
-  export type TokenCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Token
-     */
-    select?: TokenSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Token
-     */
-    omit?: TokenOmit<ExtArgs> | null
-    /**
-     * The data used to create many Tokens.
-     */
-    data: TokenCreateManyInput | TokenCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TokenIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Token update
-   */
-  export type TokenUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Token
-     */
-    select?: TokenSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Token
-     */
-    omit?: TokenOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TokenInclude<ExtArgs> | null
-    /**
-     * The data needed to update a Token.
-     */
-    data: XOR<TokenUpdateInput, TokenUncheckedUpdateInput>
-    /**
-     * Choose, which Token to update.
-     */
-    where: TokenWhereUniqueInput
-  }
-
-  /**
-   * Token updateMany
-   */
-  export type TokenUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update Tokens.
-     */
-    data: XOR<TokenUpdateManyMutationInput, TokenUncheckedUpdateManyInput>
-    /**
-     * Filter which Tokens to update
-     */
-    where?: TokenWhereInput
-    /**
-     * Limit how many Tokens to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * Token updateManyAndReturn
-   */
-  export type TokenUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Token
-     */
-    select?: TokenSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Token
-     */
-    omit?: TokenOmit<ExtArgs> | null
-    /**
-     * The data used to update Tokens.
-     */
-    data: XOR<TokenUpdateManyMutationInput, TokenUncheckedUpdateManyInput>
-    /**
-     * Filter which Tokens to update
-     */
-    where?: TokenWhereInput
-    /**
-     * Limit how many Tokens to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TokenIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Token upsert
-   */
-  export type TokenUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Token
-     */
-    select?: TokenSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Token
-     */
-    omit?: TokenOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TokenInclude<ExtArgs> | null
-    /**
-     * The filter to search for the Token to update in case it exists.
-     */
-    where: TokenWhereUniqueInput
-    /**
-     * In case the Token found by the `where` argument doesn't exist, create a new Token with this data.
-     */
-    create: XOR<TokenCreateInput, TokenUncheckedCreateInput>
-    /**
-     * In case the Token was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<TokenUpdateInput, TokenUncheckedUpdateInput>
-  }
-
-  /**
-   * Token delete
-   */
-  export type TokenDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Token
-     */
-    select?: TokenSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Token
-     */
-    omit?: TokenOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TokenInclude<ExtArgs> | null
-    /**
-     * Filter which Token to delete.
-     */
-    where: TokenWhereUniqueInput
-  }
-
-  /**
-   * Token deleteMany
-   */
-  export type TokenDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Tokens to delete
-     */
-    where?: TokenWhereInput
-    /**
-     * Limit how many Tokens to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * Token without action
-   */
-  export type TokenDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Token
-     */
-    select?: TokenSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Token
-     */
-    omit?: TokenOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TokenInclude<ExtArgs> | null
   }
 
 
@@ -28718,21 +27485,20 @@ export namespace Prisma {
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-  export const ApiKeyScalarFieldEnum: {
+  export const TokenScalarFieldEnum: {
     id: 'id',
-    name: 'name',
-    keyHash: 'keyHash',
-    description: 'description',
-    permissions: 'permissions',
-    isActive: 'isActive',
+    type: 'type',
+    hashedToken: 'hashedToken',
     expiresAt: 'expiresAt',
-    lastUsedAt: 'lastUsedAt',
-    createdById: 'createdById',
+    channel: 'channel',
+    description: 'description',
+    userId: 'userId',
+    isActive: 'isActive',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    lastUsedAt: 'lastUsedAt'
   };
 
-  export type ApiKeyScalarFieldEnum = (typeof ApiKeyScalarFieldEnum)[keyof typeof ApiKeyScalarFieldEnum]
+  export type TokenScalarFieldEnum = (typeof TokenScalarFieldEnum)[keyof typeof TokenScalarFieldEnum]
 
 
   export const WabaAccountScalarFieldEnum: {
@@ -28775,20 +27541,6 @@ export namespace Prisma {
   };
 
   export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
-
-
-  export const TokenScalarFieldEnum: {
-    id: 'id',
-    type: 'type',
-    hashedToken: 'hashedToken',
-    expires: 'expires',
-    channel: 'channel',
-    userId: 'userId',
-    createdAt: 'createdAt',
-    lastUsedAt: 'lastUsedAt'
-  };
-
-  export type TokenScalarFieldEnum = (typeof TokenScalarFieldEnum)[keyof typeof TokenScalarFieldEnum]
 
 
   export const SubscriptionScalarFieldEnum: {
@@ -29139,16 +27891,30 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Json'
+   * Reference to a field of type 'TokenType'
    */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+  export type EnumTokenTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TokenType'>
     
 
 
   /**
-   * Reference to a field of type 'QueryMode'
+   * Reference to a field of type 'TokenType[]'
    */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+  export type ListEnumTokenTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TokenType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'NotificationChannel'
+   */
+  export type EnumNotificationChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationChannel'>
+    
+
+
+  /**
+   * Reference to a field of type 'NotificationChannel[]'
+   */
+  export type ListEnumNotificationChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationChannel[]'>
     
 
 
@@ -29216,30 +27982,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'TokenType'
+   * Reference to a field of type 'Json'
    */
-  export type EnumTokenTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TokenType'>
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
     
 
 
   /**
-   * Reference to a field of type 'TokenType[]'
+   * Reference to a field of type 'QueryMode'
    */
-  export type ListEnumTokenTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TokenType[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'NotificationChannel'
-   */
-  export type EnumNotificationChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationChannel'>
-    
-
-
-  /**
-   * Reference to a field of type 'NotificationChannel[]'
-   */
-  export type ListEnumNotificationChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationChannel[]'>
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -29466,7 +28218,6 @@ export namespace Prisma {
     messages?: MessageListRelationFilter
     subscriptions?: SubscriptionListRelationFilter
     sessions?: SessionListRelationFilter
-    apiKeys?: ApiKeyListRelationFilter
     tokens?: TokenListRelationFilter
     autoreplyRules?: AutoReplyRuleListRelationFilter
     wabaTemplates?: WabaTemplateListRelationFilter
@@ -29494,7 +28245,6 @@ export namespace Prisma {
     messages?: MessageOrderByRelationAggregateInput
     subscriptions?: SubscriptionOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
-    apiKeys?: ApiKeyOrderByRelationAggregateInput
     tokens?: TokenOrderByRelationAggregateInput
     autoreplyRules?: AutoReplyRuleOrderByRelationAggregateInput
     wabaTemplates?: WabaTemplateOrderByRelationAggregateInput
@@ -29525,7 +28275,6 @@ export namespace Prisma {
     messages?: MessageListRelationFilter
     subscriptions?: SubscriptionListRelationFilter
     sessions?: SessionListRelationFilter
-    apiKeys?: ApiKeyListRelationFilter
     tokens?: TokenListRelationFilter
     autoreplyRules?: AutoReplyRuleListRelationFilter
     wabaTemplates?: WabaTemplateListRelationFilter
@@ -29572,89 +28321,85 @@ export namespace Prisma {
     resetTokenExpiry?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   }
 
-  export type ApiKeyWhereInput = {
-    AND?: ApiKeyWhereInput | ApiKeyWhereInput[]
-    OR?: ApiKeyWhereInput[]
-    NOT?: ApiKeyWhereInput | ApiKeyWhereInput[]
-    id?: StringFilter<"ApiKey"> | string
-    name?: StringFilter<"ApiKey"> | string
-    keyHash?: StringFilter<"ApiKey"> | string
-    description?: StringNullableFilter<"ApiKey"> | string | null
-    permissions?: JsonFilter<"ApiKey">
-    isActive?: BoolFilter<"ApiKey"> | boolean
-    expiresAt?: DateTimeFilter<"ApiKey"> | Date | string
-    lastUsedAt?: DateTimeNullableFilter<"ApiKey"> | Date | string | null
-    createdById?: StringFilter<"ApiKey"> | string
-    createdAt?: DateTimeFilter<"ApiKey"> | Date | string
-    updatedAt?: DateTimeFilter<"ApiKey"> | Date | string
-    createdBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+  export type TokenWhereInput = {
+    AND?: TokenWhereInput | TokenWhereInput[]
+    OR?: TokenWhereInput[]
+    NOT?: TokenWhereInput | TokenWhereInput[]
+    id?: StringFilter<"Token"> | string
+    type?: EnumTokenTypeFilter<"Token"> | $Enums.TokenType
+    hashedToken?: StringFilter<"Token"> | string
+    expiresAt?: DateTimeFilter<"Token"> | Date | string
+    channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
+    description?: StringNullableFilter<"Token"> | string | null
+    userId?: StringFilter<"Token"> | string
+    isActive?: BoolFilter<"Token"> | boolean
+    createdAt?: DateTimeFilter<"Token"> | Date | string
+    lastUsedAt?: DateTimeNullableFilter<"Token"> | Date | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
-  export type ApiKeyOrderByWithRelationInput = {
+  export type TokenOrderByWithRelationInput = {
     id?: SortOrder
-    name?: SortOrder
-    keyHash?: SortOrder
-    description?: SortOrderInput | SortOrder
-    permissions?: SortOrder
-    isActive?: SortOrder
+    type?: SortOrder
+    hashedToken?: SortOrder
     expiresAt?: SortOrder
-    lastUsedAt?: SortOrderInput | SortOrder
-    createdById?: SortOrder
+    channel?: SortOrderInput | SortOrder
+    description?: SortOrderInput | SortOrder
+    userId?: SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
-    updatedAt?: SortOrder
-    createdBy?: UserOrderByWithRelationInput
+    lastUsedAt?: SortOrderInput | SortOrder
+    user?: UserOrderByWithRelationInput
   }
 
-  export type ApiKeyWhereUniqueInput = Prisma.AtLeast<{
+  export type TokenWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    keyHash?: string
-    AND?: ApiKeyWhereInput | ApiKeyWhereInput[]
-    OR?: ApiKeyWhereInput[]
-    NOT?: ApiKeyWhereInput | ApiKeyWhereInput[]
-    name?: StringFilter<"ApiKey"> | string
-    description?: StringNullableFilter<"ApiKey"> | string | null
-    permissions?: JsonFilter<"ApiKey">
-    isActive?: BoolFilter<"ApiKey"> | boolean
-    expiresAt?: DateTimeFilter<"ApiKey"> | Date | string
-    lastUsedAt?: DateTimeNullableFilter<"ApiKey"> | Date | string | null
-    createdById?: StringFilter<"ApiKey"> | string
-    createdAt?: DateTimeFilter<"ApiKey"> | Date | string
-    updatedAt?: DateTimeFilter<"ApiKey"> | Date | string
-    createdBy?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id" | "keyHash">
+    type_userId?: TokenTypeUserIdCompoundUniqueInput
+    AND?: TokenWhereInput | TokenWhereInput[]
+    OR?: TokenWhereInput[]
+    NOT?: TokenWhereInput | TokenWhereInput[]
+    type?: EnumTokenTypeFilter<"Token"> | $Enums.TokenType
+    hashedToken?: StringFilter<"Token"> | string
+    expiresAt?: DateTimeFilter<"Token"> | Date | string
+    channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
+    description?: StringNullableFilter<"Token"> | string | null
+    userId?: StringFilter<"Token"> | string
+    isActive?: BoolFilter<"Token"> | boolean
+    createdAt?: DateTimeFilter<"Token"> | Date | string
+    lastUsedAt?: DateTimeNullableFilter<"Token"> | Date | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "type_userId">
 
-  export type ApiKeyOrderByWithAggregationInput = {
+  export type TokenOrderByWithAggregationInput = {
     id?: SortOrder
-    name?: SortOrder
-    keyHash?: SortOrder
-    description?: SortOrderInput | SortOrder
-    permissions?: SortOrder
-    isActive?: SortOrder
+    type?: SortOrder
+    hashedToken?: SortOrder
     expiresAt?: SortOrder
-    lastUsedAt?: SortOrderInput | SortOrder
-    createdById?: SortOrder
+    channel?: SortOrderInput | SortOrder
+    description?: SortOrderInput | SortOrder
+    userId?: SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
-    updatedAt?: SortOrder
-    _count?: ApiKeyCountOrderByAggregateInput
-    _max?: ApiKeyMaxOrderByAggregateInput
-    _min?: ApiKeyMinOrderByAggregateInput
+    lastUsedAt?: SortOrderInput | SortOrder
+    _count?: TokenCountOrderByAggregateInput
+    _max?: TokenMaxOrderByAggregateInput
+    _min?: TokenMinOrderByAggregateInput
   }
 
-  export type ApiKeyScalarWhereWithAggregatesInput = {
-    AND?: ApiKeyScalarWhereWithAggregatesInput | ApiKeyScalarWhereWithAggregatesInput[]
-    OR?: ApiKeyScalarWhereWithAggregatesInput[]
-    NOT?: ApiKeyScalarWhereWithAggregatesInput | ApiKeyScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"ApiKey"> | string
-    name?: StringWithAggregatesFilter<"ApiKey"> | string
-    keyHash?: StringWithAggregatesFilter<"ApiKey"> | string
-    description?: StringNullableWithAggregatesFilter<"ApiKey"> | string | null
-    permissions?: JsonWithAggregatesFilter<"ApiKey">
-    isActive?: BoolWithAggregatesFilter<"ApiKey"> | boolean
-    expiresAt?: DateTimeWithAggregatesFilter<"ApiKey"> | Date | string
-    lastUsedAt?: DateTimeNullableWithAggregatesFilter<"ApiKey"> | Date | string | null
-    createdById?: StringWithAggregatesFilter<"ApiKey"> | string
-    createdAt?: DateTimeWithAggregatesFilter<"ApiKey"> | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter<"ApiKey"> | Date | string
+  export type TokenScalarWhereWithAggregatesInput = {
+    AND?: TokenScalarWhereWithAggregatesInput | TokenScalarWhereWithAggregatesInput[]
+    OR?: TokenScalarWhereWithAggregatesInput[]
+    NOT?: TokenScalarWhereWithAggregatesInput | TokenScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Token"> | string
+    type?: EnumTokenTypeWithAggregatesFilter<"Token"> | $Enums.TokenType
+    hashedToken?: StringWithAggregatesFilter<"Token"> | string
+    expiresAt?: DateTimeWithAggregatesFilter<"Token"> | Date | string
+    channel?: EnumNotificationChannelNullableWithAggregatesFilter<"Token"> | $Enums.NotificationChannel | null
+    description?: StringNullableWithAggregatesFilter<"Token"> | string | null
+    userId?: StringWithAggregatesFilter<"Token"> | string
+    isActive?: BoolWithAggregatesFilter<"Token"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"Token"> | Date | string
+    lastUsedAt?: DateTimeNullableWithAggregatesFilter<"Token"> | Date | string | null
   }
 
   export type WabaAccountWhereInput = {
@@ -29875,77 +28620,6 @@ export namespace Prisma {
     sessionToken?: StringWithAggregatesFilter<"Session"> | string
     userId?: StringWithAggregatesFilter<"Session"> | string
     expires?: DateTimeWithAggregatesFilter<"Session"> | Date | string
-  }
-
-  export type TokenWhereInput = {
-    AND?: TokenWhereInput | TokenWhereInput[]
-    OR?: TokenWhereInput[]
-    NOT?: TokenWhereInput | TokenWhereInput[]
-    id?: StringFilter<"Token"> | string
-    type?: EnumTokenTypeFilter<"Token"> | $Enums.TokenType
-    hashedToken?: StringFilter<"Token"> | string
-    expires?: DateTimeFilter<"Token"> | Date | string
-    channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
-    userId?: StringFilter<"Token"> | string
-    createdAt?: DateTimeFilter<"Token"> | Date | string
-    lastUsedAt?: DateTimeNullableFilter<"Token"> | Date | string | null
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }
-
-  export type TokenOrderByWithRelationInput = {
-    id?: SortOrder
-    type?: SortOrder
-    hashedToken?: SortOrder
-    expires?: SortOrder
-    channel?: SortOrderInput | SortOrder
-    userId?: SortOrder
-    createdAt?: SortOrder
-    lastUsedAt?: SortOrderInput | SortOrder
-    user?: UserOrderByWithRelationInput
-  }
-
-  export type TokenWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    type_userId?: TokenTypeUserIdCompoundUniqueInput
-    AND?: TokenWhereInput | TokenWhereInput[]
-    OR?: TokenWhereInput[]
-    NOT?: TokenWhereInput | TokenWhereInput[]
-    type?: EnumTokenTypeFilter<"Token"> | $Enums.TokenType
-    hashedToken?: StringFilter<"Token"> | string
-    expires?: DateTimeFilter<"Token"> | Date | string
-    channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
-    userId?: StringFilter<"Token"> | string
-    createdAt?: DateTimeFilter<"Token"> | Date | string
-    lastUsedAt?: DateTimeNullableFilter<"Token"> | Date | string | null
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id" | "type_userId">
-
-  export type TokenOrderByWithAggregationInput = {
-    id?: SortOrder
-    type?: SortOrder
-    hashedToken?: SortOrder
-    expires?: SortOrder
-    channel?: SortOrderInput | SortOrder
-    userId?: SortOrder
-    createdAt?: SortOrder
-    lastUsedAt?: SortOrderInput | SortOrder
-    _count?: TokenCountOrderByAggregateInput
-    _max?: TokenMaxOrderByAggregateInput
-    _min?: TokenMinOrderByAggregateInput
-  }
-
-  export type TokenScalarWhereWithAggregatesInput = {
-    AND?: TokenScalarWhereWithAggregatesInput | TokenScalarWhereWithAggregatesInput[]
-    OR?: TokenScalarWhereWithAggregatesInput[]
-    NOT?: TokenScalarWhereWithAggregatesInput | TokenScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Token"> | string
-    type?: EnumTokenTypeWithAggregatesFilter<"Token"> | $Enums.TokenType
-    hashedToken?: StringWithAggregatesFilter<"Token"> | string
-    expires?: DateTimeWithAggregatesFilter<"Token"> | Date | string
-    channel?: EnumNotificationChannelNullableWithAggregatesFilter<"Token"> | $Enums.NotificationChannel | null
-    userId?: StringWithAggregatesFilter<"Token"> | string
-    createdAt?: DateTimeWithAggregatesFilter<"Token"> | Date | string
-    lastUsedAt?: DateTimeNullableWithAggregatesFilter<"Token"> | Date | string | null
   }
 
   export type SubscriptionWhereInput = {
@@ -31252,7 +29926,6 @@ export namespace Prisma {
     messages?: MessageCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyCreateNestedManyWithoutCreatedByInput
     tokens?: TokenCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateCreateNestedManyWithoutCreatedByInput
@@ -31280,7 +29953,6 @@ export namespace Prisma {
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutCreatedByInput
     tokens?: TokenUncheckedCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutCreatedByInput
@@ -31308,7 +29980,6 @@ export namespace Prisma {
     messages?: MessageUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUpdateManyWithoutCreatedByNestedInput
@@ -31336,7 +30007,6 @@ export namespace Prisma {
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -31394,101 +30064,94 @@ export namespace Prisma {
     resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
-  export type ApiKeyCreateInput = {
+  export type TokenCreateInput = {
     id?: string
-    name: string
-    keyHash: string
-    description?: string | null
-    permissions?: JsonNullValueInput | InputJsonValue
-    isActive?: boolean
+    type: $Enums.TokenType
+    hashedToken: string
     expiresAt: Date | string
-    lastUsedAt?: Date | string | null
+    channel?: $Enums.NotificationChannel | null
+    description?: string | null
+    isActive?: boolean
     createdAt?: Date | string
-    updatedAt?: Date | string
-    createdBy: UserCreateNestedOneWithoutApiKeysInput
+    lastUsedAt?: Date | string | null
+    user: UserCreateNestedOneWithoutTokensInput
   }
 
-  export type ApiKeyUncheckedCreateInput = {
+  export type TokenUncheckedCreateInput = {
     id?: string
-    name: string
-    keyHash: string
-    description?: string | null
-    permissions?: JsonNullValueInput | InputJsonValue
-    isActive?: boolean
+    type: $Enums.TokenType
+    hashedToken: string
     expiresAt: Date | string
-    lastUsedAt?: Date | string | null
-    createdById: string
+    channel?: $Enums.NotificationChannel | null
+    description?: string | null
+    userId: string
+    isActive?: boolean
     createdAt?: Date | string
-    updatedAt?: Date | string
+    lastUsedAt?: Date | string | null
   }
 
-  export type ApiKeyUpdateInput = {
+  export type TokenUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    keyHash?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    permissions?: JsonNullValueInput | InputJsonValue
-    isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
+    hashedToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdBy?: UserUpdateOneRequiredWithoutApiKeysNestedInput
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    user?: UserUpdateOneRequiredWithoutTokensNestedInput
   }
 
-  export type ApiKeyUncheckedUpdateInput = {
+  export type TokenUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    keyHash?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    permissions?: JsonNullValueInput | InputJsonValue
-    isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
+    hashedToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdById?: StringFieldUpdateOperationsInput | string
+    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
-  export type ApiKeyCreateManyInput = {
+  export type TokenCreateManyInput = {
     id?: string
-    name: string
-    keyHash: string
-    description?: string | null
-    permissions?: JsonNullValueInput | InputJsonValue
-    isActive?: boolean
+    type: $Enums.TokenType
+    hashedToken: string
     expiresAt: Date | string
-    lastUsedAt?: Date | string | null
-    createdById: string
+    channel?: $Enums.NotificationChannel | null
+    description?: string | null
+    userId: string
+    isActive?: boolean
     createdAt?: Date | string
-    updatedAt?: Date | string
+    lastUsedAt?: Date | string | null
   }
 
-  export type ApiKeyUpdateManyMutationInput = {
+  export type TokenUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    keyHash?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    permissions?: JsonNullValueInput | InputJsonValue
-    isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
+    hashedToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
-  export type ApiKeyUncheckedUpdateManyInput = {
+  export type TokenUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    keyHash?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    permissions?: JsonNullValueInput | InputJsonValue
-    isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
+    hashedToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdById?: StringFieldUpdateOperationsInput | string
+    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type WabaAccountCreateInput = {
@@ -31724,82 +30387,6 @@ export namespace Prisma {
     sessionToken?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type TokenCreateInput = {
-    id?: string
-    type: $Enums.TokenType
-    hashedToken: string
-    expires: Date | string
-    channel?: $Enums.NotificationChannel | null
-    createdAt?: Date | string
-    lastUsedAt?: Date | string | null
-    user: UserCreateNestedOneWithoutTokensInput
-  }
-
-  export type TokenUncheckedCreateInput = {
-    id?: string
-    type: $Enums.TokenType
-    hashedToken: string
-    expires: Date | string
-    channel?: $Enums.NotificationChannel | null
-    userId: string
-    createdAt?: Date | string
-    lastUsedAt?: Date | string | null
-  }
-
-  export type TokenUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
-    hashedToken?: StringFieldUpdateOperationsInput | string
-    expires?: DateTimeFieldUpdateOperationsInput | Date | string
-    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    user?: UserUpdateOneRequiredWithoutTokensNestedInput
-  }
-
-  export type TokenUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
-    hashedToken?: StringFieldUpdateOperationsInput | string
-    expires?: DateTimeFieldUpdateOperationsInput | Date | string
-    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
-    userId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type TokenCreateManyInput = {
-    id?: string
-    type: $Enums.TokenType
-    hashedToken: string
-    expires: Date | string
-    channel?: $Enums.NotificationChannel | null
-    userId: string
-    createdAt?: Date | string
-    lastUsedAt?: Date | string | null
-  }
-
-  export type TokenUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
-    hashedToken?: StringFieldUpdateOperationsInput | string
-    expires?: DateTimeFieldUpdateOperationsInput | Date | string
-    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type TokenUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
-    hashedToken?: StringFieldUpdateOperationsInput | string
-    expires?: DateTimeFieldUpdateOperationsInput | Date | string
-    channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
-    userId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SubscriptionCreateInput = {
@@ -33312,12 +31899,6 @@ export namespace Prisma {
     none?: SessionWhereInput
   }
 
-  export type ApiKeyListRelationFilter = {
-    every?: ApiKeyWhereInput
-    some?: ApiKeyWhereInput
-    none?: ApiKeyWhereInput
-  }
-
   export type TokenListRelationFilter = {
     every?: TokenWhereInput
     some?: TokenWhereInput
@@ -33364,10 +31945,6 @@ export namespace Prisma {
   }
 
   export type SessionOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type ApiKeyOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -33521,28 +32098,19 @@ export namespace Prisma {
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
-  export type JsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  export type EnumTokenTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TokenType | EnumTokenTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTokenTypeFilter<$PrismaModel> | $Enums.TokenType
+  }
+
+  export type EnumNotificationChannelNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumNotificationChannelNullableFilter<$PrismaModel> | $Enums.NotificationChannel | null
   }
 
   export type BoolFilter<$PrismaModel = never> = {
@@ -33555,70 +32123,68 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
-  export type ApiKeyCountOrderByAggregateInput = {
-    id?: SortOrder
-    name?: SortOrder
-    keyHash?: SortOrder
-    description?: SortOrder
-    permissions?: SortOrder
-    isActive?: SortOrder
-    expiresAt?: SortOrder
-    lastUsedAt?: SortOrder
-    createdById?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
+  export type TokenTypeUserIdCompoundUniqueInput = {
+    type: $Enums.TokenType
+    userId: string
   }
 
-  export type ApiKeyMaxOrderByAggregateInput = {
+  export type TokenCountOrderByAggregateInput = {
     id?: SortOrder
-    name?: SortOrder
-    keyHash?: SortOrder
-    description?: SortOrder
-    isActive?: SortOrder
+    type?: SortOrder
+    hashedToken?: SortOrder
     expiresAt?: SortOrder
-    lastUsedAt?: SortOrder
-    createdById?: SortOrder
+    channel?: SortOrder
+    description?: SortOrder
+    userId?: SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
-    updatedAt?: SortOrder
+    lastUsedAt?: SortOrder
   }
 
-  export type ApiKeyMinOrderByAggregateInput = {
+  export type TokenMaxOrderByAggregateInput = {
     id?: SortOrder
-    name?: SortOrder
-    keyHash?: SortOrder
-    description?: SortOrder
-    isActive?: SortOrder
+    type?: SortOrder
+    hashedToken?: SortOrder
     expiresAt?: SortOrder
-    lastUsedAt?: SortOrder
-    createdById?: SortOrder
+    channel?: SortOrder
+    description?: SortOrder
+    userId?: SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
-    updatedAt?: SortOrder
+    lastUsedAt?: SortOrder
   }
-  export type JsonWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  export type TokenMinOrderByAggregateInput = {
+    id?: SortOrder
+    type?: SortOrder
+    hashedToken?: SortOrder
+    expiresAt?: SortOrder
+    channel?: SortOrder
+    description?: SortOrder
+    userId?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    lastUsedAt?: SortOrder
+  }
+
+  export type EnumTokenTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TokenType | EnumTokenTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTokenTypeWithAggregatesFilter<$PrismaModel> | $Enums.TokenType
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedJsonFilter<$PrismaModel>
-    _max?: NestedJsonFilter<$PrismaModel>
+    _min?: NestedEnumTokenTypeFilter<$PrismaModel>
+    _max?: NestedEnumTokenTypeFilter<$PrismaModel>
+  }
+
+  export type EnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel> | $Enums.NotificationChannel | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumNotificationChannelNullableFilter<$PrismaModel>
+    _max?: NestedEnumNotificationChannelNullableFilter<$PrismaModel>
   }
 
   export type BoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -33717,6 +32283,29 @@ export namespace Prisma {
     notIn?: $Enums.TemplateLanguage[] | ListEnumTemplateLanguageFieldRefInput<$PrismaModel>
     not?: NestedEnumTemplateLanguageFilter<$PrismaModel> | $Enums.TemplateLanguage
   }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type WabaAccountScalarRelationFilter = {
     is?: WabaAccountWhereInput
@@ -33797,6 +32386,32 @@ export namespace Prisma {
     _min?: NestedEnumTemplateLanguageFilter<$PrismaModel>
     _max?: NestedEnumTemplateLanguageFilter<$PrismaModel>
   }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
 
   export type SessionCountOrderByAggregateInput = {
     id?: SortOrder
@@ -33817,78 +32432,6 @@ export namespace Prisma {
     sessionToken?: SortOrder
     userId?: SortOrder
     expires?: SortOrder
-  }
-
-  export type EnumTokenTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TokenType | EnumTokenTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTokenTypeFilter<$PrismaModel> | $Enums.TokenType
-  }
-
-  export type EnumNotificationChannelNullableFilter<$PrismaModel = never> = {
-    equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
-    in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumNotificationChannelNullableFilter<$PrismaModel> | $Enums.NotificationChannel | null
-  }
-
-  export type TokenTypeUserIdCompoundUniqueInput = {
-    type: $Enums.TokenType
-    userId: string
-  }
-
-  export type TokenCountOrderByAggregateInput = {
-    id?: SortOrder
-    type?: SortOrder
-    hashedToken?: SortOrder
-    expires?: SortOrder
-    channel?: SortOrder
-    userId?: SortOrder
-    createdAt?: SortOrder
-    lastUsedAt?: SortOrder
-  }
-
-  export type TokenMaxOrderByAggregateInput = {
-    id?: SortOrder
-    type?: SortOrder
-    hashedToken?: SortOrder
-    expires?: SortOrder
-    channel?: SortOrder
-    userId?: SortOrder
-    createdAt?: SortOrder
-    lastUsedAt?: SortOrder
-  }
-
-  export type TokenMinOrderByAggregateInput = {
-    id?: SortOrder
-    type?: SortOrder
-    hashedToken?: SortOrder
-    expires?: SortOrder
-    channel?: SortOrder
-    userId?: SortOrder
-    createdAt?: SortOrder
-    lastUsedAt?: SortOrder
-  }
-
-  export type EnumTokenTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.TokenType | EnumTokenTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTokenTypeWithAggregatesFilter<$PrismaModel> | $Enums.TokenType
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumTokenTypeFilter<$PrismaModel>
-    _max?: NestedEnumTokenTypeFilter<$PrismaModel>
-  }
-
-  export type EnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
-    in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel> | $Enums.NotificationChannel | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedEnumNotificationChannelNullableFilter<$PrismaModel>
-    _max?: NestedEnumNotificationChannelNullableFilter<$PrismaModel>
   }
 
   export type EnumPlanNameFilter<$PrismaModel = never> = {
@@ -34965,13 +33508,6 @@ export namespace Prisma {
     connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
   }
 
-  export type ApiKeyCreateNestedManyWithoutCreatedByInput = {
-    create?: XOR<ApiKeyCreateWithoutCreatedByInput, ApiKeyUncheckedCreateWithoutCreatedByInput> | ApiKeyCreateWithoutCreatedByInput[] | ApiKeyUncheckedCreateWithoutCreatedByInput[]
-    connectOrCreate?: ApiKeyCreateOrConnectWithoutCreatedByInput | ApiKeyCreateOrConnectWithoutCreatedByInput[]
-    createMany?: ApiKeyCreateManyCreatedByInputEnvelope
-    connect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
-  }
-
   export type TokenCreateNestedManyWithoutUserInput = {
     create?: XOR<TokenCreateWithoutUserInput, TokenUncheckedCreateWithoutUserInput> | TokenCreateWithoutUserInput[] | TokenUncheckedCreateWithoutUserInput[]
     connectOrCreate?: TokenCreateOrConnectWithoutUserInput | TokenCreateOrConnectWithoutUserInput[]
@@ -35039,13 +33575,6 @@ export namespace Prisma {
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
     createMany?: SessionCreateManyUserInputEnvelope
     connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
-  }
-
-  export type ApiKeyUncheckedCreateNestedManyWithoutCreatedByInput = {
-    create?: XOR<ApiKeyCreateWithoutCreatedByInput, ApiKeyUncheckedCreateWithoutCreatedByInput> | ApiKeyCreateWithoutCreatedByInput[] | ApiKeyUncheckedCreateWithoutCreatedByInput[]
-    connectOrCreate?: ApiKeyCreateOrConnectWithoutCreatedByInput | ApiKeyCreateOrConnectWithoutCreatedByInput[]
-    createMany?: ApiKeyCreateManyCreatedByInputEnvelope
-    connect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
   }
 
   export type TokenUncheckedCreateNestedManyWithoutUserInput = {
@@ -35178,20 +33707,6 @@ export namespace Prisma {
     update?: SessionUpdateWithWhereUniqueWithoutUserInput | SessionUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: SessionUpdateManyWithWhereWithoutUserInput | SessionUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
-  }
-
-  export type ApiKeyUpdateManyWithoutCreatedByNestedInput = {
-    create?: XOR<ApiKeyCreateWithoutCreatedByInput, ApiKeyUncheckedCreateWithoutCreatedByInput> | ApiKeyCreateWithoutCreatedByInput[] | ApiKeyUncheckedCreateWithoutCreatedByInput[]
-    connectOrCreate?: ApiKeyCreateOrConnectWithoutCreatedByInput | ApiKeyCreateOrConnectWithoutCreatedByInput[]
-    upsert?: ApiKeyUpsertWithWhereUniqueWithoutCreatedByInput | ApiKeyUpsertWithWhereUniqueWithoutCreatedByInput[]
-    createMany?: ApiKeyCreateManyCreatedByInputEnvelope
-    set?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
-    disconnect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
-    delete?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
-    connect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
-    update?: ApiKeyUpdateWithWhereUniqueWithoutCreatedByInput | ApiKeyUpdateWithWhereUniqueWithoutCreatedByInput[]
-    updateMany?: ApiKeyUpdateManyWithWhereWithoutCreatedByInput | ApiKeyUpdateManyWithWhereWithoutCreatedByInput[]
-    deleteMany?: ApiKeyScalarWhereInput | ApiKeyScalarWhereInput[]
   }
 
   export type TokenUpdateManyWithoutUserNestedInput = {
@@ -35330,20 +33845,6 @@ export namespace Prisma {
     deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
   }
 
-  export type ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInput = {
-    create?: XOR<ApiKeyCreateWithoutCreatedByInput, ApiKeyUncheckedCreateWithoutCreatedByInput> | ApiKeyCreateWithoutCreatedByInput[] | ApiKeyUncheckedCreateWithoutCreatedByInput[]
-    connectOrCreate?: ApiKeyCreateOrConnectWithoutCreatedByInput | ApiKeyCreateOrConnectWithoutCreatedByInput[]
-    upsert?: ApiKeyUpsertWithWhereUniqueWithoutCreatedByInput | ApiKeyUpsertWithWhereUniqueWithoutCreatedByInput[]
-    createMany?: ApiKeyCreateManyCreatedByInputEnvelope
-    set?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
-    disconnect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
-    delete?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
-    connect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
-    update?: ApiKeyUpdateWithWhereUniqueWithoutCreatedByInput | ApiKeyUpdateWithWhereUniqueWithoutCreatedByInput[]
-    updateMany?: ApiKeyUpdateManyWithWhereWithoutCreatedByInput | ApiKeyUpdateManyWithWhereWithoutCreatedByInput[]
-    deleteMany?: ApiKeyScalarWhereInput | ApiKeyScalarWhereInput[]
-  }
-
   export type TokenUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<TokenCreateWithoutUserInput, TokenUncheckedCreateWithoutUserInput> | TokenCreateWithoutUserInput[] | TokenUncheckedCreateWithoutUserInput[]
     connectOrCreate?: TokenCreateOrConnectWithoutUserInput | TokenCreateOrConnectWithoutUserInput[]
@@ -35400,22 +33901,30 @@ export namespace Prisma {
     deleteMany?: PromptTemplateScalarWhereInput | PromptTemplateScalarWhereInput[]
   }
 
-  export type UserCreateNestedOneWithoutApiKeysInput = {
-    create?: XOR<UserCreateWithoutApiKeysInput, UserUncheckedCreateWithoutApiKeysInput>
-    connectOrCreate?: UserCreateOrConnectWithoutApiKeysInput
+  export type UserCreateNestedOneWithoutTokensInput = {
+    create?: XOR<UserCreateWithoutTokensInput, UserUncheckedCreateWithoutTokensInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTokensInput
     connect?: UserWhereUniqueInput
+  }
+
+  export type EnumTokenTypeFieldUpdateOperationsInput = {
+    set?: $Enums.TokenType
+  }
+
+  export type NullableEnumNotificationChannelFieldUpdateOperationsInput = {
+    set?: $Enums.NotificationChannel | null
   }
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
   }
 
-  export type UserUpdateOneRequiredWithoutApiKeysNestedInput = {
-    create?: XOR<UserCreateWithoutApiKeysInput, UserUncheckedCreateWithoutApiKeysInput>
-    connectOrCreate?: UserCreateOrConnectWithoutApiKeysInput
-    upsert?: UserUpsertWithoutApiKeysInput
+  export type UserUpdateOneRequiredWithoutTokensNestedInput = {
+    create?: XOR<UserCreateWithoutTokensInput, UserUncheckedCreateWithoutTokensInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTokensInput
+    upsert?: UserUpsertWithoutTokensInput
     connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutApiKeysInput, UserUpdateWithoutApiKeysInput>, UserUncheckedUpdateWithoutApiKeysInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTokensInput, UserUpdateWithoutTokensInput>, UserUncheckedUpdateWithoutTokensInput>
   }
 
   export type UserCreateNestedOneWithoutWabaInput = {
@@ -35576,28 +34085,6 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutSessionsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSessionsInput, UserUpdateWithoutSessionsInput>, UserUncheckedUpdateWithoutSessionsInput>
-  }
-
-  export type UserCreateNestedOneWithoutTokensInput = {
-    create?: XOR<UserCreateWithoutTokensInput, UserUncheckedCreateWithoutTokensInput>
-    connectOrCreate?: UserCreateOrConnectWithoutTokensInput
-    connect?: UserWhereUniqueInput
-  }
-
-  export type EnumTokenTypeFieldUpdateOperationsInput = {
-    set?: $Enums.TokenType
-  }
-
-  export type NullableEnumNotificationChannelFieldUpdateOperationsInput = {
-    set?: $Enums.NotificationChannel | null
-  }
-
-  export type UserUpdateOneRequiredWithoutTokensNestedInput = {
-    create?: XOR<UserCreateWithoutTokensInput, UserUncheckedCreateWithoutTokensInput>
-    connectOrCreate?: UserCreateOrConnectWithoutTokensInput
-    upsert?: UserUpsertWithoutTokensInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTokensInput, UserUpdateWithoutTokensInput>, UserUncheckedUpdateWithoutTokensInput>
   }
 
   export type PaymentCreateNestedOneWithoutSubscriptionInput = {
@@ -36487,32 +34974,43 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedEnumTokenTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TokenType | EnumTokenTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTokenTypeFilter<$PrismaModel> | $Enums.TokenType
+  }
+
+  export type NestedEnumNotificationChannelNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumNotificationChannelNullableFilter<$PrismaModel> | $Enums.NotificationChannel | null
+  }
+
   export type NestedBoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
-  export type NestedJsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
 
-  export type NestedJsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  export type NestedEnumTokenTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TokenType | EnumTokenTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTokenTypeWithAggregatesFilter<$PrismaModel> | $Enums.TokenType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTokenTypeFilter<$PrismaModel>
+    _max?: NestedEnumTokenTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel> | $Enums.NotificationChannel | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumNotificationChannelNullableFilter<$PrismaModel>
+    _max?: NestedEnumNotificationChannelNullableFilter<$PrismaModel>
   }
 
   export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -36590,39 +35088,28 @@ export namespace Prisma {
     _min?: NestedEnumTemplateLanguageFilter<$PrismaModel>
     _max?: NestedEnumTemplateLanguageFilter<$PrismaModel>
   }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
 
-  export type NestedEnumTokenTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TokenType | EnumTokenTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTokenTypeFilter<$PrismaModel> | $Enums.TokenType
-  }
-
-  export type NestedEnumNotificationChannelNullableFilter<$PrismaModel = never> = {
-    equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
-    in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumNotificationChannelNullableFilter<$PrismaModel> | $Enums.NotificationChannel | null
-  }
-
-  export type NestedEnumTokenTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.TokenType | EnumTokenTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TokenType[] | ListEnumTokenTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTokenTypeWithAggregatesFilter<$PrismaModel> | $Enums.TokenType
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumTokenTypeFilter<$PrismaModel>
-    _max?: NestedEnumTokenTypeFilter<$PrismaModel>
-  }
-
-  export type NestedEnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.NotificationChannel | EnumNotificationChannelFieldRefInput<$PrismaModel> | null
-    in?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.NotificationChannel[] | ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumNotificationChannelNullableWithAggregatesFilter<$PrismaModel> | $Enums.NotificationChannel | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedEnumNotificationChannelNullableFilter<$PrismaModel>
-    _max?: NestedEnumNotificationChannelNullableFilter<$PrismaModel>
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NestedEnumPlanNameFilter<$PrismaModel = never> = {
@@ -37092,48 +35579,14 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type ApiKeyCreateWithoutCreatedByInput = {
-    id?: string
-    name: string
-    keyHash: string
-    description?: string | null
-    permissions?: JsonNullValueInput | InputJsonValue
-    isActive?: boolean
-    expiresAt: Date | string
-    lastUsedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type ApiKeyUncheckedCreateWithoutCreatedByInput = {
-    id?: string
-    name: string
-    keyHash: string
-    description?: string | null
-    permissions?: JsonNullValueInput | InputJsonValue
-    isActive?: boolean
-    expiresAt: Date | string
-    lastUsedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type ApiKeyCreateOrConnectWithoutCreatedByInput = {
-    where: ApiKeyWhereUniqueInput
-    create: XOR<ApiKeyCreateWithoutCreatedByInput, ApiKeyUncheckedCreateWithoutCreatedByInput>
-  }
-
-  export type ApiKeyCreateManyCreatedByInputEnvelope = {
-    data: ApiKeyCreateManyCreatedByInput | ApiKeyCreateManyCreatedByInput[]
-    skipDuplicates?: boolean
-  }
-
   export type TokenCreateWithoutUserInput = {
     id?: string
     type: $Enums.TokenType
     hashedToken: string
-    expires: Date | string
+    expiresAt: Date | string
     channel?: $Enums.NotificationChannel | null
+    description?: string | null
+    isActive?: boolean
     createdAt?: Date | string
     lastUsedAt?: Date | string | null
   }
@@ -37142,8 +35595,10 @@ export namespace Prisma {
     id?: string
     type: $Enums.TokenType
     hashedToken: string
-    expires: Date | string
+    expiresAt: Date | string
     channel?: $Enums.NotificationChannel | null
+    description?: string | null
+    isActive?: boolean
     createdAt?: Date | string
     lastUsedAt?: Date | string | null
   }
@@ -37454,39 +35909,6 @@ export namespace Prisma {
     expires?: DateTimeFilter<"Session"> | Date | string
   }
 
-  export type ApiKeyUpsertWithWhereUniqueWithoutCreatedByInput = {
-    where: ApiKeyWhereUniqueInput
-    update: XOR<ApiKeyUpdateWithoutCreatedByInput, ApiKeyUncheckedUpdateWithoutCreatedByInput>
-    create: XOR<ApiKeyCreateWithoutCreatedByInput, ApiKeyUncheckedCreateWithoutCreatedByInput>
-  }
-
-  export type ApiKeyUpdateWithWhereUniqueWithoutCreatedByInput = {
-    where: ApiKeyWhereUniqueInput
-    data: XOR<ApiKeyUpdateWithoutCreatedByInput, ApiKeyUncheckedUpdateWithoutCreatedByInput>
-  }
-
-  export type ApiKeyUpdateManyWithWhereWithoutCreatedByInput = {
-    where: ApiKeyScalarWhereInput
-    data: XOR<ApiKeyUpdateManyMutationInput, ApiKeyUncheckedUpdateManyWithoutCreatedByInput>
-  }
-
-  export type ApiKeyScalarWhereInput = {
-    AND?: ApiKeyScalarWhereInput | ApiKeyScalarWhereInput[]
-    OR?: ApiKeyScalarWhereInput[]
-    NOT?: ApiKeyScalarWhereInput | ApiKeyScalarWhereInput[]
-    id?: StringFilter<"ApiKey"> | string
-    name?: StringFilter<"ApiKey"> | string
-    keyHash?: StringFilter<"ApiKey"> | string
-    description?: StringNullableFilter<"ApiKey"> | string | null
-    permissions?: JsonFilter<"ApiKey">
-    isActive?: BoolFilter<"ApiKey"> | boolean
-    expiresAt?: DateTimeFilter<"ApiKey"> | Date | string
-    lastUsedAt?: DateTimeNullableFilter<"ApiKey"> | Date | string | null
-    createdById?: StringFilter<"ApiKey"> | string
-    createdAt?: DateTimeFilter<"ApiKey"> | Date | string
-    updatedAt?: DateTimeFilter<"ApiKey"> | Date | string
-  }
-
   export type TokenUpsertWithWhereUniqueWithoutUserInput = {
     where: TokenWhereUniqueInput
     update: XOR<TokenUpdateWithoutUserInput, TokenUncheckedUpdateWithoutUserInput>
@@ -37510,9 +35932,11 @@ export namespace Prisma {
     id?: StringFilter<"Token"> | string
     type?: EnumTokenTypeFilter<"Token"> | $Enums.TokenType
     hashedToken?: StringFilter<"Token"> | string
-    expires?: DateTimeFilter<"Token"> | Date | string
+    expiresAt?: DateTimeFilter<"Token"> | Date | string
     channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
+    description?: StringNullableFilter<"Token"> | string | null
     userId?: StringFilter<"Token"> | string
+    isActive?: BoolFilter<"Token"> | boolean
     createdAt?: DateTimeFilter<"Token"> | Date | string
     lastUsedAt?: DateTimeNullableFilter<"Token"> | Date | string | null
   }
@@ -37615,7 +36039,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"PromptTemplate"> | Date | string
   }
 
-  export type UserCreateWithoutApiKeysInput = {
+  export type UserCreateWithoutTokensInput = {
     id?: string
     name?: string | null
     email?: string | null
@@ -37636,13 +36060,12 @@ export namespace Prisma {
     messages?: MessageCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    tokens?: TokenCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateCreateNestedManyWithoutCreatedByInput
     promptTemplates?: PromptTemplateCreateNestedManyWithoutUserInput
   }
 
-  export type UserUncheckedCreateWithoutApiKeysInput = {
+  export type UserUncheckedCreateWithoutTokensInput = {
     id?: string
     name?: string | null
     email?: string | null
@@ -37663,29 +36086,28 @@ export namespace Prisma {
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    tokens?: TokenUncheckedCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutCreatedByInput
     promptTemplates?: PromptTemplateUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutApiKeysInput = {
+  export type UserCreateOrConnectWithoutTokensInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutApiKeysInput, UserUncheckedCreateWithoutApiKeysInput>
+    create: XOR<UserCreateWithoutTokensInput, UserUncheckedCreateWithoutTokensInput>
   }
 
-  export type UserUpsertWithoutApiKeysInput = {
-    update: XOR<UserUpdateWithoutApiKeysInput, UserUncheckedUpdateWithoutApiKeysInput>
-    create: XOR<UserCreateWithoutApiKeysInput, UserUncheckedCreateWithoutApiKeysInput>
+  export type UserUpsertWithoutTokensInput = {
+    update: XOR<UserUpdateWithoutTokensInput, UserUncheckedUpdateWithoutTokensInput>
+    create: XOR<UserCreateWithoutTokensInput, UserUncheckedCreateWithoutTokensInput>
     where?: UserWhereInput
   }
 
-  export type UserUpdateToOneWithWhereWithoutApiKeysInput = {
+  export type UserUpdateToOneWithWhereWithoutTokensInput = {
     where?: UserWhereInput
-    data: XOR<UserUpdateWithoutApiKeysInput, UserUncheckedUpdateWithoutApiKeysInput>
+    data: XOR<UserUpdateWithoutTokensInput, UserUncheckedUpdateWithoutTokensInput>
   }
 
-  export type UserUpdateWithoutApiKeysInput = {
+  export type UserUpdateWithoutTokensInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37706,13 +36128,12 @@ export namespace Prisma {
     messages?: MessageUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    tokens?: TokenUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUpdateManyWithoutCreatedByNestedInput
     promptTemplates?: PromptTemplateUpdateManyWithoutUserNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutApiKeysInput = {
+  export type UserUncheckedUpdateWithoutTokensInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37733,7 +36154,6 @@ export namespace Prisma {
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    tokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
     promptTemplates?: PromptTemplateUncheckedUpdateManyWithoutUserNestedInput
@@ -37759,7 +36179,6 @@ export namespace Prisma {
     messages?: MessageCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyCreateNestedManyWithoutCreatedByInput
     tokens?: TokenCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateCreateNestedManyWithoutCreatedByInput
@@ -37786,7 +36205,6 @@ export namespace Prisma {
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutCreatedByInput
     tokens?: TokenUncheckedCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutCreatedByInput
@@ -37905,7 +36323,6 @@ export namespace Prisma {
     messages?: MessageUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUpdateManyWithoutCreatedByNestedInput
@@ -37932,7 +36349,6 @@ export namespace Prisma {
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -38039,7 +36455,6 @@ export namespace Prisma {
     messages?: MessageCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyCreateNestedManyWithoutCreatedByInput
     tokens?: TokenCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleCreateNestedManyWithoutCreatedByInput
     promptTemplates?: PromptTemplateCreateNestedManyWithoutUserInput
@@ -38066,7 +36481,6 @@ export namespace Prisma {
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutCreatedByInput
     tokens?: TokenUncheckedCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutCreatedByInput
     promptTemplates?: PromptTemplateUncheckedCreateNestedManyWithoutUserInput
@@ -38146,7 +36560,6 @@ export namespace Prisma {
     messages?: MessageUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUpdateManyWithoutCreatedByNestedInput
     promptTemplates?: PromptTemplateUpdateManyWithoutUserNestedInput
@@ -38173,7 +36586,6 @@ export namespace Prisma {
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutCreatedByNestedInput
     promptTemplates?: PromptTemplateUncheckedUpdateManyWithoutUserNestedInput
@@ -38199,7 +36611,6 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyCreateNestedManyWithoutCreatedByInput
     tokens?: TokenCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateCreateNestedManyWithoutCreatedByInput
@@ -38226,7 +36637,6 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutCreatedByInput
     tokens?: TokenUncheckedCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutCreatedByInput
@@ -38269,7 +36679,6 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUpdateManyWithoutCreatedByNestedInput
@@ -38296,132 +36705,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
-    autoreplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutCreatedByNestedInput
-    wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
-    promptTemplates?: PromptTemplateUncheckedUpdateManyWithoutUserNestedInput
-  }
-
-  export type UserCreateWithoutTokensInput = {
-    id?: string
-    name?: string | null
-    email?: string | null
-    emailVerified?: Date | string | null
-    tel?: string | null
-    telVerified?: Date | string | null
-    image?: string | null
-    password?: string | null
-    role?: $Enums.UserRole
-    status?: $Enums.UserStatus
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
-    waba?: WabaAccountCreateNestedOneWithoutUserInput
-    accounts?: AccountCreateNestedManyWithoutUserInput
-    contacts?: ContactCreateNestedManyWithoutUserInput
-    messages?: MessageCreateNestedManyWithoutUserInput
-    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
-    sessions?: SessionCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyCreateNestedManyWithoutCreatedByInput
-    autoreplyRules?: AutoReplyRuleCreateNestedManyWithoutCreatedByInput
-    wabaTemplates?: WabaTemplateCreateNestedManyWithoutCreatedByInput
-    promptTemplates?: PromptTemplateCreateNestedManyWithoutUserInput
-  }
-
-  export type UserUncheckedCreateWithoutTokensInput = {
-    id?: string
-    name?: string | null
-    email?: string | null
-    emailVerified?: Date | string | null
-    tel?: string | null
-    telVerified?: Date | string | null
-    image?: string | null
-    password?: string | null
-    role?: $Enums.UserRole
-    status?: $Enums.UserStatus
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
-    waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
-    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
-    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
-    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
-    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutCreatedByInput
-    autoreplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutCreatedByInput
-    wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutCreatedByInput
-    promptTemplates?: PromptTemplateUncheckedCreateNestedManyWithoutUserInput
-  }
-
-  export type UserCreateOrConnectWithoutTokensInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutTokensInput, UserUncheckedCreateWithoutTokensInput>
-  }
-
-  export type UserUpsertWithoutTokensInput = {
-    update: XOR<UserUpdateWithoutTokensInput, UserUncheckedUpdateWithoutTokensInput>
-    create: XOR<UserCreateWithoutTokensInput, UserUncheckedCreateWithoutTokensInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutTokensInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutTokensInput, UserUncheckedUpdateWithoutTokensInput>
-  }
-
-  export type UserUpdateWithoutTokensInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    tel?: NullableStringFieldUpdateOperationsInput | string | null
-    telVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    password?: NullableStringFieldUpdateOperationsInput | string | null
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    waba?: WabaAccountUpdateOneWithoutUserNestedInput
-    accounts?: AccountUpdateManyWithoutUserNestedInput
-    contacts?: ContactUpdateManyWithoutUserNestedInput
-    messages?: MessageUpdateManyWithoutUserNestedInput
-    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
-    sessions?: SessionUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUpdateManyWithoutCreatedByNestedInput
-    autoreplyRules?: AutoReplyRuleUpdateManyWithoutCreatedByNestedInput
-    wabaTemplates?: WabaTemplateUpdateManyWithoutCreatedByNestedInput
-    promptTemplates?: PromptTemplateUpdateManyWithoutUserNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutTokensInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    tel?: NullableStringFieldUpdateOperationsInput | string | null
-    telVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    password?: NullableStringFieldUpdateOperationsInput | string | null
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
-    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
-    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
-    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
-    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInput
     autoreplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
     promptTemplates?: PromptTemplateUncheckedUpdateManyWithoutUserNestedInput
@@ -38509,7 +36793,6 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyCreateNestedManyWithoutCreatedByInput
     tokens?: TokenCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateCreateNestedManyWithoutCreatedByInput
@@ -38536,7 +36819,6 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutCreatedByInput
     tokens?: TokenUncheckedCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutCreatedByInput
@@ -38653,7 +36935,6 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUpdateManyWithoutCreatedByNestedInput
@@ -38680,7 +36961,6 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -39297,7 +37577,6 @@ export namespace Prisma {
     messages?: MessageCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyCreateNestedManyWithoutCreatedByInput
     tokens?: TokenCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateCreateNestedManyWithoutCreatedByInput
@@ -39324,7 +37603,6 @@ export namespace Prisma {
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutCreatedByInput
     tokens?: TokenUncheckedCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutCreatedByInput
@@ -39439,7 +37717,6 @@ export namespace Prisma {
     messages?: MessageUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUpdateManyWithoutCreatedByNestedInput
@@ -39466,7 +37743,6 @@ export namespace Prisma {
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -39605,7 +37881,6 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyCreateNestedManyWithoutCreatedByInput
     tokens?: TokenCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateCreateNestedManyWithoutCreatedByInput
@@ -39632,7 +37907,6 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutCreatedByInput
     tokens?: TokenUncheckedCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutCreatedByInput
@@ -39751,7 +38025,6 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUpdateManyWithoutCreatedByNestedInput
@@ -39778,7 +38051,6 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -39841,7 +38113,6 @@ export namespace Prisma {
     messages?: MessageCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyCreateNestedManyWithoutCreatedByInput
     tokens?: TokenCreateNestedManyWithoutUserInput
     wabaTemplates?: WabaTemplateCreateNestedManyWithoutCreatedByInput
     promptTemplates?: PromptTemplateCreateNestedManyWithoutUserInput
@@ -39868,7 +38139,6 @@ export namespace Prisma {
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutCreatedByInput
     tokens?: TokenUncheckedCreateNestedManyWithoutUserInput
     wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutCreatedByInput
     promptTemplates?: PromptTemplateUncheckedCreateNestedManyWithoutUserInput
@@ -39952,7 +38222,6 @@ export namespace Prisma {
     messages?: MessageUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUpdateManyWithoutUserNestedInput
     wabaTemplates?: WabaTemplateUpdateManyWithoutCreatedByNestedInput
     promptTemplates?: PromptTemplateUpdateManyWithoutUserNestedInput
@@ -39979,7 +38248,6 @@ export namespace Prisma {
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
     wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
     promptTemplates?: PromptTemplateUncheckedUpdateManyWithoutUserNestedInput
@@ -40005,7 +38273,6 @@ export namespace Prisma {
     messages?: MessageCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyCreateNestedManyWithoutCreatedByInput
     tokens?: TokenCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateCreateNestedManyWithoutCreatedByInput
@@ -40032,7 +38299,6 @@ export namespace Prisma {
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutCreatedByInput
     tokens?: TokenUncheckedCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutCreatedByInput
@@ -40075,7 +38341,6 @@ export namespace Prisma {
     messages?: MessageUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUpdateManyWithoutCreatedByNestedInput
@@ -40102,7 +38367,6 @@ export namespace Prisma {
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -40408,7 +38672,6 @@ export namespace Prisma {
     messages?: MessageCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyCreateNestedManyWithoutCreatedByInput
     tokens?: TokenCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateCreateNestedManyWithoutCreatedByInput
@@ -40435,7 +38698,6 @@ export namespace Prisma {
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutCreatedByInput
     tokens?: TokenUncheckedCreateNestedManyWithoutUserInput
     autoreplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutCreatedByInput
     wabaTemplates?: WabaTemplateUncheckedCreateNestedManyWithoutCreatedByInput
@@ -40478,7 +38740,6 @@ export namespace Prisma {
     messages?: MessageUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUpdateManyWithoutCreatedByNestedInput
@@ -40505,7 +38766,6 @@ export namespace Prisma {
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    apiKeys?: ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInput
     tokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
     autoreplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutCreatedByNestedInput
     wabaTemplates?: WabaTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -40564,25 +38824,14 @@ export namespace Prisma {
     expires: Date | string
   }
 
-  export type ApiKeyCreateManyCreatedByInput = {
-    id?: string
-    name: string
-    keyHash: string
-    description?: string | null
-    permissions?: JsonNullValueInput | InputJsonValue
-    isActive?: boolean
-    expiresAt: Date | string
-    lastUsedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
   export type TokenCreateManyUserInput = {
     id?: string
     type: $Enums.TokenType
     hashedToken: string
-    expires: Date | string
+    expiresAt: Date | string
     channel?: $Enums.NotificationChannel | null
+    description?: string | null
+    isActive?: boolean
     createdAt?: Date | string
     lastUsedAt?: Date | string | null
   }
@@ -40790,51 +39039,14 @@ export namespace Prisma {
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type ApiKeyUpdateWithoutCreatedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    keyHash?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    permissions?: JsonNullValueInput | InputJsonValue
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ApiKeyUncheckedUpdateWithoutCreatedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    keyHash?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    permissions?: JsonNullValueInput | InputJsonValue
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ApiKeyUncheckedUpdateManyWithoutCreatedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    keyHash?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    permissions?: JsonNullValueInput | InputJsonValue
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
   export type TokenUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
     hashedToken?: StringFieldUpdateOperationsInput | string
-    expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -40843,8 +39055,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
     hashedToken?: StringFieldUpdateOperationsInput | string
-    expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -40853,8 +39067,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumTokenTypeFieldUpdateOperationsInput | $Enums.TokenType
     hashedToken?: StringFieldUpdateOperationsInput | string
-    expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }

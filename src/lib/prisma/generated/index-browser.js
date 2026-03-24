@@ -137,18 +137,17 @@ exports.Prisma.UserScalarFieldEnum = {
   resetTokenExpiry: 'resetTokenExpiry'
 };
 
-exports.Prisma.ApiKeyScalarFieldEnum = {
+exports.Prisma.TokenScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  keyHash: 'keyHash',
-  description: 'description',
-  permissions: 'permissions',
-  isActive: 'isActive',
+  type: 'type',
+  hashedToken: 'hashedToken',
   expiresAt: 'expiresAt',
-  lastUsedAt: 'lastUsedAt',
-  createdById: 'createdById',
+  channel: 'channel',
+  description: 'description',
+  userId: 'userId',
+  isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  lastUsedAt: 'lastUsedAt'
 };
 
 exports.Prisma.WabaAccountScalarFieldEnum = {
@@ -182,17 +181,6 @@ exports.Prisma.SessionScalarFieldEnum = {
   sessionToken: 'sessionToken',
   userId: 'userId',
   expires: 'expires'
-};
-
-exports.Prisma.TokenScalarFieldEnum = {
-  id: 'id',
-  type: 'type',
-  hashedToken: 'hashedToken',
-  expires: 'expires',
-  channel: 'channel',
-  userId: 'userId',
-  createdAt: 'createdAt',
-  lastUsedAt: 'lastUsedAt'
 };
 
 exports.Prisma.SubscriptionScalarFieldEnum = {
@@ -428,6 +416,19 @@ exports.UserStatus = exports.$Enums.UserStatus = {
   INACTIVE: 'INACTIVE'
 };
 
+exports.TokenType = exports.$Enums.TokenType = {
+  SIGN_IN: 'SIGN_IN',
+  RESET: 'RESET',
+  ONBOARDING: 'ONBOARDING',
+  API_KEY: 'API_KEY'
+};
+
+exports.NotificationChannel = exports.$Enums.NotificationChannel = {
+  EMAIL: 'EMAIL',
+  WHATSAPP: 'WHATSAPP',
+  SMS: 'SMS'
+};
+
 exports.WabaOwnership = exports.$Enums.WabaOwnership = {
   OWNED: 'OWNED',
   SHARED: 'SHARED'
@@ -451,18 +452,6 @@ exports.TemplateLanguage = exports.$Enums.TemplateLanguage = {
   en_GB: 'en_GB',
   fr_FR: 'fr_FR',
   sw_KE: 'sw_KE'
-};
-
-exports.TokenType = exports.$Enums.TokenType = {
-  SIGN_IN: 'SIGN_IN',
-  RESET: 'RESET',
-  ONBOARDING: 'ONBOARDING'
-};
-
-exports.NotificationChannel = exports.$Enums.NotificationChannel = {
-  EMAIL: 'EMAIL',
-  WHATSAPP: 'WHATSAPP',
-  SMS: 'SMS'
 };
 
 exports.PlanName = exports.$Enums.PlanName = {
@@ -549,11 +538,10 @@ exports.ContactStatus = exports.$Enums.ContactStatus = {
 
 exports.Prisma.ModelName = {
   User: 'User',
-  ApiKey: 'ApiKey',
+  Token: 'Token',
   WabaAccount: 'WabaAccount',
   WabaTemplate: 'WabaTemplate',
   Session: 'Session',
-  Token: 'Token',
   Subscription: 'Subscription',
   Payment: 'Payment',
   Plan: 'Plan',

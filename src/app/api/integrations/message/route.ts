@@ -4,7 +4,7 @@ import { MessageSchema } from "@/lib/validations";
 import {
   apiKeyMiddleware,
   type AuthenticatedHandler,
-} from "@/lib/auth/api-key";
+} from "@/lib/auth/token-handlers";
 import { validatePhoneNumberOwnership } from "@/data/phoneNumber";
 import { checkMessageLimits } from "@/lib/usage/limits";
 import { findOrCreateContact } from "@/data/contact";

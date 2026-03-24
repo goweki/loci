@@ -37,6 +37,17 @@ export type UserGetPayload = Prisma.UserGetPayload<{
   };
 }>;
 
+export function excludeFields<User, Key extends keyof User>(
+  user: User,
+  keys: Key[],
+): Omit<User, Key> {
+  const newUser = { ...user };
+  for (const key of keys) {
+    delete newUser[key];
+  }
+  return newUser;
+}
+
 /**
  * Creates a new user (doesnt send Welcome email)
  */
@@ -354,10 +365,13 @@ export async function getUserByTel(tel: string): Promise<User | null> {
 /**
  * Find a user by key attribute.
  */
-export async function getUserByKey(key: string): Promise<User | null> {
+export async function getUserByKey(key: string) {
   return db.user.findFirst({
     where: {
       OR: [{ id: key }, { email: key }, { tel: key }],
+    },
+    include: {
+      tokens: true,
     },
   });
 }
