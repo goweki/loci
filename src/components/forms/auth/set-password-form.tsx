@@ -3,18 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import {
-  Lock,
-  Eye,
-  EyeOff,
-  ArrowRight,
-  Check,
-  ShieldCheck,
-  AlertCircle,
-} from "lucide-react";
+import { Lock, Eye, EyeOff, ArrowRight, AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,11 +19,9 @@ import {
 } from "@/components/ui/form";
 import Loader from "@/components/ui/loaders";
 import { Divider, IconInput } from "./_shared";
-import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import { setPasswordSchema } from "@/lib/validations";
-// import { verifyToken } from "@/data/user";
-import { _verifyToken, setNewPassword } from "./_actions";
+import { _verifyResetToken, setNewPassword } from "./_actions";
 import Link from "next/link";
 
 export default function SetPasswordForm({
@@ -69,7 +59,7 @@ export default function SetPasswordForm({
       }
 
       try {
-        const isValid = await _verifyToken({ username, token });
+        const isValid = await _verifyResetToken({ username, token });
         setIsTokenValid(isValid.verification);
         if (isValid.verification) {
           toast.success("Token validated");

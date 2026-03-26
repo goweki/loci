@@ -194,7 +194,10 @@ export async function _sendResetLink(
   }
 }
 
-export async function _verifyToken(props: { username: string; token: string }) {
+export async function _verifyResetToken(props: {
+  username: string;
+  token: string;
+}) {
   const { username, token } = props;
   return verifyToken({ username, token });
 }

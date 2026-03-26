@@ -81,7 +81,10 @@ export function SignUpForm() {
 
         if (verificationMethod === NotificationChannel.EMAIL && !email) {
           return toast.error("Email ERROR");
-        } else if (!phoneNumber) {
+        } else if (
+          verificationMethod != NotificationChannel.EMAIL &&
+          !phoneNumber
+        ) {
           return toast.error("Phone Number ERROR");
         }
 
