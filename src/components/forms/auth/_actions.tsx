@@ -133,10 +133,17 @@ export async function setNewPassword(
 
   const tokenValidation = await verifyToken({ token, username });
   if (!tokenValidation.verification) {
-    return { error: "Invalid token" };
+    return { error: tokenValidation.message };
   }
 
-  const updatedUser_ = await updateUserPassword(user.id, { password });
+  try {
+    await updateUserPassword(user.id, { password });
+  } catch (error) {
+    const errorMessage = getFriendlyErrorMessage(error);
+    console.log("ERROR:", error);
+    return { error: errorMessage };
+  }
+
   return { success: `Password updated` };
 }
 

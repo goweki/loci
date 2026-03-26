@@ -224,11 +224,11 @@ export async function sendResetLink(data: {
   const resetLink = `${BASE_URL}/${resetLinkTail}`;
 
   try {
-    const passUpdates = {
-      resetToken: tokenObj.hashed,
-      resetTokenExpiry: tokenObj.expiry,
+    const resetToken = {
+      hashedToken: tokenObj.hashed,
+      expiresAt: tokenObj.expiry,
     };
-    await updateUserPassword(user_.id, passUpdates);
+    await updateUserResetToken(user_.id, resetToken);
 
     let sentTo_: NotificationChannel | undefined = undefined;
 
@@ -521,29 +521,78 @@ export async function updateUser(
 }
 
 /**
- * Update user password.
+ * Update user password and clear the reset token.
  */
-
 export async function updateUserPassword(
   id: string,
   passwordAttributes: {
     password?: string;
-    resetToken?: string | null;
-    resetTokenExpiry?: Date | null;
   },
 ): Promise<{ id: string; email: string | null; tel: string | null }> {
-  const update = passwordAttributes;
+  // 1. Hash the password if provided
+  const hashedPassword = passwordAttributes.password
+    ? await hash(passwordAttributes.password)
+    : undefined;
 
-  if (passwordAttributes.password) {
-    update.password = await hash(passwordAttributes.password);
-    update.resetToken = null;
-    update.resetToken = null;
-  }
+  // 2. Execute as a transaction
+  return await prisma.$transaction(async (tx) => {
+    // A. Update the user password
+    const updatedUser = await tx.user.update({
+      where: { id },
+      data: {
+        password: hashedPassword,
+      },
+      select: { id: true, email: true, tel: true },
+    });
 
-  return prisma.user.update({
-    where: { id },
-    data: update,
-    select: { id: true, email: true, tel: true },
+    // B. Delete the RESET token for this user
+    // We use deleteMany instead of delete to avoid throwing an error
+    // if the token was already deleted or expired.
+    await tx.token.deleteMany({
+      where: {
+        userId: id,
+        type: "RESET",
+      },
+    });
+
+    return updatedUser;
+  });
+}
+
+/**
+ * Update (or Create) user reset token using an Upsert.
+ * respects the @@unique([type, userId]) constraint in schema.
+ */
+export async function updateUserResetToken(
+  id: string,
+  passwordAttributes: {
+    hashedToken: string; // The hashed token
+    expiresAt: Date;
+  },
+) {
+  return await prisma.token.upsert({
+    where: {
+      // Accessing the composite unique index: type_userId
+      type_userId: {
+        userId: id,
+        type: TokenType.RESET,
+      },
+    },
+    // If the record exists, update these fields
+    update: {
+      hashedToken: passwordAttributes.hashedToken,
+      expiresAt: passwordAttributes.expiresAt,
+      isActive: true,
+      lastUsedAt: null, // Reset usage if you're re-issuing
+    },
+    // If the record doesn't exist, create it
+    create: {
+      userId: id,
+      type: TokenType.RESET,
+      hashedToken: passwordAttributes.hashedToken,
+      expiresAt: passwordAttributes.expiresAt,
+      description: "Password reset token",
+    },
   });
 }
 
