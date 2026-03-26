@@ -11,7 +11,8 @@ export type ApiKey = {
   isActive: boolean;
   createdAt: Date;
   expiresAt: Date;
-  lastUsedAT: Date | null;
+  lastUsedAt: Date | null;
+  description: string;
 };
 
 export const getUserApiKeys = async (userId: string): Promise<ApiKey[]> => {
@@ -25,7 +26,8 @@ export const getUserApiKeys = async (userId: string): Promise<ApiKey[]> => {
     isActive: key.isActive,
     createdAt: key.createdAt,
     expiresAt: key.expiresAt,
-    lastUsedAT: key.lastUsedAt,
+    lastUsedAt: key.lastUsedAt,
+    description: key.description,
   }));
 };
 

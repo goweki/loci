@@ -4889,7 +4889,7 @@ export namespace Prisma {
     hashedToken: string
     expiresAt: Date
     channel: $Enums.NotificationChannel | null
-    description: string | null
+    description: string
     userId: string
     isActive: boolean
     createdAt: Date
@@ -4990,7 +4990,7 @@ export namespace Prisma {
       hashedToken: string
       expiresAt: Date
       channel: $Enums.NotificationChannel | null
-      description: string | null
+      description: string
       userId: string
       isActive: boolean
       createdAt: Date
@@ -28330,7 +28330,7 @@ export namespace Prisma {
     hashedToken?: StringFilter<"Token"> | string
     expiresAt?: DateTimeFilter<"Token"> | Date | string
     channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
-    description?: StringNullableFilter<"Token"> | string | null
+    description?: StringFilter<"Token"> | string
     userId?: StringFilter<"Token"> | string
     isActive?: BoolFilter<"Token"> | boolean
     createdAt?: DateTimeFilter<"Token"> | Date | string
@@ -28344,7 +28344,7 @@ export namespace Prisma {
     hashedToken?: SortOrder
     expiresAt?: SortOrder
     channel?: SortOrderInput | SortOrder
-    description?: SortOrderInput | SortOrder
+    description?: SortOrder
     userId?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -28362,7 +28362,7 @@ export namespace Prisma {
     hashedToken?: StringFilter<"Token"> | string
     expiresAt?: DateTimeFilter<"Token"> | Date | string
     channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
-    description?: StringNullableFilter<"Token"> | string | null
+    description?: StringFilter<"Token"> | string
     userId?: StringFilter<"Token"> | string
     isActive?: BoolFilter<"Token"> | boolean
     createdAt?: DateTimeFilter<"Token"> | Date | string
@@ -28376,7 +28376,7 @@ export namespace Prisma {
     hashedToken?: SortOrder
     expiresAt?: SortOrder
     channel?: SortOrderInput | SortOrder
-    description?: SortOrderInput | SortOrder
+    description?: SortOrder
     userId?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -28395,7 +28395,7 @@ export namespace Prisma {
     hashedToken?: StringWithAggregatesFilter<"Token"> | string
     expiresAt?: DateTimeWithAggregatesFilter<"Token"> | Date | string
     channel?: EnumNotificationChannelNullableWithAggregatesFilter<"Token"> | $Enums.NotificationChannel | null
-    description?: StringNullableWithAggregatesFilter<"Token"> | string | null
+    description?: StringWithAggregatesFilter<"Token"> | string
     userId?: StringWithAggregatesFilter<"Token"> | string
     isActive?: BoolWithAggregatesFilter<"Token"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Token"> | Date | string
@@ -30070,7 +30070,7 @@ export namespace Prisma {
     hashedToken: string
     expiresAt: Date | string
     channel?: $Enums.NotificationChannel | null
-    description?: string | null
+    description: string
     isActive?: boolean
     createdAt?: Date | string
     lastUsedAt?: Date | string | null
@@ -30083,7 +30083,7 @@ export namespace Prisma {
     hashedToken: string
     expiresAt: Date | string
     channel?: $Enums.NotificationChannel | null
-    description?: string | null
+    description: string
     userId: string
     isActive?: boolean
     createdAt?: Date | string
@@ -30096,7 +30096,7 @@ export namespace Prisma {
     hashedToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30109,7 +30109,7 @@ export namespace Prisma {
     hashedToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30122,7 +30122,7 @@ export namespace Prisma {
     hashedToken: string
     expiresAt: Date | string
     channel?: $Enums.NotificationChannel | null
-    description?: string | null
+    description: string
     userId: string
     isActive?: boolean
     createdAt?: Date | string
@@ -30135,7 +30135,7 @@ export namespace Prisma {
     hashedToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30147,7 +30147,7 @@ export namespace Prisma {
     hashedToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35585,7 +35585,7 @@ export namespace Prisma {
     hashedToken: string
     expiresAt: Date | string
     channel?: $Enums.NotificationChannel | null
-    description?: string | null
+    description: string
     isActive?: boolean
     createdAt?: Date | string
     lastUsedAt?: Date | string | null
@@ -35597,7 +35597,7 @@ export namespace Prisma {
     hashedToken: string
     expiresAt: Date | string
     channel?: $Enums.NotificationChannel | null
-    description?: string | null
+    description: string
     isActive?: boolean
     createdAt?: Date | string
     lastUsedAt?: Date | string | null
@@ -35934,7 +35934,7 @@ export namespace Prisma {
     hashedToken?: StringFilter<"Token"> | string
     expiresAt?: DateTimeFilter<"Token"> | Date | string
     channel?: EnumNotificationChannelNullableFilter<"Token"> | $Enums.NotificationChannel | null
-    description?: StringNullableFilter<"Token"> | string | null
+    description?: StringFilter<"Token"> | string
     userId?: StringFilter<"Token"> | string
     isActive?: BoolFilter<"Token"> | boolean
     createdAt?: DateTimeFilter<"Token"> | Date | string
@@ -38830,7 +38830,7 @@ export namespace Prisma {
     hashedToken: string
     expiresAt: Date | string
     channel?: $Enums.NotificationChannel | null
-    description?: string | null
+    description: string
     isActive?: boolean
     createdAt?: Date | string
     lastUsedAt?: Date | string | null
@@ -39045,7 +39045,7 @@ export namespace Prisma {
     hashedToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -39057,7 +39057,7 @@ export namespace Prisma {
     hashedToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -39069,7 +39069,7 @@ export namespace Prisma {
     hashedToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     channel?: NullableEnumNotificationChannelFieldUpdateOperationsInput | $Enums.NotificationChannel | null
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

@@ -315,9 +315,9 @@ export function TabSecurity() {
                 >
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
-                      {/* <span className="text-sm font-semibold tracking-tight">
-                        {key.name}
-                      </span> */}
+                      <span className="text-sm font-semibold tracking-tight">
+                        {key.description}
+                      </span>
                       <Badge
                         variant={
                           !key.isActive || key.expiresAt < new Date()
