@@ -3,19 +3,19 @@
 import { SocialIcon } from "react-social-icons";
 
 export function SideBanner() {
-  const sm_links: string[] = ["https://www.linkedin.com/in/nlm-tech"];
+  const sm_links: string[] = ["https://www.linkedin.com/in/goweki"];
 
   return (
     <div className="flex flex-row space-x-4 items-center">
       <div className="pt-1 text-sm">
         Powered by{" "}
         <a
-          href="https://nlm-tech.com"
-          className="text-blue-500"
+          href="https://goweki.com"
+          className="text-emerald-500"
           target="_blank"
           rel="noopener noreferrer"
         >
-          NLM-tech
+          KOMOLO
         </a>
       </div>
       {sm_links.map((link, i) => (
