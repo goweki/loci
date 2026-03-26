@@ -60,6 +60,7 @@ export default function SetPasswordForm({
 
       try {
         const isValid = await _verifyResetToken({ username, token });
+        console.log("TOKEN VERIFICATION:", isValid);
         setIsTokenValid(isValid.verification);
         if (isValid.verification) {
           toast.success("Token validated");
@@ -119,7 +120,7 @@ export default function SetPasswordForm({
           This password reset link is no longer valid. Please request a new one.
         </p>
         <Button asChild variant="outline" className="w-full">
-          <Link href={`/${language}/forgot-password`}>Go Back</Link>
+          <Link href={`/${language}/reset-password`}>Go Back</Link>
         </Button>
       </div>
     );

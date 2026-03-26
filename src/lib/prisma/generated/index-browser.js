@@ -132,9 +132,7 @@ exports.Prisma.UserScalarFieldEnum = {
   role: 'role',
   status: 'status',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  resetToken: 'resetToken',
-  resetTokenExpiry: 'resetTokenExpiry'
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.TokenScalarFieldEnum = {

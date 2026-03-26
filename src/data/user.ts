@@ -8,7 +8,7 @@
 
 import "server-only";
 
-import db from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { buildResetUrlTail, generateResetToken } from "@/lib/utils/resetToken";
 import {
   Prisma,
@@ -27,6 +27,7 @@ import sendSms, { SMSprops } from "@/lib/sms";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import whatsapp from "@/lib/whatsapp";
 import { Message } from "@/lib/validations";
+import { tokenRepository } from "./repositories/token.repository";
 
 export type UserGetPayload = Prisma.UserGetPayload<{
   include: {
@@ -60,7 +61,7 @@ export async function createUser(
 > {
   console.log("Creating user... ", data);
 
-  return await db.user.create({
+  return await prisma.user.create({
     data,
     select: { id: true, name: true, email: true, tel: true },
   });
@@ -103,13 +104,35 @@ export async function registerUser(
     const reseUrlTail = await buildResetUrlTail(tokenObj.plain, username);
     const resetLink = `${BASE_URL}/${reseUrlTail}`;
 
-    const initUser = await db.user.create({
-      data: {
-        ...data_,
-        resetToken: tokenObj.hashed,
-        resetTokenExpiry: tokenObj.expiry.toISOString(),
-      },
-    });
+    let initUser;
+
+    try {
+      // Use a transaction-safe nested write
+      initUser = await prisma.user.create({
+        data: {
+          ...data,
+          tokens: {
+            create: {
+              type: TokenType.RESET,
+              hashedToken: tokenObj.hashed,
+              expiresAt: tokenObj.expiry,
+              description: "Password RESET token on signup",
+              isActive: true,
+            },
+          },
+        },
+        include: {
+          tokens: true,
+        },
+      });
+
+      console.log("User and Reset Token created successfully:", initUser);
+    } catch (error) {
+      // If either the user exists (unique email) or token creation fails,
+      // nothing will be committed to the database.
+      console.error("Transaction failed:", error);
+      throw new Error("User registration and token initialization failed");
+    }
 
     if (notificationChannel === NotificationChannel.EMAIL) {
       const emailToSend = await welcomeEmail(name || "", resetLink);
@@ -162,7 +185,7 @@ export async function registerUser(
     }
 
     if (!tokenSentTo) {
-      throw new Error(`Username not verified:${JSON.stringify(resetLink)}`);
+      throw new Error(`Username not verified: ${JSON.stringify(resetLink)}`);
     }
 
     return { ...initUser, verificationMethod: tokenSentTo };
@@ -302,15 +325,24 @@ export async function verifyToken(data: {
   console.log(`verifying token for user: ${username} \ntoken:${token}\n`);
 
   const user = await getUserByKey(username);
-  if (!user || !user.resetToken || !user.resetTokenExpiry) {
+
+  if (!user || !user.tokens || user.tokens.length == 0) {
+    return { verification: false, message: "Invalid reset-link" };
+  }
+
+  const resetToken = await tokenRepository.findValidTokenByTypeUserId(
+    TokenType.RESET,
+    user.id,
+  );
+  if (!resetToken) {
     return { verification: false, message: "Invalid link" };
   }
 
-  if (!(await compareHash(token, user.resetToken))) {
+  if (!(await compareHash(token, resetToken.hashedToken))) {
     return { verification: false, message: "Invalid token" };
   }
 
-  if (user.resetTokenExpiry < new Date()) {
+  if (resetToken.expiresAt < new Date()) {
     return { verification: false, message: "Expired token" };
   }
 
@@ -321,7 +353,7 @@ export async function verifyToken(data: {
  * Find a user by ID.
  */
 export async function getUserById(id: string): Promise<UserGetPayload | null> {
-  return db.user.findUnique({
+  return prisma.user.findUnique({
     where: { id },
     include: {
       contacts: true,
@@ -352,21 +384,21 @@ export async function getUserById(id: string): Promise<UserGetPayload | null> {
  * Find a user by email.
  */
 export async function getUserByEmail(email: string): Promise<User | null> {
-  return db.user.findUnique({ where: { email } });
+  return prisma.user.findUnique({ where: { email } });
 }
 
 /**
  * Find a user by tel.
  */
 export async function getUserByTel(tel: string): Promise<User | null> {
-  return db.user.findUnique({ where: { tel } });
+  return prisma.user.findUnique({ where: { tel } });
 }
 
 /**
  * Find a user by key attribute.
  */
 export async function getUserByKey(key: string) {
-  return db.user.findFirst({
+  return prisma.user.findFirst({
     where: {
       OR: [{ id: key }, { email: key }, { tel: key }],
     },
@@ -383,7 +415,7 @@ export async function getAllUsers(
   skip = 0,
   take = 20,
 ): Promise<UserGetPayload[]> {
-  return db.user.findMany({
+  return prisma.user.findMany({
     skip,
     take,
     orderBy: { createdAt: "desc" },
@@ -405,7 +437,7 @@ type AdminUser = Prisma.UserGetPayload<{
 }>;
 
 export async function getAdminUsers(skip = 0, take = 20): Promise<AdminUser[]> {
-  return db.user.findMany({
+  return prisma.user.findMany({
     where: { role: UserRole.ADMIN },
     skip,
     take,
@@ -420,7 +452,7 @@ export async function getAdminUsers(skip = 0, take = 20): Promise<AdminUser[]> {
  * Search users by name or email.
  */
 export async function searchUsers(query: string): Promise<User[]> {
-  return db.user.findMany({
+  return prisma.user.findMany({
     where: {
       OR: [
         { name: { contains: query, mode: "insensitive" } },
@@ -435,7 +467,7 @@ export async function searchUsers(query: string): Promise<User[]> {
  * Count total users.
  */
 export async function countUsers(): Promise<number> {
-  return db.user.count();
+  return prisma.user.count();
 }
 
 /**
@@ -444,7 +476,7 @@ export async function countUsers(): Promise<number> {
 export async function getUserByPhoneNumberId(
   phoneNumberId: string,
 ): Promise<Prisma.UserGetPayload<{ include: { waba: true } }> | null> {
-  return db.user.findFirst({
+  return prisma.user.findFirst({
     where: {
       waba: {
         phoneNumbers: {
@@ -473,7 +505,7 @@ export async function updateUser(
     Pick<User, "name" | "email" | "tel" | "image" | "role" | "status">
   >,
 ): Promise<Partial<User>> {
-  return db.user.update({
+  return prisma.user.update({
     where: { id },
     data,
     select: {
@@ -508,7 +540,7 @@ export async function updateUserPassword(
     update.resetToken = null;
   }
 
-  return db.user.update({
+  return prisma.user.update({
     where: { id },
     data: update,
     select: { id: true, email: true, tel: true },
@@ -522,7 +554,7 @@ export async function updateUserStatus(
   id: string,
   status: UserStatus,
 ): Promise<User> {
-  return db.user.update({
+  return prisma.user.update({
     where: { id },
     data: { status },
   });
@@ -535,7 +567,7 @@ export async function updateUserRole(
   id: string,
   role: UserRole,
 ): Promise<User> {
-  return db.user.update({
+  return prisma.user.update({
     where: { id },
     data: { role },
   });
@@ -549,7 +581,7 @@ export async function updateUserRole(
  * Soft-delete (mark as INACTIVE).
  */
 export async function deactivateUser(id: string): Promise<User> {
-  return db.user.update({
+  return prisma.user.update({
     where: { id },
     data: { status: UserStatus.INACTIVE },
   });
@@ -559,7 +591,7 @@ export async function deactivateUser(id: string): Promise<User> {
  * Permanently delete a user and cascade relations.
  */
 export async function deleteUser(id: string): Promise<User> {
-  return db.user.delete({ where: { id } });
+  return prisma.user.delete({ where: { id } });
 }
 
 /* -----------------------------
@@ -570,7 +602,7 @@ export async function deleteUser(id: string): Promise<User> {
  * Get user subscriptions with plan details.
  */
 export async function getUserSubscriptions(userId: string) {
-  return db.subscription.findMany({
+  return prisma.subscription.findMany({
     where: { userId },
     include: { plan: true, payment: true },
   });
@@ -581,14 +613,14 @@ export async function getUserSubscriptions(userId: string) {
  */
 export async function getUserPhoneNumbers(userId: string) {
   const wabaId = (await getUserById(userId))?.id;
-  return db.phoneNumber.findMany({ where: { wabaId } });
+  return prisma.phoneNumber.findMany({ where: { wabaId } });
 }
 
 /**
  * Get all contacts for a user.
  */
 export async function getUserContacts(userId: string) {
-  return db.contact.findMany({
+  return prisma.contact.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
   });
@@ -601,7 +633,7 @@ export async function getUserMessages(
   userId: string,
   filter?: { direction?: string; status?: string },
 ) {
-  return db.message.findMany({
+  return prisma.message.findMany({
     where: {
       userId,
       direction: filter?.direction as any,
@@ -615,7 +647,7 @@ export async function getUserMessages(
  * Check if user has active subscription.
  */
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
-  const sub = await db.subscription.findFirst({
+  const sub = await prisma.subscription.findFirst({
     where: {
       userId,
       startDate: { not: null },
@@ -642,7 +674,7 @@ export async function hasActiveSubscription(userId: string): Promise<boolean> {
  */
 export async function deleteInactiveUsers(olderThanDays: number) {
   const cutoff = new Date(Date.now() - olderThanDays * 24 * 60 * 60 * 1000);
-  return db.user.deleteMany({
+  return prisma.user.deleteMany({
     where: {
       status: UserStatus.INACTIVE,
       updatedAt: { lt: cutoff },
@@ -654,7 +686,7 @@ export async function deleteInactiveUsers(olderThanDays: number) {
  * Get user with all deep relations (admin use).
  */
 export async function getUserFullProfile(userId: string) {
-  return db.user.findUnique({
+  return prisma.user.findUnique({
     where: { id: userId },
     include: {
       subscriptions: { include: { plan: true, payment: true } },

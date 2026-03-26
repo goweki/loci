@@ -3309,8 +3309,6 @@ export namespace Prisma {
     status: $Enums.UserStatus | null
     createdAt: Date | null
     updatedAt: Date | null
-    resetToken: string | null
-    resetTokenExpiry: Date | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -3326,8 +3324,6 @@ export namespace Prisma {
     status: $Enums.UserStatus | null
     createdAt: Date | null
     updatedAt: Date | null
-    resetToken: string | null
-    resetTokenExpiry: Date | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -3343,8 +3339,6 @@ export namespace Prisma {
     status: number
     createdAt: number
     updatedAt: number
-    resetToken: number
-    resetTokenExpiry: number
     _all: number
   }
 
@@ -3362,8 +3356,6 @@ export namespace Prisma {
     status?: true
     createdAt?: true
     updatedAt?: true
-    resetToken?: true
-    resetTokenExpiry?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -3379,8 +3371,6 @@ export namespace Prisma {
     status?: true
     createdAt?: true
     updatedAt?: true
-    resetToken?: true
-    resetTokenExpiry?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -3396,8 +3386,6 @@ export namespace Prisma {
     status?: true
     createdAt?: true
     updatedAt?: true
-    resetToken?: true
-    resetTokenExpiry?: true
     _all?: true
   }
 
@@ -3486,8 +3474,6 @@ export namespace Prisma {
     status: $Enums.UserStatus
     createdAt: Date
     updatedAt: Date
-    resetToken: string | null
-    resetTokenExpiry: Date | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -3520,8 +3506,6 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    resetToken?: boolean
-    resetTokenExpiry?: boolean
     waba?: boolean | User$wabaArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
     contacts?: boolean | User$contactsArgs<ExtArgs>
@@ -3548,8 +3532,6 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    resetToken?: boolean
-    resetTokenExpiry?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -3565,8 +3547,6 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    resetToken?: boolean
-    resetTokenExpiry?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -3582,11 +3562,9 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    resetToken?: boolean
-    resetTokenExpiry?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "tel" | "telVerified" | "image" | "password" | "role" | "status" | "createdAt" | "updatedAt" | "resetToken" | "resetTokenExpiry", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "tel" | "telVerified" | "image" | "password" | "role" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     waba?: boolean | User$wabaArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
@@ -3630,8 +3608,6 @@ export namespace Prisma {
       status: $Enums.UserStatus
       createdAt: Date
       updatedAt: Date
-      resetToken: string | null
-      resetTokenExpiry: Date | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -4077,8 +4053,6 @@ export namespace Prisma {
     readonly status: FieldRef<"User", 'UserStatus'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
-    readonly resetToken: FieldRef<"User", 'String'>
-    readonly resetTokenExpiry: FieldRef<"User", 'DateTime'>
   }
     
 
@@ -27477,9 +27451,7 @@ export namespace Prisma {
     role: 'role',
     status: 'status',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    resetToken: 'resetToken',
-    resetTokenExpiry: 'resetTokenExpiry'
+    updatedAt: 'updatedAt'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -28210,8 +28182,6 @@ export namespace Prisma {
     status?: EnumUserStatusFilter<"User"> | $Enums.UserStatus
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-    resetToken?: StringNullableFilter<"User"> | string | null
-    resetTokenExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
     waba?: XOR<WabaAccountNullableScalarRelationFilter, WabaAccountWhereInput> | null
     accounts?: AccountListRelationFilter
     contacts?: ContactListRelationFilter
@@ -28237,8 +28207,6 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    resetToken?: SortOrderInput | SortOrder
-    resetTokenExpiry?: SortOrderInput | SortOrder
     waba?: WabaAccountOrderByWithRelationInput
     accounts?: AccountOrderByRelationAggregateInput
     contacts?: ContactOrderByRelationAggregateInput
@@ -28267,8 +28235,6 @@ export namespace Prisma {
     status?: EnumUserStatusFilter<"User"> | $Enums.UserStatus
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-    resetToken?: StringNullableFilter<"User"> | string | null
-    resetTokenExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
     waba?: XOR<WabaAccountNullableScalarRelationFilter, WabaAccountWhereInput> | null
     accounts?: AccountListRelationFilter
     contacts?: ContactListRelationFilter
@@ -28294,8 +28260,6 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    resetToken?: SortOrderInput | SortOrder
-    resetTokenExpiry?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -28317,8 +28281,6 @@ export namespace Prisma {
     status?: EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
-    resetToken?: StringNullableWithAggregatesFilter<"User"> | string | null
-    resetTokenExpiry?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   }
 
   export type TokenWhereInput = {
@@ -29918,8 +29880,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -29945,8 +29905,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -29972,8 +29930,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -29999,8 +29955,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -30026,8 +29980,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -30043,8 +29995,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -30060,8 +30010,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type TokenCreateInput = {
@@ -31977,8 +31925,6 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    resetToken?: SortOrder
-    resetTokenExpiry?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -31994,8 +31940,6 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    resetToken?: SortOrder
-    resetTokenExpiry?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -32011,8 +31955,6 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    resetToken?: SortOrder
-    resetTokenExpiry?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -36052,8 +35994,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -36078,8 +36018,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -36120,8 +36058,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -36146,8 +36082,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -36172,8 +36106,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -36198,8 +36130,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -36316,8 +36246,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -36342,8 +36270,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -36447,8 +36373,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -36473,8 +36397,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -36552,8 +36474,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -36578,8 +36498,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -36604,8 +36522,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -36630,8 +36546,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -36672,8 +36586,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -36698,8 +36610,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -36786,8 +36696,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -36812,8 +36720,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -36928,8 +36834,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -36954,8 +36858,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -37570,8 +37472,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -37596,8 +37496,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -37710,8 +37608,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -37736,8 +37632,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -37874,8 +37768,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -37900,8 +37792,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -38018,8 +37908,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -38044,8 +37932,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -38105,8 +37991,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -38131,8 +38015,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -38214,8 +38096,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -38240,8 +38120,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -38266,8 +38144,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -38292,8 +38168,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -38334,8 +38208,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -38360,8 +38232,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -38664,8 +38534,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -38690,8 +38558,6 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -38732,8 +38598,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -38758,8 +38622,6 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput

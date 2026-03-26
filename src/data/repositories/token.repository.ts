@@ -59,6 +59,27 @@ export class TokenRepository {
   }
 
   /**
+   * Find a valid token by its userId and type.
+   * Includes a check to ensure it hasn't expired.
+   */
+  async findValidTokenByTypeUserId(type: TokenType, userId: string) {
+    return prisma.token.findUnique({
+      where: {
+        type_userId: {
+          type,
+          userId,
+        },
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+      include: {
+        user: true,
+      },
+    });
+  }
+
+  /**
    * Get all tokens for a specific user, optionally filtered by type.
    */
   async getTokensByUser(userId: string, type?: TokenType) {
