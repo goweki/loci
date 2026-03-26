@@ -102,13 +102,13 @@ export async function validateToken(
  */
 export function extractApiKey(req: Request): string {
   const headerKey = req.headers.get("api-key") || req.headers.get("x-api-key");
-
   if (headerKey) return headerKey;
 
-  const auth = req.headers.get("authorization");
-
-  if (!auth) return "";
-
+  const auth = req.headers.get("Authorization");
+  if (!auth) {
+    console.error("Authorization failed");
+    return "";
+  }
   return auth.replace(/^Bearer\s+/i, "");
 }
 
