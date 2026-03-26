@@ -8,6 +8,7 @@ export class TokenRepository {
    */
   async upsertToken(data: {
     userId: string;
+    description: string;
     type: TokenType;
     hashedToken: string;
     expiresAt: Date;
@@ -21,6 +22,7 @@ export class TokenRepository {
         },
       },
       update: {
+        description: data.description,
         hashedToken: data.hashedToken,
         expiresAt: data.expiresAt,
         channel: data.channel,
@@ -28,6 +30,7 @@ export class TokenRepository {
       },
       create: {
         userId: data.userId,
+        description: data.description,
         type: data.type,
         hashedToken: data.hashedToken,
         expiresAt: data.expiresAt,

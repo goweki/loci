@@ -51,7 +51,7 @@ model Token {
   hashedToken String
   expiresAt   DateTime             @map("expires_at")
   channel     NotificationChannel?
-  description String?
+  description String
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

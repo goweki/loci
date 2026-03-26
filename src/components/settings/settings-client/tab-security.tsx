@@ -55,9 +55,9 @@ export function TabSecurity() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Reset Password</CardTitle>
+          <CardTitle>Set New Password</CardTitle>
           <CardDescription>
-            Choose how you&apos;d like to receive your password recovery link
+            Choose how you&apos;d like to receive your password reset link
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -206,7 +206,7 @@ export function TabSecurity() {
 
       setIsGenerating(true);
       try {
-        const rawKey = await generateUserApiKey(session?.user.id);
+        const rawKey = await generateUserApiKey(session?.user.id, newKeyName);
         setRevealedKey(rawKey);
         toast.success("API Key generated successfully");
       } catch (err) {

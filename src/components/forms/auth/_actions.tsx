@@ -46,9 +46,10 @@ export async function sendOtp({
     type: TokenType.SIGN_IN,
     expiresAt: addToDate({ hours: 1 }),
     userId: user.id,
+    description: `OTCode-sent-to-${user.id}`,
   });
 
-  console.log(`New token generated for user-${user.id}`);
+  console.log(`New OTCode generated for user-${user.id}`);
 
   try {
     switch (notificationChannel) {

@@ -29,9 +29,13 @@ export const getUserApiKeys = async (userId: string): Promise<ApiKey[]> => {
   }));
 };
 
-export const generateUserApiKey = async (userId: string): Promise<string> => {
+export const generateUserApiKey = async (
+  userId: string,
+  description: string,
+): Promise<string> => {
   const newKey = await createApiKey({
     userId,
+    description,
     expiresAt: addToDate({ days: 1 }),
   });
   return newKey.apiKey;

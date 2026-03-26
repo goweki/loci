@@ -36,6 +36,7 @@ export function hashToken(token: string) {
 export async function createApiKey(options: {
   userId: string;
   expiresAt: Date;
+  description: string;
 }) {
   const user = await getUserById(options.userId);
   if (!user) {
@@ -48,6 +49,7 @@ export async function createApiKey(options: {
 
   const apiKey = await tokenRepository.upsertToken({
     userId: options.userId,
+    description: options.description,
     type: TokenType.API_KEY,
     hashedToken: keyHash,
     expiresAt: options.expiresAt,

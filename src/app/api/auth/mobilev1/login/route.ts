@@ -64,19 +64,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const apiKeyString = await generateUserApiKey(user.id);
-    const updatedToken = await tokenRepository.upsertToken({
-      userId: user.id,
-      type: TokenType.API_KEY,
-      hashedToken: hashToken(apiKeyString),
-      expiresAt: addToDate({ days: 1 }),
-    });
+    const apiKeyString = await generateUserApiKey(user.id, "mobile-login");
 
     return NextResponse.json({
       success: true,
       data: {
         apiKey: apiKeyString,
-        expiresAt: updatedToken.expiresAt,
+        expiresAt: addToDate({ hours: 23 }),
         user: {
           id: user.id,
           name: user.name,
