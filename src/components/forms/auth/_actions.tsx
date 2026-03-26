@@ -2,7 +2,6 @@
 
 import { tokenRepository } from "@/data/repositories/token.repository";
 import {
-  getUserById,
   getUserByKey,
   registerUser,
   sendResetLink,
@@ -173,6 +172,7 @@ export async function signUpUser(
     return { success: false, message: "Unknown error" };
   } catch (error) {
     const errMessage = getFriendlyErrorMessage(error);
+    console.log("User-Facing Error:", errMessage);
     return { success: false, message: errMessage };
   }
 }

@@ -79,121 +79,102 @@ export async function registerUser(
   let tokenSentTo: NotificationChannel | undefined = undefined;
   const { verificationMethod, name, email, tel, ...data_ } = data;
 
-  try {
-    if (!email && !tel) {
-      throw new Error("Email or Phone No. is required");
-    }
-
-    const notificationChannel: NotificationChannel = verificationMethod
-      ? verificationMethod
-      : email
-        ? NotificationChannel.EMAIL
-        : NotificationChannel.SMS;
-    let username: string;
-
-    if (notificationChannel === NotificationChannel.EMAIL) {
-      if (!email) throw new Error("No email provided");
-      username = email;
-    } else {
-      if (!tel) throw new Error("No phone number provided");
-      username = tel;
-    }
-
-    const tokenObj = await generateResetToken();
-
-    const reseUrlTail = await buildResetUrlTail(tokenObj.plain, username);
-    const resetLink = `${BASE_URL}/${reseUrlTail}`;
-
-    let initUser;
-
-    try {
-      // Use a transaction-safe nested write
-      initUser = await prisma.user.create({
-        data: {
-          ...data,
-          tokens: {
-            create: {
-              type: TokenType.RESET,
-              hashedToken: tokenObj.hashed,
-              expiresAt: tokenObj.expiry,
-              description: "Password RESET token on signup",
-              isActive: true,
-            },
-          },
-        },
-        include: {
-          tokens: true,
-        },
-      });
-
-      console.log("User and Reset Token created successfully:", initUser);
-    } catch (error) {
-      // If either the user exists (unique email) or token creation fails,
-      // nothing will be committed to the database.
-      console.error("Transaction failed:", error);
-      throw new Error("User registration and token initialization failed");
-    }
-
-    if (notificationChannel === NotificationChannel.EMAIL) {
-      const emailToSend = await welcomeEmail(name || "", resetLink);
-      await sendMail({
-        to: email!,
-        subject: "Welcome to Loci",
-        html: emailToSend.html,
-        text: emailToSend.text,
-      });
-
-      tokenSentTo = NotificationChannel.EMAIL;
-    } else if (verificationMethod === NotificationChannel.WHATSAPP && tel) {
-      const message: Message = {
-        messaging_product: "whatsapp",
-        recipient_type: "INDIVIDUAL",
-        to: tel,
-        type: "template",
-        template: {
-          name: "set_password",
-          language: { code: TemplateLanguage.en_US },
-          components: [
-            {
-              type: "header",
-              parameters: [
-                { type: "image", image: { link: BANNER_IMAGE_URL } },
-              ],
-            },
-            {
-              type: "body",
-              parameters: [
-                { type: "text", parameter_name: "name", text: name },
-              ],
-            },
-            {
-              type: "button",
-              sub_type: "url",
-              index: "0",
-              parameters: [{ type: "text", text: reseUrlTail }],
-            },
-          ],
-        },
-      };
-
-      console.log("Sending waba message template:", message);
-      await whatsapp.sendTemplate(message);
-
-      tokenSentTo = NotificationChannel.WHATSAPP;
-    } else if (verificationMethod === NotificationChannel.SMS) {
-      tokenSentTo = NotificationChannel.SMS;
-    }
-
-    if (!tokenSentTo) {
-      throw new Error(`Username not verified: ${JSON.stringify(resetLink)}`);
-    }
-
-    return { ...initUser, verificationMethod: tokenSentTo };
-  } catch (error) {
-    console.error("User registration failed: ", error);
-    const errorMessage = getFriendlyErrorMessage(error);
-    throw new Error(errorMessage);
+  if (!email && !tel) {
+    throw new Error("Email or Phone No. is required");
   }
+
+  const notificationChannel: NotificationChannel = verificationMethod
+    ? verificationMethod
+    : email
+      ? NotificationChannel.EMAIL
+      : NotificationChannel.SMS;
+  let username: string;
+
+  if (notificationChannel === NotificationChannel.EMAIL) {
+    if (!email) throw new Error("No email provided");
+    username = email;
+  } else {
+    if (!tel) throw new Error("No phone number provided");
+    username = tel;
+  }
+
+  const tokenObj = await generateResetToken();
+
+  const reseUrlTail = await buildResetUrlTail(tokenObj.plain, username);
+  const resetLink = `${BASE_URL}/${reseUrlTail}`;
+
+  const initUser = await prisma.user.create({
+    data: {
+      name,
+      email,
+      tel,
+      ...data_,
+      tokens: {
+        create: {
+          type: TokenType.RESET,
+          hashedToken: tokenObj.hashed,
+          expiresAt: tokenObj.expiry,
+          description: "Password RESET token on signup",
+          isActive: true,
+        },
+      },
+    },
+    include: {
+      tokens: true,
+    },
+  });
+
+  if (notificationChannel === NotificationChannel.EMAIL) {
+    const emailToSend = await welcomeEmail(name || "", resetLink);
+    await sendMail({
+      to: email!,
+      subject: "Welcome to Loci",
+      html: emailToSend.html,
+      text: emailToSend.text,
+    });
+
+    tokenSentTo = NotificationChannel.EMAIL;
+  } else if (verificationMethod === NotificationChannel.WHATSAPP && tel) {
+    const message: Message = {
+      messaging_product: "whatsapp",
+      recipient_type: "INDIVIDUAL",
+      to: tel,
+      type: "template",
+      template: {
+        name: "set_password",
+        language: { code: TemplateLanguage.en_US },
+        components: [
+          {
+            type: "header",
+            parameters: [{ type: "image", image: { link: BANNER_IMAGE_URL } }],
+          },
+          {
+            type: "body",
+            parameters: [{ type: "text", parameter_name: "name", text: name }],
+          },
+          {
+            type: "button",
+            sub_type: "url",
+            index: "0",
+            parameters: [{ type: "text", text: reseUrlTail }],
+          },
+        ],
+      },
+    };
+
+    console.log("Sending waba message template:", message);
+    await whatsapp.sendTemplate(message);
+
+    tokenSentTo = NotificationChannel.WHATSAPP;
+  } else if (verificationMethod === NotificationChannel.SMS) {
+    tokenSentTo = NotificationChannel.SMS;
+  }
+
+  if (!tokenSentTo) {
+    throw new Error(`Username not verified: ${JSON.stringify(resetLink)}`);
+  }
+
+  return { ...initUser, verificationMethod: tokenSentTo };
 }
 
 /**

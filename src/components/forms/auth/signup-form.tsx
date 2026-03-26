@@ -32,7 +32,6 @@ import GoogleIcon, { WhatsAppLogo } from "@/components/ui/svg";
 import { Divider, IconInput } from "./_shared";
 import { signUpSchema } from "@/lib/validations/authentication";
 import { cn } from "@/lib/utils";
-import { registerUser } from "@/data/user";
 import { removePlus } from "@/lib/utils/telHandlers";
 import { useI18n } from "@/lib/i18n";
 import { signUpUser } from "./_actions";
