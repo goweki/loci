@@ -4,7 +4,6 @@ import { authOptions } from "@/lib/auth";
 import Footer from "@/components/ui/footer";
 import { Navbar, NavbarNavLink } from "@/components/ui/navbar";
 import { getDictionary, isValidLanguage, Language } from "@/lib/i18n";
-import ComingSoon from "@/components/landing-page/coming-soon";
 
 export default async function UnAuthLayout({
   params,
