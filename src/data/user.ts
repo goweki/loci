@@ -8,7 +8,7 @@
 
 import "server-only";
 
-import db from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { buildResetUrlTail, generateResetToken } from "@/lib/utils/resetToken";
 import {
   Prisma,
@@ -27,6 +27,7 @@ import sendSms, { SMSprops } from "@/lib/sms";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import whatsapp from "@/lib/whatsapp";
 import { Message } from "@/lib/validations";
+import { tokenRepository } from "./repositories/token.repository";
 
 export type UserGetPayload = Prisma.UserGetPayload<{
   include: {
@@ -36,6 +37,17 @@ export type UserGetPayload = Prisma.UserGetPayload<{
     waba: { include: { phoneNumbers: true; templates: true } };
   };
 }>;
+
+export function excludeFields<User, Key extends keyof User>(
+  user: User,
+  keys: Key[],
+): Omit<User, Key> {
+  const newUser = { ...user };
+  for (const key of keys) {
+    delete newUser[key];
+  }
+  return newUser;
+}
 
 /**
  * Creates a new user (doesnt send Welcome email)
@@ -49,7 +61,7 @@ export async function createUser(
 > {
   console.log("Creating user... ", data);
 
-  return await db.user.create({
+  return await prisma.user.create({
     data,
     select: { id: true, name: true, email: true, tel: true },
   });
@@ -67,99 +79,102 @@ export async function registerUser(
   let tokenSentTo: NotificationChannel | undefined = undefined;
   const { verificationMethod, name, email, tel, ...data_ } = data;
 
-  try {
-    if (!email && !tel) {
-      throw new Error("Email or Phone No. is required");
-    }
+  if (!email && !tel) {
+    throw new Error("Email or Phone No. is required");
+  }
 
-    const notificationChannel: NotificationChannel = verificationMethod
-      ? verificationMethod
-      : email
-        ? NotificationChannel.EMAIL
-        : NotificationChannel.SMS;
-    let username: string;
+  const notificationChannel: NotificationChannel = verificationMethod
+    ? verificationMethod
+    : email
+      ? NotificationChannel.EMAIL
+      : NotificationChannel.SMS;
+  let username: string;
 
-    if (notificationChannel === NotificationChannel.EMAIL) {
-      if (!email) throw new Error("No email provided");
-      username = email;
-    } else {
-      if (!tel) throw new Error("No phone number provided");
-      username = tel;
-    }
+  if (notificationChannel === NotificationChannel.EMAIL) {
+    if (!email) throw new Error("No email provided");
+    username = email;
+  } else {
+    if (!tel) throw new Error("No phone number provided");
+    username = tel;
+  }
 
-    const tokenObj = await generateResetToken();
+  const tokenObj = await generateResetToken();
 
-    const reseUrlTail = await buildResetUrlTail(tokenObj.plain, username);
-    const resetLink = `${BASE_URL}/${reseUrlTail}`;
+  const reseUrlTail = await buildResetUrlTail(tokenObj.plain, username);
+  const resetLink = `${BASE_URL}/${reseUrlTail}`;
 
-    const initUser = await db.user.create({
-      data: {
-        ...data_,
-        resetToken: tokenObj.hashed,
-        resetTokenExpiry: tokenObj.expiry.toISOString(),
+  const initUser = await prisma.user.create({
+    data: {
+      name,
+      email,
+      tel,
+      ...data_,
+      tokens: {
+        create: {
+          type: TokenType.RESET,
+          hashedToken: tokenObj.hashed,
+          expiresAt: tokenObj.expiry,
+          description: "Password RESET token on signup",
+          isActive: true,
+        },
       },
+    },
+    include: {
+      tokens: true,
+    },
+  });
+
+  if (notificationChannel === NotificationChannel.EMAIL) {
+    const emailToSend = await welcomeEmail(name || "", resetLink);
+    await sendMail({
+      to: email!,
+      subject: "Welcome to Loci",
+      html: emailToSend.html,
+      text: emailToSend.text,
     });
 
-    if (notificationChannel === NotificationChannel.EMAIL) {
-      const emailToSend = await welcomeEmail(name || "", resetLink);
-      await sendMail({
-        to: email!,
-        subject: "Welcome to Loci",
-        html: emailToSend.html,
-        text: emailToSend.text,
-      });
+    tokenSentTo = NotificationChannel.EMAIL;
+  } else if (verificationMethod === NotificationChannel.WHATSAPP && tel) {
+    const message: Message = {
+      messaging_product: "whatsapp",
+      recipient_type: "INDIVIDUAL",
+      to: tel,
+      type: "template",
+      template: {
+        name: "set_password",
+        language: { code: TemplateLanguage.en_US },
+        components: [
+          {
+            type: "header",
+            parameters: [{ type: "image", image: { link: BANNER_IMAGE_URL } }],
+          },
+          {
+            type: "body",
+            parameters: [{ type: "text", parameter_name: "name", text: name }],
+          },
+          {
+            type: "button",
+            sub_type: "url",
+            index: "0",
+            parameters: [{ type: "text", text: reseUrlTail }],
+          },
+        ],
+      },
+    };
 
-      tokenSentTo = NotificationChannel.EMAIL;
-    } else if (verificationMethod === NotificationChannel.WHATSAPP && tel) {
-      const message: Message = {
-        messaging_product: "whatsapp",
-        recipient_type: "INDIVIDUAL",
-        to: tel,
-        type: "template",
-        template: {
-          name: "set_password",
-          language: { code: TemplateLanguage.en_US },
-          components: [
-            {
-              type: "header",
-              parameters: [
-                { type: "image", image: { link: BANNER_IMAGE_URL } },
-              ],
-            },
-            {
-              type: "body",
-              parameters: [
-                { type: "text", parameter_name: "name", text: name },
-              ],
-            },
-            {
-              type: "button",
-              sub_type: "url",
-              index: "0",
-              parameters: [{ type: "text", text: reseUrlTail }],
-            },
-          ],
-        },
-      };
+    console.log("Sending waba message template:", message);
+    await whatsapp.sendTemplate(message);
 
-      console.log("Sending waba message template:", message);
-      await whatsapp.sendTemplate(message);
-
-      tokenSentTo = NotificationChannel.WHATSAPP;
-    } else if (verificationMethod === NotificationChannel.SMS) {
-      tokenSentTo = NotificationChannel.SMS;
-    }
-
-    if (!tokenSentTo) {
-      throw new Error(`Username not verified:${JSON.stringify(resetLink)}`);
-    }
-
-    return { ...initUser, verificationMethod: tokenSentTo };
-  } catch (error) {
-    console.error("User registration failed: ", error);
-    const errorMessage = getFriendlyErrorMessage(error);
-    throw new Error(errorMessage);
+    tokenSentTo = NotificationChannel.WHATSAPP;
+  } else if (verificationMethod === NotificationChannel.SMS) {
+    tokenSentTo = NotificationChannel.SMS;
   }
+
+  if (!tokenSentTo) {
+    throw new Error(`Username not verified: ${JSON.stringify(resetLink)}`);
+  }
+
+  return { ...initUser, verificationMethod: tokenSentTo };
 }
 
 /**
@@ -190,11 +205,11 @@ export async function sendResetLink(data: {
   const resetLink = `${BASE_URL}/${resetLinkTail}`;
 
   try {
-    const passUpdates = {
-      resetToken: tokenObj.hashed,
-      resetTokenExpiry: tokenObj.expiry,
+    const resetToken = {
+      hashedToken: tokenObj.hashed,
+      expiresAt: tokenObj.expiry,
     };
-    await updateUserPassword(user_.id, passUpdates);
+    await updateUserResetToken(user_.id, resetToken);
 
     let sentTo_: NotificationChannel | undefined = undefined;
 
@@ -291,15 +306,24 @@ export async function verifyToken(data: {
   console.log(`verifying token for user: ${username} \ntoken:${token}\n`);
 
   const user = await getUserByKey(username);
-  if (!user || !user.resetToken || !user.resetTokenExpiry) {
+
+  if (!user || !user.tokens || user.tokens.length == 0) {
+    return { verification: false, message: "Invalid reset-link" };
+  }
+
+  const resetToken = await tokenRepository.findValidTokenByTypeUserId(
+    TokenType.RESET,
+    user.id,
+  );
+  if (!resetToken) {
     return { verification: false, message: "Invalid link" };
   }
 
-  if (!(await compareHash(token, user.resetToken))) {
+  if (!(await compareHash(token, resetToken.hashedToken))) {
     return { verification: false, message: "Invalid token" };
   }
 
-  if (user.resetTokenExpiry < new Date()) {
+  if (resetToken.expiresAt < new Date()) {
     return { verification: false, message: "Expired token" };
   }
 
@@ -310,7 +334,7 @@ export async function verifyToken(data: {
  * Find a user by ID.
  */
 export async function getUserById(id: string): Promise<UserGetPayload | null> {
-  return db.user.findUnique({
+  return prisma.user.findUnique({
     where: { id },
     include: {
       contacts: true,
@@ -341,23 +365,26 @@ export async function getUserById(id: string): Promise<UserGetPayload | null> {
  * Find a user by email.
  */
 export async function getUserByEmail(email: string): Promise<User | null> {
-  return db.user.findUnique({ where: { email } });
+  return prisma.user.findUnique({ where: { email } });
 }
 
 /**
  * Find a user by tel.
  */
 export async function getUserByTel(tel: string): Promise<User | null> {
-  return db.user.findUnique({ where: { tel } });
+  return prisma.user.findUnique({ where: { tel } });
 }
 
 /**
  * Find a user by key attribute.
  */
-export async function getUserByKey(key: string): Promise<User | null> {
-  return db.user.findFirst({
+export async function getUserByKey(key: string) {
+  return prisma.user.findFirst({
     where: {
       OR: [{ id: key }, { email: key }, { tel: key }],
+    },
+    include: {
+      tokens: true,
     },
   });
 }
@@ -369,7 +396,7 @@ export async function getAllUsers(
   skip = 0,
   take = 20,
 ): Promise<UserGetPayload[]> {
-  return db.user.findMany({
+  return prisma.user.findMany({
     skip,
     take,
     orderBy: { createdAt: "desc" },
@@ -391,7 +418,7 @@ type AdminUser = Prisma.UserGetPayload<{
 }>;
 
 export async function getAdminUsers(skip = 0, take = 20): Promise<AdminUser[]> {
-  return db.user.findMany({
+  return prisma.user.findMany({
     where: { role: UserRole.ADMIN },
     skip,
     take,
@@ -406,7 +433,7 @@ export async function getAdminUsers(skip = 0, take = 20): Promise<AdminUser[]> {
  * Search users by name or email.
  */
 export async function searchUsers(query: string): Promise<User[]> {
-  return db.user.findMany({
+  return prisma.user.findMany({
     where: {
       OR: [
         { name: { contains: query, mode: "insensitive" } },
@@ -421,7 +448,7 @@ export async function searchUsers(query: string): Promise<User[]> {
  * Count total users.
  */
 export async function countUsers(): Promise<number> {
-  return db.user.count();
+  return prisma.user.count();
 }
 
 /**
@@ -430,7 +457,7 @@ export async function countUsers(): Promise<number> {
 export async function getUserByPhoneNumberId(
   phoneNumberId: string,
 ): Promise<Prisma.UserGetPayload<{ include: { waba: true } }> | null> {
-  return db.user.findFirst({
+  return prisma.user.findFirst({
     where: {
       waba: {
         phoneNumbers: {
@@ -459,7 +486,7 @@ export async function updateUser(
     Pick<User, "name" | "email" | "tel" | "image" | "role" | "status">
   >,
 ): Promise<Partial<User>> {
-  return db.user.update({
+  return prisma.user.update({
     where: { id },
     data,
     select: {
@@ -475,29 +502,78 @@ export async function updateUser(
 }
 
 /**
- * Update user password.
+ * Update user password and clear the reset token.
  */
-
 export async function updateUserPassword(
   id: string,
   passwordAttributes: {
     password?: string;
-    resetToken?: string | null;
-    resetTokenExpiry?: Date | null;
   },
 ): Promise<{ id: string; email: string | null; tel: string | null }> {
-  const update = passwordAttributes;
+  // 1. Hash the password if provided
+  const hashedPassword = passwordAttributes.password
+    ? await hash(passwordAttributes.password)
+    : undefined;
 
-  if (passwordAttributes.password) {
-    update.password = await hash(passwordAttributes.password);
-    update.resetToken = null;
-    update.resetToken = null;
-  }
+  // 2. Execute as a transaction
+  return await prisma.$transaction(async (tx) => {
+    // A. Update the user password
+    const updatedUser = await tx.user.update({
+      where: { id },
+      data: {
+        password: hashedPassword,
+      },
+      select: { id: true, email: true, tel: true },
+    });
 
-  return db.user.update({
-    where: { id },
-    data: update,
-    select: { id: true, email: true, tel: true },
+    // B. Delete the RESET token for this user
+    // We use deleteMany instead of delete to avoid throwing an error
+    // if the token was already deleted or expired.
+    await tx.token.deleteMany({
+      where: {
+        userId: id,
+        type: "RESET",
+      },
+    });
+
+    return updatedUser;
+  });
+}
+
+/**
+ * Update (or Create) user reset token using an Upsert.
+ * respects the @@unique([type, userId]) constraint in schema.
+ */
+export async function updateUserResetToken(
+  id: string,
+  passwordAttributes: {
+    hashedToken: string; // The hashed token
+    expiresAt: Date;
+  },
+) {
+  return await prisma.token.upsert({
+    where: {
+      // Accessing the composite unique index: type_userId
+      type_userId: {
+        userId: id,
+        type: TokenType.RESET,
+      },
+    },
+    // If the record exists, update these fields
+    update: {
+      hashedToken: passwordAttributes.hashedToken,
+      expiresAt: passwordAttributes.expiresAt,
+      isActive: true,
+      lastUsedAt: null, // Reset usage if you're re-issuing
+    },
+    // If the record doesn't exist, create it
+    create: {
+      userId: id,
+      type: TokenType.RESET,
+      hashedToken: passwordAttributes.hashedToken,
+      expiresAt: passwordAttributes.expiresAt,
+      description: "Password reset token",
+    },
   });
 }
 
@@ -508,7 +584,7 @@ export async function updateUserStatus(
   id: string,
   status: UserStatus,
 ): Promise<User> {
-  return db.user.update({
+  return prisma.user.update({
     where: { id },
     data: { status },
   });
@@ -521,7 +597,7 @@ export async function updateUserRole(
   id: string,
   role: UserRole,
 ): Promise<User> {
-  return db.user.update({
+  return prisma.user.update({
     where: { id },
     data: { role },
   });
@@ -535,7 +611,7 @@ export async function updateUserRole(
  * Soft-delete (mark as INACTIVE).
  */
 export async function deactivateUser(id: string): Promise<User> {
-  return db.user.update({
+  return prisma.user.update({
     where: { id },
     data: { status: UserStatus.INACTIVE },
   });
@@ -545,7 +621,7 @@ export async function deactivateUser(id: string): Promise<User> {
  * Permanently delete a user and cascade relations.
  */
 export async function deleteUser(id: string): Promise<User> {
-  return db.user.delete({ where: { id } });
+  return prisma.user.delete({ where: { id } });
 }
 
 /* -----------------------------
@@ -556,7 +632,7 @@ export async function deleteUser(id: string): Promise<User> {
  * Get user subscriptions with plan details.
  */
 export async function getUserSubscriptions(userId: string) {
-  return db.subscription.findMany({
+  return prisma.subscription.findMany({
     where: { userId },
     include: { plan: true, payment: true },
   });
@@ -567,14 +643,14 @@ export async function getUserSubscriptions(userId: string) {
  */
 export async function getUserPhoneNumbers(userId: string) {
   const wabaId = (await getUserById(userId))?.id;
-  return db.phoneNumber.findMany({ where: { wabaId } });
+  return prisma.phoneNumber.findMany({ where: { wabaId } });
 }
 
 /**
  * Get all contacts for a user.
  */
 export async function getUserContacts(userId: string) {
-  return db.contact.findMany({
+  return prisma.contact.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
   });
@@ -587,7 +663,7 @@ export async function getUserMessages(
   userId: string,
   filter?: { direction?: string; status?: string },
 ) {
-  return db.message.findMany({
+  return prisma.message.findMany({
     where: {
       userId,
       direction: filter?.direction as any,
@@ -601,7 +677,7 @@ export async function getUserMessages(
  * Check if user has active subscription.
  */
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
-  const sub = await db.subscription.findFirst({
+  const sub = await prisma.subscription.findFirst({
     where: {
       userId,
       startDate: { not: null },
@@ -628,7 +704,7 @@ export async function hasActiveSubscription(userId: string): Promise<boolean> {
  */
 export async function deleteInactiveUsers(olderThanDays: number) {
   const cutoff = new Date(Date.now() - olderThanDays * 24 * 60 * 60 * 1000);
-  return db.user.deleteMany({
+  return prisma.user.deleteMany({
     where: {
       status: UserStatus.INACTIVE,
       updatedAt: { lt: cutoff },
@@ -640,7 +716,7 @@ export async function deleteInactiveUsers(olderThanDays: number) {
  * Get user with all deep relations (admin use).
  */
 export async function getUserFullProfile(userId: string) {
-  return db.user.findUnique({
+  return prisma.user.findUnique({
     where: { id: userId },
     include: {
       subscriptions: { include: { plan: true, payment: true } },

@@ -2,6 +2,8 @@ import { type NextRequest } from "next/server";
 import { compareHash, hash } from "@/lib/utils/passwordHandlers";
 import { getUserByKey, updateUserPassword } from "@/data/user";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
+import { tokenRepository } from "@/data/repositories/token.repository";
+import { TokenType } from "@/lib/prisma/generated";
 
 //validates token
 export async function GET(request: NextRequest) {
@@ -13,18 +15,22 @@ export async function GET(request: NextRequest) {
 
     const userExists = await getUserByKey(username);
 
-    if (
-      !userExists ||
-      !userExists.resetToken ||
-      !userExists.resetTokenExpiry ||
-      userExists.resetTokenExpiry < new Date()
-    ) {
+    if (!userExists || !userExists.tokens || userExists.tokens.length === 0) {
+      return Response.json({ error: "Invalid reset-link" }, { status: 400 });
+    }
+
+    const resetToken = await tokenRepository.findValidTokenByTypeUserId(
+      TokenType.RESET,
+      userExists.id,
+    );
+
+    if (!resetToken) {
       return Response.json({ error: "Invalid link" }, { status: 400 });
     }
 
     const _isTokenValid: boolean = await compareHash(
       token,
-      userExists.resetToken
+      resetToken?.hashedToken,
     );
 
     if (!_isTokenValid) {
@@ -32,7 +38,7 @@ export async function GET(request: NextRequest) {
         { error: "Invalid token. Try resetting password" },
         {
           status: 400,
-        }
+        },
       );
     } else return Response.json({ message: "Enter new password" });
   } catch (err: any) {
@@ -48,22 +54,26 @@ export async function PUT(request: Request) {
   try {
     const userExists = await getUserByKey(username);
 
-    if (!userExists || !userExists.resetToken || !userExists.resetTokenExpiry) {
-      return Response.json(
-        { error: "Not found. Try resetting your password later." },
-        {
-          status: 404,
-        }
-      );
+    if (!userExists || !userExists.tokens || userExists.tokens.length === 0) {
+      return Response.json({ error: "Invalid reset-link" }, { status: 400 });
     }
 
-    const _isTokenValid = await compareHash(token, userExists.resetToken);
+    const resetToken = await tokenRepository.findValidTokenByTypeUserId(
+      TokenType.RESET,
+      userExists.id,
+    );
+
+    if (!resetToken) {
+      return Response.json({ error: "Invalid link" }, { status: 400 });
+    }
+
+    const _isTokenValid = await compareHash(token, resetToken.hashedToken);
     if (!_isTokenValid)
       return Response.json(
         { error: "Invalid token. Try Resetting your password." },
         {
           status: 401,
-        }
+        },
       );
 
     const userUpdates = {
@@ -76,7 +86,7 @@ export async function PUT(request: Request) {
     if (!updatedUser)
       return Response.json(
         { message: "Password not updated" },
-        { status: 500 }
+        { status: 500 },
       );
 
     return Response.json({ message: "Password updated" });

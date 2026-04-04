@@ -3,13 +3,13 @@ import "server-only";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { ApiKey } from "../prisma/generated";
+import { TokenType } from "../prisma/generated";
 import { addToDate } from "../utils/dateHandlers";
 import { getUserById } from "@/data/user";
+import { tokenRepository } from "@/data/repositories/token.repository";
 
 export type ApiKeyAuth = {
   id: string;
-  permissions: any;
   user: { id: string };
 };
 
@@ -25,8 +25,8 @@ function generateApiKeyString() {
 /**
  * Hash API key before storage
  */
-export function hashApiKey(apiKey: string) {
-  return crypto.createHash("sha256").update(apiKey).digest("hex");
+export function hashToken(token: string) {
+  return crypto.createHash("sha256").update(token).digest("hex");
 }
 
 /**
@@ -34,112 +34,69 @@ export function hashApiKey(apiKey: string) {
  * Returns raw key ONLY ONCE
  */
 export async function createApiKey(options: {
-  name: string;
-  description?: string;
-  permissions?: any;
-  expiresAt?: Date;
-  createdById: string;
+  userId: string;
+  expiresAt: Date;
+  description: string;
 }) {
-  const user = await getUserById(options.createdById);
+  const user = await getUserById(options.userId);
   if (!user) {
     throw new Error("User not found");
   }
 
   const rawKey = generateApiKeyString();
 
-  const keyHash = hashApiKey(rawKey);
+  const keyHash = hashToken(rawKey);
 
-  const apiKey = await prisma.apiKey.create({
-    data: {
-      name: options.name,
-      description: options.description,
-      keyHash,
-      permissions: options.permissions ?? {
-        contracts: true,
-        users: true,
-        loading_advices: true,
-      },
-      expiresAt: options.expiresAt || addToDate({ months: 12 }),
-      createdById: options.createdById,
-    },
+  const apiKey = await tokenRepository.upsertToken({
+    userId: options.userId,
+    description: options.description,
+    type: TokenType.API_KEY,
+    hashedToken: keyHash,
+    expiresAt: options.expiresAt,
   });
 
   return {
     id: apiKey.id,
-    apiKey: rawKey, // only returned once
+    apiKey: rawKey,
   };
 }
 
 /**
- * Validate API key
+ * Validate Token
  */
-export async function validateApiKey(
-  apiKey: string,
+export async function validateToken(
+  token: string,
+  type: TokenType,
 ): Promise<ApiKeyValidationResult> {
-  if (!apiKey) {
+  if (!token) {
     return NextResponse.json({ error: "Missing API key" }, { status: 401 });
   }
 
-  const keyHash = hashApiKey(apiKey);
+  const hashedToken = hashToken(token);
 
-  const record = await prisma.apiKey.findUnique({
-    where: {
-      keyHash,
-    },
-    include: { createdBy: { select: { id: true } } },
-  });
+  const apiKey_inDb = await tokenRepository.findValidToken(hashedToken, type);
 
-  if (!record) {
+  if (!apiKey_inDb) {
     return NextResponse.json({ error: "Invalid API key" }, { status: 401 });
   }
 
-  if (!record.isActive) {
+  if (!apiKey_inDb.isActive) {
     return NextResponse.json({ error: "API key revoked" }, { status: 401 });
   }
 
-  if (record.expiresAt && record.expiresAt < new Date()) {
+  if (apiKey_inDb.expiresAt && apiKey_inDb.expiresAt < new Date()) {
     return NextResponse.json({ error: "API key expired" }, { status: 401 });
   }
 
   /**
    * Update last used timestamp
    */
-  await prisma.apiKey.update({
-    where: { id: record.id },
-    data: {
-      lastUsedAt: new Date(),
-    },
-  });
+  await tokenRepository.touch(apiKey_inDb.id);
 
   return {
-    id: record.id,
-    permissions: record.permissions,
-    user: record.createdBy,
+    id: apiKey_inDb.id,
+    user: apiKey_inDb.user,
   };
-}
-
-/**
- * Disable API key
- */
-export async function revokeApiKey(id: string) {
-  return prisma.apiKey.update({
-    where: { id },
-    data: {
-      isActive: false,
-    },
-  });
-}
-
-/**
- * Reactivate API key
- */
-export async function activateApiKey(id: string) {
-  return prisma.apiKey.update({
-    where: { id },
-    data: {
-      isActive: true,
-    },
-  });
 }
 
 /**
@@ -147,19 +104,19 @@ export async function activateApiKey(id: string) {
  */
 export function extractApiKey(req: Request): string {
   const headerKey = req.headers.get("api-key") || req.headers.get("x-api-key");
-
   if (headerKey) return headerKey;
 
-  const auth = req.headers.get("authorization");
-
-  if (!auth) return "";
-
+  const auth = req.headers.get("Authorization");
+  if (!auth) {
+    console.error("Authorization failed");
+    return "";
+  }
   return auth.replace(/^Bearer\s+/i, "");
 }
 
 export type AuthenticatedHandler = (
   request: NextRequest,
-  apiKey: { id: string; permissions: string[]; user: { id: string } },
+  apiKey: { id: string; user: { id: string } },
 ) => Promise<Response | NextResponse> | Response | NextResponse;
 
 export function apiKeyMiddleware(handler: AuthenticatedHandler) {
@@ -168,7 +125,7 @@ export function apiKeyMiddleware(handler: AuthenticatedHandler) {
       request.headers.get("api-key") ||
       request.headers.get("authorization")?.replace("Bearer ", "");
 
-    const auth = await validateApiKey(apiKey || "");
+    const auth = await validateToken(apiKey || "", TokenType.API_KEY);
 
     if (auth instanceof NextResponse) {
       return auth;

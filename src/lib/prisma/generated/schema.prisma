@@ -8,20 +8,18 @@ datasource db {
 }
 
 model User {
-  id               String     @id @default(cuid())
-  name             String?
-  email            String?    @unique
-  emailVerified    DateTime?
-  tel              String?    @unique
-  telVerified      DateTime?
-  image            String?
-  password         String?
-  role             UserRole   @default(USER)
-  status           UserStatus @default(ACTIVE)
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  resetToken       String?
-  resetTokenExpiry DateTime?
+  id            String     @id @default(cuid())
+  name          String?
+  email         String?    @unique
+  emailVerified DateTime?
+  tel           String?    @unique
+  telVerified   DateTime?
+  image         String?
+  password      String?
+  role          UserRole   @default(USER)
+  status        UserStatus @default(ACTIVE)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
   waba WabaAccount?
 
@@ -30,7 +28,6 @@ model User {
   messages        Message[]
   subscriptions   Subscription[]
   sessions        Session[]
-  apiKeys         ApiKey[]
   tokens          Token[]
   autoreplyRules  AutoReplyRule[]
   wabaTemplates   WabaTemplate[]
@@ -39,27 +36,31 @@ model User {
   @@map("users")
 }
 
-model ApiKey {
-  id          String  @id @default(uuid())
-  name        String
-  keyHash     String  @unique
-  description String?
+enum TokenType {
+  SIGN_IN
+  RESET
+  ONBOARDING
+  API_KEY
+}
 
-  permissions Json @default("{\"read\": true, \"write\": true}")
+model Token {
+  id          String               @id @default(cuid())
+  type        TokenType
+  hashedToken String
+  expiresAt   DateTime             @map("expires_at")
+  channel     NotificationChannel?
+  description String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   isActive   Boolean   @default(true) @map("is_active")
-  expiresAt  DateTime  @map("expires_at")
-  lastUsedAt DateTime? @map("last_used_at")
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
 
-  createdById String @map("created_by_id")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  createdBy User @relation(fields: [createdById], references: [id])
-
-  @@index([createdById])
-  @@map("api_keys")
+  @@unique([type, userId])
+  @@index([type, hashedToken])
+  @@map("auth_tokens")
 }
 
 enum WabaOwnership {
@@ -141,30 +142,6 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_sessions")
-}
-
-enum TokenType {
-  SIGN_IN
-  RESET
-  ONBOARDING
-}
-
-model Token {
-  id          String               @id @default(cuid())
-  type        TokenType
-  hashedToken String
-  expires     DateTime
-  channel     NotificationChannel?
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt  DateTime  @default(now())
-  lastUsedAt DateTime?
-
-  @@unique([type, userId])
-  @@index([type, hashedToken])
-  @@map("auth_tokens")
 }
 
 enum NotificationChannel {

@@ -1,14 +1,14 @@
 "use server";
 
+import { tokenRepository } from "@/data/repositories/token.repository";
 import {
-  getUserById,
   getUserByKey,
   registerUser,
   sendResetLink,
   updateUserPassword,
   verifyToken,
 } from "@/data/user";
-import { hashApiKey } from "@/lib/auth/api-key";
+import { hashToken } from "@/lib/auth/token-handlers";
 import prisma from "@/lib/prisma";
 import { NotificationChannel, TokenType } from "@/lib/prisma/generated";
 import sendSms from "@/lib/sms";
@@ -37,19 +37,18 @@ export async function sendOtp({
 
   if (!user) throw new Error("User not found");
 
-  // Generate  OTP and save it to the DB here
+  // Generate  OTP and save it to the DB
   const otpCode = await generateRandom(6);
-  const hashedToken = hashApiKey(otpCode);
-  await prisma.token.create({
-    data: {
-      hashedToken,
-      type: TokenType.SIGN_IN,
-      expires: addToDate({ hours: 1 }),
-      userId: user.id,
-    },
+  const hashedToken = hashToken(otpCode);
+  await tokenRepository.upsertToken({
+    hashedToken,
+    type: TokenType.SIGN_IN,
+    expiresAt: addToDate({ hours: 1 }),
+    userId: user.id,
+    description: `OTCode-sent-to-${user.id}`,
   });
 
-  console.log(`New token generated for user-${user.id}`);
+  console.log(`New OTCode generated for user-${user.id}`);
 
   try {
     switch (notificationChannel) {
@@ -97,14 +96,14 @@ export async function verifyAndClearOtp({
 }: VerifyOtpProps): Promise<boolean> {
   if (!otpVal) return false;
 
-  const hashedToken = hashApiKey(otpVal);
+  const hashedToken = hashToken(otpVal);
 
   try {
     const deleteResult = await prisma.token.deleteMany({
       where: {
         hashedToken,
         userId,
-        expires: { gt: new Date() },
+        expiresAt: { gt: new Date() },
       },
     });
 
@@ -133,10 +132,17 @@ export async function setNewPassword(
 
   const tokenValidation = await verifyToken({ token, username });
   if (!tokenValidation.verification) {
-    return { error: "Invalid token" };
+    return { error: tokenValidation.message };
   }
 
-  const updatedUser_ = await updateUserPassword(user.id, { password });
+  try {
+    await updateUserPassword(user.id, { password });
+  } catch (error) {
+    const errorMessage = getFriendlyErrorMessage(error);
+    console.log("ERROR:", error);
+    return { error: errorMessage };
+  }
+
   return { success: `Password updated` };
 }
 
@@ -166,6 +172,7 @@ export async function signUpUser(
     return { success: false, message: "Unknown error" };
   } catch (error) {
     const errMessage = getFriendlyErrorMessage(error);
+    console.log("User-Facing Error:", errMessage);
     return { success: false, message: errMessage };
   }
 }
@@ -194,7 +201,10 @@ export async function _sendResetLink(
   }
 }
 
-export async function _verifyToken(props: { username: string; token: string }) {
+export async function _verifyResetToken(props: {
+  username: string;
+  token: string;
+}) {
   const { username, token } = props;
   return verifyToken({ username, token });
 }

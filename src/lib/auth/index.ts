@@ -1,2 +1,2 @@
-export * from "./auth-api";
+export * from "./auth-actions";
 export * from "./auth-options";

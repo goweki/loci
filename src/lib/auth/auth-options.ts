@@ -8,7 +8,7 @@ import { upsertAccount } from "@/data/account";
 import { compareHash } from "../utils/passwordHandlers";
 import { SubscriptionStatusEnum } from "@/types";
 import prisma from "../prisma";
-import { hashApiKey } from "./api-key";
+import { hashToken } from "./token-handlers";
 
 if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("NEXTAUTH_SECRET is not set in environment variables");
@@ -52,7 +52,7 @@ export const authOptions: NextAuthOptions = {
           );
         }
         if (!isPasswordValid) {
-          const hashedPassword = hashApiKey(credentials.password);
+          const hashedPassword = hashToken(credentials.password);
           const validOtp = validTokens.find(
             ({ hashedToken }) => hashedToken === hashedPassword,
           );

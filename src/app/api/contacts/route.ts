@@ -1,4 +1,4 @@
-// app/api/messages/route.ts
+// app/api/contacts/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -21,9 +21,7 @@ export async function GET(request: NextRequest) {
     userId = token_inDb?.user.id || null;
   }
 
-  if (!userId) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
+  if (!userId) return new NextResponse("Unauthorized", { status: 401 });
 
   const { searchParams } = new URL(request.url);
   const contactId = searchParams.get("contactId");
@@ -31,20 +29,19 @@ export async function GET(request: NextRequest) {
   const page = parseInt(searchParams.get("page") || "1");
   const limit = parseInt(searchParams.get("limit") || "50");
 
-  const messages = await db.message.findMany({
+  const contacts = await db.contact.findMany({
     where: {
       userId,
       ...(contactId && { contactId }),
       ...(phoneNumberId && { phoneNumberId }),
     },
     include: {
-      contact: true,
-      phoneNumber: true,
+      messages: true,
     },
-    orderBy: { timestamp: "desc" },
+    orderBy: { createdAt: "desc" },
     take: limit,
     skip: (page - 1) * limit,
   });
 
-  return NextResponse.json({ messages });
+  return NextResponse.json({ contacts });
 }
