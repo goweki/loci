@@ -9,9 +9,6 @@ export default async function Landing({
 }) {
   const { lang } = await params;
   if (!isValidLanguage(lang)) return null;
-  const dict = await getDictionary(lang);
-
-  const launchDate = new Date("2026-04-01T00:00:00");
 
   return (
     <main>
