@@ -19,7 +19,9 @@ export default function ComingSoon() {
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const targetDate = new Date("2026-05-01").getTime();
+      const targetDate = new Date(
+        process.env.LAUNCH_DATE || "2026-05-01",
+      ).getTime();
       const now = new Date().getTime();
       const difference = targetDate - now;
 
