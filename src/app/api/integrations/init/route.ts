@@ -31,12 +31,12 @@ const postInit: AuthenticatedHandler = async (request, apiKey) => {
 
     const syncRes = await metaSyncService.syncFromMeta();
 
-    if (syncRes.errors) {
+    if (syncRes.errors.length > 0) {
       return NextResponse.json(
         {
           success: false,
           error: "synchronization failed",
-          details: syncRes.errors,
+          details: JSON.stringify(syncRes.errors),
         },
         { status: 500 },
       );
@@ -44,7 +44,7 @@ const postInit: AuthenticatedHandler = async (request, apiKey) => {
 
     return NextResponse.json({
       success: true,
-      details: `synchronized: ${JSON.stringify(syncRes.errors)}`,
+      details: `synchronized: created-${syncRes.created}, updated-${syncRes.updated}`,
     });
   } catch (error: any) {
     console.error(`[WABA_DISPATCH_ERROR]:`, error);
