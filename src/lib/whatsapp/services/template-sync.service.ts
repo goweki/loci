@@ -15,6 +15,7 @@ import {
   WabaOwnership,
   WabaAccount,
   Prisma,
+  PhoneNumberStatus,
 } from "@/lib/prisma/generated";
 import type { WhatsAppClient } from "./client";
 import { getAdminUsers } from "@/data/user";
@@ -168,6 +169,7 @@ export class MetaSyncService {
             phoneNumber: display_phone_number,
             displayName: verified_name,
             wabaId,
+            status: PhoneNumberStatus.VERIFIED,
           }),
         );
 
@@ -177,6 +179,7 @@ export class MetaSyncService {
           update: {
             phoneNumber: phoneNo.phoneNumber,
             displayName: phoneNo.displayName,
+            status: phoneNo.status,
           },
           create: phoneNo,
         });
