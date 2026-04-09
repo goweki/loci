@@ -34,7 +34,7 @@ const postInit: AuthenticatedHandler = async (request, apiKey) => {
     return NextResponse.json(
       {
         success: true,
-        details: "synchronizing...",
+        details: "synchronized",
       },
       { status: 201 },
     );
