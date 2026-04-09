@@ -19,7 +19,13 @@ const postInit: AuthenticatedHandler = async (request, apiKey) => {
     const launchDate = body.launchDate;
 
     if (launchDate !== process.env.LAUNCH_DATE) {
-      throw new Error("Invalid info, bro");
+      return NextResponse.json(
+        {
+          success: false,
+          details: "Invalid info, bro...",
+        },
+        { status: 400 },
+      );
     }
 
     metaSyncService.syncFromMeta();
