@@ -29,7 +29,7 @@ const postInit: AuthenticatedHandler = async (request, apiKey) => {
       );
     }
 
-    metaSyncService.syncFromMeta();
+    await metaSyncService.syncFromMeta();
 
     return NextResponse.json(
       {
