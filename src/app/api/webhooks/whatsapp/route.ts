@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   if (!WHATSAPP_VERIFY_TOKEN) {
     return NextResponse.json(
       { error: "Verifivcation TOKEN not configured" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function processWebhookEvent(body: InboundWebhookPayload) {
-  console.log("processing webhook event:", body);
+  console.log("processing webhook event:", JSON.stringify(body));
   const entry = body.entry?.[0];
   const changes = entry?.changes?.[0];
 
