@@ -44,7 +44,7 @@ const postInit: AuthenticatedHandler = async (request, apiKey) => {
 
     return NextResponse.json({
       success: true,
-      details: "synchronized",
+      details: `synchronized: ${JSON.stringify(syncRes.errors)}`,
     });
   } catch (error: any) {
     console.error(`[WABA_DISPATCH_ERROR]:`, error);
