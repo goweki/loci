@@ -19,6 +19,7 @@ const postInit: AuthenticatedHandler = async (request, apiKey) => {
     const launchDate = body.launchDate;
 
     if (launchDate !== process.env.LAUNCH_DATE) {
+      console.error("invalid launch date", launchDate, process.env.LAUNCH_DATE);
       return NextResponse.json(
         {
           success: false,
