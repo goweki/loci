@@ -25,6 +25,7 @@ import {
   updateWabaAccount,
 } from "@/data/waba";
 import { createPhoneNumber, getAllPhoneNumbers } from "@/data/phoneNumber";
+import prisma from "@/lib/prisma";
 
 /**
  * Service that syncs templates between Meta's API and our database
@@ -145,7 +146,7 @@ export class MetaSyncService {
     // sync phone numbers
     const ownedWabaPhoneNumbersInCloud = (await this.WaClient.getPhoneNumbers())
       .data;
-    const ownedWabaPhoneNumbersInDb = await getAllPhoneNumbers();
+    // const ownedWabaPhoneNumbersInDb = await getAllPhoneNumbers();
 
     try {
       if (!ownedWabaInDb) {
@@ -171,7 +172,14 @@ export class MetaSyncService {
         );
 
       for (const phoneNo of appendedPhoneNumbers) {
-        await createPhoneNumber(phoneNo);
+        await prisma.phoneNumber.upsert({
+          where: { id: phoneNo.id },
+          update: {
+            phoneNumber: phoneNo.phoneNumber,
+            displayName: phoneNo.displayName,
+          },
+          create: phoneNo,
+        });
       }
       result.created++;
 

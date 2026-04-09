@@ -775,8 +775,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 7.4.2
-   * Query Engine version: 94a226be1cf2967af2541cca5529f0f7ba866919
+   * Prisma Client JS version: 7.7.0
+   * Query Engine version: 75cbdc1eb7150937890ad5465d861175c6624711
    */
   export type PrismaVersion = {
     client: string
@@ -4249,6 +4249,11 @@ export namespace Prisma {
      * Skip the first `n` Users.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Users.
+     */
     distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
 
@@ -5599,6 +5604,11 @@ export namespace Prisma {
      * Skip the first `n` Tokens.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Tokens.
+     */
     distinct?: TokenScalarFieldEnum | TokenScalarFieldEnum[]
   }
 
@@ -6719,6 +6729,11 @@ export namespace Prisma {
      * Skip the first `n` WabaAccounts.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WabaAccounts.
+     */
     distinct?: WabaAccountScalarFieldEnum | WabaAccountScalarFieldEnum[]
   }
 
@@ -7926,6 +7941,11 @@ export namespace Prisma {
      * Skip the first `n` WabaTemplates.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WabaTemplates.
+     */
     distinct?: WabaTemplateScalarFieldEnum | WabaTemplateScalarFieldEnum[]
   }
 
@@ -8990,6 +9010,11 @@ export namespace Prisma {
      * Skip the first `n` Sessions.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Sessions.
+     */
     distinct?: SessionScalarFieldEnum | SessionScalarFieldEnum[]
   }
 
@@ -10086,6 +10111,11 @@ export namespace Prisma {
      * Skip the first `n` Subscriptions.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Subscriptions.
+     */
     distinct?: SubscriptionScalarFieldEnum | SubscriptionScalarFieldEnum[]
   }
 
@@ -11249,6 +11279,11 @@ export namespace Prisma {
      * Skip the first `n` Payments.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Payments.
+     */
     distinct?: PaymentScalarFieldEnum | PaymentScalarFieldEnum[]
   }
 
@@ -12427,6 +12462,11 @@ export namespace Prisma {
      * Skip the first `n` Plans.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Plans.
+     */
     distinct?: PlanScalarFieldEnum | PlanScalarFieldEnum[]
   }
 
@@ -13534,6 +13574,11 @@ export namespace Prisma {
      * Skip the first `n` Features.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Features.
+     */
     distinct?: FeatureScalarFieldEnum | FeatureScalarFieldEnum[]
   }
 
@@ -14663,6 +14708,11 @@ export namespace Prisma {
      * Skip the first `n` PlanFeatures.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlanFeatures.
+     */
     distinct?: PlanFeatureScalarFieldEnum | PlanFeatureScalarFieldEnum[]
   }
 
@@ -15800,6 +15850,11 @@ export namespace Prisma {
      * Skip the first `n` PhoneNumbers.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PhoneNumbers.
+     */
     distinct?: PhoneNumberScalarFieldEnum | PhoneNumberScalarFieldEnum[]
   }
 
@@ -16974,6 +17029,11 @@ export namespace Prisma {
      * Skip the first `n` Contacts.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Contacts.
+     */
     distinct?: ContactScalarFieldEnum | ContactScalarFieldEnum[]
   }
 
@@ -18183,6 +18243,11 @@ export namespace Prisma {
      * Skip the first `n` Messages.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Messages.
+     */
     distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
   }
 
@@ -19275,6 +19340,11 @@ export namespace Prisma {
      * Skip the first `n` MessageUnprocesseds.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MessageUnprocesseds.
+     */
     distinct?: MessageUnprocessedScalarFieldEnum | MessageUnprocessedScalarFieldEnum[]
   }
 
@@ -20438,6 +20508,11 @@ export namespace Prisma {
      * Skip the first `n` AutoReplyRules.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AutoReplyRules.
+     */
     distinct?: AutoReplyRuleScalarFieldEnum | AutoReplyRuleScalarFieldEnum[]
   }
 
@@ -21457,6 +21532,11 @@ export namespace Prisma {
      * Skip the first `n` WebhookEvents.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WebhookEvents.
+     */
     distinct?: WebhookEventScalarFieldEnum | WebhookEventScalarFieldEnum[]
   }
 
@@ -22612,6 +22692,11 @@ export namespace Prisma {
      * Skip the first `n` Accounts.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Accounts.
+     */
     distinct?: AccountScalarFieldEnum | AccountScalarFieldEnum[]
   }
 
@@ -23852,6 +23937,11 @@ export namespace Prisma {
      * Skip the first `n` ChatbotConfigs.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ChatbotConfigs.
+     */
     distinct?: ChatbotConfigScalarFieldEnum | ChatbotConfigScalarFieldEnum[]
   }
 
@@ -25037,6 +25127,11 @@ export namespace Prisma {
      * Skip the first `n` ChatbotConversations.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ChatbotConversations.
+     */
     distinct?: ChatbotConversationScalarFieldEnum | ChatbotConversationScalarFieldEnum[]
   }
 
@@ -26147,6 +26242,11 @@ export namespace Prisma {
      * Skip the first `n` PromptTemplates.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PromptTemplates.
+     */
     distinct?: PromptTemplateScalarFieldEnum | PromptTemplateScalarFieldEnum[]
   }
 
@@ -27235,6 +27335,11 @@ export namespace Prisma {
      * Skip the first `n` Contactuses.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Contactuses.
+     */
     distinct?: ContactUsScalarFieldEnum | ContactUsScalarFieldEnum[]
   }
 
