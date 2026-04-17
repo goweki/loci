@@ -213,6 +213,7 @@ export function TabSecurity() {
         toast.error("Failed to generate key");
       } finally {
         setIsGenerating(false);
+        refreshKeys();
       }
     };
 

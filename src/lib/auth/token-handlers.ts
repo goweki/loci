@@ -53,6 +53,7 @@ export async function createApiKey(options: {
     type: TokenType.API_KEY,
     hashedToken: keyHash,
     expiresAt: options.expiresAt,
+    isActive: true,
   });
 
   return {
