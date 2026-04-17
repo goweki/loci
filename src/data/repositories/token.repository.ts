@@ -13,6 +13,7 @@ export class TokenRepository {
     hashedToken: string;
     expiresAt: Date;
     channel?: Token["channel"];
+    isActive?: boolean;
   }) {
     return prisma.token.upsert({
       where: {
@@ -26,7 +27,8 @@ export class TokenRepository {
         hashedToken: data.hashedToken,
         expiresAt: data.expiresAt,
         channel: data.channel,
-        lastUsedAt: null, // Reset usage on update
+        lastUsedAt: null,
+        isActive: data.isActive,
       },
       create: {
         userId: data.userId,
@@ -35,6 +37,7 @@ export class TokenRepository {
         hashedToken: data.hashedToken,
         expiresAt: data.expiresAt,
         channel: data.channel,
+        isActive: data.isActive,
       },
     });
   }
