@@ -71,10 +71,12 @@ export function TabSecurity() {
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2">
                 <KeyIcon className="h-5 w-5 text-primary" />
-                API Access Keys
+                API Access Key
               </CardTitle>
               <CardDescription>
-                Use these keys to authenticate your requests to our API.
+                Use this key to authenticate your requests to our API.
+                Generating a new key will log you out of existing mobile logins
+                and invalidate any existing key
               </CardDescription>
             </div>
           </div>
@@ -213,7 +215,6 @@ export function TabSecurity() {
         toast.error("Failed to generate key");
       } finally {
         setIsGenerating(false);
-        refreshKeys();
       }
     };
 

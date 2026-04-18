@@ -29,6 +29,7 @@ export class TokenRepository {
         channel: data.channel,
         lastUsedAt: null,
         isActive: data.isActive,
+        createdAt: new Date(),
       },
       create: {
         userId: data.userId,
