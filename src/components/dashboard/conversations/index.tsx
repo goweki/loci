@@ -30,6 +30,7 @@ import { getPhoneNumbersByUser } from "@/data/phoneNumber";
 import { Button } from "@/components/ui/button";
 import { Input, InputWithIcon } from "@/components/ui/input";
 import toast from "react-hot-toast";
+import { Card } from "@/components/ui/card";
 
 type TabName = "all" | "unread" | "archived";
 
@@ -174,7 +175,7 @@ const ConversationsComponent = () => {
   return (
     <div className="flex h-screen overflow-y-auto pb-4">
       {/* Conversations List Sidebar */}
-      <div className="w-96 border-r border-border bg-card flex flex-col">
+      <Card className="w-96 bg-card flex flex-col">
         <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -249,7 +250,7 @@ const ConversationsComponent = () => {
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* Chat Area */}
       <div className="flex-1 flex flex-col bg-background">
@@ -264,7 +265,7 @@ const ConversationsComponent = () => {
                 </div>
                 <div>
                   <h2 className="font-semibold text-card-foreground">
-                    {selectedContact.name}
+                    {selectedContact.name} : {selectedContact.phoneNumber}
                   </h2>
                 </div>
               </div>

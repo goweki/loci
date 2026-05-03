@@ -33,11 +33,11 @@ const Footer = () => {
           <span className="text-muted-foreground">
             &copy; {new Date().getFullYear()}{" "}
             <Link
-              href="https://nlm-tech.com"
+              href="mailto:komolo.digital@gmail.com"
               target="_blank"
               className="hover:underline"
             >
-              NLM-tech
+              Komolo
             </Link>
             . All rights reserved.
           </span>
