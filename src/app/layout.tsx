@@ -1,10 +1,26 @@
-export const metadata = {
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import Providers from "./providers";
+import { BASE_URL } from "@/lib/utils/getUrl";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
   title: {
     template: "%s | loci ",
     default: "loci",
   },
   description: "Supercharging Engagement",
-  metadataBase: new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000"),
   icons: {
     icon: "/brand/favicon.ico",
     shortcut: "/brand/favicon-16x16.png",
@@ -45,22 +61,17 @@ export const metadata = {
   },
 };
 
-import { Inter } from "next/font/google";
-import "./globals.css";
-import "aos/dist/aos.css";
-import Providers from "./providers";
-
-const inter = Inter({ subsets: ["latin"] });
-
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
-      <body className={inter.className}>
-        <Providers>{children}</Providers>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <Providers> {children}</Providers>
       </body>
     </html>
   );

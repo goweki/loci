@@ -65,7 +65,7 @@ const ConversationsComponent = () => {
   const [contacts, setContacts] = useState<ContactGetPayload[]>();
   const [userPhoneNumbers, setUserPhoneNumbers] = useState<PhoneNumber[]>();
   const [selectedContact, setSelectedContact] = useState<ContactType | null>(
-    null
+    null,
   );
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [messageInput, setMessageInput] = useState("");
@@ -172,7 +172,7 @@ const ConversationsComponent = () => {
   };
 
   return (
-    <main className="flex h-screen overflow-y-auto pb-4">
+    <div className="flex h-screen overflow-y-auto pb-4">
       {/* Conversations List Sidebar */}
       <div className="w-96 border-r border-border bg-card flex flex-col">
         <div className="p-4 border-b border-border">
@@ -241,7 +241,7 @@ const ConversationsComponent = () => {
                   </div>
                   <p className="text-sm truncate mb-1">
                     {JSON.stringify(
-                      contact.messages[contact.messages.length - 1]?.content
+                      contact.messages[contact.messages.length - 1]?.content,
                     )}
                   </p>
                 </div>
@@ -337,7 +337,7 @@ const ConversationsComponent = () => {
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 };
 
