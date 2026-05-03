@@ -19,8 +19,11 @@ export interface SMSMessageResponse {
 }
 
 export default async function sendSms(options: SMSprops) {
+  // if (!SENDER_ID && !options.from) {
+  //   throw new Error("[AFRICASTALKING] missing 'from' in SMS options'");
+  // }
   if (!SENDER_ID) {
-    throw new Error("missing .env AFRICASTALKING_SENDER_ID");
+    throw new Error("missing env.AFRICASTALKING_SENDER_ID");
   }
   const smsOptions = { ...options, from: options.from || SENDER_ID };
 
