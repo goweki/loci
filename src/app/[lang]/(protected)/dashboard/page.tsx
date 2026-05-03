@@ -16,7 +16,7 @@ const DashboardPage = async () => {
   const stats = await getDashboardStatsSummary(session.user.id);
 
   return (
-    <main className="flex-1 overflow-y-auto p-6">
+    <>
       <div className="max-w-7xl mx-auto space-y-6">
         <DashboardTitle />
         <DashboardStats stats={stats} />
@@ -24,7 +24,7 @@ const DashboardPage = async () => {
         <RecentConvos />
       </div>
       <Footer />
-    </main>
+    </>
   );
 };
 

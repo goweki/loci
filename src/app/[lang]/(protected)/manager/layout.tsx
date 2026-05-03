@@ -12,11 +12,9 @@ export default async function ManagerLayout({
   const { lang } = await params;
 
   return isValidLanguage(lang) ? (
-    <div className="flex h-screen bg-background pt-16">
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar />
-        {children}
-      </div>
-    </div>
+    <>
+      <Navbar />
+      {children}
+    </>
   ) : null;
 }
