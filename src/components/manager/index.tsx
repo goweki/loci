@@ -23,9 +23,13 @@ import TabTemplates from "./tab-templates";
 import TabPhoneNumbers from "./tab-phoneNumbers";
 import TabAutoreplyRules from "./tab-autoReply";
 import TabSettings from "./tab-settings";
+import { useSearchParams } from "next/navigation";
 
 export default function ManagerComponent() {
-  const [activeTab, setActiveTab] = useState("templates");
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
+
+  const [activeTab, setActiveTab] = useState(tab ?? "templates");
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
