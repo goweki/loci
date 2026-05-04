@@ -3,6 +3,7 @@
 import { useI18n } from "@/lib/i18n";
 import { Plus, Send, Zap } from "lucide-react";
 import { Card } from "../ui/card";
+import Link from "next/link";
 
 const translations = {
   en: {
@@ -28,16 +29,19 @@ export default function QuickActions() {
       label: t.sendMessage,
       icon: Send,
       color: "bg-blue-600 hover:bg-blue-700",
+      href: `/${language}/dashboard/conversations?dialog=new-message`,
     },
     {
       label: t.addContact,
       icon: Plus,
       color: "bg-green-600 hover:bg-green-700",
+      href: `/${language}/dashboard/contacts?dialog=new-contact`,
     },
     {
       label: t.createRule,
       icon: Zap,
       color: "bg-purple-600 hover:bg-purple-700",
+      href: `/${language}/dashboard/manager?dialog=new-contact`,
     },
   ];
 
@@ -46,13 +50,14 @@ export default function QuickActions() {
       <h2 className="text-xl font-bold mb-4">{t.quickActions}</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {quickActions.map((action, idx) => (
-          <button
+          <Link
+            href={action.href}
             key={idx}
             className={`${action.color} text-white p-4 rounded-lg flex items-center justify-center gap-3 transition-colors`}
           >
             <action.icon className="w-5 h-5" />
             <span className="font-medium">{action.label}</span>
-          </button>
+          </Link>
         ))}
       </div>
     </Card>

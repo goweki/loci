@@ -32,7 +32,7 @@ import { Button } from "@/components/ui/button";
 import { Input, InputWithIcon } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import { Card } from "@/components/ui/card";
-import { NewMessageButton } from "./new-dialog";
+import { NewMessageDialog } from "./new-message-dialog";
 
 type TabName = "all" | "unread" | "archived";
 
@@ -73,7 +73,9 @@ const ConversationsComponent = () => {
     null,
   );
   const [messages, setMessages] = useState<MessageType[]>([]);
-  const [newDialogOpen, setNewDialogOpen] = useState<boolean>(dialog === "new");
+  const [newDialogOpen, setNewDialogOpen] = useState<boolean>(
+    dialog === "new-message",
+  );
 
   const [messageInput, setMessageInput] = useState("");
   const [activeTab, setActiveTab] = useState<TabName>("all");
@@ -190,7 +192,11 @@ const ConversationsComponent = () => {
               </h1>
               <p className="text-sm text-muted-foreground">{t.subtitle}</p>
             </div>
-            <NewMessageButton />
+
+            <Button onClick={() => setNewDialogOpen(true)}>
+              <Plus /> New Message
+            </Button>
+            <NewMessageDialog open={newDialogOpen} setOpen={setNewDialogOpen} />
           </div>
 
           <div>
