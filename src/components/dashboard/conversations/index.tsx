@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Search,
   Send,
@@ -31,6 +32,7 @@ import { Button } from "@/components/ui/button";
 import { Input, InputWithIcon } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import { Card } from "@/components/ui/card";
+import { NewMessageButton } from "./new-dialog";
 
 type TabName = "all" | "unread" | "archived";
 
@@ -61,6 +63,8 @@ const translations = {
 
 const ConversationsComponent = () => {
   const { language } = useI18n();
+  const searchParams = useSearchParams();
+  const dialog = searchParams.get("dialog");
   const t = translations[language];
 
   const [contacts, setContacts] = useState<ContactGetPayload[]>();
@@ -69,6 +73,8 @@ const ConversationsComponent = () => {
     null,
   );
   const [messages, setMessages] = useState<MessageType[]>([]);
+  const [newDialogOpen, setNewDialogOpen] = useState<boolean>(dialog === "new");
+
   const [messageInput, setMessageInput] = useState("");
   const [activeTab, setActiveTab] = useState<TabName>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -184,9 +190,7 @@ const ConversationsComponent = () => {
               </h1>
               <p className="text-sm text-muted-foreground">{t.subtitle}</p>
             </div>
-            <Button>
-              <Plus className="w-5 h-5" /> New
-            </Button>
+            <NewMessageButton />
           </div>
 
           <div>
