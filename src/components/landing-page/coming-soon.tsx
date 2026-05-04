@@ -7,7 +7,11 @@ import { submitContactForm } from "../forms/contact-us/actions";
 import toast from "react-hot-toast";
 import Loader from "../ui/loaders";
 
-export default function ComingSoon() {
+export default function ComingSoon({
+  launchDateString,
+}: {
+  launchDateString: string;
+}) {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -19,11 +23,9 @@ export default function ComingSoon() {
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const LAUNCH_DATE = new Date(
-        process.env.LAUNCH_DATE ?? "2026-05-01",
-      ).getTime();
+      const launchDate = new Date(launchDateString).getTime();
       const now = new Date().getTime();
-      const difference = LAUNCH_DATE - now;
+      const difference = launchDate - now;
 
       if (difference > 0) {
         setTimeLeft({
