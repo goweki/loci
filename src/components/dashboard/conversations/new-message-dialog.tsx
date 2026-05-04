@@ -12,14 +12,15 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 
-export function NewMessageButton() {
+export function NewMessageDialog({
+  open,
+  setOpen,
+}: {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus /> New Message
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="min-w-1/2">
         <DialogHeader className="hidden">
           <DialogTitle>New Message</DialogTitle>

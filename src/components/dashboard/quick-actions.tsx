@@ -28,6 +28,7 @@ export default function QuickActions() {
       label: t.sendMessage,
       icon: Send,
       color: "bg-blue-600 hover:bg-blue-700",
+      href: `${language}/dashboard/conversations?dialog=new-message`,
     },
     {
       label: t.addContact,
