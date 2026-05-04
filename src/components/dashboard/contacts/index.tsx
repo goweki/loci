@@ -29,6 +29,14 @@ import { getPhoneNumberById, PhoneNumberGetPayload } from "@/data/phoneNumber";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import NewContactForm from "./new-contact-form";
 
 const isNotNull = <T,>(value: T | null): value is T => value !== null;
 
@@ -39,10 +47,13 @@ interface Props {
   contacts: Prisma.ContactGetPayload<{ include: { messages: true } }>[];
 }
 
+type Tab = "phone-numbers" | "contacts";
+
 export default function ContactsComponent({ wabaAccount, contacts }: Props) {
-  const [activeTab, setActiveTab] = useState<"phone-numbers" | "contacts">(
-    "phone-numbers",
-  );
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab") as Tab;
+  const showNewContactDialog = searchParams.get("new-contact") === "true";
+  const [activeTab, setActiveTab] = useState<Tab>(tab || "contacts");
   const [searchQuery, setSearchQuery] = useState("");
   const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumberGetPayload[]>([]);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -57,6 +68,7 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
     phoneNumberId: "",
   });
   const { language } = useI18n();
+  const router = useRouter();
 
   useEffect(() => {
     if (!wabaAccount?.phoneNumbers) return;
@@ -172,6 +184,18 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
     return date.toLocaleDateString();
   };
 
+  const toggleShowNewContactDialog = (open: boolean) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (open) {
+      params.set("new-contact", "true");
+    } else {
+      params.delete("new-contact");
+    }
+
+    router.replace(`?${params.toString()}`);
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
@@ -191,20 +215,6 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
         <div className="border-b border-border">
           <div className="flex">
             <button
-              onClick={() => setActiveTab("phone-numbers")}
-              className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors relative ${
-                activeTab === "phone-numbers"
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Bot className="w-4 h-4" />
-              Whatsapp Bots
-              {activeTab === "phone-numbers" && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
-              )}
-            </button>
-            <button
               onClick={() => setActiveTab("contacts")}
               className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors relative ${
                 activeTab === "contacts"
@@ -215,6 +225,21 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
               <Phone className="w-4 h-4" />
               Contacts
               {activeTab === "contacts" && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+              )}
+            </button>
+
+            <button
+              onClick={() => setActiveTab("phone-numbers")}
+              className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors relative ${
+                activeTab === "phone-numbers"
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Bot className="w-4 h-4" />
+              Whatsapp Bots
+              {activeTab === "phone-numbers" && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
               )}
             </button>
@@ -469,10 +494,25 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
                     className="w-full pl-10 pr-4 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                   />
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+                <Link
+                  href={`/${language}/dashboard/contacts?tab=contacts&new-contact=true`}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                >
                   <Plus className="w-4 h-4" />
                   Add Contact
-                </button>
+                </Link>
+                <Dialog
+                  open={showNewContactDialog}
+                  onOpenChange={toggleShowNewContactDialog}
+                >
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>New Contact</DialogTitle>
+                    </DialogHeader>
+
+                    <NewContactForm />
+                  </DialogContent>
+                </Dialog>
               </div>
 
               {/* Contacts List */}
