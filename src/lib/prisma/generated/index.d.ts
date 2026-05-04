@@ -123,7 +123,24 @@ export type ContactUs = $Result.DefaultSelection<Prisma.$ContactUsPayload>
  * Enums
  */
 export namespace $Enums {
-  export const TokenType: {
+  export const UserRole: {
+  USER: 'USER',
+  ADMIN: 'ADMIN'
+};
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+
+export const CommunicationChannel: {
+  WHATSAPP: 'WHATSAPP',
+  SMS: 'SMS',
+  EMAIL: 'EMAIL'
+};
+
+export type CommunicationChannel = (typeof CommunicationChannel)[keyof typeof CommunicationChannel]
+
+
+export const TokenType: {
   SIGN_IN: 'SIGN_IN',
   RESET: 'RESET',
   ONBOARDING: 'ONBOARDING',
@@ -214,14 +231,6 @@ export const PlanName: {
 };
 
 export type PlanName = (typeof PlanName)[keyof typeof PlanName]
-
-
-export const UserRole: {
-  USER: 'USER',
-  ADMIN: 'ADMIN'
-};
-
-export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
 export const UserStatus: {
@@ -315,6 +324,14 @@ export type ContactStatus = (typeof ContactStatus)[keyof typeof ContactStatus]
 
 }
 
+export type UserRole = $Enums.UserRole
+
+export const UserRole: typeof $Enums.UserRole
+
+export type CommunicationChannel = $Enums.CommunicationChannel
+
+export const CommunicationChannel: typeof $Enums.CommunicationChannel
+
 export type TokenType = $Enums.TokenType
 
 export const TokenType: typeof $Enums.TokenType
@@ -354,10 +371,6 @@ export const TriggerType: typeof $Enums.TriggerType
 export type PlanName = $Enums.PlanName
 
 export const PlanName: typeof $Enums.PlanName
-
-export type UserRole = $Enums.UserRole
-
-export const UserRole: typeof $Enums.UserRole
 
 export type UserStatus = $Enums.UserStatus
 
@@ -3309,6 +3322,7 @@ export namespace Prisma {
     status: $Enums.UserStatus | null
     createdAt: Date | null
     updatedAt: Date | null
+    preferredCommunicationChannel: $Enums.CommunicationChannel | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -3324,6 +3338,7 @@ export namespace Prisma {
     status: $Enums.UserStatus | null
     createdAt: Date | null
     updatedAt: Date | null
+    preferredCommunicationChannel: $Enums.CommunicationChannel | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -3339,6 +3354,7 @@ export namespace Prisma {
     status: number
     createdAt: number
     updatedAt: number
+    preferredCommunicationChannel: number
     _all: number
   }
 
@@ -3356,6 +3372,7 @@ export namespace Prisma {
     status?: true
     createdAt?: true
     updatedAt?: true
+    preferredCommunicationChannel?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -3371,6 +3388,7 @@ export namespace Prisma {
     status?: true
     createdAt?: true
     updatedAt?: true
+    preferredCommunicationChannel?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -3386,6 +3404,7 @@ export namespace Prisma {
     status?: true
     createdAt?: true
     updatedAt?: true
+    preferredCommunicationChannel?: true
     _all?: true
   }
 
@@ -3474,6 +3493,7 @@ export namespace Prisma {
     status: $Enums.UserStatus
     createdAt: Date
     updatedAt: Date
+    preferredCommunicationChannel: $Enums.CommunicationChannel
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -3506,6 +3526,7 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    preferredCommunicationChannel?: boolean
     waba?: boolean | User$wabaArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
     contacts?: boolean | User$contactsArgs<ExtArgs>
@@ -3532,6 +3553,7 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    preferredCommunicationChannel?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -3547,6 +3569,7 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    preferredCommunicationChannel?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -3562,9 +3585,10 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    preferredCommunicationChannel?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "tel" | "telVerified" | "image" | "password" | "role" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "tel" | "telVerified" | "image" | "password" | "role" | "status" | "createdAt" | "updatedAt" | "preferredCommunicationChannel", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     waba?: boolean | User$wabaArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
@@ -3608,6 +3632,7 @@ export namespace Prisma {
       status: $Enums.UserStatus
       createdAt: Date
       updatedAt: Date
+      preferredCommunicationChannel: $Enums.CommunicationChannel
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -4053,6 +4078,7 @@ export namespace Prisma {
     readonly status: FieldRef<"User", 'UserStatus'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
+    readonly preferredCommunicationChannel: FieldRef<"User", 'CommunicationChannel'>
   }
     
 
@@ -27556,7 +27582,8 @@ export namespace Prisma {
     role: 'role',
     status: 'status',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    preferredCommunicationChannel: 'preferredCommunicationChannel'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -27968,6 +27995,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'CommunicationChannel'
+   */
+  export type EnumCommunicationChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CommunicationChannel'>
+    
+
+
+  /**
+   * Reference to a field of type 'CommunicationChannel[]'
+   */
+  export type ListEnumCommunicationChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CommunicationChannel[]'>
+    
+
+
+  /**
    * Reference to a field of type 'TokenType'
    */
   export type EnumTokenTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TokenType'>
@@ -28287,6 +28328,7 @@ export namespace Prisma {
     status?: EnumUserStatusFilter<"User"> | $Enums.UserStatus
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFilter<"User"> | $Enums.CommunicationChannel
     waba?: XOR<WabaAccountNullableScalarRelationFilter, WabaAccountWhereInput> | null
     accounts?: AccountListRelationFilter
     contacts?: ContactListRelationFilter
@@ -28312,6 +28354,7 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    preferredCommunicationChannel?: SortOrder
     waba?: WabaAccountOrderByWithRelationInput
     accounts?: AccountOrderByRelationAggregateInput
     contacts?: ContactOrderByRelationAggregateInput
@@ -28340,6 +28383,7 @@ export namespace Prisma {
     status?: EnumUserStatusFilter<"User"> | $Enums.UserStatus
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFilter<"User"> | $Enums.CommunicationChannel
     waba?: XOR<WabaAccountNullableScalarRelationFilter, WabaAccountWhereInput> | null
     accounts?: AccountListRelationFilter
     contacts?: ContactListRelationFilter
@@ -28365,6 +28409,7 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    preferredCommunicationChannel?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -28386,6 +28431,7 @@ export namespace Prisma {
     status?: EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelWithAggregatesFilter<"User"> | $Enums.CommunicationChannel
   }
 
   export type TokenWhereInput = {
@@ -29985,6 +30031,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -30010,6 +30057,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -30035,6 +30083,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -30060,6 +30109,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -30085,6 +30135,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
   }
 
   export type UserUpdateManyMutationInput = {
@@ -30100,6 +30151,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -30115,6 +30167,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
   }
 
   export type TokenCreateInput = {
@@ -31917,6 +31970,13 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type EnumCommunicationChannelFilter<$PrismaModel = never> = {
+    equals?: $Enums.CommunicationChannel | EnumCommunicationChannelFieldRefInput<$PrismaModel>
+    in?: $Enums.CommunicationChannel[] | ListEnumCommunicationChannelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CommunicationChannel[] | ListEnumCommunicationChannelFieldRefInput<$PrismaModel>
+    not?: NestedEnumCommunicationChannelFilter<$PrismaModel> | $Enums.CommunicationChannel
+  }
+
   export type WabaAccountNullableScalarRelationFilter = {
     is?: WabaAccountWhereInput | null
     isNot?: WabaAccountWhereInput | null
@@ -32030,6 +32090,7 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    preferredCommunicationChannel?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -32045,6 +32106,7 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    preferredCommunicationChannel?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -32060,6 +32122,7 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    preferredCommunicationChannel?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -32144,6 +32207,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type EnumCommunicationChannelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CommunicationChannel | EnumCommunicationChannelFieldRefInput<$PrismaModel>
+    in?: $Enums.CommunicationChannel[] | ListEnumCommunicationChannelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CommunicationChannel[] | ListEnumCommunicationChannelFieldRefInput<$PrismaModel>
+    not?: NestedEnumCommunicationChannelWithAggregatesFilter<$PrismaModel> | $Enums.CommunicationChannel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCommunicationChannelFilter<$PrismaModel>
+    _max?: NestedEnumCommunicationChannelFilter<$PrismaModel>
   }
 
   export type EnumTokenTypeFilter<$PrismaModel = never> = {
@@ -33676,6 +33749,10 @@ export namespace Prisma {
     set?: Date | string
   }
 
+  export type EnumCommunicationChannelFieldUpdateOperationsInput = {
+    set?: $Enums.CommunicationChannel
+  }
+
   export type WabaAccountUpdateOneWithoutUserNestedInput = {
     create?: XOR<WabaAccountCreateWithoutUserInput, WabaAccountUncheckedCreateWithoutUserInput>
     connectOrCreate?: WabaAccountCreateOrConnectWithoutUserInput
@@ -34917,6 +34994,13 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type NestedEnumCommunicationChannelFilter<$PrismaModel = never> = {
+    equals?: $Enums.CommunicationChannel | EnumCommunicationChannelFieldRefInput<$PrismaModel>
+    in?: $Enums.CommunicationChannel[] | ListEnumCommunicationChannelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CommunicationChannel[] | ListEnumCommunicationChannelFieldRefInput<$PrismaModel>
+    not?: NestedEnumCommunicationChannelFilter<$PrismaModel> | $Enums.CommunicationChannel
+  }
+
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -35019,6 +35103,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumCommunicationChannelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CommunicationChannel | EnumCommunicationChannelFieldRefInput<$PrismaModel>
+    in?: $Enums.CommunicationChannel[] | ListEnumCommunicationChannelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CommunicationChannel[] | ListEnumCommunicationChannelFieldRefInput<$PrismaModel>
+    not?: NestedEnumCommunicationChannelWithAggregatesFilter<$PrismaModel> | $Enums.CommunicationChannel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCommunicationChannelFilter<$PrismaModel>
+    _max?: NestedEnumCommunicationChannelFilter<$PrismaModel>
   }
 
   export type NestedEnumTokenTypeFilter<$PrismaModel = never> = {
@@ -36099,6 +36193,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -36123,6 +36218,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -36163,6 +36259,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -36187,6 +36284,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -36211,6 +36309,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -36235,6 +36334,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -36351,6 +36451,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -36375,6 +36476,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -36478,6 +36580,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -36502,6 +36605,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -36579,6 +36683,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -36603,6 +36708,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -36627,6 +36733,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -36651,6 +36758,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -36691,6 +36799,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -36715,6 +36824,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -36801,6 +36911,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -36825,6 +36936,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -36939,6 +37051,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -36963,6 +37076,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -37577,6 +37691,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -37601,6 +37716,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -37713,6 +37829,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -37737,6 +37854,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -37873,6 +37991,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -37897,6 +38016,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -38013,6 +38133,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -38037,6 +38158,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -38096,6 +38218,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -38120,6 +38243,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -38201,6 +38325,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -38225,6 +38350,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -38249,6 +38375,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -38273,6 +38400,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -38313,6 +38441,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -38337,6 +38466,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -38639,6 +38769,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountCreateNestedOneWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -38663,6 +38794,7 @@ export namespace Prisma {
     status?: $Enums.UserStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    preferredCommunicationChannel?: $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedCreateNestedOneWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -38703,6 +38835,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUpdateOneWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -38727,6 +38860,7 @@ export namespace Prisma {
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
     waba?: WabaAccountUncheckedUpdateOneWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput

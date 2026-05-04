@@ -7,6 +7,17 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum CommunicationChannel {
+  WHATSAPP
+  SMS
+  EMAIL
+}
+
 model User {
   id            String     @id @default(cuid())
   name          String?
@@ -20,6 +31,8 @@ model User {
   status        UserStatus @default(ACTIVE)
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
+
+  preferredCommunicationChannel CommunicationChannel @default(WHATSAPP)
 
   waba WabaAccount?
 
@@ -131,8 +144,6 @@ enum TemplateApprovalStatus {
   REJECTED
   DISABLED
 }
-
-// 
 
 model Session {
   id           String   @id @default(cuid())
@@ -264,8 +275,9 @@ model PhoneNumber {
 }
 
 model Contact {
-  id            String    @id @default(cuid())
-  phoneNumber   String
+  id          String @id @default(cuid())
+  phoneNumber String
+
   name          String?
   avatar        String?
   lastMessageAt DateTime?
@@ -375,11 +387,6 @@ enum PlanName {
   BASIC
   STANDARD
   PREMIUM
-}
-
-enum UserRole {
-  USER
-  ADMIN
 }
 
 enum UserStatus {

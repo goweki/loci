@@ -132,7 +132,8 @@ exports.Prisma.UserScalarFieldEnum = {
   role: 'role',
   status: 'status',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  preferredCommunicationChannel: 'preferredCommunicationChannel'
 };
 
 exports.Prisma.TokenScalarFieldEnum = {
@@ -412,6 +413,12 @@ exports.UserStatus = exports.$Enums.UserStatus = {
   ACTIVE: 'ACTIVE',
   SUSPENDED: 'SUSPENDED',
   INACTIVE: 'INACTIVE'
+};
+
+exports.CommunicationChannel = exports.$Enums.CommunicationChannel = {
+  WHATSAPP: 'WHATSAPP',
+  SMS: 'SMS',
+  EMAIL: 'EMAIL'
 };
 
 exports.TokenType = exports.$Enums.TokenType = {
