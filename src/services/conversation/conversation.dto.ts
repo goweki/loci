@@ -1,4 +1,9 @@
 import { Prisma } from "@/lib/prisma/generated";
+import { ConversationService } from "./conversation.service";
+
+export type ConversationDTO = ReturnType<
+  ConversationService["toConversationDTO"]
+>;
 
 // Input DTO for creating a message
 export type CreateMessageDTO = Prisma.MessageUncheckedCreateInput;

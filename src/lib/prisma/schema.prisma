@@ -291,6 +291,7 @@ model Contact {
   chatbotConversations ChatbotConversation[]
 
   @@unique([userId, phoneNumber])
+  @@index([userId, lastMessageAt(sort: Desc)])
   @@map("contacts")
 }
 
@@ -311,6 +312,9 @@ model Message {
   phoneNumber   PhoneNumber      @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
   user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([contactId, timestamp(sort: Desc)])
+  @@index([userId, direction, status])
+  @@index([contactId, direction, status])
   @@map("messages")
 }
 
