@@ -17,7 +17,7 @@ const DashboardPage = async () => {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="space-y-6 flex flex-col flex-1 min-h-[calc(100vh-24rem)]">
         <DashboardTitle />
         <DashboardStats stats={stats} />
         <QuickActions />

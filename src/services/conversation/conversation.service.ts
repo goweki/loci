@@ -101,7 +101,7 @@ export class ConversationService {
   }) {
     const { search, limit = 20, cursor } = params || {};
 
-    const conversations = await prisma.contact.findMany({
+    const contactsWithMessages = await prisma.contact.findMany({
       where: this.scope({
         OR: search
           ? [
@@ -137,14 +137,34 @@ export class ConversationService {
       },
     });
 
-    return conversations.map((c) => this.toConversationDTO(c));
+    return contactsWithMessages.map((c) => this.toConversationDTO(c));
   }
 
   /**
    * 💬 Get single conversation
    */
-  async getConversation(contactId: string) {
-    const contact = await prisma.contact.findFirst({
+  async getConversations() {
+    const contactsWithMessages = await prisma.contact.findMany({
+      where: this.scope(),
+
+      include: {
+        ...contactInclude,
+
+        messages: {
+          orderBy: {
+            timestamp: "asc",
+          },
+
+          take: 100,
+        },
+      },
+    });
+
+    return contactsWithMessages.map((c) => this.toConversationDTO(c));
+  }
+
+  async getConversationWithContact(contactId: string) {
+    const contactWithMessages = await prisma.contact.findFirst({
       where: this.scope({
         id: contactId,
       }),
@@ -162,14 +182,11 @@ export class ConversationService {
       },
     });
 
-    if (!contact) {
-      throw new Error("Conversation not found");
+    if (!contactWithMessages) {
+      throw new Error("Contact not found");
     }
 
-    return {
-      ...this.toConversationDTO(contact),
-      messages: contact.messages,
-    };
+    return this.toConversationDTO(contactWithMessages);
   }
 
   /**

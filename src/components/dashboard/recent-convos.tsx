@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import Loader from "../ui/loaders";
 import toast from "react-hot-toast";
 import { ConversationDTO } from "@/services/conversation";
+import Link from "next/link";
 
 const translations = {
   en: {
@@ -80,15 +81,18 @@ export default function RecentConvos() {
     <Card>
       <div className="p-6 border-b flex items-center justify-between">
         <h2 className="text-xl font-bold">{t.recentConversations}</h2>
-        <button className="text-primary hover:underline font-medium transition-colors">
+        <Link
+          href={`/${language}/dashboard/conversations`}
+          className="text-primary hover:underline font-medium transition-colors"
+        >
           {t.viewAll} →
-        </button>
+        </Link>
       </div>
       <div className="divide-y divide-border">
         {!recentConversations || isPending ? (
           <Loader />
         ) : recentConversations.length === 0 ? (
-          <p className="p-4 text-center italic">No conversations found</p>
+          <p className="p-4 text-center italic">No conversations</p>
         ) : (
           recentConversations.map((conv, idx) => (
             <div

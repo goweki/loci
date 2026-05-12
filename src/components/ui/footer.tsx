@@ -16,7 +16,7 @@ const Footer = () => {
 
   return (
     <footer className="border-t mt-8">
-      <div className="max-w-screen-xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="px-6 text-muted-foreground flex flex-col justify-between gap-4 pt-8 text-sm font-medium md:flex-row md:items-center">
           <div className="h-6 w-6">
             <BrandSymbol />

@@ -76,7 +76,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       authenticated = false,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [isMobile, setIsMobile] = useState(false);
     const [isVisible, setIsVisible] = useState<boolean>(true);
@@ -157,7 +157,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
           ref.current = node;
         }
       },
-      [ref]
+      [ref],
     );
 
     return (
@@ -166,11 +166,11 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
         className={cn(
           "fixed top-0 z-40 w-full border-b bg-popover/50 text-popover-foreground backdrop-blur px-4 md:px-6 [&_*]:no-underline transition-transform duration-300",
           className,
-          isVisible ? "translate-y-0" : "-translate-y-full"
+          isVisible ? "translate-y-0" : "-translate-y-full",
         )}
         {...props}
       >
-        <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto flex h-16 items-center justify-between gap-4">
           {/* Left side */}
           <div className="flex items-center gap-2">
             {/* Mobile menu trigger */}
@@ -196,7 +196,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                               buttonVariants({ variant: "ghost" }),
                               isActive(link.href)
                                 ? "bg-accent text-accent-foreground"
-                                : "text-foreground/80"
+                                : "text-foreground/80",
                             )}
                           >
                             {link.label}
@@ -228,7 +228,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                             buttonVariants({ variant: "ghost" }),
                             isActive(link.href)
                               ? "bg-accent text-accent-foreground"
-                              : ""
+                              : "",
                           )}
                         >
                           {link.label}
@@ -266,7 +266,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
         </div>
       </header>
     );
-  }
+  },
 );
 
 Navbar.displayName = "Navbar";

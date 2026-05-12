@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "@/components/dashboard/navbar";
 import { isValidLanguage, Language } from "@/lib/i18n";
+import Footer from "@/components/ui/footer";
 
 const DashboardLayout = async ({
   params,
