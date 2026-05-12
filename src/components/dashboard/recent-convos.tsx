@@ -87,6 +87,8 @@ export default function RecentConvos() {
       <div className="divide-y divide-border">
         {!recentConversations || isPending ? (
           <Loader />
+        ) : recentConversations.length === 0 ? (
+          <p className="p-4 text-center italic">No conversations found</p>
         ) : (
           recentConversations.map((conv, idx) => (
             <div
