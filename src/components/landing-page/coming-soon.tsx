@@ -43,7 +43,7 @@ export default function ComingSoon({
     const timer = setInterval(calculateTimeLeft, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [launchDateString]);
 
   async function handleSubmit() {
     if (!email) return toast.error("Please provide an email");

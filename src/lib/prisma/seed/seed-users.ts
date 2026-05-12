@@ -1,3 +1,4 @@
+import { hashToken } from "@/lib/auth/token-handlers";
 import { PrismaClient, UserRole, UserStatus, TokenType } from "../generated";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -5,7 +6,7 @@ import crypto from "crypto";
 const usersData = [
   {
     name: "System User",
-    email: process.env.SYSTEM_EMAIL || "loci@goweki.com",
+    email: process.env.SYSTEM_EMAIL || "system@goweki.com",
     tel: process.env.SYSTEM_TEL,
     password: process.env.SYSTEM_PASSWORD || "pass1234",
     role: UserRole.ADMIN,
@@ -81,7 +82,7 @@ async function ensureApiKey(prisma: PrismaClient, userId: string) {
   }
 
   // generate raw token (this is what you show ONCE)
-  const rawToken = crypto.randomBytes(32).toString("hex");
+  const rawToken = `loc_A_${crypto.randomBytes(32).toString("hex")}`;
 
   // hash it before storing
   const hashedToken = hashToken(rawToken);
@@ -99,8 +100,4 @@ async function ensureApiKey(prisma: PrismaClient, userId: string) {
   console.log(" 🔑 Admin API key created:");
   console.log(" 👉 SAVE THIS TOKEN NOW (won’t be shown again):");
   console.log(rawToken);
-}
-
-export function hashToken(token: string) {
-  return crypto.createHash("sha256").update(token).digest("hex");
 }

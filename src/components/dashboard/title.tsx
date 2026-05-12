@@ -6,13 +6,11 @@ import PageTitle from "../ui/page-title";
 const translations = {
   en: {
     title: "Dashboard Overview",
-    subtitle:
-      "Welcome back! Here's what's happening with your WhatsApp business.",
+    subtitle: "Welcome back!",
   },
   sw: {
     title: "Muhtasari wa Dashibodi",
-    subtitle:
-      "Karibu tena! Hivi ndivyo biashara yako ya WhatsApp inavyoendelea.",
+    subtitle: "Karibu tena!",
   },
 };
 

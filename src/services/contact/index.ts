@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { Prisma, UserRole } from "@/lib/prisma/generated";
 
@@ -7,19 +7,19 @@ type ServiceContext = {
   role: UserRole;
 };
 
-export class ContactsService {
+export class ContactService {
   private userId: string;
   private role: UserRole;
 
-  private constructor(ctx: { userId: string; role: UserRole }) {
-    this.userId = ctx.userId;
-    this.role = ctx.role;
+  private constructor({ userId, role }: { userId: string; role: UserRole }) {
+    this.userId = userId;
+    this.role = role;
   }
 
   static async create() {
-    const user = await requireAuth();
+    const user = await requireUser();
 
-    return new ContactsService({
+    return new ContactService({
       userId: user.id,
       role: user.role as UserRole,
     });
