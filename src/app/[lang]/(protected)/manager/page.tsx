@@ -1,6 +1,5 @@
 import ManagerComponent from "@/components/manager";
 import PageTitle from "@/components/ui/page-title";
-import { getUserById } from "@/data/user";
 import { authOptions } from "@/lib/auth";
 import { isValidLanguage } from "@/lib/i18n";
 import { getServerSession } from "next-auth";

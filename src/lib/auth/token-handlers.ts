@@ -5,8 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { TokenType } from "../prisma/generated";
 import { addToDate } from "../utils/dateHandlers";
-import { getUserById } from "@/data/user";
 import { tokenRepository } from "@/data/repositories/token.repository";
+import { UserService } from "@/services/user/user.service";
 
 export type ApiKeyAuth = {
   id: string;
@@ -38,7 +38,7 @@ export async function createApiKey(options: {
   expiresAt: Date;
   description: string;
 }) {
-  const user = await getUserById(options.userId);
+  const user = await UserService.getUserByKey(options.userId);
   if (!user) {
     throw new Error("User not found");
   }

@@ -13,12 +13,7 @@ import {
 } from "@/lib/prisma/generated";
 import { InboundMessage, WabaPhoneNumberDetailsResponse } from "../types";
 import { Message } from "../../validations";
-import { createPhoneNumber } from "@/data/phoneNumber";
-import {
-  getAdminUsers,
-  getUserById,
-  getUserByPhoneNumberId,
-} from "@/data/user";
+import { getAdminUsers, getUserByPhoneNumberId } from "@/data/user";
 import whatsapp from "../";
 import { findContactByPhoneNumber } from "@/data/contact";
 import {
@@ -30,6 +25,8 @@ import {
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth";
 import { env_ } from "../types/environment-variables";
+import { UserService } from "@/services/user/user.service";
+import { createPhoneNumberAction } from "@/data/phoneNumber";
 
 const BASE_URL = `https://graph.facebook.com/${env_.apiVersion}`;
 
@@ -61,7 +58,7 @@ export async function processIncomingMessage(
   metadata: {
     phone_number_id: string;
     display_phone_number: string;
-  }
+  },
 ): Promise<void> {
   try {
     console.log("Processing incoming message:", message);
@@ -77,7 +74,7 @@ export async function processIncomingMessage(
     let user = await getUserByPhoneNumberId(phoneNumberId);
     if (!user) {
       console.warn(
-        `No user assigned the phoneNumberId:${phoneNumberId}, assigning it to admin...`
+        `No user assigned the phoneNumberId:${phoneNumberId}, assigning it to admin...`,
       );
 
       const phoneNumberDetails: WabaPhoneNumberDetailsResponse =
@@ -85,10 +82,10 @@ export async function processIncomingMessage(
       user = (await getAdminUsers())[0];
       if (!user.waba)
         throw new Error(
-          `No waba account found to save phone number - ${phoneNumberDetails.verified_name}`
+          `No waba account found to save phone number - ${phoneNumberDetails.verified_name}`,
         );
 
-      await createPhoneNumber({
+      await createPhoneNumberAction({
         wabaId: user.waba.id,
         phoneNumber: phoneNumberDetails.display_phone_number,
         displayName: phoneNumberDetails.verified_name,
@@ -103,7 +100,7 @@ export async function processIncomingMessage(
         await findOrCreateContact(
           user.id,
           contact.wa_id,
-          contact.profile?.name
+          contact.profile?.name,
         );
       }
     }
@@ -156,13 +153,13 @@ export async function processIncomingMessage(
  * Process WhatsApp status updates (delivery receipts, read receipts)
  */
 export async function processStatusUpdate(
-  statusUpdate: WhatsAppStatusUpdate
+  statusUpdate: WhatsAppStatusUpdate,
 ): Promise<void> {
   try {
     console.log(
       "Processing status update:",
       statusUpdate.id,
-      statusUpdate.status
+      statusUpdate.status,
     );
 
     // Find the message by WhatsApp message ID
@@ -180,7 +177,7 @@ export async function processStatusUpdate(
 
     // Update message status
     const newStatus: MessageStatus = mapWhatsAppStatusToMessageStatus(
-      statusUpdate.status
+      statusUpdate.status,
     );
     await prisma.message.update({
       where: { id: message.id },
@@ -208,7 +205,7 @@ export async function processStatusUpdate(
 async function findOrCreateContact(
   userId: string,
   phoneNumber: string,
-  name?: string
+  name?: string,
 ) {
   const contact = await prisma.contact.findFirst({
     where: {
@@ -262,7 +259,7 @@ async function processMessageContent(message: InboundMessage): Promise<any> {
       if (message.document.id) {
         const mediaUrl = await downloadAndStoreMedia(
           message.document.id,
-          "document"
+          "document",
         );
         return {
           url: mediaUrl,
@@ -351,7 +348,7 @@ async function processMessageContent(message: InboundMessage): Promise<any> {
  */
 async function downloadAndStoreMedia(
   mediaId: string,
-  mediaType: string
+  mediaType: string,
 ): Promise<string> {
   try {
     // Step 1: Get media URL from WhatsApp API
@@ -361,7 +358,7 @@ async function downloadAndStoreMedia(
         headers: {
           Authorization: `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}`,
         },
-      }
+      },
     );
 
     if (!mediaResponse.ok) {
@@ -388,7 +385,7 @@ async function downloadAndStoreMedia(
     const storedUrl = await storeFile(
       fileName,
       fileBuffer,
-      mediaInfo.mime_type
+      mediaInfo.mime_type,
     );
 
     return storedUrl;
@@ -404,7 +401,7 @@ async function downloadAndStoreMedia(
 async function storeFile(
   fileName: string,
   fileBuffer: ArrayBuffer,
-  mimeType: string
+  mimeType: string,
 ): Promise<string> {
   // Implement your file storage logic here
   // Examples:
@@ -468,7 +465,7 @@ function mapWhatsAppTypeToMessageType(whatsappType: string): MessageType {
  * Map WhatsApp status to database MessageStatus
  */
 function mapWhatsAppStatusToMessageStatus(
-  whatsappStatus: string
+  whatsappStatus: string,
 ): MessageStatus {
   const statusMap: Record<string, MessageStatus> = {
     sent: MessageStatus.SENT,
@@ -486,7 +483,7 @@ function mapWhatsAppStatusToMessageStatus(
 async function notifyUserOfNewMessage(
   userId: string,
   contactId: string,
-  message: InboundMessage
+  message: InboundMessage,
 ): Promise<void> {
   // Implement real-time notification logic
   // Examples:
@@ -496,7 +493,7 @@ async function notifyUserOfNewMessage(
   // - Email notifications
 
   console.log(
-    `Notifying user ${userId} of new message from contact ${contactId}`
+    `Notifying user ${userId} of new message from contact ${contactId}`,
   );
 
   // Placeholder for actual implementation
@@ -513,7 +510,7 @@ async function notifyUserOfNewMessage(
 async function processAutoReplies(
   userId: string,
   contact: any,
-  message: InboundMessage
+  message: InboundMessage,
 ): Promise<void> {
   try {
     // Check if user has auto-reply rules configured
@@ -545,7 +542,7 @@ async function processAutoReplies(
 async function shouldTriggerAutoReply(
   rule: any,
   message: InboundMessage,
-  contact: any
+  contact: any,
 ): Promise<boolean> {
   // Implement your auto-reply logic
   // Examples:
@@ -563,7 +560,7 @@ async function shouldTriggerAutoReply(
 async function triggerAutoReply(
   rule: any,
   contact: any,
-  originalMessage: InboundMessage
+  originalMessage: InboundMessage,
 ): Promise<void> {
   // Implement auto-reply sending logic
   console.log(`Triggering auto-reply for rule ${rule.id}`);
@@ -574,7 +571,7 @@ async function triggerAutoReply(
  */
 async function storeFailedMessage(
   message: InboundMessage,
-  error: any
+  error: any,
 ): Promise<void> {
   try {
     await prisma.messageUnprocessed?.create?.({
@@ -692,7 +689,7 @@ export async function buildWhatsAppMessage(input: Message) {
  * Create a pre-verified business phone number in your portfolio
  */
 export async function createPreVerifiedNumber(
-  phoneNumber: string
+  phoneNumber: string,
 ): Promise<PreVerifiedNumberResponse> {
   const session = await getServerSession(authOptions);
   const userId = session?.user.id;
@@ -700,7 +697,7 @@ export async function createPreVerifiedNumber(
     throw new Error("401: Unauthorized");
   }
 
-  const user = await getUserById(userId);
+  const user = await UserService.getUserByKey(userId, { waba: true });
   if (!user) {
     throw new Error("401: Unauthorized");
   }
@@ -728,7 +725,7 @@ export async function createPreVerifiedNumber(
     throw new Error(`Failed: Try again later`);
   }
   const { preverificationId }: PreVerifiedNumberResponse = await res.json();
-  await createPhoneNumber({
+  await createPhoneNumberAction({
     phoneNumber,
     wabaId: user.waba.id,
     preVerificationId: preverificationId,
@@ -742,7 +739,7 @@ export async function createPreVerifiedNumber(
  */
 export async function requestVerificationCode(
   baseUrl: string,
-  preVerifiedNumberId: string
+  preVerifiedNumberId: string,
 ): Promise<RequestCodeResponse> {
   var body = JSON.stringify({
     code_method: "SMS",
@@ -776,7 +773,7 @@ export async function verifyPreVerifiedNumber(
   baseUrl: string,
   preVerifiedNumberId: string,
   otpCode: string,
-  wabaAccessToken: string
+  wabaAccessToken: string,
 ): Promise<VerifyNumberResponse> {
   var body = JSON.stringify({
     code: otpCode,
@@ -803,7 +800,7 @@ export async function getTokenUsingWabaAuthCode(
   baseUrl: string,
   code: string,
   fbAppId: string,
-  appSecret: string
+  appSecret: string,
 ): Promise<GetTokenUsingWabaAuthCodeResult> {
   const url = new URL(`${baseUrl}/oauth_access_token`);
 

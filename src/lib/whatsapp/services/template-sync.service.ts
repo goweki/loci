@@ -19,14 +19,8 @@ import {
 } from "@/lib/prisma/generated";
 import type { WhatsAppClient } from "./client";
 import { getAdminUsers } from "@/data/user";
-import {
-  createWabaAccount,
-  getAllWabaAccounts,
-  getWabaAccountById,
-  updateWabaAccount,
-} from "@/data/waba";
-import { createPhoneNumber, getAllPhoneNumbers } from "@/data/phoneNumber";
 import prisma from "@/lib/prisma";
+import { WabaService } from "@/services/waba/waba.service";
 
 /**
  * Service that syncs templates between Meta's API and our database
@@ -54,7 +48,10 @@ export class MetaSyncService {
     //sync owned waba
 
     const ownedWabaInCloud = await this.WaClient.getWaba();
-    const ownedWabaInDb = await getWabaAccountById(ownedWabaInCloud.id);
+    const wabaService = await WabaService.create();
+    const ownedWabaInDb = await wabaService.getWabaAccountById(
+      ownedWabaInCloud.id,
+    );
 
     const adminUsers = await getAdminUsers();
     // console.log(`${adminUsers.length} admin users fetched`);
@@ -74,7 +71,7 @@ export class MetaSyncService {
           timezoneId: ownedWabaInCloud.timezone_id,
           messageTemplateNamespace: ownedWabaInCloud.message_template_namespace,
         };
-        const ownedWabaInDb = await createWabaAccount(appendedWaba);
+        const ownedWabaInDb = await wabaService.createWabaAccount(appendedWaba);
         result.created++;
 
         console.log(` >> saved waba:`, ownedWabaInDb);
@@ -89,7 +86,7 @@ export class MetaSyncService {
           messageTemplateNamespace: ownedWabaInCloud.message_template_namespace,
         };
 
-        const updatedWaba = await updateWabaAccount(
+        const updatedWaba = await wabaService.updateWabaAccount(
           ownedWabaInDb.id,
           appendedWaba,
         );
@@ -196,7 +193,7 @@ export class MetaSyncService {
     }
 
     // sync templates
-    const localWabas = await getAllWabaAccounts();
+    const localWabas = await wabaService.getAllWabaAccounts();
     const templatesCreationArray: (Prisma.WabaTemplateUncheckedCreateInput & {
       id: string;
     })[] = [];

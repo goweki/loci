@@ -16,6 +16,7 @@ import { Input } from "../ui/input";
 import { Alert, AlertDescription } from "../ui/alert";
 import { useSession } from "next-auth/react";
 import { type UserGetPayload } from "@/data/user";
+import { getUserByIdAction } from "@/actions/user.actions";
 
 export default function TabSettings() {
   const [user, setUser] = useState<UserGetPayload>();
@@ -27,8 +28,13 @@ export default function TabSettings() {
     if (!session?.user) return;
 
     console.log(`Fetching user: id-${session.user.id}`);
-    const _user = await _getUserById(session.user.id);
-    if (_user) setUser(_user);
+    const _resUser = await getUserByIdAction(session.user.id, {
+      contacts: true,
+      messages: true,
+      subscriptions: { include: { plan: true } },
+      waba: { include: { phoneNumbers: true, templates: true } },
+    });
+    if (_resUser.ok) setUser(_resUser.data);
   }, [session?.user]);
 
   const syncWithMeta = useCallback(async () => {

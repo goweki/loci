@@ -94,8 +94,8 @@ export function SignUpForm() {
           verificationMethod,
         });
 
-        if (!signupRes.success) {
-          toast.error(signupRes.message);
+        if (!signupRes.ok) {
+          toast.error(signupRes.error);
           return;
         }
 

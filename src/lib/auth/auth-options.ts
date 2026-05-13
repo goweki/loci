@@ -1,7 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { NextAuthOptions } from "next-auth";
-import { createUser, getUserByEmail, getUserByKey } from "@/data/user";
+import { createUser } from "@/data/user";
 import { User, UserRole, UserStatus } from "@/lib/prisma/generated";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
 import { upsertAccount } from "@/data/account";
@@ -9,6 +9,8 @@ import { compareHash } from "../utils/passwordHandlers";
 import { SubscriptionStatusEnum } from "@/types";
 import prisma from "../prisma";
 import { hashToken } from "./token-handlers";
+import { getUserByKeyAction } from "@/actions/user.actions";
+import { UserService } from "@/services/user/user.service";
 
 if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("NEXTAUTH_SECRET is not set in environment variables");
@@ -26,8 +28,8 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.username || !credentials?.password)
           throw new Error("Missing credentials");
 
-        const user = await getUserByKey(credentials.username);
-        if (!user) throw new Error("Invalid credentials"); //User not found
+        const user = await UserService.getUserByKey(credentials.username);
+        // if (!user) throw new Error("Invalid credentials"); //User not found
 
         if (user.status === UserStatus.SUSPENDED)
           throw new Error("Account suspended");
@@ -178,10 +180,12 @@ export const authOptions: NextAuthOptions = {
         if (account?.provider === "google" && profile?.email) {
           const userEmail_ = profile?.email;
           // 1️⃣ Find or create local user
-          let localUser: Partial<User & { id: string }> | null =
-            await getUserByEmail(userEmail_);
+          const resLocalUser = await getUserByKeyAction(userEmail_);
+          let localUser: (Partial<User> & { id: string }) | null = null;
 
-          if (!localUser) {
+          if (resLocalUser.ok) {
+            localUser = resLocalUser.data;
+          } else {
             localUser = await createUser({
               email: userEmail_,
               name: profile.name ?? "",

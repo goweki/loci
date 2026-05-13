@@ -4,8 +4,12 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
-import { createPhoneNumber, getPhoneNumbersByUser } from "@/data/phoneNumber";
 import { PhoneNumberStatus } from "@/lib/prisma/generated";
+import {
+  createPhoneNumberAction,
+  getPhoneNumbersByUserAction,
+} from "@/data/phoneNumber";
+import prisma from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -15,18 +19,20 @@ export async function POST(request: NextRequest) {
   const { phoneNumber, displayName, wabaId } = body;
 
   const subscriptionStatus = await getSubscriptionStatusByUserId(
-    session.user.id
+    session.user.id,
   );
 
   if (!subscriptionStatus.plan) {
     return NextResponse.json(
       { error: "Get a plan to add a phone number" },
-      { status: 402 }
+      { status: 402 },
     );
   }
 
   const maxPhoneNumbers = subscriptionStatus.plan.maxPhoneNumbers;
-  const phoneNumbers = await getPhoneNumbersByUser(session.user.id);
+  const phoneNumbers = await prisma.phoneNumber.findMany({
+    where: { waba: { userId: session.user.id } },
+  });
 
   // check against limit
   if (phoneNumbers.length > maxPhoneNumbers) {
@@ -36,12 +42,12 @@ export async function POST(request: NextRequest) {
         limit: maxPhoneNumbers,
         used: phoneNumbers.length,
       },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
   // Create phone number record
-  const newPhoneNumber = await createPhoneNumber({
+  const newPhoneNumber = await createPhoneNumberAction({
     wabaId,
     phoneNumber,
     displayName,

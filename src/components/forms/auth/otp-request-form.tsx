@@ -30,10 +30,11 @@ import { NotificationChannel } from "@/lib/prisma/generated";
 import { WhatsAppLogo } from "@/components/ui/svg";
 
 import { removePlus } from "@/lib/utils/telHandlers";
-import { _getUserByKey, sendOtp } from "./_actions";
+import { sendOtp } from "./_actions";
 import { InputOTP } from "./_input-otp";
 import { signIn } from "next-auth/react";
 import { ERROR_MESSAGES } from "./_errorHandler";
+import { getUserByKeyAction } from "@/actions/user.actions";
 
 // ─────────────────────────────────────
 // Types
@@ -134,13 +135,6 @@ export function OtpSigninForm({ phoneNumber }: Props) {
     setLoading(true);
 
     try {
-      const user = await _getUserByKey(removePlus(phoneNumber));
-
-      if (!user) {
-        toast.error("User not found. Verify contact provided.");
-        return;
-      }
-
       const sendRes = await sendOtp({
         notificationChannel: otpChannel,
         contact: phoneNumber,

@@ -5,7 +5,6 @@ import {
   apiKeyMiddleware,
   type AuthenticatedHandler,
 } from "@/lib/auth/token-handlers";
-import { validatePhoneNumberOwnership } from "@/data/phoneNumber";
 import { checkMessageLimits } from "@/lib/usage/limits";
 import { findOrCreateContact } from "@/data/contact";
 import { createMessage, getMessagesByUserId } from "@/data/message";
@@ -13,6 +12,7 @@ import { MessageType } from "@/lib/prisma/generated";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
 import { SubscriptionStatusEnum } from "@/types";
 import z from "zod";
+import { validatePhoneNumberOwnershipAction } from "@/data/phoneNumber";
 
 const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
   try {
@@ -36,7 +36,7 @@ const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
       getSubscriptionStatusByUserId(userId),
       checkMessageLimits(userId),
       message.phoneNumberId
-        ? validatePhoneNumberOwnership(message.phoneNumberId, userId)
+        ? validatePhoneNumberOwnershipAction(message.phoneNumberId, userId)
         : Promise.resolve(),
     ]);
 

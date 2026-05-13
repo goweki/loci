@@ -27,12 +27,12 @@ import type {
 import { ContactGetPayload, getContactsByUserId } from "@/data/contact";
 import { useSession } from "next-auth/react";
 import { createMessage, getMessagesByContactId } from "@/data/message";
-import { getPhoneNumbersByUser } from "@/data/phoneNumber";
 import { Button } from "@/components/ui/button";
 import { Input, InputWithIcon } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import { Card } from "@/components/ui/card";
 import { NewMessageDialog } from "./_new-message-dialog";
+import { getPhoneNumbersByUserAction } from "@/data/phoneNumber";
 
 type TabName = "all" | "unread" | "archived";
 
@@ -94,8 +94,11 @@ const OldConversationsComponent = () => {
 
   async function fetchPhoneNumbers(userId_: string) {
     try {
-      const phoneNumbers_ = await getPhoneNumbersByUser(userId_);
-      setUserPhoneNumbers(phoneNumbers_);
+      const resPhones_ = await getPhoneNumbersByUserAction(userId_);
+
+      if (resPhones_.ok) {
+        setUserPhoneNumbers(resPhones_.data);
+      }
     } catch (error) {
       console.error("Failed to fetch phone numbers:", error);
     }

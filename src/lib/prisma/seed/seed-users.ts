@@ -1,4 +1,3 @@
-import { hashToken } from "@/lib/auth/token-handlers";
 import { PrismaClient, UserRole, UserStatus, TokenType } from "../generated";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -20,6 +19,10 @@ const usersData = [
     status: UserStatus.ACTIVE,
   },
 ];
+
+function hashToken(token: string) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
 
 export async function seedUsers(prisma: PrismaClient) {
   console.log("👤 Seeding users...");

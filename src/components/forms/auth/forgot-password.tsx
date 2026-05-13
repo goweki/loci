@@ -33,9 +33,8 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import { forgotPasswordSchema } from "@/lib/validations";
 import { NotificationChannel } from "@/lib/prisma/generated";
-import { sendResetLink } from "@/data/user";
 import { removePlus } from "@/lib/utils/telHandlers";
-import { _sendResetLink } from "./_actions";
+import { sendResetLinkAction } from "@/actions/user.actions";
 
 export function ForgotPasswordForm() {
   const router = useRouter();
@@ -76,16 +75,18 @@ export function ForgotPasswordForm() {
 
         // console.log("Requesting reset for:", values);
 
-        const res = await _sendResetLink({
+        const resReset = await sendResetLinkAction({
           username: values.email || removePlus(values.phoneNumber),
           sendTo: values.notificationChannel,
         });
 
         // console.log("reset response:", res);
 
-        if (res.error || !res.sentTo) {
-          throw new Error(res.error || "Unknown error");
+        if (!resReset.ok) {
+          throw new Error(resReset.error || "Unknown error");
         }
+
+        const res = resReset.data;
 
         const messages: Record<string, string> = {
           EMAIL: `Password reset link sent to ${values.notificationChannel}`,

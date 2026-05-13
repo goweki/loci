@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { tokenRepository } from "@/data/repositories/token.repository";
 import z from "zod";
-import { TokenType, UserRole } from "@/lib/prisma/generated";
-import { hashToken } from "@/lib/auth/token-handlers";
-import { getUserByKey } from "@/data/user";
 import { compareHash } from "@/lib/utils/passwordHandlers";
 import { generateUserApiKey } from "@/actions";
 import { addToDate } from "@/lib/utils/dateHandlers";
 import { excludeFields } from "@/lib/utils/dataHandlers";
+import { UserService } from "@/services/user/user.service";
 
 const LoginSchema = z.object({
   username: z.string().min(6),
@@ -35,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     const { username, password } = parse.data;
 
-    const user = await getUserByKey(username);
+    const user = await UserService.getUserByKey(username);
 
     if (!user) {
       return NextResponse.json(

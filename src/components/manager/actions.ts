@@ -1,7 +1,7 @@
 "use server";
 
+import { getUserByIdAction } from "@/actions/user.actions";
 import { WabaTemplateRepository } from "@/data/repositories/waba-template";
-import { getUserById } from "@/data/user";
 import { metaSyncService } from "@/lib/whatsapp";
 
 export async function createWabaTemplateAction(
@@ -41,5 +41,5 @@ export async function synchronizeMeta() {
 }
 
 export async function _getUserById(userId: string) {
-  return getUserById(userId);
+  return getUserByIdAction(userId);
 }

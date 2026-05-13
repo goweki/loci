@@ -2,10 +2,10 @@
 
 "use server";
 
+import { getUserByIdAction } from "@/actions/user.actions";
 import { DashboardStatsProps } from "@/components/dashboard/stats";
 import { prisma } from "@/lib/prisma";
 import { cache } from "react";
-import { getUserById } from "./user";
 
 export interface DashboardStats {
   totalMessages: number;
@@ -22,7 +22,13 @@ export interface DashboardStats {
 export const getDashboardStats = cache(
   async (userId: string): Promise<DashboardStats> => {
     // Get date ranges for current and previous period (last 30 days)
-    const wabaId = (await getUserById(userId))?.id;
+    const resUser = await getUserByIdAction(userId, { waba: true });
+    let wabaId: string | null = null;
+
+    if (resUser.ok) {
+      wabaId = resUser.data.id;
+    }
+
     const now = new Date();
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
@@ -124,7 +130,7 @@ export const getDashboardStats = cache(
     // Phone Numbers (active/verified)
     const phoneNumbers = await prisma.phoneNumber.count({
       where: {
-        wabaId,
+        wabaId: wabaId ?? undefined,
         status: "VERIFIED",
       },
     });
@@ -132,7 +138,7 @@ export const getDashboardStats = cache(
     // Phone Numbers (previous count - all time before 30 days ago)
     const phoneNumbersPrevious = await prisma.phoneNumber.count({
       where: {
-        wabaId,
+        wabaId: wabaId ?? undefined,
         status: "VERIFIED",
         createdAt: {
           lt: thirtyDaysAgo,
@@ -150,7 +156,7 @@ export const getDashboardStats = cache(
       phoneNumbers,
       phoneNumbersPrevious,
     };
-  }
+  },
 );
 
 // Get stats summary (optimized single query version)
@@ -164,7 +170,7 @@ export const getDashboardStatsSummary = cache(
         value: stats.totalMessages.toString(),
         change: calculatePercentageChange(
           stats.totalMessages,
-          stats.totalMessagesPrevious
+          stats.totalMessagesPrevious,
         ),
         trend:
           stats.totalMessages >= stats.totalMessagesPrevious ? "up" : "down",
@@ -174,7 +180,7 @@ export const getDashboardStatsSummary = cache(
         value: stats.activeContacts.toString(),
         change: calculatePercentageChange(
           stats.activeContacts,
-          stats.activeContactsPrevious
+          stats.activeContactsPrevious,
         ),
         trend:
           stats.activeContacts >= stats.activeContactsPrevious ? "up" : "down",
@@ -184,7 +190,7 @@ export const getDashboardStatsSummary = cache(
         value: stats.responseRate.toString(),
         change: calculatePercentageChange(
           stats.responseRate,
-          stats.responseRatePrevious
+          stats.responseRatePrevious,
         ),
         trend: stats.responseRate >= stats.responseRatePrevious ? "up" : "down",
       },
@@ -195,7 +201,7 @@ export const getDashboardStatsSummary = cache(
         trend: stats.phoneNumbers >= stats.phoneNumbersPrevious ? "up" : "down",
       },
     };
-  }
+  },
 );
 
 function calculatePercentageChange(current: number, previous: number): string {

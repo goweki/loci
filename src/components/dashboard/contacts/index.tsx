@@ -25,7 +25,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import AddWhatsappNumberModal from "./new-phone-number-modal";
 import WabaEmbeddedSignup from "@/components/ui/waba-embedded-signup";
 import Image from "next/image";
-import { getPhoneNumberById, PhoneNumberGetPayload } from "@/data/phoneNumber";
+// import { getPhoneNumberById, PhoneNumberGetPayload } from "@/data/phoneNumber";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -37,6 +37,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import NewContactForm from "./new-contact-form";
+import {
+  getPhoneNumberByIdAction,
+  PhoneNumberWithRelations,
+} from "@/data/phoneNumber";
 
 const isNotNull = <T,>(value: T | null): value is T => value !== null;
 
@@ -55,7 +59,9 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
   const showNewContactDialog = searchParams.get("new-contact") === "true";
   const [activeTab, setActiveTab] = useState<Tab>(tab || "contacts");
   const [searchQuery, setSearchQuery] = useState("");
-  const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumberGetPayload[]>([]);
+  const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumberWithRelations[]>(
+    [],
+  );
   const [statusFilter, setStatusFilter] = useState("all");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -74,11 +80,15 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
     if (!wabaAccount?.phoneNumbers) return;
 
     const fetchPhoneNos = async () => {
-      const results = await Promise.all(
-        wabaAccount.phoneNumbers.map((phone) => getPhoneNumberById(phone.id)),
+      const res_ = await Promise.all(
+        wabaAccount.phoneNumbers.map(async (phone) => {
+          const resPhone = await getPhoneNumberByIdAction(phone.id);
+          if (resPhone.ok) return resPhone.data;
+          else return null;
+        }),
       );
 
-      setPhoneNumbers(results.filter(isNotNull));
+      setPhoneNumbers(res_.filter(isNotNull));
     };
 
     fetchPhoneNos();

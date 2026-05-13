@@ -4,12 +4,12 @@ import {
   type AuthenticatedHandler,
 } from "@/lib/auth/token-handlers";
 import { metaSyncService } from "@/lib/whatsapp";
-import { getUserById } from "@/data/user";
 import { UserRole } from "@/lib/prisma/generated";
+import { UserService } from "@/services/user/user.service";
 
 const postInit: AuthenticatedHandler = async (request, apiKey) => {
   try {
-    const user = await getUserById(apiKey.user.id);
+    const user = await UserService.getUserByKey(apiKey.user.id);
 
     if (user?.role !== UserRole.ADMIN)
       return NextResponse.json({ error: "uskue mjanja" }, { status: 400 });
