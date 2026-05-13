@@ -1,13 +1,6 @@
-// import ConversationsComponent from "@/components/dashboard/conversations";
-
 import { getConversationsAction } from "@/actions/conversation.actions";
 import { ConversationsComponent } from "@/components/dashboard/conversations";
-import { requireUser } from "@/lib/auth";
 import { ConversationDTO } from "@/services/conversation";
-
-// export default function ConversationsPage() {
-//   return <ConversationsComponent />;
-// }
 
 export default async function ConversationsPage() {
   const resConvos = await getConversationsAction();

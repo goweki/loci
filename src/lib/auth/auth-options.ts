@@ -21,15 +21,17 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: { label: "Username", type: "email" },
+        username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password)
           throw new Error("Missing credentials");
+        else {
+          console.log(`[SIGN IN REQUEST] Signing in ${credentials.username}`);
+        }
 
         const user = await UserService.getUserByKey(credentials.username);
-        // if (!user) throw new Error("Invalid credentials"); //User not found
 
         if (user.status === UserStatus.SUSPENDED)
           throw new Error("Account suspended");

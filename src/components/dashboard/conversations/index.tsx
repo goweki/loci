@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, User, Check, CheckCheck, Clock } from "lucide-react";
+import { Search, User, Check, CheckCheck, Clock, PlusIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -9,6 +9,10 @@ import { Card } from "@/components/ui/card";
 import { InputWithIcon } from "@/components/ui/input";
 
 import type { ConversationDTO } from "@/services/conversation";
+import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n";
+import { useSearchParams } from "next/navigation";
+import { NewMessageDialog } from "./new-message-dialog";
 
 type ConversationsComponentProps = {
   initialConversations: ConversationDTO[] | null;
@@ -19,6 +23,10 @@ export function ConversationsComponent({
   initialConversations,
   error,
 }: ConversationsComponentProps) {
+  const { language } = useI18n();
+  const searchParams = useSearchParams();
+  const dialog = searchParams.get("dialog");
+
   const [search, setSearch] = useState("");
 
   const [selectedConversationId, setSelectedConversationId] = useState<
@@ -27,6 +35,10 @@ export function ConversationsComponent({
     initialConversations?.length && initialConversations?.length > 0
       ? initialConversations[0]?.id
       : null,
+  );
+
+  const [newDialogOpen, setNewDialogOpen] = useState<boolean>(
+    dialog === "new-message",
   );
 
   const conversations = useMemo(() => {
@@ -76,6 +88,10 @@ export function ConversationsComponent({
               Manage your WhatsApp conversations
             </p>
           </div>
+          <Button className="mb-4" onClick={() => setNewDialogOpen(true)}>
+            <PlusIcon /> New Message
+          </Button>
+          <NewMessageDialog open={newDialogOpen} setOpen={setNewDialogOpen} />
 
           <InputWithIcon
             icon={Search}

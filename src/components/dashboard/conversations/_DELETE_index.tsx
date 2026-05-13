@@ -31,7 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Input, InputWithIcon } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import { Card } from "@/components/ui/card";
-import { NewMessageDialog } from "./_new-message-dialog";
+import { NewMessageDialog } from "./new-message-dialog";
 import { getPhoneNumbersByUserAction } from "@/data/phoneNumber";
 
 type TabName = "all" | "unread" | "archived";
