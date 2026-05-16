@@ -1,9 +1,11 @@
-import prisma from "..";
+import prisma from "../index";
 import { PrismaClient, TokenType, UserRole } from "../generated";
 import crypto from "crypto";
 
 async function createOrRotateAdminApiKey() {
-  console.log("🔑 Creating/updating admin API key...");
+  console.log(
+    `🔑 Creating/updating admin API key... user email:${process.env.SYSTEM_EMAIL}`,
+  );
 
   // find admin user
   const admin = await prisma.user.findFirst({
