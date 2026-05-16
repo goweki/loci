@@ -45,6 +45,8 @@ model User {
   autoreplyRules  AutoReplyRule[]
   wabaTemplates   WabaTemplate[]
   promptTemplates PromptTemplate[]
+  products        Product[]
+  orders          Order[]
 
   @@map("users")
 }
@@ -180,25 +182,26 @@ model Subscription {
 
 model Payment {
   id            String        @id @default(cuid())
-  reference     String        @unique
-  paymentMethod PaymentMethod @default(ONLINE)
-  amount        Int
-  currency      Currency      @default(KSH)
-  status        PaymentStatus @default(PENDING)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  transactionId String?       @unique
+  paymentMethod PaymentMethod
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  amount   Decimal       @db.Decimal(10, 2)
+  currency Currency      @default(KSH)
+  status   PaymentStatus @default(PENDING)
 
   subscriptionId String       @unique
   subscription   Subscription @relation(fields: [subscriptionId], references: [id])
 
-  @@map("payments")
-}
+  provider String?
+  paidAt   DateTime?
 
-enum PaymentStatus {
-  PENDING
-  SUCCESS
-  FAILED
-  REVERSED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("payments")
 }
 
 enum Currency {
@@ -289,6 +292,7 @@ model Contact {
 
   messages             Message[]
   chatbotConversations ChatbotConversation[]
+  orders               Order[]
 
   @@unique([userId, phoneNumber])
   @@index([userId, lastMessageAt(sort: Desc)])
@@ -311,6 +315,8 @@ model Message {
   contact       Contact          @relation(fields: [contactId], references: [id], onDelete: Cascade)
   phoneNumber   PhoneNumber      @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
   user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order         Order?           @relation(fields: [orderId], references: [id])
+  orderId       String?
 
   @@index([contactId, timestamp(sort: Desc)])
   @@index([userId, direction, status])
@@ -443,10 +449,100 @@ enum MessageStatus {
 }
 
 enum PaymentMethod {
-  ONLINE
-  OTHER
+  PAYSTACK
   MPESA
+  CARD
+  BANK
   CASH
+  WHATSAPP
+}
+
+// ecommerce
+
+model Product {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  name        String
+  description String?
+  sku         String?
+
+  price    Decimal @db.Decimal(10, 2)
+  currency String  @default("KES")
+
+  stockQty Int @default(0)
+
+  imageUrl String?
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orderItems OrderItem[]
+}
+
+model Order {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id])
+
+  status OrderStatus @default(PENDING)
+
+  subtotal Decimal @db.Decimal(10, 2)
+  total    Decimal @db.Decimal(10, 2)
+
+  currency String @default("KES")
+
+  paymentLink String?
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items    OrderItem[]
+  payments Payment[]
+
+  messages Message[]
+}
+
+model OrderItem {
+  id String @id @default(cuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+
+  name String
+
+  quantity Int
+
+  unitPrice Decimal @db.Decimal(10, 2)
+
+  total Decimal @db.Decimal(10, 2)
+}
+
+enum OrderStatus {
+  PENDING
+  SENT
+  PARTIALLY_PAID
+  PAID
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
 }
 
 // AI chatbot configs
