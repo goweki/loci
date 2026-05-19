@@ -1,4 +1,4 @@
-Your current platform already solves a hard problem:
+Loci currently solves a hard problem:
 
 - WABA onboarding
 - Messaging infra
@@ -13,12 +13,11 @@ But the missing layer is:
 
 Right now messages exist without commercial context.
 
-The fastest market-fit improvement is not “ERP”.
-It is:
+The fastest market-fit improvement is:
 
 # Add a lightweight commerce layer
 
-You only need 4 core entities:
+Only needs 4 core entities:
 
 1. Products / Inventory
 2. Orders / Invoices
@@ -37,17 +36,9 @@ into:
 
 # Recommended Direction
 
-Do NOT build:
-
-- warehouses
-- procurement
-- accounting
-- complex stock movements
-- manufacturing
-
 Start with:
 
-# Commerce CRM
+## Commerce CRM
 
 Think:
 

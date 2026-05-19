@@ -2,6 +2,7 @@ import React from "react";
 import Navbar from "@/components/dashboard/navbar";
 import { isValidLanguage, Language } from "@/lib/i18n";
 import Footer from "@/components/ui/footer";
+import { requireUser } from "@/lib/auth";
 
 const DashboardLayout = async ({
   params,
@@ -11,11 +12,12 @@ const DashboardLayout = async ({
   children: React.ReactNode;
 }) => {
   const { lang } = await params;
+  const user = await requireUser();
 
   return isValidLanguage(lang) ? (
     <>
-      <Navbar />
-      <main className="flex-1 p-6 pt-24"> {children}</main>
+      <Navbar user={user} />
+      <main className="flex-1 p-6 pt-16"> {children}</main>
     </>
   ) : null;
 };

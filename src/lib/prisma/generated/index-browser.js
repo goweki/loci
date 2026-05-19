@@ -194,14 +194,17 @@ exports.Prisma.SubscriptionScalarFieldEnum = {
 
 exports.Prisma.PaymentScalarFieldEnum = {
   id: 'id',
-  reference: 'reference',
+  transactionId: 'transactionId',
   paymentMethod: 'paymentMethod',
+  orderId: 'orderId',
   amount: 'amount',
   currency: 'currency',
   status: 'status',
+  subscriptionId: 'subscriptionId',
+  provider: 'provider',
+  paidAt: 'paidAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  subscriptionId: 'subscriptionId'
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.PlanScalarFieldEnum = {
@@ -272,7 +275,8 @@ exports.Prisma.MessageScalarFieldEnum = {
   status: 'status',
   timestamp: 'timestamp',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  orderId: 'orderId'
 };
 
 exports.Prisma.MessageUnprocessedScalarFieldEnum = {
@@ -322,6 +326,65 @@ exports.Prisma.AccountScalarFieldEnum = {
   scope: 'scope',
   id_token: 'id_token',
   session_state: 'session_state'
+};
+
+exports.Prisma.ProductScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  description: 'description',
+  sku: 'sku',
+  price: 'price',
+  currency: 'currency',
+  stockQty: 'stockQty',
+  imageUrl: 'imageUrl',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OrderScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  contactId: 'contactId',
+  invoiceId: 'invoiceId',
+  status: 'status',
+  subtotal: 'subtotal',
+  total: 'total',
+  currency: 'currency',
+  paymentLink: 'paymentLink',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OrderItemScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  productId: 'productId',
+  name: 'name',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice',
+  total: 'total'
+};
+
+exports.Prisma.InvoiceScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  invoiceNumber: 'invoiceNumber',
+  currency: 'currency',
+  subtotal: 'subtotal',
+  tax: 'tax',
+  discount: 'discount',
+  total: 'total',
+  amountPaid: 'amountPaid',
+  status: 'status',
+  issuedAt: 'issuedAt',
+  dueDate: 'dueDate',
+  paidAt: 'paidAt',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ChatbotConfigScalarFieldEnum = {
@@ -466,10 +529,12 @@ exports.PlanName = exports.$Enums.PlanName = {
 };
 
 exports.PaymentMethod = exports.$Enums.PaymentMethod = {
-  ONLINE: 'ONLINE',
-  OTHER: 'OTHER',
+  PAYSTACK: 'PAYSTACK',
   MPESA: 'MPESA',
-  CASH: 'CASH'
+  CARD: 'CARD',
+  BANK: 'BANK',
+  CASH: 'CASH',
+  WHATSAPP: 'WHATSAPP'
 };
 
 exports.Currency = exports.$Enums.Currency = {
@@ -480,8 +545,7 @@ exports.Currency = exports.$Enums.Currency = {
 exports.PaymentStatus = exports.$Enums.PaymentStatus = {
   PENDING: 'PENDING',
   SUCCESS: 'SUCCESS',
-  FAILED: 'FAILED',
-  REVERSED: 'REVERSED'
+  FAILED: 'FAILED'
 };
 
 exports.PlanInterval = exports.$Enums.PlanInterval = {
@@ -534,6 +598,23 @@ exports.AccountType = exports.$Enums.AccountType = {
   credentials: 'credentials'
 };
 
+exports.OrderStatus = exports.$Enums.OrderStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  PARTIALLY_PAID: 'PARTIALLY_PAID',
+  PAID: 'PAID',
+  CANCELLED: 'CANCELLED'
+};
+
+exports.InvoiceStatus = exports.$Enums.InvoiceStatus = {
+  DRAFT: 'DRAFT',
+  PENDING: 'PENDING',
+  PARTIALLY_PAID: 'PARTIALLY_PAID',
+  PAID: 'PAID',
+  OVERDUE: 'OVERDUE',
+  CANCELLED: 'CANCELLED'
+};
+
 exports.ContactStatus = exports.$Enums.ContactStatus = {
   PENDING: 'PENDING',
   IN_PROGRESS: 'IN_PROGRESS',
@@ -559,6 +640,10 @@ exports.Prisma.ModelName = {
   AutoReplyRule: 'AutoReplyRule',
   WebhookEvent: 'WebhookEvent',
   Account: 'Account',
+  Product: 'Product',
+  Order: 'Order',
+  OrderItem: 'OrderItem',
+  Invoice: 'Invoice',
   ChatbotConfig: 'ChatbotConfig',
   ChatbotConversation: 'ChatbotConversation',
   PromptTemplate: 'PromptTemplate',

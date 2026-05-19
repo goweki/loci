@@ -47,6 +47,7 @@ model User {
   promptTemplates PromptTemplate[]
   products        Product[]
   orders          Order[]
+  invoices        Invoice[]
 
   @@map("users")
 }
@@ -493,6 +494,9 @@ model Order {
   contactId String?
   contact   Contact? @relation(fields: [contactId], references: [id])
 
+  invoiceId String?  @unique
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+
   status OrderStatus @default(PENDING)
 
   subtotal Decimal @db.Decimal(10, 2)
@@ -543,6 +547,51 @@ enum PaymentStatus {
   PENDING
   SUCCESS
   FAILED
+}
+
+enum InvoiceStatus {
+  DRAFT // created but not sent
+  PENDING // issued, awaiting payment
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model Invoice {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  order Order?
+
+  invoiceNumber String @unique
+
+  currency String @default("KES")
+
+  subtotal Decimal @db.Decimal(10, 2)
+  tax      Decimal @db.Decimal(10, 2)
+  discount Decimal @default(0) @db.Decimal(10, 2)
+  total    Decimal @db.Decimal(10, 2)
+
+  amountPaid Decimal @default(0) @db.Decimal(10, 2)
+
+  status InvoiceStatus @default(DRAFT)
+
+  issuedAt DateTime  @default(now())
+  dueDate  DateTime?
+
+  paidAt DateTime?
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([invoiceNumber])
+  @@index([dueDate])
 }
 
 // AI chatbot configs

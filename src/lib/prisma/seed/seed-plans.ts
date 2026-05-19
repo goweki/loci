@@ -208,7 +208,17 @@ export async function seedPlans(prisma: PrismaClient) {
   for (const plan of plansData) {
     const dbPlan = await prisma.plan.upsert({
       where: { name: plan.name },
-      update: {},
+      update: {
+        id: plan.id,
+        name: plan.name,
+        description: plan.description,
+        price: plan.price,
+        interval: plan.interval,
+        popular: plan.popular,
+        maxPhoneNumbers: plan.maxPhoneNumbers,
+        maxMessagesPerMonth: plan.maxMessagesPerMonth,
+        active: true,
+      },
       create: {
         id: plan.id,
         name: plan.name,
