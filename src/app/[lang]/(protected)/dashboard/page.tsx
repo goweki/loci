@@ -37,7 +37,7 @@ const DashboardPage = async ({
 
   return (
     <>
-      <div className="space-y-6 flex flex-col flex-1 min-h-[calc(100vh-24rem)]">
+      <div className="space-y-6 flex flex-col flex-1 min-h-[calc(100vh-24rem)] py-6">
         <TitleSection title={t.title} subtitle={t.subtitle} />
         <DashboardStats stats={stats} />
         <QuickActions />

@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { Prisma, Plan, PlanInterval, PlanName } from "@/lib/prisma/generated";
+import { subscriptionInclude } from "@/services/user/user.dto";
 import { SubscriptionStatus, SubscriptionStatusEnum } from "@/types";
 
 /**
@@ -13,9 +14,11 @@ export async function getSubscriptionStatusByUserId(
   if (!userId) throw new Error("User ID is required");
 
   const subscriptions = await prisma.subscription.findMany({
-    where: { userId },
-    include: { plan: true },
+    where: { userId, product: { lociPlan: { isNot: null } } },
+    include: subscriptionInclude,
   });
+
+  const plans = subscriptions.map(({ product }) => product.lociPlan);
 
   // Default: trialing if no subscription
   if (subscriptions.length === 0) {
@@ -31,16 +34,16 @@ export async function getSubscriptionStatusByUserId(
   } | null = null;
 
   for (const sub of subscriptions) {
-    if (!sub.startDate) {
+    if (!sub.startDate || !sub.product.lociPlan) {
       break;
     }
 
     const startDate = new Date(sub.startDate);
     const endDate = new Date(startDate);
 
-    if (sub.plan.interval === PlanInterval.MONTHLY) {
+    if (sub.product.lociPlan?.interval === PlanInterval.MONTHLY) {
       endDate.setMonth(endDate.getMonth() + 1);
-    } else if (sub.plan.interval === PlanInterval.YEARLY) {
+    } else if (sub.product.lociPlan?.interval === PlanInterval.YEARLY) {
       endDate.setFullYear(endDate.getFullYear() + 1);
     }
 
@@ -48,7 +51,7 @@ export async function getSubscriptionStatusByUserId(
     const gracePeriodEnd = new Date(endDate.getTime() + 60 * 60 * 1000);
 
     if (gracePeriodEnd > now) {
-      activeSub = { plan: sub.plan, endDate };
+      activeSub = { plan: sub.product.lociPlan, endDate };
       break;
     }
   }
@@ -85,11 +88,18 @@ export async function isUserSubscribed(
 /**
  * Create a new subscription for a user.
  */
-export async function createSubscription(
-  data: Prisma.SubscriptionUncheckedCreateInput,
-) {
+export async function createLociSubscription(userId: string, plan: PlanName) {
+  const plan_ = await prisma.plan.findUnique({
+    where: { name: plan },
+    include: { product: true },
+  });
+
+  if (!plan_) {
+    throw new Error("Plan product not found. Subscription not created");
+  }
+
   return prisma.subscription.create({
-    data,
+    data: { userId, productId: plan_.product.id },
     include: {
       plan: true,
       payment: true,
@@ -125,10 +135,7 @@ export async function getUserSubscriptions(userId: string) {
   return prisma.subscription.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
-    include: {
-      plan: true,
-      payment: true,
-    },
+    include: subscriptionInclude,
   });
 }
 
@@ -152,10 +159,7 @@ export async function updateSubscription(
   return prisma.subscription.update({
     where: { id },
     data,
-    include: {
-      plan: true,
-      payment: true,
-    },
+    include: subscriptionInclude,
   });
 }
 
@@ -171,10 +175,10 @@ export async function deleteSubscription(id: string) {
 /**
  * Get all subscriptions for a specific plan.
  */
-export async function getSubscriptionsByPlan(planId: PlanName) {
+export async function getSubscriptionsByPlan(planName: PlanName) {
   return prisma.subscription.findMany({
-    where: { planId },
-    include: { user: true, payment: true },
+    where: { product: { lociPlan: { name: planName } } },
+    include: { product: { include: { lociPlan: true } } },
   });
 }
 
@@ -185,11 +189,15 @@ export async function getSubscriptionDetails(id: string) {
   return prisma.subscription.findUnique({
     where: { id },
     include: {
-      plan: {
+      product: {
         include: {
-          features: {
+          lociPlan: {
             include: {
-              feature: true,
+              features: {
+                include: {
+                  feature: true,
+                },
+              },
             },
           },
         },
@@ -206,8 +214,14 @@ export async function recordPayment(data: Prisma.PaymentUncheckedCreateInput) {
   return prisma.payment.create({
     data,
     include: {
-      subscription: {
-        include: { plan: true, user: true },
+      order: {
+        include: {
+          items: {
+            include: {
+              product: true,
+            },
+          },
+        },
       },
     },
   });
@@ -218,7 +232,23 @@ export async function recordPayment(data: Prisma.PaymentUncheckedCreateInput) {
  */
 export async function getPaymentsForSubscription(subscriptionId: string) {
   return prisma.payment.findMany({
-    where: { subscriptionId },
-    orderBy: { id: "desc" },
+    where: {
+      order: {
+        items: {
+          some: {
+            product: {
+              subscriptions: {
+                some: {
+                  id: subscriptionId,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc", // Recommended over 'id' for logical time sorting
+    },
   });
 }

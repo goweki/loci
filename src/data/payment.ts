@@ -8,19 +8,19 @@ import { PaymentStatus, PaymentMethod } from "@/lib/prisma/generated";
  */
 export async function createPayment({
   reference,
-  subscriptionId,
+  orderId,
   amount,
-  method = PaymentMethod.ONLINE,
+  method,
 }: {
   reference: string;
-  subscriptionId: string;
+  orderId: string;
   amount: number;
-  method?: PaymentMethod;
+  method: PaymentMethod;
 }) {
   return prisma.payment.create({
     data: {
-      reference,
-      subscriptionId,
+      transactionId: reference,
+      orderId,
       amount,
       paymentMethod: method,
       status: PaymentStatus.PENDING,
@@ -33,8 +33,20 @@ export async function updatePaymentStatus(
   status: PaymentStatus,
 ) {
   const payment = await prisma.payment.findFirst({
-    where: { reference },
-    include: { subscription: true },
+    where: { transactionId: reference },
+    include: {
+      order: {
+        include: {
+          items: {
+            include: {
+              product: {
+                include: { lociPlan: { include: { product: true } } },
+              },
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!payment) {
@@ -47,39 +59,40 @@ export async function updatePaymentStatus(
   // 1️⃣ Always update payment status
   tx.push(
     prisma.payment.updateMany({
-      where: { reference },
+      where: { transactionId: reference },
       data: { status },
     }),
   );
 
+  // if subscription — activate if not started
+  const lociPlan = payment.order.items.find(
+    ({ product }) => !!product?.lociPlan,
+  )?.product?.lociPlan;
+
   // 2️⃣ Subscription handling
-  if (status === PaymentStatus.SUCCESS) {
-    // Existing subscription — activate if not started
-    if (!payment.subscription.startDate) {
-      tx.push(
-        prisma.subscription.update({
-          where: { id: payment.subscription.id },
-          data: {
-            startDate: new Date(),
+  if (!!lociPlan && status === PaymentStatus.SUCCESS) {
+    tx.push(
+      prisma.subscription.upsert({
+        where: {
+          userId_productId: {
+            userId: payment.order.userId,
+            productId: "prod_456",
           },
-        }),
-      );
-    }
+        },
+        create: {
+          userId: payment.order.userId,
+          productId: lociPlan.product.id,
+          startDate: new Date(),
+        },
+        update: {
+          startDate: new Date(),
+        },
+      }),
+    );
   } else if (status === PaymentStatus.FAILED) {
     console.warn(
-      `[PAYMENT] Payment ${payment.id} failed. No subscription will be activated.`,
+      `[PAYMENT] Payment ${payment.id} failed. No subscription is activated.`,
     );
-
-    if (payment.subscription) {
-      tx.push(
-        prisma.subscription.update({
-          where: { id: payment.subscription.id },
-          data: {
-            startDate: null,
-          },
-        }),
-      );
-    }
   }
 
   return prisma.$transaction(tx);
@@ -89,17 +102,8 @@ export async function updatePaymentStatus(
  * List payments for a user
  */
 export async function getPaymentsByUserId(userId: string) {
-  const subscriptions = await prisma.subscription.findMany({
-    where: { userId },
-    orderBy: { createdAt: "desc" },
-  });
-
-  if (subscriptions.length === 0) return [];
-
-  const subscriptionIds = subscriptions.map(({ id }) => id);
-
   return prisma.payment.findMany({
-    where: { subscriptionId: { in: subscriptionIds } },
+    where: { order: { userId: userId } },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -109,17 +113,7 @@ export async function getPaymentsByUserId(userId: string) {
  */
 export async function getPaymentByReference(reference: string) {
   return prisma.payment.findUnique({
-    where: { reference },
-  });
-}
-
-/**
- * List payments for a specific subscription
- */
-export async function getPaymentsBySubscription(subscriptionId: string) {
-  return prisma.payment.findMany({
-    where: { subscriptionId },
-    orderBy: { createdAt: "desc" },
+    where: { transactionId: reference },
   });
 }
 

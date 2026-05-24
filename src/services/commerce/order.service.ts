@@ -1,170 +1,227 @@
-// import prisma from "@/lib/prisma";
-
-// export class OrderService {
-//   static async createOrder(dto: {
-//     userId: string;
-//     contactId?: string;
-
-//     items: {
-//       productId: string;
-//       quantity: number;
-//     }[];
-//   }) {
-//     return prisma.$transaction(async (tx) => {
-//       let subtotal = 0;
-
-//       const orderItems = [];
-
-//       for (const item of dto.items) {
-//         const product = await tx.product.findUnique({
-//           where: {
-//             id: item.productId,
-//           },
-//         });
-
-//         if (!product) {
-//           throw new Error("Product not found");
-//         }
-
-//         if (product.stockQty < item.quantity) {
-//           throw new Error(`${product.name} is out of stock`);
-//         }
-
-//         const lineTotal = Number(product.price) * item.quantity;
-
-//         subtotal += lineTotal;
-
-//         orderItems.push({
-//           productId: product.id,
-//           name: product.name,
-//           quantity: item.quantity,
-//           unitPrice: product.price,
-//           total: lineTotal,
-//         });
-
-//         await tx.product.update({
-//           where: {
-//             id: product.id,
-//           },
-
-//           data: {
-//             stockQty: {
-//               decrement: item.quantity,
-//             },
-//           },
-//         });
-//       }
-
-//       const order = await tx.order.create({
-//         data: {
-//           userId: dto.userId,
-//           contactId: dto.contactId,
-
-//           subtotal,
-//           total: subtotal,
-
-//           items: {
-//             create: orderItems,
-//           },
-//         },
-
-//         include: {
-//           items: true,
-//           contact: true,
-//         },
-//       });
-
-//       return order;
-//     });
-//   }
-// }
-
+import { requireUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { InvoiceService } from "./invoice.service";
-// import { Decimal } from "@prisma/client/runtime/library";
-// import { InvoiceService } from "../invoice/invoice.service";
+import {
+  Currency,
+  Order,
+  OrderStatus,
+  Prisma,
+  UserRole,
+} from "@/lib/prisma/generated";
+
+export type OrderServiceContext = {
+  userId: string;
+  role: UserRole;
+};
 
 export class OrderService {
-  static async createOrder(dto: {
-    userId: string;
+  private userId: string;
+  private role: UserRole;
+
+  private constructor({ userId, role }: OrderServiceContext) {
+    this.userId = userId;
+    this.role = role;
+  }
+
+  /**
+   * 🛠️ Initialize service with logged-in user context
+   */
+  static async create() {
+    const user = await requireUser();
+
+    return new OrderService({
+      userId: user.id,
+      role: user.role as UserRole,
+    });
+  }
+
+  /**
+   * 🔐 Centralized access control
+   * Admins can view any order, standard users are strictly scoped to their own userId.
+   */
+  private scope<T extends Prisma.OrderWhereInput>(
+    where: T = {} as T,
+  ): Prisma.OrderWhereInput {
+    if (this.role === UserRole.ADMIN) {
+      return where;
+    }
+
+    return {
+      ...where,
+      userId: this.userId,
+    };
+  }
+
+  /**
+   * 📦 Create a new Order with nested OrderItems atomically
+   */
+  async createOrder(data: {
     contactId?: string;
-    items: {
-      productId: string;
-      quantity: number;
-    }[];
-  }) {
-    return prisma.$transaction(async (tx) => {
-      let subtotal = 0;
-
-      const itemsData = [];
-
-      for (const item of dto.items) {
-        const product = await tx.product.findUnique({
-          where: { id: item.productId },
-        });
-
-        if (!product) {
-          throw new Error("Product not found");
+    currency: Currency;
+    notes?: string;
+    total: number;
+    paymentLink?: string;
+    items: (
+      | {
+          productId: string;
+          name: string;
+          quantity: number;
+          unitPrice: number;
+          total: number;
         }
-
-        if (product.stockQty < item.quantity) {
-          throw new Error(`${product.name} out of stock`);
+      | {
+          productId: null;
+          name: string;
+          quantity: number;
+          unitPrice: number;
+          total: number;
         }
+    )[];
+  }): Promise<Order> {
+    const { items, ...orderData } = data;
 
-        const total = Number(product.price) * item.quantity;
+    return prisma.order.create({
+      data: {
+        ...orderData,
+        userId: this.userId, // Context enforced
+        items: {
+          create: items,
+        },
+      },
+      include: {
+        items: true,
+      },
+    });
+  }
 
-        subtotal += total;
-
-        itemsData.push({
-          productId: product.id,
-          name: product.name,
-          quantity: item.quantity,
-          unitPrice: product.price,
-          total,
-        });
-
-        await tx.product.update({
-          where: {
-            id: product.id,
-          },
-
-          data: {
-            stockQty: {
-              decrement: item.quantity,
+  /**
+   * 🔎 Get single order by ID with structural scoping checks
+   */
+  async getOrderById(id: string) {
+    const order = await prisma.order.findFirst({
+      where: this.scope({ id }),
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                lociPlan: true,
+              },
             },
           },
-        });
-      }
+        },
+        payments: true,
+        invoice: true,
+        contact: true,
+      },
+    });
 
-      const order = await tx.order.create({
-        data: {
-          userId: dto.userId,
-          contactId: dto.contactId,
-          subtotal,
-          total: subtotal,
+    if (!order) {
+      throw new Error("Order not found or unauthorized access");
+    }
 
+    return order;
+  }
+
+  /**
+   * 👥 Get all orders with filtering, pagination, and multi-tenant scoping
+   */
+  async getOrders(params?: {
+    status?: OrderStatus;
+    limit?: number;
+    cursor?: string;
+    search?: string;
+  }) {
+    const { status, limit = 20, cursor, search } = params || {};
+
+    return prisma.order.findMany({
+      where: this.scope({
+        ...(status ? { status } : {}),
+        ...(search
+          ? {
+              OR: [
+                { id: { contains: search, mode: "insensitive" } },
+                { notes: { contains: search, mode: "insensitive" } },
+                {
+                  contact: { name: { contains: search, mode: "insensitive" } },
+                },
+              ],
+            }
+          : {}),
+      }),
+      include: {
+        items: true,
+        payments: true,
+        contact: true,
+      },
+      take: limit,
+      ...(cursor && {
+        skip: 1,
+        cursor: { id: cursor },
+      }),
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  }
+
+  /**
+   * 🏷️ Update status or add invoice reference details
+   */
+  async updateOrderStatus(
+    id: string,
+    status: OrderStatus,
+    paymentLink?: string,
+  ): Promise<Order> {
+    // Assert existence and access rights first
+    await this.getOrderById(id);
+
+    return prisma.order.update({
+      where: { id },
+      data: {
+        status,
+        ...(paymentLink && { paymentLink }),
+      },
+    });
+  }
+
+  /**
+   * 💳 Fetch all payments linked to a structural subscription context
+   */
+  async getPaymentsBySubscriptionId(subscriptionId: string) {
+    return prisma.payment.findMany({
+      where: {
+        order: this.scope({
           items: {
-            create: itemsData,
+            some: {
+              product: {
+                subscriptions: {
+                  some: {
+                    id: subscriptionId,
+                  },
+                },
+              },
+            },
           },
-        },
+        }),
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  }
 
-        include: {
-          items: true,
-          contact: true,
-        },
-      });
+  /**
+   * ❌ Securely cancel an order
+   */
+  async cancelOrder(id: string): Promise<Order> {
+    // Assert execution rights
+    await this.getOrderById(id);
 
-      const invoice = await InvoiceService.createInvoiceFromOrder(order.id, tx);
-
-      await tx.order.update({
-        where: { id: order.id },
-
-        data: {
-          invoiceId: invoice.id,
-        },
-      });
-
-      return order;
+    return prisma.order.update({
+      where: { id },
+      data: {
+        status: OrderStatus.CANCELLED,
+      },
     });
   }
 }

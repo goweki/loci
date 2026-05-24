@@ -1,3 +1,5 @@
+import "server-only";
+
 import { requireUser } from "@/lib/auth";
 import { sendMail } from "@/lib/mail";
 import { resetPasswordEmail } from "@/lib/mail/email-render";

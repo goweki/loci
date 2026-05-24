@@ -14,25 +14,11 @@ import sendSms from "@/lib/sms";
 import { addToDate } from "@/lib/utils/dateHandlers";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import { generateRandom } from "@/lib/utils/passwordHandlers";
-import { removePlus } from "@/lib/utils/telHandlers";
 
 import whatsapp from "@/lib/whatsapp";
 
 import { UserService } from "@/services/user/user.service";
-
-// ======================================================
-// TYPES
-// ======================================================
-
-export type ActionResult<T = void> =
-  | {
-      ok: true;
-      data: T;
-    }
-  | {
-      ok: false;
-      error: string;
-    };
+import { ActionResult } from "@/types";
 
 // ======================================================
 // SEND OTP

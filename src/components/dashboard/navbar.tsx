@@ -14,28 +14,7 @@ import { Navbar } from "@/components/ui/navbar";
 import { RichNavMenuProps } from "@/components/ui/navbar";
 import { useI18n } from "@/lib/i18n";
 import { UserRole } from "@/lib/prisma/generated";
-import {
-  CalendarDays,
-  ClipboardList,
-  Factory,
-  LayoutDashboard,
-  ListChecks,
-  ShieldCheck,
-  Truck,
-  Users,
-  Bell,
-  Settings,
-  LineChart,
-  FileText,
-  History,
-  ScanLine,
-  Wrench,
-  TicketIcon,
-  User2Icon,
-  Users2Icon,
-  FilePenIcon,
-  FileBoxIcon,
-} from "lucide-react";
+import { FilePenIcon, FileBoxIcon } from "lucide-react";
 
 const translations = {
   en: {

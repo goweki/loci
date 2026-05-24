@@ -8,9 +8,11 @@ export type UserResponse<T extends Prisma.UserDefaultArgs> =
   Prisma.UserGetPayload<T>;
 
 export const userInclude = Prisma.validator<Prisma.UserInclude>()({
-  waba: true,
-  subscriptions: true,
   contacts: true,
+  messages: true,
+  subscriptions: { include: { product: { include: { lociPlan: true } } } },
+  waba: { include: { phoneNumbers: true, templates: true } },
+  autoreplyRules: true,
   _count: {
     select: {
       contacts: true,
@@ -21,4 +23,17 @@ export const userInclude = Prisma.validator<Prisma.UserInclude>()({
 
 export type UserWithRelations = Prisma.UserGetPayload<{
   include: typeof userInclude;
+}>;
+
+/*
+ *.  Subscription
+ */
+
+export const subscriptionInclude =
+  Prisma.validator<Prisma.SubscriptionInclude>()({
+    product: { include: { lociPlan: true } },
+  });
+
+export type SubscriptionWithRelations = Prisma.PlanGetPayload<{
+  include: typeof subscriptionInclude;
 }>;

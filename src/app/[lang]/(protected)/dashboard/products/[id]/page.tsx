@@ -41,34 +41,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Header */}
-      {/* <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="space-y-2">
-          <Button variant="ghost" asChild className="w-fit px-0">
-            <Link href={`/${lang}/dashboard/products`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Products
-            </Link>
-          </Button>
-
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {product.name}
-            </h1>
-
-            <p className="text-muted-foreground">
-              Product details and inventory information
-            </p>
-          </div>
-        </div>
-
-        <Button asChild>
-          <Link href={`/${lang}/dashboard/products/${product.id}/edit`}>
-            <Pencil className="mr-2 h-4 w-4" />
-            Edit Product
-          </Link>
-        </Button>
-      </div> */}
       <div className="flex items-center gap-4">
         <TitleSection
           title={product.name}

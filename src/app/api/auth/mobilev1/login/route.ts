@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { tokenRepository } from "@/data/repositories/token.repository";
 import z from "zod";
 import { compareHash } from "@/lib/utils/passwordHandlers";
-import { generateUserApiKey } from "@/actions";
 import { addToDate } from "@/lib/utils/dateHandlers";
 import { excludeFields } from "@/lib/utils/dataHandlers";
 import { UserService } from "@/services/user/user.service";
+import { generateUserApiKey } from "@/actions/api-key";
 
 const LoginSchema = z.object({
   username: z.string().min(6),

@@ -9,17 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import { ProductActionsDropdown } from "./product-actions-dropdown";
+import { ProductWithRelations } from "@/services/commerce/product.service";
 
-interface Props {
-  product: Product;
-}
-
-export function ProductCard({ product }: Props) {
+export function ProductCard({ product }: { product: ProductWithRelations }) {
   return (
     <Card className="overflow-hidden">
       <div className="relative aspect-square">
         <Image
-          src={product.imageUrl ?? "/placeholder-product.jpg"}
+          src={product.imageUrl || "/placeholder-product.jpg"}
           alt={product.name}
           fill
           className="object-cover"

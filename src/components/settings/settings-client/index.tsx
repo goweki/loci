@@ -26,7 +26,6 @@ import {
   AlertCircle,
   MessageSquareIcon,
 } from "lucide-react";
-import { UserGetPayload } from "@/data/user";
 import { WhatsAppLogo } from "@/components/ui/svg";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import TabWhatsApp from "./tab-whatsapp";
@@ -35,8 +34,9 @@ import TabSubscription from "./subscription";
 import TabAutoreplyRules from "./tab-autoReply";
 import { strPascalCase } from "@/lib/utils/stringHandlers";
 import { TabSecurity } from "./tab-security";
+import { UserWithRelations } from "@/services/user/user.dto";
 
-export default function SettingsClient({ user }: { user: UserGetPayload }) {
+export default function SettingsClient({ user }: { user: UserWithRelations }) {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
 

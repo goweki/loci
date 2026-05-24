@@ -10,12 +10,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { TabsContent } from "@/components/ui/tabs";
 import { CalendarIcon, CheckCircle2Icon } from "lucide-react";
 import { getStatusBadge } from "./utilities";
-import { UserGetPayload } from "@/data/user";
+import { UserWithRelations } from "@/services/user/user.dto";
 
-export default function TabProfile({ user }: { user: UserGetPayload }) {
+export default function TabProfile({ user }: { user: UserWithRelations }) {
   return (
     <>
       <Card>

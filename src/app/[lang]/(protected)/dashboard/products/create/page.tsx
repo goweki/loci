@@ -1,21 +1,29 @@
-import { redirect } from "next/navigation";
-
 import { requireUser } from "@/lib/auth";
-
-import { createProductAction } from "@/actions/product.actions";
-
 import { ProductForm } from "@/components/dashboard/products/product-form";
+import TitleSection from "@/components/ui/page-title";
+import { BoxIcon } from "lucide-react";
 
-export default async function CreateProductPage() {
+type PageProps = {
+  params: Promise<{
+    lang: string;
+  }>;
+};
+
+export default async function CreateProductPage({ params }: PageProps) {
   const session = await requireUser();
+  const { lang } = await params;
 
   return (
     <div className="mx-auto max-w-2xl p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Create Product</h1>
-
-        <p className="text-muted-foreground">Add a product to your inventory</p>
-      </div>
+      <TitleSection
+        title="New Product"
+        subtitle=" Product details and inventory information"
+        icon={BoxIcon}
+        breadcrumbs={[
+          { label: "Products", href: `/${lang}/dashboard/products` },
+          { label: "new" },
+        ]}
+      />
 
       <ProductForm />
     </div>

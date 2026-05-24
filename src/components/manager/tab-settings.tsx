@@ -15,11 +15,11 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Alert, AlertDescription } from "../ui/alert";
 import { useSession } from "next-auth/react";
-import { type UserGetPayload } from "@/data/user";
 import { getUserByIdAction } from "@/actions/user.actions";
+import { userInclude, type UserWithRelations } from "@/services/user/user.dto";
 
 export default function TabSettings() {
-  const [user, setUser] = useState<UserGetPayload>();
+  const [user, setUser] = useState<UserWithRelations>();
   const [loading, setLoading] = useState<"waba">();
 
   const { data: session } = useSession();
@@ -28,12 +28,7 @@ export default function TabSettings() {
     if (!session?.user) return;
 
     console.log(`Fetching user: id-${session.user.id}`);
-    const _resUser = await getUserByIdAction(session.user.id, {
-      contacts: true,
-      messages: true,
-      subscriptions: { include: { plan: true } },
-      waba: { include: { phoneNumbers: true, templates: true } },
-    });
+    const _resUser = await getUserByIdAction(session.user.id, userInclude);
     if (_resUser.ok) setUser(_resUser.data);
   }, [session?.user]);
 

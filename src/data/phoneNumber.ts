@@ -495,7 +495,7 @@ export async function checkPhoneNumberLimitAction(userId: string): Promise<
         cancelDate: null,
       },
       include: {
-        plan: true,
+        product: { include: { lociPlan: true } },
       },
     });
 
@@ -516,7 +516,14 @@ export async function checkPhoneNumberLimitAction(userId: string): Promise<
     }
 
     const verifiedCount = verifiedCountRes.data;
-    const allowed = subscription.plan.maxPhoneNumbers;
+
+    if (!subscription.product.lociPlan) {
+      throw new Error(
+        `No subscription found in [subscription.product]: ${subscription.product}`,
+      );
+    }
+
+    const allowed = subscription.product.lociPlan.maxPhoneNumbers;
 
     return {
       ok: true,

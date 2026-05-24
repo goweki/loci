@@ -7,6 +7,7 @@ import PageTitle from "@/components/ui/page-title";
 import { Suspense } from "react";
 import { isValidLanguage } from "@/lib/i18n";
 import { getUserByIdAction } from "@/actions/user.actions";
+import { userInclude } from "@/services/user/user.dto";
 
 const translations = {
   en: {
@@ -35,12 +36,7 @@ export default async function SettingsPage({
 
   const t = translations[lang];
 
-  const resUser = await getUserByIdAction(session.user.id, {
-    contacts: true,
-    messages: true,
-    subscriptions: { include: { plan: true } },
-    waba: { include: { phoneNumbers: true, templates: true } },
-  });
+  const resUser = await getUserByIdAction(session.user.id, userInclude);
 
   if (!resUser.ok) {
     return;
@@ -49,15 +45,13 @@ export default async function SettingsPage({
   const user = resUser.data;
 
   return user ? (
-    <main className="flex-1 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <PageTitle title={t.title} subtitle={t.subtitle} />
+    <div className="max-w-7xl mx-auto space-y-6 py-6">
+      <PageTitle title={t.title} subtitle={t.subtitle} />
 
-        <Suspense fallback={<TemplatesSkeleton />}>
-          <SettingsClient user={user} />
-        </Suspense>
-      </div>
-    </main>
+      <Suspense fallback={<TemplatesSkeleton />}>
+        <SettingsClient user={user} />
+      </Suspense>
+    </div>
   ) : (
     "ERROR: Couldnt fetch user"
   );

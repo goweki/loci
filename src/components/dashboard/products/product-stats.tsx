@@ -1,9 +1,8 @@
-import { Product } from "@/lib/prisma/generated";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ProductWithRelations } from "@/services/commerce/product.service";
 
 interface Props {
-  products: Product[];
+  products: ProductWithRelations[];
 }
 
 export function ProductStats({ products }: Props) {

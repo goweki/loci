@@ -1,14 +1,37 @@
 import { requireUser } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { Prisma, Product } from "@/lib/prisma/generated";
+import _prisma from "@/lib/prisma";
+import { Prisma, Product as Product_ } from "@/lib/prisma/generated";
 
 const productIncludeRelations: Prisma.ProductInclude = {
   orderItems: true,
 };
 
-export type ProductWithRelations = Prisma.ProductGetPayload<{
+export type ProductWithRelations_ = Prisma.ProductGetPayload<{
   include: typeof productIncludeRelations;
 }>;
+
+export const prisma = _prisma.$extends({
+  result: {
+    product: {
+      price: {
+        needs: { price: true },
+        compute(product) {
+          return product.price.toNumber(); // Or .toFixed(2)
+        },
+      },
+    },
+  },
+});
+
+// 1. Swap the price out for standard Product
+export type Product = Omit<Product_, "price"> & {
+  price: number;
+};
+
+// 2. Swap the price out for ProductWithRelations
+export type ProductWithRelations = Omit<ProductWithRelations_, "price"> & {
+  price: number;
+};
 
 export class ProductService {
   static async createProduct(

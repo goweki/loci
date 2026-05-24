@@ -1,9 +1,8 @@
-import { Product } from "@/lib/prisma/generated";
-
 import { ProductCard } from "./product-card";
+import { ProductWithRelations } from "@/services/commerce/product.service";
 
 interface Props {
-  products: Product[];
+  products: ProductWithRelations[];
 }
 
 export function ProductGrid({ products }: Props) {

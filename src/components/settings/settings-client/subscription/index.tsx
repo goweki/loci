@@ -130,7 +130,7 @@ export default function TabSubscription() {
                 {payments.map((payment) => (
                   <TableRow key={payment.id}>
                     <TableCell className="font-mono text-xs">
-                      {payment.reference}
+                      {payment.transactionId}
                     </TableCell>
 
                     <TableCell>{payment.paymentMethod}</TableCell>

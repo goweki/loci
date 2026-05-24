@@ -185,7 +185,7 @@ exports.Prisma.SessionScalarFieldEnum = {
 exports.Prisma.SubscriptionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  planId: 'planId',
+  productId: 'productId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   cancelDate: 'cancelDate',
@@ -200,8 +200,6 @@ exports.Prisma.PaymentScalarFieldEnum = {
   amount: 'amount',
   currency: 'currency',
   status: 'status',
-  subscriptionId: 'subscriptionId',
-  provider: 'provider',
   paidAt: 'paidAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -347,13 +345,11 @@ exports.Prisma.OrderScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   contactId: 'contactId',
-  invoiceId: 'invoiceId',
   status: 'status',
-  subtotal: 'subtotal',
-  total: 'total',
   currency: 'currency',
-  paymentLink: 'paymentLink',
   notes: 'notes',
+  paymentLink: 'paymentLink',
+  total: 'total',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -371,6 +367,7 @@ exports.Prisma.OrderItemScalarFieldEnum = {
 exports.Prisma.InvoiceScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  orderId: 'orderId',
   invoiceNumber: 'invoiceNumber',
   currency: 'currency',
   subtotal: 'subtotal',
@@ -381,7 +378,6 @@ exports.Prisma.InvoiceScalarFieldEnum = {
   status: 'status',
   issuedAt: 'issuedAt',
   dueDate: 'dueDate',
-  paidAt: 'paidAt',
   notes: 'notes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -522,12 +518,6 @@ exports.TemplateLanguage = exports.$Enums.TemplateLanguage = {
   sw_KE: 'sw_KE'
 };
 
-exports.PlanName = exports.$Enums.PlanName = {
-  BASIC: 'BASIC',
-  STANDARD: 'STANDARD',
-  PREMIUM: 'PREMIUM'
-};
-
 exports.PaymentMethod = exports.$Enums.PaymentMethod = {
   PAYSTACK: 'PAYSTACK',
   MPESA: 'MPESA',
@@ -546,6 +536,12 @@ exports.PaymentStatus = exports.$Enums.PaymentStatus = {
   PENDING: 'PENDING',
   SUCCESS: 'SUCCESS',
   FAILED: 'FAILED'
+};
+
+exports.PlanName = exports.$Enums.PlanName = {
+  BASIC: 'BASIC',
+  STANDARD: 'STANDARD',
+  PREMIUM: 'PREMIUM'
 };
 
 exports.PlanInterval = exports.$Enums.PlanInterval = {

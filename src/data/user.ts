@@ -20,23 +20,12 @@ import {
   NotificationChannel,
 } from "@/lib/prisma/generated";
 import { sendMail } from "@/lib/mail";
-import { welcomeEmail, resetPasswordEmail } from "@/lib/mail/email-render";
+import { welcomeEmail } from "@/lib/mail/email-render";
 import { BANNER_IMAGE_URL, BASE_URL } from "@/lib/utils/getUrl";
 import { compareHash, hash } from "@/lib/utils/passwordHandlers";
-import sendSms, { SMSprops } from "@/lib/sms";
-import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import whatsapp from "@/lib/whatsapp";
 import { Message } from "@/lib/validations";
-import { tokenRepository } from "./repositories/token.repository";
-
-export type UserGetPayload = Prisma.UserGetPayload<{
-  include: {
-    contacts: true;
-    messages: true;
-    subscriptions: { include: { plan: true } };
-    waba: { include: { phoneNumbers: true; templates: true } };
-  };
-}>;
+import { userInclude, type UserWithRelations } from "@/services/user/user.dto";
 
 export function excludeFields<User, Key extends keyof User>(
   user: User,
@@ -183,17 +172,12 @@ export async function registerUser(
 export async function getAllUsers(
   skip = 0,
   take = 20,
-): Promise<UserGetPayload[]> {
+): Promise<UserWithRelations[]> {
   return prisma.user.findMany({
     skip,
     take,
     orderBy: { createdAt: "desc" },
-    include: {
-      contacts: true,
-      messages: true,
-      subscriptions: { include: { plan: true } },
-      waba: { include: { phoneNumbers: true, templates: true } },
-    },
+    include: userInclude,
   });
 }
 
@@ -387,13 +371,15 @@ export async function deleteUser(id: string): Promise<User> {
 /**
  * Get user subscriptions with plan details.
  */
-export async function getUserSubscriptions(userId: string) {
+export async function getUserLociSubscriptions(userId: string) {
   return prisma.subscription.findMany({
-    where: { userId },
-    include: { plan: true, payment: true },
+    where: {
+      userId,
+      product: { lociPlan: { isNot: null } },
+      include: { product: { include: { lociPlan: true } } },
+    },
   });
 }
-
 /**
  * Get all contacts for a user.
  */
@@ -466,12 +452,6 @@ export async function deleteInactiveUsers(olderThanDays: number) {
 export async function getUserFullProfile(userId: string) {
   return prisma.user.findUnique({
     where: { id: userId },
-    include: {
-      subscriptions: { include: { plan: true, payment: true } },
-      waba: true,
-      contacts: true,
-      messages: true,
-      autoreplyRules: true,
-    },
+    include: userInclude,
   });
 }

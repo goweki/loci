@@ -1,3 +1,5 @@
+import "server-only";
+
 import { prisma } from "@/lib/prisma";
 import { TokenType, Token, Prisma } from "@/lib/prisma/generated";
 

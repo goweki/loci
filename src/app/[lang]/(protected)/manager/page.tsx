@@ -35,15 +35,13 @@ export default async function ManagerPage({
   const t = translations[lang];
 
   return (
-    <main className="flex-1 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <PageTitle title={t.title} subtitle={t.subtitle} />
+    <div className="max-w-7xl mx-auto space-y-6">
+      <PageTitle title={t.title} subtitle={t.subtitle} />
 
-        <Suspense fallback={<TemplatesSkeleton />}>
-          <ManagerComponent />
-        </Suspense>
-      </div>
-    </main>
+      <Suspense fallback={<TemplatesSkeleton />}>
+        <ManagerComponent />
+      </Suspense>
+    </div>
   );
 }
 

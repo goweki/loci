@@ -13,10 +13,12 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { initializePayment } from "@/lib/payments";
 import { createPayment } from "@/data/payment";
-import { createSubscription } from "@/data/subscription";
-import { PlanName } from "@/lib/prisma/generated";
+import { createLociSubscription } from "@/data/subscription";
+import { Currency, PaymentMethod, PlanName } from "@/lib/prisma/generated";
 import Loader from "../ui/loaders";
 import toast from "react-hot-toast";
+import { createOrderAction } from "@/actions/order.actions";
+import { getProductByPlanName } from "@/actions/product.actions";
 
 export function PaymentCheckout({
   _email,
@@ -46,17 +48,39 @@ export function PaymentCheckout({
 
     try {
       // 1️⃣ Create subscription
-      const subscription = await createSubscription({
-        userId: userId,
-        planId: planName as PlanName,
-      });
+      const subscription = await createLociSubscription(
+        userId,
+        planName as PlanName,
+      );
 
       // 2️⃣ Create payment record in DB
       const reference = `${packag}_${userId}_${Date.now()}`;
+      const productRes = await getProductByPlanName(planName);
+
+      if (!productRes.ok) {
+        throw new Error(`Plan product does not exist: ${planName}`);
+      }
+
+      const orderRes = await createOrderAction({
+        currency: Currency.KSH,
+        notes: "LOCi subscription",
+        items: [
+          {
+            productId: productRes.data.id,
+            quantity: 1,
+          },
+        ],
+      });
+
+      if (!orderRes.ok) {
+        throw new Error(`Order creation for plan failed: ${planName}`);
+      }
+
       await createPayment({
         reference,
-        subscriptionId: subscription.id,
+        orderId: orderRes.data.id,
         amount,
+        method: PaymentMethod.PAYSTACK,
       });
 
       // 3️⃣ Initialize Paystack payment

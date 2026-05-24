@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import Footer from "@/components/ui/footer";
-import { Navbar, NavbarNavLink } from "@/components/ui/navbar";
+import { Navbar, RichNavMenuProps } from "@/components/ui/navbar";
 import { getDictionary, isValidLanguage, Language } from "@/lib/i18n";
 
 export default async function UnAuthLayout({
@@ -24,9 +24,9 @@ export default async function UnAuthLayout({
 
   const dict = await getDictionary(lang);
 
-  const navigationLinks: NavbarNavLink[] = [
-    { href: "/", label: dict.navbar.home },
-    { href: "/pricing", label: dict.navbar.pricing },
+  const navigationLinks: RichNavMenuProps["navigation"] = [
+    { type: "link", href: "/", label: dict.navbar.home },
+    { type: "link", href: "/pricing", label: dict.navbar.pricing },
   ];
 
   return (

@@ -33,7 +33,7 @@ import {
   generateUserApiKey,
   getUserApiKeys,
   revokeApiKey,
-} from "@/actions";
+} from "@/actions/api-key";
 
 export function TabSecurity() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>();
