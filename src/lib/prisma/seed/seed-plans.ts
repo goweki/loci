@@ -196,9 +196,10 @@ export async function seedPlans(prisma: PrismaClient) {
   console.log("📦 Seeding features...");
 
   for (const feature of featuresData) {
+    const { name, ...feat } = feature;
     await prisma.feature.upsert({
-      where: { name: feature.name },
-      update: {},
+      where: { name },
+      update: { feat },
       create: feature,
     });
   }
@@ -206,6 +207,30 @@ export async function seedPlans(prisma: PrismaClient) {
   console.log("📦 Seeding plans & plan features...");
 
   for (const plan of plansData) {
+    const adminUser = await prisma.user.findFirst({ where: { role: "ADMIN" } });
+
+    if (!adminUser) {
+      throw new Error(
+        "❌ Seed an Admin user first before seeding plans, because products require a userId.",
+      );
+    }
+
+    await prisma.product.upsert({
+      where: { id: plan.id },
+      update: {
+        name: plan.name,
+        price: plan.price,
+        description: plan.description,
+      },
+      create: {
+        id: plan.id,
+        userId: adminUser.id,
+        name: plan.name,
+        price: plan.price,
+        description: plan.description,
+      },
+    });
+
     const dbPlan = await prisma.plan.upsert({
       where: { name: plan.name },
       update: {

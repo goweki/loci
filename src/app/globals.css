@@ -171,7 +171,7 @@
   }
 
   main {
-    @apply min-h-screen max-w-7xl mx-auto;
+    @apply min-h-screen mx-auto;
   }
 
   h1 {

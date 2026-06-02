@@ -376,7 +376,7 @@ function RichNavigationMenu({ navigation, className }: RichNavMenuProps) {
   };
 
   return (
-    <NavigationMenu className={cn("z-20 container", className)}>
+    <NavigationMenu className={cn("z-20 max-w-7xl mx-auto", className)}>
       <NavigationMenuList>
         {navigation.map((navItem) => {
           // -----------------------------
