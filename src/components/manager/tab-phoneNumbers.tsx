@@ -8,17 +8,17 @@ import {
   CardTitle,
 } from "../ui/card";
 import { TabsContent } from "../ui/tabs";
-import { getAllPhoneNumbers } from "@/data/phoneNumber";
 import { PhoneNumber } from "@/lib/prisma/generated";
 import { useCallback, useEffect, useState } from "react";
 import Loader from "../ui/loaders";
+import { getAllPhoneNumbersAction } from "@/data/phoneNumber";
 
 export default function TabPhoneNumbers() {
   const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumber[]>();
 
   const fetchPhoneNumbers = useCallback(async () => {
-    const phoneNos_ = await getAllPhoneNumbers();
-    setPhoneNumbers(phoneNos_);
+    const resPhones_ = await getAllPhoneNumbersAction();
+    if (resPhones_.ok) setPhoneNumbers(resPhones_.data);
   }, []);
 
   // load templates and phone numbers

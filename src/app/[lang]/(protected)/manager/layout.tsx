@@ -14,7 +14,7 @@ export default async function ManagerLayout({
   return isValidLanguage(lang) ? (
     <>
       <Navbar />
-      {children}
+      <main className="flex-1 p-6 pt-16">{children}</main>
     </>
   ) : null;
 }

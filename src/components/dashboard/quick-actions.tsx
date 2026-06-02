@@ -10,13 +10,14 @@ const translations = {
     quickActions: "Quick Actions",
     sendMessage: "Send Message",
     addContact: "Add Contact",
-    createRule: "Create Auto-Reply",
+    createBot: "Whatsapp Bots",
   },
+
   sw: {
     quickActions: "Vitendo vya Haraka",
     sendMessage: "Tuma Ujumbe",
     addContact: "Ongeza Anwani",
-    createRule: "Unda Kanuni ya Kiotomatiki",
+    createBot: "Boti za WhatsApp",
   },
 };
 
@@ -34,14 +35,14 @@ export default function QuickActions() {
     {
       label: t.addContact,
       icon: Plus,
-      color: "bg-green-600 hover:bg-green-700",
+      color: "bg-purple-600 hover:bg-purple-700",
       href: `/${language}/dashboard/contacts?dialog=new-contact`,
     },
     {
-      label: t.createRule,
+      label: t.createBot,
       icon: Zap,
-      color: "bg-purple-600 hover:bg-purple-700",
-      href: `/${language}/dashboard/manager?dialog=new-contact`,
+      color: "bg-green-600 hover:bg-green-700",
+      href: `/${language}/settings?tab=chatbots`,
     },
   ];
 

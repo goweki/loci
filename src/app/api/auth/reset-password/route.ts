@@ -1,9 +1,10 @@
 import { type NextRequest } from "next/server";
 import { compareHash, hash } from "@/lib/utils/passwordHandlers";
-import { getUserByKey, updateUserPassword } from "@/data/user";
+import { updateUserPassword } from "@/data/user";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import { tokenRepository } from "@/data/repositories/token.repository";
 import { TokenType } from "@/lib/prisma/generated";
+import { UserService } from "@/services/user/user.service";
 
 //validates token
 export async function GET(request: NextRequest) {
@@ -13,7 +14,9 @@ export async function GET(request: NextRequest) {
     const token = searchParams.get("token") as string;
     console.log("email-", username, "\ntoken-", token);
 
-    const userExists = await getUserByKey(username);
+    const userExists = await UserService.getUserByKey(username, {
+      tokens: true,
+    });
 
     if (!userExists || !userExists.tokens || userExists.tokens.length === 0) {
       return Response.json({ error: "Invalid reset-link" }, { status: 400 });
@@ -52,7 +55,9 @@ export async function PUT(request: Request) {
   const { username, token, password } = await request.json();
   console.log("password update request by - ", username);
   try {
-    const userExists = await getUserByKey(username);
+    const userExists = await UserService.getUserByKey(username, {
+      tokens: true,
+    });
 
     if (!userExists || !userExists.tokens || userExists.tokens.length === 0) {
       return Response.json({ error: "Invalid reset-link" }, { status: 400 });

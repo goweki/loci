@@ -45,6 +45,9 @@ model User {
   autoreplyRules  AutoReplyRule[]
   wabaTemplates   WabaTemplate[]
   promptTemplates PromptTemplate[]
+  products        Product[]
+  orders          Order[]
+  invoices        Invoice[]
 
   @@map("users")
 }
@@ -162,43 +165,42 @@ enum NotificationChannel {
 }
 
 model Subscription {
-  id         String    @id @default(cuid())
-  userId     String
-  planId     PlanName
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   cancelDate DateTime?
   startDate  DateTime?
 
-  payment Payment?
-  plan    Plan     @relation(fields: [planId], references: [id])
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  @@unique([userId, productId])
   @@index([userId])
   @@map("subscriptions")
 }
 
 model Payment {
   id            String        @id @default(cuid())
-  reference     String        @unique
-  paymentMethod PaymentMethod @default(ONLINE)
-  amount        Int
-  currency      Currency      @default(KSH)
-  status        PaymentStatus @default(PENDING)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  transactionId String        @unique
+  paymentMethod PaymentMethod
 
-  subscriptionId String       @unique
-  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  amount   Decimal       @db.Decimal(10, 2)
+  currency Currency      @default(KSH)
+  status   PaymentStatus @default(PENDING)
+
+  paidAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("payments")
-}
-
-enum PaymentStatus {
-  PENDING
-  SUCCESS
-  FAILED
-  REVERSED
 }
 
 enum Currency {
@@ -207,8 +209,11 @@ enum Currency {
 }
 
 model Plan {
-  id                  PlanName     @id
-  name                PlanName     @unique
+  id      String  @id @default(cuid())
+  product Product @relation(fields: [id], references: [id])
+
+  name PlanName @unique
+
   description         String?
   price               Int
   popular             Boolean      @default(false)
@@ -219,8 +224,7 @@ model Plan {
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
 
-  features      PlanFeature[]
-  subscriptions Subscription[]
+  features PlanFeature[]
 
   @@map("plans")
 }
@@ -238,7 +242,7 @@ model Feature {
 }
 
 model PlanFeature {
-  planId      PlanName
+  planId      String
   featureId   String
   enabled     Boolean  @default(true)
   limitUse    Int?
@@ -289,8 +293,10 @@ model Contact {
 
   messages             Message[]
   chatbotConversations ChatbotConversation[]
+  orders               Order[]
 
   @@unique([userId, phoneNumber])
+  @@index([userId, lastMessageAt(sort: Desc)])
   @@map("contacts")
 }
 
@@ -310,7 +316,12 @@ model Message {
   contact       Contact          @relation(fields: [contactId], references: [id], onDelete: Cascade)
   phoneNumber   PhoneNumber      @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
   user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order         Order?           @relation(fields: [orderId], references: [id])
+  orderId       String?
 
+  @@index([contactId, timestamp(sort: Desc)])
+  @@index([userId, direction, status])
+  @@index([contactId, direction, status])
   @@map("messages")
 }
 
@@ -439,10 +450,142 @@ enum MessageStatus {
 }
 
 enum PaymentMethod {
-  ONLINE
-  OTHER
+  PAYSTACK
   MPESA
+  CARD
+  BANK
   CASH
+  WHATSAPP
+}
+
+// ecommerce
+
+model Product {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  name        String
+  description String?
+  sku         String?
+
+  price    Decimal @db.Decimal(10, 2)
+  currency String  @default("KES")
+
+  stockQty Int @default(0)
+
+  imageUrl String?
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lociPlan Plan?
+
+  orderItems    OrderItem[]
+  subscriptions Subscription[]
+}
+
+model Order {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id])
+
+  status      OrderStatus @default(PENDING)
+  currency    String      @default("KES")
+  notes       String?
+  paymentLink String?
+
+  total Decimal @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoice  Invoice?
+  items    OrderItem[]
+  payments Payment[]
+  messages Message[]
+}
+
+model OrderItem {
+  id String @id @default(cuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+
+  name String
+
+  quantity Int
+
+  unitPrice Decimal @db.Decimal(10, 2)
+
+  total Decimal @db.Decimal(10, 2)
+}
+
+enum OrderStatus {
+  PENDING
+  SENT
+  PARTIALLY_PAID
+  PAID
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum InvoiceStatus {
+  DRAFT // created but not sent
+  PENDING // issued, awaiting payment
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model Invoice {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  invoiceNumber String @unique
+
+  currency String @default("KES")
+
+  subtotal   Decimal @db.Decimal(10, 2)
+  tax        Decimal @db.Decimal(10, 2)
+  discount   Decimal @default(0) @db.Decimal(10, 2)
+  total      Decimal @db.Decimal(10, 2)
+  amountPaid Decimal @default(0) @db.Decimal(10, 2)
+
+  status InvoiceStatus @default(DRAFT)
+
+  issuedAt DateTime  @default(now())
+  dueDate  DateTime?
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([invoiceNumber])
+  @@index([dueDate])
 }
 
 // AI chatbot configs

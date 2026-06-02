@@ -1,15 +1,13 @@
-"use server";
+import "server-only";
 
 import { getServerSession, User } from "next-auth";
-import { NextRequest } from "next/server";
-import { authOptions } from "./index";
+import { redirect } from "next/navigation";
+import { authOptions } from "./auth-options";
 
-export async function requireAuth(request?: NextRequest): Promise<User> {
+export async function requireUser() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user) {
-    throw new Error("Unauthorized");
-  }
+  if (!session?.user?.id) redirect("/sign-in");
 
   return session.user;
 }

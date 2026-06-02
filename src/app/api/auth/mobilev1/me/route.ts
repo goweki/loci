@@ -3,7 +3,7 @@ import {
   apiKeyMiddleware,
   AuthenticatedHandler,
 } from "@/lib/auth/token-handlers";
-import { getUserById } from "@/data/user";
+import { UserService } from "@/services/user/user.service";
 
 /**
  * Route: GET
@@ -11,7 +11,7 @@ import { getUserById } from "@/data/user";
  */
 const getMe: AuthenticatedHandler = async (_request, apiKey) => {
   try {
-    const _user = await getUserById(apiKey.user.id);
+    const _user = await UserService.getUserByKey(apiKey.user.id);
     const user = _user!;
 
     return NextResponse.json({

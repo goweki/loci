@@ -1,7 +1,10 @@
 "use client";
 
 import { useI18n } from "@/lib/i18n";
-import { Navbar as DefaultNavbar, NavbarNavLink } from "@/components/ui/navbar";
+import {
+  Navbar as DefaultNavbar,
+  RichNavMenuProps,
+} from "@/components/ui/navbar";
 import { LucideArrowLeft } from "lucide-react";
 
 const translations = {
@@ -25,14 +28,24 @@ export default function SettingsNavbar() {
   const { language } = useI18n();
   const t = translations[language];
 
-  const navigationLinks: NavbarNavLink[] = [
+  // const navigationLinks: RichNavMenuProps["navigation"] = [
+  //   { type: "link", href: "/", label: dict.navbar.home },
+  //   { type: "link", href: "/pricing", label: dict.navbar.pricing },
+  // ];
+
+  const navigationLinks: RichNavMenuProps["navigation"] = [
     {
+      type: "link",
       href: `/${language}/settings`,
       label: t.settings,
       // active: false,
     },
-    { href: `/${language}/settings/templates`, label: t.templates },
-    { href: `/${language}/settings/billing`, label: t.billing },
+    {
+      type: "link",
+      href: `/${language}/settings/templates`,
+      label: t.templates,
+    },
+    { type: "link", href: `/${language}/settings/billing`, label: t.billing },
   ];
 
   const logo = (

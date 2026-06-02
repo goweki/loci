@@ -1,13 +1,13 @@
 "use server";
 
 import { contactUsRepository } from "@/data/repositories/contact-us";
-import { z } from "zod";
+import z from "zod";
 
 const nullableToUndefined = (v: unknown) => (v === null ? undefined : v);
 
-const contactSchema = z.object({
+export const contactSchema = z.object({
   name: z.preprocess(nullableToUndefined, z.string().min(1).optional()),
-  email: z.string().email(),
+  email: z.email(),
   phone: z.preprocess(nullableToUndefined, z.string().optional()),
   company: z.preprocess(nullableToUndefined, z.string().optional()),
   subject: z.preprocess(nullableToUndefined, z.string().min(1).optional()),

@@ -73,7 +73,7 @@ export default function RecipientStep({
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="space-y-2">
-        <h2 className="text-xl font-semibold tracking-tight">
+        <h2 className="text-base font-semibold tracking-tight">
           Select Recipient
         </h2>
         <p className="text-sm text-muted-foreground">

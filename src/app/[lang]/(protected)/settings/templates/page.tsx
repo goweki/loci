@@ -10,7 +10,8 @@ import {
   WabaTemplateFilters,
   WabaTemplateRepository,
 } from "@/data/repositories/waba-template";
-import { getUserById } from "@/data/user";
+import { getUserByIdAction } from "@/actions/user.actions";
+import { Prisma } from "@/lib/prisma/generated";
 
 function TemplatesSkeleton() {
   return (
@@ -51,17 +52,44 @@ export default async function TemplatesPage({
 
   const templates = await WabaTemplateRepository.findByUserId(session.user.id);
 
-  const wabaAccount = (await getUserById(session.user.id))?.waba || null;
+  // const wabaAccount = (await getUserById(session.user.id))?.waba || null;
+
+  const resUserWithWaba = await getUserByIdAction(session.user.id, {
+    waba: {
+      include: {
+        phoneNumbers: true,
+        templates: true,
+      },
+    },
+  });
+
+  let userWithWaba: Prisma.UserGetPayload<{
+    include: {
+      waba: {
+        include: {
+          phoneNumbers: true;
+          templates: true;
+        };
+      };
+    };
+  }> | null = null;
+  let wabaAccount: Prisma.WabaAccountGetPayload<{
+    include: {
+      phoneNumbers: true;
+      templates: true;
+    };
+  }> | null = null;
+
+  if (resUserWithWaba.ok) userWithWaba = resUserWithWaba.data;
+  if (userWithWaba) wabaAccount = userWithWaba.waba;
 
   return (
-    <main className="flex-1 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <PageTitle title={t.title} subtitle={t.subtitle} />
+    <div className="max-w-7xl mx-auto space-y-6 py-6">
+      <PageTitle title={t.title} subtitle={t.subtitle} />
 
-        <Suspense fallback={<TemplatesSkeleton />}>
-          <TemplatesClient wabaAccount={wabaAccount} />
-        </Suspense>
-      </div>
-    </main>
+      <Suspense fallback={<TemplatesSkeleton />}>
+        <TemplatesClient wabaAccount={wabaAccount} />
+      </Suspense>
+    </div>
   );
 }

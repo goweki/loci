@@ -21,8 +21,10 @@ import Loader from "@/components/ui/loaders";
 import { Divider, IconInput } from "./_shared";
 import { useI18n } from "@/lib/i18n";
 import { setPasswordSchema } from "@/lib/validations";
-import { _verifyResetToken, setNewPassword } from "./_actions";
+import { setNewPassword } from "./_actions";
 import Link from "next/link";
+import { verifyResetTokenAction } from "@/actions/user.actions";
+import { User } from "@/lib/prisma/generated";
 
 export default function SetPasswordForm({
   token,
@@ -59,7 +61,21 @@ export default function SetPasswordForm({
       }
 
       try {
-        const isValid = await _verifyResetToken({ username, token });
+        const resTokenValid = await verifyResetTokenAction({ username, token });
+
+        let isValid: {
+          verification: boolean;
+          user?: Pick<User, "id" | "name" | "email" | "tel">;
+          message: string;
+        } | null = null;
+
+        if (resTokenValid.ok) {
+          isValid = resTokenValid.data;
+        } else {
+          toast.error(resTokenValid.error);
+          return;
+        }
+
         console.log("TOKEN VERIFICATION:", isValid);
         setIsTokenValid(isValid.verification);
         if (isValid.verification) {
@@ -82,8 +98,8 @@ export default function SetPasswordForm({
       setIsUpdating(true);
       try {
         const res_ = await setNewPassword(values);
-        if (res_.success) {
-          toast.success(res_.success);
+        if (res_.ok) {
+          toast.success("Successfully set password");
           return router.push(`/${language}/sign-in`);
         }
 

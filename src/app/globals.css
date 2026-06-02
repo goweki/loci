@@ -171,7 +171,7 @@
   }
 
   main {
-    @apply min-h-screen;
+    @apply min-h-screen mx-auto;
   }
 
   h1 {
@@ -195,10 +195,6 @@
    Layout Utilities
    ========================= */
 @layer components {
-  .container {
-    @apply w-full mx-auto max-w-7xl;
-  }
-
   /* clickable elements */
   .clickable {
     border: 1px solid var(--border);

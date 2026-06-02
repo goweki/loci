@@ -1,12 +1,13 @@
 // src/app/[lang]/(protected)/settings/page.tsx
 
-import { getUserById } from "@/data/user";
 import SettingsClient from "@/components/settings/settings-client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import PageTitle from "@/components/ui/page-title";
 import { Suspense } from "react";
 import { isValidLanguage } from "@/lib/i18n";
+import { getUserByIdAction } from "@/actions/user.actions";
+import { userInclude } from "@/services/user/user.dto";
 
 const translations = {
   en: {
@@ -35,19 +36,25 @@ export default async function SettingsPage({
 
   const t = translations[lang];
 
-  const user = await getUserById(session.user.id);
+  const resUser = await getUserByIdAction(session.user.id, userInclude);
+
+  if (!resUser.ok) {
+    return;
+  }
+
+  const user = resUser.data;
 
   return user ? (
-    <main className="flex-1 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <PageTitle title={t.title} subtitle={t.subtitle} />
+    <div className="max-w-7xl mx-auto space-y-6 py-6">
+      <PageTitle title={t.title} subtitle={t.subtitle} />
 
-        <Suspense fallback={<TemplatesSkeleton />}>
-          <SettingsClient user={user} />
-        </Suspense>
-      </div>
-    </main>
-  ) : null;
+      <Suspense fallback={<TemplatesSkeleton />}>
+        <SettingsClient user={user} />
+      </Suspense>
+    </div>
+  ) : (
+    "ERROR: Couldnt fetch user"
+  );
 }
 
 function TemplatesSkeleton() {

@@ -127,14 +127,12 @@ export default async function BillingPage({
   const t = translations[lang];
 
   return (
-    <main className="flex-1 p-6 pb-16">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <PageTitle title={t.title} subtitle={t.subtitle} />
+    <div className="max-w-7xl mx-auto space-y-6 py-6">
+      <PageTitle title={t.title} subtitle={t.subtitle} />
 
-        <Suspense fallback={<TemplatesSkeleton />}>
-          <PricingComponent t={t} />
-        </Suspense>
-      </div>
-    </main>
+      <Suspense fallback={<TemplatesSkeleton />}>
+        <PricingComponent t={t} />
+      </Suspense>
+    </div>
   );
 }

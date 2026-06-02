@@ -20,23 +20,12 @@ import {
   NotificationChannel,
 } from "@/lib/prisma/generated";
 import { sendMail } from "@/lib/mail";
-import { welcomeEmail, resetPasswordEmail } from "@/lib/mail/email-render";
+import { welcomeEmail } from "@/lib/mail/email-render";
 import { BANNER_IMAGE_URL, BASE_URL } from "@/lib/utils/getUrl";
 import { compareHash, hash } from "@/lib/utils/passwordHandlers";
-import sendSms, { SMSprops } from "@/lib/sms";
-import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import whatsapp from "@/lib/whatsapp";
 import { Message } from "@/lib/validations";
-import { tokenRepository } from "./repositories/token.repository";
-
-export type UserGetPayload = Prisma.UserGetPayload<{
-  include: {
-    contacts: true;
-    messages: true;
-    subscriptions: { include: { plan: true } };
-    waba: { include: { phoneNumbers: true; templates: true } };
-  };
-}>;
+import { userInclude, type UserWithRelations } from "@/services/user/user.dto";
 
 export function excludeFields<User, Key extends keyof User>(
   user: User,
@@ -178,234 +167,17 @@ export async function registerUser(
 }
 
 /**
- * Creates a new user, and sends Welcome email.
- */
-export async function sendResetLink(data: {
-  username: string;
-  sendTo?: NotificationChannel;
-}): Promise<{
-  username: string;
-  sentTo: NotificationChannel;
-}> {
-  const { username, sendTo: verificationMethod } = data;
-  console.log(`Generating ResetToken for: ${username}`);
-
-  if (!username) {
-    throw new Error("No username provided in generating resetToken");
-  }
-
-  const user_ = await getUserByKey(username);
-  if (!user_) {
-    throw new Error(`User not found`);
-  }
-
-  const usernameAttribute = user_.email === username ? "email" : "tel";
-  const tokenObj = await generateResetToken();
-  const resetLinkTail = await buildResetUrlTail(tokenObj.plain, username);
-  const resetLink = `${BASE_URL}/${resetLinkTail}`;
-
-  try {
-    const resetToken = {
-      hashedToken: tokenObj.hashed,
-      expiresAt: tokenObj.expiry,
-    };
-    await updateUserResetToken(user_.id, resetToken);
-
-    let sentTo_: NotificationChannel | undefined = undefined;
-
-    if (usernameAttribute === "email" && user_.email) {
-      const emailToSend = await resetPasswordEmail(user_.name || "", resetLink);
-      const sendmailRes = await sendMail({
-        to: user_.email,
-        subject: "Reset Password: LOCi",
-        html: emailToSend.html,
-        text: emailToSend.text,
-      });
-
-      const { data, error } = sendmailRes;
-
-      if (error) {
-        console.error("Resend ERROR:", error);
-        throw new Error(error.message);
-      }
-      console.log("Email sent successfully:", data);
-
-      sentTo_ = NotificationChannel.EMAIL;
-    } else if (
-      verificationMethod === NotificationChannel.WHATSAPP &&
-      user_.tel
-    ) {
-      const message: Message = {
-        messaging_product: "whatsapp",
-        recipient_type: "INDIVIDUAL",
-        to: user_.tel,
-        type: "template",
-        template: {
-          name: "reset_account_password",
-          language: { code: TemplateLanguage.en_US },
-          components: [
-            {
-              type: "header",
-              parameters: [
-                { type: "image", image: { link: BANNER_IMAGE_URL } },
-              ],
-            },
-            {
-              type: "body",
-              parameters: [
-                { type: "text", parameter_name: "name", text: user_.name },
-              ],
-            },
-            {
-              type: "button",
-              sub_type: "url",
-              index: "0", // first button
-              parameters: [{ type: "text", text: resetLinkTail }],
-            },
-          ],
-        },
-      };
-
-      await whatsapp.sendTemplate(message);
-      sentTo_ = NotificationChannel.WHATSAPP;
-    } else if (verificationMethod === NotificationChannel.SMS && user_.tel) {
-      const emailToSend = await resetPasswordEmail(user_.name || "", resetLink);
-      const options_: SMSprops = {
-        to: user_.tel,
-        message: emailToSend.text,
-      };
-      await sendSms(options_);
-      sentTo_ = NotificationChannel.SMS;
-    }
-
-    if (!sentTo_) {
-      throw new Error(`Message not sent to ${username}`);
-    }
-
-    return { username, sentTo: sentTo_ };
-  } catch (error) {
-    console.error("Sending reset link failed: ", error);
-    const errorMessage = getFriendlyErrorMessage(error);
-    throw new Error(errorMessage);
-  }
-}
-
-/**
- * verify token.
- */
-export async function verifyToken(data: {
-  token: string;
-  username: string;
-}): Promise<{
-  verification: boolean;
-  user?: Pick<User, "id" | "name" | "email" | "tel">;
-  message: string;
-}> {
-  const { token, username } = data;
-
-  console.log(`verifying token for user: ${username} \ntoken:${token}\n`);
-
-  const user = await getUserByKey(username);
-
-  if (!user || !user.tokens || user.tokens.length == 0) {
-    return { verification: false, message: "Invalid reset-link" };
-  }
-
-  const resetToken = await tokenRepository.findValidTokenByTypeUserId(
-    TokenType.RESET,
-    user.id,
-  );
-  if (!resetToken) {
-    return { verification: false, message: "Invalid link" };
-  }
-
-  if (!(await compareHash(token, resetToken.hashedToken))) {
-    return { verification: false, message: "Invalid token" };
-  }
-
-  if (resetToken.expiresAt < new Date()) {
-    return { verification: false, message: "Expired token" };
-  }
-
-  return { verification: true, user, message: "Valid token" };
-}
-
-/**
- * Find a user by ID.
- */
-export async function getUserById(id: string): Promise<UserGetPayload | null> {
-  return prisma.user.findUnique({
-    where: { id },
-    include: {
-      contacts: true,
-      messages: true,
-      waba: {
-        include: {
-          phoneNumbers: true,
-          templates: true,
-        },
-      },
-      subscriptions: {
-        where: {
-          cancelDate: null,
-        },
-        include: {
-          plan: true,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-        take: 1,
-      },
-    },
-  });
-}
-
-/**
- * Find a user by email.
- */
-export async function getUserByEmail(email: string): Promise<User | null> {
-  return prisma.user.findUnique({ where: { email } });
-}
-
-/**
- * Find a user by tel.
- */
-export async function getUserByTel(tel: string): Promise<User | null> {
-  return prisma.user.findUnique({ where: { tel } });
-}
-
-/**
- * Find a user by key attribute.
- */
-export async function getUserByKey(key: string) {
-  return prisma.user.findFirst({
-    where: {
-      OR: [{ id: key }, { email: key }, { tel: key }],
-    },
-    include: {
-      tokens: true,
-    },
-  });
-}
-
-/**
  * Get all users (paginated).
  */
 export async function getAllUsers(
   skip = 0,
   take = 20,
-): Promise<UserGetPayload[]> {
+): Promise<UserWithRelations[]> {
   return prisma.user.findMany({
     skip,
     take,
     orderBy: { createdAt: "desc" },
-    include: {
-      contacts: true,
-      messages: true,
-      subscriptions: { include: { plan: true } },
-      waba: { include: { phoneNumbers: true, templates: true } },
-    },
+    include: userInclude,
   });
 }
 
@@ -544,38 +316,6 @@ export async function updateUserPassword(
  * Update (or Create) user reset token using an Upsert.
  * respects the @@unique([type, userId]) constraint in schema.
  */
-export async function updateUserResetToken(
-  id: string,
-  passwordAttributes: {
-    hashedToken: string; // The hashed token
-    expiresAt: Date;
-  },
-) {
-  return await prisma.token.upsert({
-    where: {
-      // Accessing the composite unique index: type_userId
-      type_userId: {
-        userId: id,
-        type: TokenType.RESET,
-      },
-    },
-    // If the record exists, update these fields
-    update: {
-      hashedToken: passwordAttributes.hashedToken,
-      expiresAt: passwordAttributes.expiresAt,
-      isActive: true,
-      lastUsedAt: null, // Reset usage if you're re-issuing
-    },
-    // If the record doesn't exist, create it
-    create: {
-      userId: id,
-      type: TokenType.RESET,
-      hashedToken: passwordAttributes.hashedToken,
-      expiresAt: passwordAttributes.expiresAt,
-      description: "Password reset token",
-    },
-  });
-}
 
 /**
  * Update user status (e.g. ACTIVE, SUSPENDED).
@@ -631,21 +371,15 @@ export async function deleteUser(id: string): Promise<User> {
 /**
  * Get user subscriptions with plan details.
  */
-export async function getUserSubscriptions(userId: string) {
+export async function getUserLociSubscriptions(userId: string) {
   return prisma.subscription.findMany({
-    where: { userId },
-    include: { plan: true, payment: true },
+    where: {
+      userId,
+      product: { lociPlan: { isNot: null } },
+      include: { product: { include: { lociPlan: true } } },
+    },
   });
 }
-
-/**
- * Get all phone numbers belonging to a user.
- */
-export async function getUserPhoneNumbers(userId: string) {
-  const wabaId = (await getUserById(userId))?.id;
-  return prisma.phoneNumber.findMany({ where: { wabaId } });
-}
-
 /**
  * Get all contacts for a user.
  */
@@ -718,12 +452,6 @@ export async function deleteInactiveUsers(olderThanDays: number) {
 export async function getUserFullProfile(userId: string) {
   return prisma.user.findUnique({
     where: { id: userId },
-    include: {
-      subscriptions: { include: { plan: true, payment: true } },
-      waba: true,
-      contacts: true,
-      messages: true,
-      autoreplyRules: true,
-    },
+    include: userInclude,
   });
 }

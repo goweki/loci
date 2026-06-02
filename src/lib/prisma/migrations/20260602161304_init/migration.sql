@@ -1,4 +1,10 @@
 -- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN');
+
+-- CreateEnum
+CREATE TYPE "CommunicationChannel" AS ENUM ('WHATSAPP', 'SMS', 'EMAIL');
+
+-- CreateEnum
 CREATE TYPE "TokenType" AS ENUM ('SIGN_IN', 'RESET', 'ONBOARDING', 'API_KEY');
 
 -- CreateEnum
@@ -17,9 +23,6 @@ CREATE TYPE "TemplateApprovalStatus" AS ENUM ('APPROVED', 'PENDING', 'REJECTED',
 CREATE TYPE "NotificationChannel" AS ENUM ('EMAIL', 'WHATSAPP', 'SMS');
 
 -- CreateEnum
-CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED', 'REVERSED');
-
--- CreateEnum
 CREATE TYPE "Currency" AS ENUM ('KSH', 'US');
 
 -- CreateEnum
@@ -27,9 +30,6 @@ CREATE TYPE "TriggerType" AS ENUM ('KEYWORD', 'MESSAGE_TYPE', 'TIME_BASED', 'DEF
 
 -- CreateEnum
 CREATE TYPE "PlanName" AS ENUM ('BASIC', 'STANDARD', 'PREMIUM');
-
--- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN');
 
 -- CreateEnum
 CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'SUSPENDED', 'INACTIVE');
@@ -53,7 +53,16 @@ CREATE TYPE "MessageDirection" AS ENUM ('INBOUND', 'OUTBOUND');
 CREATE TYPE "MessageStatus" AS ENUM ('SENT', 'DELIVERED', 'READ', 'FAILED');
 
 -- CreateEnum
-CREATE TYPE "PaymentMethod" AS ENUM ('ONLINE', 'OTHER', 'MPESA', 'CASH');
+CREATE TYPE "PaymentMethod" AS ENUM ('PAYSTACK', 'MPESA', 'CARD', 'BANK', 'CASH', 'WHATSAPP');
+
+-- CreateEnum
+CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'SENT', 'PARTIALLY_PAID', 'PAID', 'CANCELLED');
+
+-- CreateEnum
+CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
+
+-- CreateEnum
+CREATE TYPE "InvoiceStatus" AS ENUM ('DRAFT', 'PENDING', 'PARTIALLY_PAID', 'PAID', 'OVERDUE', 'CANCELLED');
 
 -- CreateEnum
 CREATE TYPE "ContactStatus" AS ENUM ('PENDING', 'IN_PROGRESS', 'RESOLVED', 'SPAM');
@@ -72,8 +81,7 @@ CREATE TABLE "users" (
     "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "resetToken" TEXT,
-    "resetTokenExpiry" TIMESTAMP(3),
+    "preferredCommunicationChannel" "CommunicationChannel" NOT NULL DEFAULT 'WHATSAPP',
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -140,7 +148,7 @@ CREATE TABLE "user_sessions" (
 CREATE TABLE "subscriptions" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "planId" "PlanName" NOT NULL,
+    "productId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "cancelDate" TIMESTAMP(3),
@@ -152,21 +160,22 @@ CREATE TABLE "subscriptions" (
 -- CreateTable
 CREATE TABLE "payments" (
     "id" TEXT NOT NULL,
-    "reference" TEXT NOT NULL,
-    "paymentMethod" "PaymentMethod" NOT NULL DEFAULT 'ONLINE',
-    "amount" INTEGER NOT NULL,
+    "transactionId" TEXT NOT NULL,
+    "paymentMethod" "PaymentMethod" NOT NULL,
+    "orderId" TEXT NOT NULL,
+    "amount" DECIMAL(10,2) NOT NULL,
     "currency" "Currency" NOT NULL DEFAULT 'KSH',
     "status" "PaymentStatus" NOT NULL DEFAULT 'PENDING',
+    "paidAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "subscriptionId" TEXT NOT NULL,
 
     CONSTRAINT "payments_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "plans" (
-    "id" "PlanName" NOT NULL,
+    "id" TEXT NOT NULL,
     "name" "PlanName" NOT NULL,
     "description" TEXT,
     "price" INTEGER NOT NULL,
@@ -195,7 +204,7 @@ CREATE TABLE "features" (
 
 -- CreateTable
 CREATE TABLE "plan_features" (
-    "planId" "PlanName" NOT NULL,
+    "planId" TEXT NOT NULL,
     "featureId" TEXT NOT NULL,
     "enabled" BOOLEAN NOT NULL DEFAULT true,
     "limitUse" INTEGER,
@@ -249,6 +258,7 @@ CREATE TABLE "messages" (
     "timestamp" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "orderId" TEXT,
 
     CONSTRAINT "messages_pkey" PRIMARY KEY ("id")
 );
@@ -312,6 +322,75 @@ CREATE TABLE "accounts" (
     "session_state" TEXT,
 
     CONSTRAINT "accounts_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Product" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "sku" TEXT,
+    "price" DECIMAL(10,2) NOT NULL,
+    "currency" TEXT NOT NULL DEFAULT 'KES',
+    "stockQty" INTEGER NOT NULL DEFAULT 0,
+    "imageUrl" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Order" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "contactId" TEXT,
+    "status" "OrderStatus" NOT NULL DEFAULT 'PENDING',
+    "currency" TEXT NOT NULL DEFAULT 'KES',
+    "notes" TEXT,
+    "paymentLink" TEXT,
+    "total" DECIMAL(10,2) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "OrderItem" (
+    "id" TEXT NOT NULL,
+    "orderId" TEXT NOT NULL,
+    "productId" TEXT,
+    "name" TEXT NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "unitPrice" DECIMAL(10,2) NOT NULL,
+    "total" DECIMAL(10,2) NOT NULL,
+
+    CONSTRAINT "OrderItem_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Invoice" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "orderId" TEXT NOT NULL,
+    "invoiceNumber" TEXT NOT NULL,
+    "currency" TEXT NOT NULL DEFAULT 'KES',
+    "subtotal" DECIMAL(10,2) NOT NULL,
+    "tax" DECIMAL(10,2) NOT NULL,
+    "discount" DECIMAL(10,2) NOT NULL DEFAULT 0,
+    "total" DECIMAL(10,2) NOT NULL,
+    "amountPaid" DECIMAL(10,2) NOT NULL DEFAULT 0,
+    "status" "InvoiceStatus" NOT NULL DEFAULT 'DRAFT',
+    "issuedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "dueDate" TIMESTAMP(3),
+    "notes" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Invoice_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -416,10 +495,10 @@ CREATE UNIQUE INDEX "user_sessions_sessionToken_key" ON "user_sessions"("session
 CREATE INDEX "subscriptions_userId_idx" ON "subscriptions"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "payments_reference_key" ON "payments"("reference");
+CREATE UNIQUE INDEX "subscriptions_userId_productId_key" ON "subscriptions"("userId", "productId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "payments_subscriptionId_key" ON "payments"("subscriptionId");
+CREATE UNIQUE INDEX "payments_transactionId_key" ON "payments"("transactionId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "plans_name_key" ON "plans"("name");
@@ -431,10 +510,37 @@ CREATE UNIQUE INDEX "features_name_key" ON "features"("name");
 CREATE UNIQUE INDEX "phone_numbers_phoneNumber_key" ON "phone_numbers"("phoneNumber");
 
 -- CreateIndex
+CREATE INDEX "contacts_userId_lastMessageAt_idx" ON "contacts"("userId", "lastMessageAt" DESC);
+
+-- CreateIndex
 CREATE UNIQUE INDEX "contacts_userId_phoneNumber_key" ON "contacts"("userId", "phoneNumber");
 
 -- CreateIndex
+CREATE INDEX "messages_contactId_timestamp_idx" ON "messages"("contactId", "timestamp" DESC);
+
+-- CreateIndex
+CREATE INDEX "messages_userId_direction_status_idx" ON "messages"("userId", "direction", "status");
+
+-- CreateIndex
+CREATE INDEX "messages_contactId_direction_status_idx" ON "messages"("contactId", "direction", "status");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "accounts_provider_providerAccountId_key" ON "accounts"("provider", "providerAccountId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Invoice_orderId_key" ON "Invoice"("orderId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Invoice_invoiceNumber_key" ON "Invoice"("invoiceNumber");
+
+-- CreateIndex
+CREATE INDEX "Invoice_userId_status_idx" ON "Invoice"("userId", "status");
+
+-- CreateIndex
+CREATE INDEX "Invoice_invoiceNumber_idx" ON "Invoice"("invoiceNumber");
+
+-- CreateIndex
+CREATE INDEX "Invoice_dueDate_idx" ON "Invoice"("dueDate");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "chatbot_configs_phoneNumberId_key" ON "chatbot_configs"("phoneNumberId");
@@ -470,13 +576,16 @@ ALTER TABLE "waba_templates" ADD CONSTRAINT "waba_templates_createdById_fkey" FO
 ALTER TABLE "user_sessions" ADD CONSTRAINT "user_sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_planId_fkey" FOREIGN KEY ("planId") REFERENCES "plans"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "payments" ADD CONSTRAINT "payments_subscriptionId_fkey" FOREIGN KEY ("subscriptionId") REFERENCES "subscriptions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "payments" ADD CONSTRAINT "payments_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "plans" ADD CONSTRAINT "plans_id_fkey" FOREIGN KEY ("id") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "plan_features" ADD CONSTRAINT "plan_features_featureId_fkey" FOREIGN KEY ("featureId") REFERENCES "features"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -500,6 +609,9 @@ ALTER TABLE "messages" ADD CONSTRAINT "messages_phoneNumberId_fkey" FOREIGN KEY 
 ALTER TABLE "messages" ADD CONSTRAINT "messages_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "messages" ADD CONSTRAINT "messages_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "autoreply_rules" ADD CONSTRAINT "autoreply_rules_phoneNumberId_fkey" FOREIGN KEY ("phoneNumberId") REFERENCES "phone_numbers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -507,6 +619,27 @@ ALTER TABLE "autoreply_rules" ADD CONSTRAINT "autoreply_rules_createdById_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Product" ADD CONSTRAINT "Product_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "contacts"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "chatbot_configs" ADD CONSTRAINT "chatbot_configs_phoneNumberId_fkey" FOREIGN KEY ("phoneNumberId") REFERENCES "phone_numbers"("id") ON DELETE CASCADE ON UPDATE CASCADE;

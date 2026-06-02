@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { useI18n } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -11,210 +14,186 @@ import {
   Play,
   CheckCircle,
   Star,
+  type LucideIcon,
 } from "lucide-react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
-import { useI18n } from "@/lib/i18n";
 
-const translations = {
+const translations: Record<
+  "en" | "sw",
+  {
+    supercharge: string;
+    customerEngagement: string;
+    description: string;
+    startTrial: string;
+    watchDemo: string;
+    features: {
+      unifiedMessaging: string;
+      unifiedMessagingDescription: string;
+      crm: string;
+      crmDescription: string;
+      fast: string;
+      fastDescription: string;
+    };
+  }
+> = {
   en: {
-    supercharge: "Supercharge",
-    customerEngagement: "Customer Engagement",
+    supercharge: "Supercharge Your Sales via",
+    customerEngagement: "Conversational Commerce",
     description:
-      "Seamlessly manage WhatsApp communications and CRM in one powerful platform — simplify workflows, build stronger relationships, and scale with ease.",
-    startTrial: "Start free trial",
+      "Seamlessly manage WhatsApp communications, inventory catalogs, and instant payments inside one dashboard. Simplify workflows, build trust, and scale with ease.",
+    startTrial: "Start Free 14-Day Trial",
     watchDemo: "Watch Demo",
     features: {
-      unifiedMessaging: "Unified Messaging",
-      unifiedMessagingDescription: "All WhatsApp chats in one dashboard",
-      crm: "Smart CRM",
-      crmDescription: "Customer insights & automation",
-      fast: "Lightning Fast",
-      fastDescription: "Instant message delivery & responses",
+      unifiedMessaging: "Unified Inbox",
+      unifiedMessagingDescription:
+        "All WhatsApp customer chats in one clear view.",
+      crm: "Chat CRM Profiles",
+      crmDescription: "Automate tracking customer insights & purchase data.",
+      fast: "Lightning Execution",
+      fastDescription: "Instant payment requests & balance receipts.",
     },
   },
   sw: {
-    supercharge: "Boresha",
-    customerEngagement: "Mwingiliano na wateja",
+    supercharge: "Boresha Mauzo Yako Kupitia",
+    customerEngagement: "Biashara ya Mazungumzo",
     description:
-      "Simamia mawasiliano ya WhatsApp na CRM kwa urahisi katika jukwaa moja lenye nguvu — rahisisha kazi zako, jenga uhusiano imara zaidi, na kukuza biashara yako kwa urahisi.",
+      "Simamia mawasiliano ya WhatsApp, orodha ya bidhaa, na malipo ya haraka katika jukwaa moja. Rahisisha kazi zako, jenga uaminifu, na kukuza biashara kwa urahisi.",
     startTrial: "Anza Jaribio la Bure",
-    watchDemo: "Mfano wa Matumizi",
+    watchDemo: "Angalia Mfano",
     features: {
       unifiedMessaging: "Ujumbe Uliounganishwa",
-      unifiedMessagingDescription:
-        "Gumzo zote za Kibiashara katika jukwaa moja",
-      crm: "CRM Mahiri",
-      crmDescription: "Uelewa wa wateja na uendeshaji wa kiotomatiki",
-      fast: "Haraka Kama Umeme",
-      fastDescription: "Ufikishaji na majibu ya ujumbe papo hapo",
+      unifiedMessagingDescription: "Gumzo zote za wateja katika jukwaa moja.",
+      crm: "CRM Mahiri ya Chat",
+      crmDescription: "Uelewa wa wateja na data zao kiotomatiki.",
+      fast: "Kasi ya Umeme",
+      fastDescription: "Ufikishaji wa ankara na malipo papo hapo.",
     },
   },
 };
 
 export default function HeroSection() {
   const { language } = useI18n();
-  const t = translations[language];
+  const t =
+    translations[language as keyof typeof translations] || translations.en;
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-32 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-32 w-96 h-96 bg-gradient-to-tr from-green-400/20 to-blue-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-purple-400/10 to-pink-600/10 rounded-full blur-3xl animate-bounce"></div>
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background pt-24 pb-16 md:py-32 border-b border-border">
+      {/* Structural Ambient Background Radial Blurs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-primary/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-primary/5 rounded-full blur-[120px]" />
       </div>
 
-      {/* Floating particles */}
-      <div className="absolute inset-0">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className={`absolute animate-float opacity-60 ${
-              i % 2 === 0 ? "text-blue-500" : "text-purple-500"
-            }`}
-            style={{
-              left: `${20 + i * 15}%`,
-              top: `${30 + i * 8}%`,
-              animationDelay: `${i * 0.5}s`,
-              animationDuration: `${3 + i * 0.5}s`,
-            }}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        {/* Trust Badging Indicators Row */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 md:mb-8 animate-fade-in">
+          <Badge
+            variant="outline"
+            className="px-3 py-1.5 bg-primary/5 border-primary/20 text-primary flex items-center gap-1.5 font-medium rounded-full text-xs"
           >
-            {i % 3 === 0 ? (
-              <MessageCircle className="w-6 h-6" />
-            ) : i % 3 === 1 ? (
-              <Users className="w-5 h-5" />
-            ) : (
-              <Sparkles className="w-4 h-4" />
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-12 mt-20">
-        <div className="text-center">
-          {/* Trust indicators */}
-          {/* <div className="flex items-center justify-center gap-4 mb-8">
-            <Badge
-              variant="secondary"
-              className="px-4 py-2 bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 border-0"
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              WhatsApp Official Partner
-            </Badge>
-            <div className="hidden sm:flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <div className="flex text-yellow-400 mr-2">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" />
-                ))}
-              </div>
-              <span>Trusted by 10,000+ businesses</span>
+            <CheckCircle className="w-3.5 h-3.5" />
+            Meta Cloud Integration
+          </Badge>
+          <div className="flex items-center text-xs font-medium text-muted-foreground bg-muted/60 px-3 py-1.5 rounded-full border border-border/50">
+            <div className="flex text-amber-500 mr-2">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3.5 h-3.5 fill-current" />
+              ))}
             </div>
-          </div> */}
+            <span>Trusted by growing merchants</span>
+          </div>
+        </div>
 
-          {/* Main headline */}
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
-            <span className="inline-block">{t.supercharge}</span>
-            <br />
-            <span className="bg-gradient-to-r from-cyan-600 via-purple-600 to-cyan-800 bg-clip-text text-transparent animate-gradient">
+        {/* Hero Copy Engine */}
+        <div className="max-w-4xl mx-auto space-y-6">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground leading-[1.1]">
+            <span className="block text-foreground/90 font-bold text-3xl sm:text-4xl md:text-5xl mb-2 sm:mb-4 tracking-normal">
+              {t.supercharge}
+            </span>
+            <span className="bg-gradient-to-r from-primary via-purple-600 to-primary bg-clip-text text-transparent">
               {t.customerEngagement}
             </span>
           </h1>
 
-          {/* Subtitle */}
-          <p className="mt-6 max-w-3xl mx-auto text-xl sm:text-2xl leading-relaxed text-gray-600 dark:text-gray-300 font-light">
+          <p className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl leading-relaxed text-muted-foreground font-normal">
             {t.description}
           </p>
+        </div>
 
-          {/* CTA Buttons */}
-          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+        {/* Unified Call to Action Triggers */}
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Button
+            asChild
+            size="lg"
+            className="w-full sm:w-auto h-12 px-8 font-semibold text-base shadow-lg shadow-primary/20 group transition-all duration-200 hover:scale-[1.01]"
+          >
             <Link
               href={`/${language}/sign-up`}
-              className={cn(
-                buttonVariants({ variant: "default", size: "lg" }),
-                "text-lg bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-800 hover:to-cyan-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl group"
-              )}
+              className="flex items-center gap-2"
             >
               {t.startTrial}
-              <Zap className="ml-2 w-5 h-5 group-hover:animate-pulse" />
+              <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
             </Link>
+          </Button>
 
-            {/* <Button variant="secondary" className="hover:scale-105" size="lg">
-              <Play className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform" />
-              {t.watchDemo}
-            </Button> */}
-          </div>
+          {/* <Button
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-auto h-12 px-8 font-semibold text-base border-border bg-background hover:bg-muted text-foreground transition-all duration-200 hover:scale-[1.01]"
+          >
+            <Play className="mr-2 w-4 h-4 fill-muted-foreground text-muted-foreground stroke-[1.5]" />
+            {t.watchDemo}
+          </Button> */}
+        </div>
 
-          {/* Feature highlights */}
-          <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {[
-              {
-                icon: MessageCircle,
-                title: t.features.unifiedMessaging,
-                desc: t.features.unifiedMessagingDescription,
-              },
-              {
-                icon: Users,
-                title: t.features.crm,
-                desc: t.features.crmDescription,
-              },
-              {
-                icon: Zap,
-                title: t.features.fast,
-                desc: t.features.fastDescription,
-              },
-            ].map((feature, index) => (
+        {/* Feature Highlights Grid Matrix */}
+        <div className="mt-20 md:mt-24 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          {[
+            {
+              icon: MessageCircle,
+              title: t.features.unifiedMessaging,
+              desc: t.features.unifiedMessagingDescription,
+            },
+            {
+              icon: Users,
+              title: t.features.crm,
+              desc: t.features.crmDescription,
+            },
+            {
+              icon: Zap,
+              title: t.features.fast,
+              desc: t.features.fastDescription,
+            },
+          ].map((feature, index) => {
+            const Icon = feature.icon;
+            return (
               <div
                 key={index}
-                className="group p-6 rounded-2xl bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-slate-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                className="group relative rounded-2xl border border-border/80 bg-card/40 p-6 text-center
+                           hover:bg-card hover:border-border transition-all duration-300 ease-out
+                           hover:shadow-md hover:-translate-y-0.5"
               >
-                <feature.icon className="w-8 h-8 text-blue-600 dark:text-blue-400 mx-auto mb-4 group-hover:animate-bounce" />
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                <div
+                  className="w-10 h-10 rounded-xl bg-background border border-border 
+                                flex items-center justify-center text-muted-foreground mx-auto mb-4
+                                group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary/20
+                                transition-all duration-300"
+                >
+                  <Icon className="w-5 h-5" strokeWidth={2} />
+                </div>
+                <h3 className="font-semibold text-foreground mb-1 tracking-tight">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   {feature.desc}
                 </p>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* Bottom fade effect */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-bacground to-transparent pointer-events-none"></div>
-
-      <style jsx>{`
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-20px) rotate(180deg);
-          }
-        }
-
-        @keyframes gradient {
-          0%,
-          100% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-        }
-
-        .animate-float {
-          animation: float 4s ease-in-out infinite;
-        }
-
-        .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradient 3s ease infinite;
-        }
-      `}</style>
+      {/* Synchronized Bottom Fade masking overlay */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent pointer-events-none" />
     </section>
   );
 }
