@@ -25,7 +25,7 @@ export default async function LandingPage({
       <HowItWorks />
       <CommerceFeatures />
       <AutomationFeatures />
-      <PricingPreview />
+      {/* <PricingPreview /> */}
       <FAQ />
       <CTASection />
     </main>
