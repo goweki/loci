@@ -199,7 +199,7 @@ export async function seedPlans(prisma: PrismaClient) {
     const { name, ...feat } = feature;
     await prisma.feature.upsert({
       where: { name },
-      update: { feat },
+      update: { ...feat },
       create: feature,
     });
   }

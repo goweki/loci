@@ -291,6 +291,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "./navigation-menu";
+import LanguageToggle from "./language-toggle";
 
 export type RichNavItem = {
   title: string;
@@ -614,6 +615,8 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
 
           {/* Right side */}
           <div className="flex items-center gap-3">
+            <LanguageToggle />
+
             <ThemeToggle variant="outline" />
 
             {authenticated ? (
