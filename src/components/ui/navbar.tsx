@@ -279,7 +279,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import ThemeToggle from "./themeToggle";
-import UserMenu from "../dashboard/user-menu";
+import UserMenu from "../__dashboard/user-menu";
 import { BrandSymbol } from "./brand";
 import { MobileHamburgerMenu } from "./navigation-menu-hamburger";
 import { LucideIcon } from "lucide-react";
