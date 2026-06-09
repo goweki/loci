@@ -52,7 +52,6 @@ export class OrderService {
     contactId?: string;
     currency: Currency;
     notes?: string;
-    subtotal: number;
     total: number;
     paymentLink?: string;
     items: {
