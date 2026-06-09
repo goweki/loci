@@ -50,9 +50,14 @@ export class MetaSyncService {
 
     const ownedWabaInCloud = await this.WaClient.getWaba();
     const wabaService = await WabaService.create(user);
-    const ownedWabaInDb = await wabaService.getWabaAccountById(
-      ownedWabaInCloud.id,
-    );
+    let ownedWabaInDb: Awaited<
+      ReturnType<typeof wabaService.getWabaAccountById>
+    > | null = null;
+    try {
+      ownedWabaInDb = await wabaService.getWabaAccountById(ownedWabaInCloud.id);
+    } catch {
+      console.warn("No waba found in db");
+    }
 
     const adminUsers = await getAdminUsers();
     // console.log(`${adminUsers.length} admin users fetched`);
