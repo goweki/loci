@@ -60,7 +60,6 @@ export class MetaSyncService {
     }
 
     const adminUsers = await getAdminUsers();
-    // console.log(`${adminUsers.length} admin users fetched`);
 
     try {
       if (!ownedWabaInDb) {
