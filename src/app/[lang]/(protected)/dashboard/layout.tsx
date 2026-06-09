@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "@/components/dashboard/navbar";
+import Navbar from "@/components/__dashboard/navbar";
 import { isValidLanguage, Language } from "@/lib/i18n";
 import Footer from "@/components/ui/footer";
 import { requireUser } from "@/lib/auth";

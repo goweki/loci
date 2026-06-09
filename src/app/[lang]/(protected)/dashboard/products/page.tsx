@@ -1,6 +1,6 @@
-import { ProductGrid } from "@/components/dashboard/products/product-grid";
-import { ProductStats } from "@/components/dashboard/products/product-stats";
-import { ProductEmptyState } from "@/components/dashboard/products/product-empty-state";
+import { ProductGrid } from "@/components/__dashboard/products/product-grid";
+import { ProductStats } from "@/components/__dashboard/products/product-stats";
+import { ProductEmptyState } from "@/components/__dashboard/products/product-empty-state";
 import { getUserProducts } from "@/actions/product.actions";
 import PageTitle from "@/components/ui/page-title";
 import { isValidLanguage } from "@/lib/i18n";

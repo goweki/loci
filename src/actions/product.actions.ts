@@ -19,12 +19,9 @@ export async function createProductAction(data: {
   price: number;
   stockQty?: number;
 }): Promise<ActionResult<Product>> {
-  const user = await requireUser();
   try {
-    const product = await ProductService.createProduct({
-      ...data,
-      userId: user.id,
-    });
+    const productService = await ProductService.create();
+    const product = await productService.createProduct(data);
 
     revalidatePath("/dashboard/products");
 
@@ -44,7 +41,8 @@ export async function getUserProducts(): Promise<
   ActionResult<ProductWithRelations[]>
 > {
   try {
-    const products = await ProductService.getUserProducts();
+    const productService = await ProductService.create();
+    const products = await productService.getProducts();
 
     return {
       ok: true,
@@ -62,7 +60,8 @@ export async function getProductById(
   productId: string,
 ): Promise<ActionResult<ProductWithRelations>> {
   try {
-    const product = await ProductService.getProductById(productId);
+    const productService = await ProductService.create();
+    const product = await productService.getProductById(productId);
 
     if (!product) notFound();
 

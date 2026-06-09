@@ -6,10 +6,12 @@ import {
 import { metaSyncService } from "@/lib/whatsapp";
 import { UserRole } from "@/lib/prisma/generated";
 import { UserService } from "@/services/user/user.service";
+import { getSubscriptionStatusByUserId } from "@/data/subscription";
 
 const postInit: AuthenticatedHandler = async (request, apiKey) => {
   try {
     const user = await UserService.getUserByKey(apiKey.user.id);
+    const subscriptionStatus = await getSubscriptionStatusByUserId(user.id);
 
     if (user?.role !== UserRole.ADMIN)
       return NextResponse.json({ error: "uskue mjanja" }, { status: 400 });
@@ -29,7 +31,14 @@ const postInit: AuthenticatedHandler = async (request, apiKey) => {
       );
     }
 
-    const syncRes = await metaSyncService.syncFromMeta();
+    const user_ = {
+      id: user.id,
+      role: user.role,
+      email: user.email,
+      subscriptionStatus,
+    };
+
+    const syncRes = await metaSyncService.syncFromMeta(user_);
 
     if (syncRes.errors.length > 0) {
       return NextResponse.json(
