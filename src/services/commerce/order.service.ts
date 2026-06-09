@@ -8,7 +8,7 @@ import {
   UserRole,
 } from "@/lib/prisma/generated";
 
-export type OrderServiceContext = {
+type OrderServiceContext = {
   userId: string;
   role: UserRole;
 };
@@ -17,14 +17,11 @@ export class OrderService {
   private userId: string;
   private role: UserRole;
 
-  private constructor({ userId, role }: OrderServiceContext) {
-    this.userId = userId;
-    this.role = role;
+  private constructor(ctx: OrderServiceContext) {
+    this.userId = ctx.userId;
+    this.role = ctx.role;
   }
 
-  /**
-   * 🛠️ Initialize service with logged-in user context
-   */
   static async create() {
     const user = await requireUser();
 
@@ -35,12 +32,9 @@ export class OrderService {
   }
 
   /**
-   * 🔐 Centralized access control
-   * Admins can view any order, standard users are strictly scoped to their own userId.
+   * Multi-tenant scoping
    */
-  private scope<T extends Prisma.OrderWhereInput>(
-    where: T = {} as T,
-  ): Prisma.OrderWhereInput {
+  private scope(where: Prisma.OrderWhereInput = {}): Prisma.OrderWhereInput {
     if (this.role === UserRole.ADMIN) {
       return where;
     }
@@ -52,7 +46,7 @@ export class OrderService {
   }
 
   /**
-   * 📦 Create a new Order with nested OrderItems atomically
+   * Create Order
    */
   async createOrder(data: {
     contactId?: string;
@@ -60,29 +54,20 @@ export class OrderService {
     notes?: string;
     total: number;
     paymentLink?: string;
-    items: (
-      | {
-          productId: string;
-          name: string;
-          quantity: number;
-          unitPrice: number;
-          total: number;
-        }
-      | {
-          productId: null;
-          name: string;
-          quantity: number;
-          unitPrice: number;
-          total: number;
-        }
-    )[];
-  }): Promise<Order> {
+    items: {
+      productId?: string | null;
+      name: string;
+      quantity: number;
+      unitPrice: number;
+      total: number;
+    }[];
+  }) {
     const { items, ...orderData } = data;
 
     return prisma.order.create({
       data: {
         ...orderData,
-        userId: this.userId, // Context enforced
+        userId: this.userId,
         items: {
           create: items,
         },
@@ -94,7 +79,7 @@ export class OrderService {
   }
 
   /**
-   * 🔎 Get single order by ID with structural scoping checks
+   * Single Order
    */
   async getOrderById(id: string) {
     const order = await prisma.order.findFirst({
@@ -102,11 +87,7 @@ export class OrderService {
       include: {
         items: {
           include: {
-            product: {
-              include: {
-                lociPlan: true,
-              },
-            },
+            product: true,
           },
         },
         payments: true,
@@ -116,14 +97,14 @@ export class OrderService {
     });
 
     if (!order) {
-      throw new Error("Order not found or unauthorized access");
+      throw new Error("Order not found");
     }
 
     return order;
   }
 
   /**
-   * 👥 Get all orders with filtering, pagination, and multi-tenant scoping
+   * Orders List
    */
   async getOrders(params?: {
     status?: OrderStatus;
@@ -131,33 +112,52 @@ export class OrderService {
     cursor?: string;
     search?: string;
   }) {
-    const { status, limit = 20, cursor, search } = params || {};
+    const { status, limit = 20, cursor, search } = params ?? {};
 
     return prisma.order.findMany({
       where: this.scope({
-        ...(status ? { status } : {}),
-        ...(search
-          ? {
-              OR: [
-                { id: { contains: search, mode: "insensitive" } },
-                { notes: { contains: search, mode: "insensitive" } },
-                {
-                  contact: { name: { contains: search, mode: "insensitive" } },
+        ...(status && { status }),
+
+        ...(search && {
+          OR: [
+            {
+              id: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              notes: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              contact: {
+                name: {
+                  contains: search,
+                  mode: "insensitive",
                 },
-              ],
-            }
-          : {}),
+              },
+            },
+          ],
+        }),
       }),
+
       include: {
+        contact: true,
         items: true,
         payments: true,
-        contact: true,
+        invoice: true,
       },
+
       take: limit,
+
       ...(cursor && {
         skip: 1,
         cursor: { id: cursor },
       }),
+
       orderBy: {
         createdAt: "desc",
       },
@@ -165,14 +165,13 @@ export class OrderService {
   }
 
   /**
-   * 🏷️ Update status or add invoice reference details
+   * Update Status
    */
   async updateOrderStatus(
     id: string,
     status: OrderStatus,
     paymentLink?: string,
-  ): Promise<Order> {
-    // Assert existence and access rights first
+  ) {
     await this.getOrderById(id);
 
     return prisma.order.update({
@@ -185,36 +184,9 @@ export class OrderService {
   }
 
   /**
-   * 💳 Fetch all payments linked to a structural subscription context
+   * Cancel
    */
-  async getPaymentsBySubscriptionId(subscriptionId: string) {
-    return prisma.payment.findMany({
-      where: {
-        order: this.scope({
-          items: {
-            some: {
-              product: {
-                subscriptions: {
-                  some: {
-                    id: subscriptionId,
-                  },
-                },
-              },
-            },
-          },
-        }),
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-  }
-
-  /**
-   * ❌ Securely cancel an order
-   */
-  async cancelOrder(id: string): Promise<Order> {
-    // Assert execution rights
+  async cancelOrder(id: string) {
     await this.getOrderById(id);
 
     return prisma.order.update({
@@ -222,6 +194,69 @@ export class OrderService {
       data: {
         status: OrderStatus.CANCELLED,
       },
+    });
+  }
+
+  /**
+   * Dashboard Revenue
+   */
+  async getTotalRevenue() {
+    const result = await prisma.order.aggregate({
+      where: this.scope({
+        status: {
+          in: [OrderStatus.PAID, OrderStatus.PARTIALLY_PAID],
+        },
+      }),
+      _sum: {
+        total: true,
+      },
+    });
+
+    return Number(result._sum.total ?? 0);
+  }
+
+  /**
+   * Dashboard Counts
+   */
+  async getOrderStats() {
+    const [totalOrders, paidOrders, pendingOrders] = await Promise.all([
+      prisma.order.count({
+        where: this.scope(),
+      }),
+
+      prisma.order.count({
+        where: this.scope({
+          status: OrderStatus.PAID,
+        }),
+      }),
+
+      prisma.order.count({
+        where: this.scope({
+          status: OrderStatus.PENDING,
+        }),
+      }),
+    ]);
+
+    return {
+      totalOrders,
+      paidOrders,
+      pendingOrders,
+    };
+  }
+
+  /**
+   * Recent Orders
+   */
+  async getRecentOrders(limit = 5) {
+    return prisma.order.findMany({
+      where: this.scope(),
+      include: {
+        contact: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: limit,
     });
   }
 }

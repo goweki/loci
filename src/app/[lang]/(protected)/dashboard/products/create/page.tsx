@@ -1,5 +1,5 @@
 import { requireUser } from "@/lib/auth";
-import { ProductForm } from "@/components/dashboard/products/product-form";
+import { ProductForm } from "@/components/__dashboard/products/product-form";
 import TitleSection from "@/components/ui/page-title";
 import { BoxIcon } from "lucide-react";
 

@@ -21,6 +21,7 @@ import type { WhatsAppClient } from "./client";
 import { getAdminUsers } from "@/data/user";
 import prisma from "@/lib/prisma";
 import { WabaService } from "@/services/waba/waba.service";
+import { User } from "next-auth";
 
 /**
  * Service that syncs templates between Meta's API and our database
@@ -33,7 +34,7 @@ export class MetaSyncService {
    * Sync all templates from Meta to local database
    * This will fetch templates from Meta and update/create them in the database
    */
-  async syncFromMeta(): Promise<{
+  async syncFromMeta(user?: User): Promise<{
     created: number;
     updated: number;
     errors: string[];
@@ -48,13 +49,17 @@ export class MetaSyncService {
     //sync owned waba
 
     const ownedWabaInCloud = await this.WaClient.getWaba();
-    const wabaService = await WabaService.create();
-    const ownedWabaInDb = await wabaService.getWabaAccountById(
-      ownedWabaInCloud.id,
-    );
+    const wabaService = await WabaService.create(user);
+    let ownedWabaInDb: Awaited<
+      ReturnType<typeof wabaService.getWabaAccountById>
+    > | null = null;
+    try {
+      ownedWabaInDb = await wabaService.getWabaAccountById(ownedWabaInCloud.id);
+    } catch {
+      console.warn("No waba found in db");
+    }
 
     const adminUsers = await getAdminUsers();
-    // console.log(`${adminUsers.length} admin users fetched`);
 
     try {
       if (!ownedWabaInDb) {

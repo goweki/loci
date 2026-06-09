@@ -17,7 +17,7 @@
 // }
 
 import { getUserByIdAction } from "@/actions/user.actions";
-import ContactsComponent from "@/components/dashboard/contacts";
+import ContactsComponent from "@/components/__dashboard/contacts";
 import { getContactsByUserId } from "@/data/contact";
 import { authOptions } from "@/lib/auth";
 import { Prisma } from "@/lib/prisma/generated";

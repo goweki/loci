@@ -1,5 +1,5 @@
 import { getConversationsAction } from "@/actions/conversation.actions";
-import { ConversationsComponent } from "@/components/dashboard/conversations";
+import { ConversationsComponent } from "@/components/__dashboard/conversations";
 import { ConversationDTO } from "@/services/conversation";
 
 export default async function ConversationsPage() {

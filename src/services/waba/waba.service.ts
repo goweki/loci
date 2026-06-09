@@ -8,6 +8,7 @@ import {
   TemplateCategory,
   UserRole,
 } from "@/lib/prisma/generated";
+import { User } from "next-auth";
 
 export type WabaServiceContext = {
   userId: string;
@@ -23,8 +24,8 @@ export class WabaService {
     this.role = role;
   }
 
-  static async create() {
-    const user = await requireUser();
+  static async create(user_?: User) {
+    const user = user_ || (await requireUser());
 
     return new WabaService({
       userId: user.id,
