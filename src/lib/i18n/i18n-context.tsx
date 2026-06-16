@@ -87,6 +87,7 @@ export function I18nProvider({
     const storedLang = localStorage.getItem(LS_KEY);
     if (storedLang && isValidLanguage(storedLang)) {
       if (!isValidLanguage(_lang)) {
+        console.log(`navigating to: /${storedLang}${pathname}`);
         router.replace(`/${storedLang}${pathname}`);
       } else if (_lang === storedLang) {
         setCurrentLang(storedLang);
@@ -100,6 +101,7 @@ export function I18nProvider({
     } else {
       setCurrentLang(defaultLng);
       localStorage.setItem(LS_KEY, defaultLng);
+      console.log(`navigating to: /${defaultLng}${pathname}`);
       router.replace(`/${defaultLng}${pathname}`);
     }
   }, [_lang, pathname, router]);
