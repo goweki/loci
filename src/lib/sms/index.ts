@@ -80,7 +80,7 @@ export default async function sendSms(options: SMSprops) {
   };
 
   try {
-    console.log("[SENDING SMS] sent successfully:", smsOptions);
+    console.log("[SENDING SMS] :", smsOptions);
     const response = await sms.send(smsOptions);
     console.log("✅ SMS sent successfully:", response);
 
@@ -95,21 +95,20 @@ export default async function sendSms(options: SMSprops) {
 }
 
 export async function getDefaultSmsPhoneNumberId() {
-  const astSenderId = process.env.AFRICASTALKING_SENDER_ID;
-
-  if (!astSenderId) throw new Error("Missing env AFRICASTALKING_SENDER_ID");
+  if (!SENDER_ID)
+    throw new Error("Missing env AFRICASTALKING_SENDER_ID && !{{from}} ");
 
   return prisma.phoneNumber.upsert({
-    where: { id: astSenderId },
+    where: { id: SENDER_ID },
     create: {
-      id: astSenderId,
-      phoneNumber: astSenderId,
-      displayName: astSenderId,
+      id: SENDER_ID,
+      phoneNumber: SENDER_ID,
+      displayName: SENDER_ID,
       status: PhoneNumberStatus.VERIFIED,
     },
     update: {
-      phoneNumber: astSenderId,
-      displayName: astSenderId,
+      phoneNumber: SENDER_ID,
+      displayName: SENDER_ID,
       status: PhoneNumberStatus.VERIFIED,
     },
   });
