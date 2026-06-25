@@ -573,7 +573,7 @@ export class PrismaClient<
    * 
    * Read more in our [docs](https://www.prisma.io/docs/orm/prisma-client/queries/transactions).
    */
-  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
+  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>
 
@@ -880,8 +880,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 7.7.0
-   * Query Engine version: 75cbdc1eb7150937890ad5465d861175c6624711
+   * Prisma Client JS version: 7.8.0
+   * Query Engine version: 3c6e192761c0362d496ed980de936e2f3cebcd3a
    */
   export type PrismaVersion = {
     client: string
@@ -15706,7 +15706,7 @@ export namespace Prisma {
     verifiedAt: Date | null
     createdAt: Date
     updatedAt: Date
-    wabaId: string
+    wabaId: string | null
     _count: PhoneNumberCountAggregateOutputType | null
     _min: PhoneNumberMinAggregateOutputType | null
     _max: PhoneNumberMaxAggregateOutputType | null
@@ -15739,7 +15739,7 @@ export namespace Prisma {
     wabaId?: boolean
     messages?: boolean | PhoneNumber$messagesArgs<ExtArgs>
     autoReplyRules?: boolean | PhoneNumber$autoReplyRulesArgs<ExtArgs>
-    waba?: boolean | WabaAccountDefaultArgs<ExtArgs>
+    waba?: boolean | PhoneNumber$wabaArgs<ExtArgs>
     chatbotConfig?: boolean | PhoneNumber$chatbotConfigArgs<ExtArgs>
     _count?: boolean | PhoneNumberCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["phoneNumber"]>
@@ -15755,7 +15755,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     wabaId?: boolean
-    waba?: boolean | WabaAccountDefaultArgs<ExtArgs>
+    waba?: boolean | PhoneNumber$wabaArgs<ExtArgs>
   }, ExtArgs["result"]["phoneNumber"]>
 
   export type PhoneNumberSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -15769,7 +15769,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     wabaId?: boolean
-    waba?: boolean | WabaAccountDefaultArgs<ExtArgs>
+    waba?: boolean | PhoneNumber$wabaArgs<ExtArgs>
   }, ExtArgs["result"]["phoneNumber"]>
 
   export type PhoneNumberSelectScalar = {
@@ -15789,15 +15789,15 @@ export namespace Prisma {
   export type PhoneNumberInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     messages?: boolean | PhoneNumber$messagesArgs<ExtArgs>
     autoReplyRules?: boolean | PhoneNumber$autoReplyRulesArgs<ExtArgs>
-    waba?: boolean | WabaAccountDefaultArgs<ExtArgs>
+    waba?: boolean | PhoneNumber$wabaArgs<ExtArgs>
     chatbotConfig?: boolean | PhoneNumber$chatbotConfigArgs<ExtArgs>
     _count?: boolean | PhoneNumberCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PhoneNumberIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    waba?: boolean | WabaAccountDefaultArgs<ExtArgs>
+    waba?: boolean | PhoneNumber$wabaArgs<ExtArgs>
   }
   export type PhoneNumberIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    waba?: boolean | WabaAccountDefaultArgs<ExtArgs>
+    waba?: boolean | PhoneNumber$wabaArgs<ExtArgs>
   }
 
   export type $PhoneNumberPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -15805,7 +15805,7 @@ export namespace Prisma {
     objects: {
       messages: Prisma.$MessagePayload<ExtArgs>[]
       autoReplyRules: Prisma.$AutoReplyRulePayload<ExtArgs>[]
-      waba: Prisma.$WabaAccountPayload<ExtArgs>
+      waba: Prisma.$WabaAccountPayload<ExtArgs> | null
       chatbotConfig: Prisma.$ChatbotConfigPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -15818,7 +15818,7 @@ export namespace Prisma {
       verifiedAt: Date | null
       createdAt: Date
       updatedAt: Date
-      wabaId: string
+      wabaId: string | null
     }, ExtArgs["result"]["phoneNumber"]>
     composites: {}
   }
@@ -16215,7 +16215,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     messages<T extends PhoneNumber$messagesArgs<ExtArgs> = {}>(args?: Subset<T, PhoneNumber$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     autoReplyRules<T extends PhoneNumber$autoReplyRulesArgs<ExtArgs> = {}>(args?: Subset<T, PhoneNumber$autoReplyRulesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AutoReplyRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    waba<T extends WabaAccountDefaultArgs<ExtArgs> = {}>(args?: Subset<T, WabaAccountDefaultArgs<ExtArgs>>): Prisma__WabaAccountClient<$Result.GetResult<Prisma.$WabaAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    waba<T extends PhoneNumber$wabaArgs<ExtArgs> = {}>(args?: Subset<T, PhoneNumber$wabaArgs<ExtArgs>>): Prisma__WabaAccountClient<$Result.GetResult<Prisma.$WabaAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     chatbotConfig<T extends PhoneNumber$chatbotConfigArgs<ExtArgs> = {}>(args?: Subset<T, PhoneNumber$chatbotConfigArgs<ExtArgs>>): Prisma__ChatbotConfigClient<$Result.GetResult<Prisma.$ChatbotConfigPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -16702,6 +16702,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AutoReplyRuleScalarFieldEnum | AutoReplyRuleScalarFieldEnum[]
+  }
+
+  /**
+   * PhoneNumber.waba
+   */
+  export type PhoneNumber$wabaArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaAccount
+     */
+    select?: WabaAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaAccount
+     */
+    omit?: WabaAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaAccountInclude<ExtArgs> | null
+    where?: WabaAccountWhereInput
   }
 
   /**
@@ -17946,6 +17965,7 @@ export namespace Prisma {
     contactId: string | null
     phoneNumberId: string | null
     waMessageId: string | null
+    astMessageId: string | null
     type: $Enums.MessageType | null
     direction: $Enums.MessageDirection | null
     status: $Enums.MessageStatus | null
@@ -17961,6 +17981,7 @@ export namespace Prisma {
     contactId: string | null
     phoneNumberId: string | null
     waMessageId: string | null
+    astMessageId: string | null
     type: $Enums.MessageType | null
     direction: $Enums.MessageDirection | null
     status: $Enums.MessageStatus | null
@@ -17976,6 +17997,7 @@ export namespace Prisma {
     contactId: number
     phoneNumberId: number
     waMessageId: number
+    astMessageId: number
     type: number
     content: number
     direction: number
@@ -17994,6 +18016,7 @@ export namespace Prisma {
     contactId?: true
     phoneNumberId?: true
     waMessageId?: true
+    astMessageId?: true
     type?: true
     direction?: true
     status?: true
@@ -18009,6 +18032,7 @@ export namespace Prisma {
     contactId?: true
     phoneNumberId?: true
     waMessageId?: true
+    astMessageId?: true
     type?: true
     direction?: true
     status?: true
@@ -18024,6 +18048,7 @@ export namespace Prisma {
     contactId?: true
     phoneNumberId?: true
     waMessageId?: true
+    astMessageId?: true
     type?: true
     content?: true
     direction?: true
@@ -18113,6 +18138,7 @@ export namespace Prisma {
     contactId: string
     phoneNumberId: string
     waMessageId: string | null
+    astMessageId: string | null
     type: $Enums.MessageType
     content: JsonValue
     direction: $Enums.MessageDirection
@@ -18146,6 +18172,7 @@ export namespace Prisma {
     contactId?: boolean
     phoneNumberId?: boolean
     waMessageId?: boolean
+    astMessageId?: boolean
     type?: boolean
     content?: boolean
     direction?: boolean
@@ -18166,6 +18193,7 @@ export namespace Prisma {
     contactId?: boolean
     phoneNumberId?: boolean
     waMessageId?: boolean
+    astMessageId?: boolean
     type?: boolean
     content?: boolean
     direction?: boolean
@@ -18186,6 +18214,7 @@ export namespace Prisma {
     contactId?: boolean
     phoneNumberId?: boolean
     waMessageId?: boolean
+    astMessageId?: boolean
     type?: boolean
     content?: boolean
     direction?: boolean
@@ -18206,6 +18235,7 @@ export namespace Prisma {
     contactId?: boolean
     phoneNumberId?: boolean
     waMessageId?: boolean
+    astMessageId?: boolean
     type?: boolean
     content?: boolean
     direction?: boolean
@@ -18216,7 +18246,7 @@ export namespace Prisma {
     orderId?: boolean
   }
 
-  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "contactId" | "phoneNumberId" | "waMessageId" | "type" | "content" | "direction" | "status" | "timestamp" | "createdAt" | "updatedAt" | "orderId", ExtArgs["result"]["message"]>
+  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "contactId" | "phoneNumberId" | "waMessageId" | "astMessageId" | "type" | "content" | "direction" | "status" | "timestamp" | "createdAt" | "updatedAt" | "orderId", ExtArgs["result"]["message"]>
   export type MessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     contact?: boolean | ContactDefaultArgs<ExtArgs>
     phoneNumber?: boolean | PhoneNumberDefaultArgs<ExtArgs>
@@ -18250,6 +18280,7 @@ export namespace Prisma {
       contactId: string
       phoneNumberId: string
       waMessageId: string | null
+      astMessageId: string | null
       type: $Enums.MessageType
       content: Prisma.JsonValue
       direction: $Enums.MessageDirection
@@ -18690,6 +18721,7 @@ export namespace Prisma {
     readonly contactId: FieldRef<"Message", 'String'>
     readonly phoneNumberId: FieldRef<"Message", 'String'>
     readonly waMessageId: FieldRef<"Message", 'String'>
+    readonly astMessageId: FieldRef<"Message", 'String'>
     readonly type: FieldRef<"Message", 'MessageType'>
     readonly content: FieldRef<"Message", 'Json'>
     readonly direction: FieldRef<"Message", 'MessageDirection'>
@@ -33390,6 +33422,7 @@ export namespace Prisma {
     contactId: 'contactId',
     phoneNumberId: 'phoneNumberId',
     waMessageId: 'waMessageId',
+    astMessageId: 'astMessageId',
     type: 'type',
     content: 'content',
     direction: 'direction',
@@ -34874,10 +34907,10 @@ export namespace Prisma {
     verifiedAt?: DateTimeNullableFilter<"PhoneNumber"> | Date | string | null
     createdAt?: DateTimeFilter<"PhoneNumber"> | Date | string
     updatedAt?: DateTimeFilter<"PhoneNumber"> | Date | string
-    wabaId?: StringFilter<"PhoneNumber"> | string
+    wabaId?: StringNullableFilter<"PhoneNumber"> | string | null
     messages?: MessageListRelationFilter
     autoReplyRules?: AutoReplyRuleListRelationFilter
-    waba?: XOR<WabaAccountScalarRelationFilter, WabaAccountWhereInput>
+    waba?: XOR<WabaAccountNullableScalarRelationFilter, WabaAccountWhereInput> | null
     chatbotConfig?: XOR<ChatbotConfigNullableScalarRelationFilter, ChatbotConfigWhereInput> | null
   }
 
@@ -34891,7 +34924,7 @@ export namespace Prisma {
     verifiedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    wabaId?: SortOrder
+    wabaId?: SortOrderInput | SortOrder
     messages?: MessageOrderByRelationAggregateInput
     autoReplyRules?: AutoReplyRuleOrderByRelationAggregateInput
     waba?: WabaAccountOrderByWithRelationInput
@@ -34911,10 +34944,10 @@ export namespace Prisma {
     verifiedAt?: DateTimeNullableFilter<"PhoneNumber"> | Date | string | null
     createdAt?: DateTimeFilter<"PhoneNumber"> | Date | string
     updatedAt?: DateTimeFilter<"PhoneNumber"> | Date | string
-    wabaId?: StringFilter<"PhoneNumber"> | string
+    wabaId?: StringNullableFilter<"PhoneNumber"> | string | null
     messages?: MessageListRelationFilter
     autoReplyRules?: AutoReplyRuleListRelationFilter
-    waba?: XOR<WabaAccountScalarRelationFilter, WabaAccountWhereInput>
+    waba?: XOR<WabaAccountNullableScalarRelationFilter, WabaAccountWhereInput> | null
     chatbotConfig?: XOR<ChatbotConfigNullableScalarRelationFilter, ChatbotConfigWhereInput> | null
   }, "id" | "phoneNumber">
 
@@ -34928,7 +34961,7 @@ export namespace Prisma {
     verifiedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    wabaId?: SortOrder
+    wabaId?: SortOrderInput | SortOrder
     _count?: PhoneNumberCountOrderByAggregateInput
     _max?: PhoneNumberMaxOrderByAggregateInput
     _min?: PhoneNumberMinOrderByAggregateInput
@@ -34947,7 +34980,7 @@ export namespace Prisma {
     verifiedAt?: DateTimeNullableWithAggregatesFilter<"PhoneNumber"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"PhoneNumber"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"PhoneNumber"> | Date | string
-    wabaId?: StringWithAggregatesFilter<"PhoneNumber"> | string
+    wabaId?: StringNullableWithAggregatesFilter<"PhoneNumber"> | string | null
   }
 
   export type ContactWhereInput = {
@@ -35039,6 +35072,7 @@ export namespace Prisma {
     contactId?: StringFilter<"Message"> | string
     phoneNumberId?: StringFilter<"Message"> | string
     waMessageId?: StringNullableFilter<"Message"> | string | null
+    astMessageId?: StringNullableFilter<"Message"> | string | null
     type?: EnumMessageTypeFilter<"Message"> | $Enums.MessageType
     content?: JsonFilter<"Message">
     direction?: EnumMessageDirectionFilter<"Message"> | $Enums.MessageDirection
@@ -35059,6 +35093,7 @@ export namespace Prisma {
     contactId?: SortOrder
     phoneNumberId?: SortOrder
     waMessageId?: SortOrderInput | SortOrder
+    astMessageId?: SortOrderInput | SortOrder
     type?: SortOrder
     content?: SortOrder
     direction?: SortOrder
@@ -35082,6 +35117,7 @@ export namespace Prisma {
     contactId?: StringFilter<"Message"> | string
     phoneNumberId?: StringFilter<"Message"> | string
     waMessageId?: StringNullableFilter<"Message"> | string | null
+    astMessageId?: StringNullableFilter<"Message"> | string | null
     type?: EnumMessageTypeFilter<"Message"> | $Enums.MessageType
     content?: JsonFilter<"Message">
     direction?: EnumMessageDirectionFilter<"Message"> | $Enums.MessageDirection
@@ -35102,6 +35138,7 @@ export namespace Prisma {
     contactId?: SortOrder
     phoneNumberId?: SortOrder
     waMessageId?: SortOrderInput | SortOrder
+    astMessageId?: SortOrderInput | SortOrder
     type?: SortOrder
     content?: SortOrder
     direction?: SortOrder
@@ -35124,6 +35161,7 @@ export namespace Prisma {
     contactId?: StringWithAggregatesFilter<"Message"> | string
     phoneNumberId?: StringWithAggregatesFilter<"Message"> | string
     waMessageId?: StringNullableWithAggregatesFilter<"Message"> | string | null
+    astMessageId?: StringNullableWithAggregatesFilter<"Message"> | string | null
     type?: EnumMessageTypeWithAggregatesFilter<"Message"> | $Enums.MessageType
     content?: JsonWithAggregatesFilter<"Message">
     direction?: EnumMessageDirectionWithAggregatesFilter<"Message"> | $Enums.MessageDirection
@@ -37062,7 +37100,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     messages?: MessageCreateNestedManyWithoutPhoneNumberInput
     autoReplyRules?: AutoReplyRuleCreateNestedManyWithoutPhoneNumberInput
-    waba: WabaAccountCreateNestedOneWithoutPhoneNumbersInput
+    waba?: WabaAccountCreateNestedOneWithoutPhoneNumbersInput
     chatbotConfig?: ChatbotConfigCreateNestedOneWithoutPhoneNumberInput
   }
 
@@ -37076,7 +37114,7 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    wabaId: string
+    wabaId?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutPhoneNumberInput
     autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutPhoneNumberInput
     chatbotConfig?: ChatbotConfigUncheckedCreateNestedOneWithoutPhoneNumberInput
@@ -37094,7 +37132,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUpdateManyWithoutPhoneNumberNestedInput
     autoReplyRules?: AutoReplyRuleUpdateManyWithoutPhoneNumberNestedInput
-    waba?: WabaAccountUpdateOneRequiredWithoutPhoneNumbersNestedInput
+    waba?: WabaAccountUpdateOneWithoutPhoneNumbersNestedInput
     chatbotConfig?: ChatbotConfigUpdateOneWithoutPhoneNumberNestedInput
   }
 
@@ -37108,7 +37146,7 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    wabaId?: StringFieldUpdateOperationsInput | string
+    wabaId?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutPhoneNumberNestedInput
     autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutPhoneNumberNestedInput
     chatbotConfig?: ChatbotConfigUncheckedUpdateOneWithoutPhoneNumberNestedInput
@@ -37124,7 +37162,7 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    wabaId: string
+    wabaId?: string | null
   }
 
   export type PhoneNumberUpdateManyMutationInput = {
@@ -37149,7 +37187,7 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    wabaId?: StringFieldUpdateOperationsInput | string
+    wabaId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ContactCreateInput = {
@@ -37243,6 +37281,7 @@ export namespace Prisma {
   export type MessageCreateInput = {
     id?: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -37262,6 +37301,7 @@ export namespace Prisma {
     contactId: string
     phoneNumberId: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -37275,6 +37315,7 @@ export namespace Prisma {
   export type MessageUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -37294,6 +37335,7 @@ export namespace Prisma {
     contactId?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -37310,6 +37352,7 @@ export namespace Prisma {
     contactId: string
     phoneNumberId: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -37323,6 +37366,7 @@ export namespace Prisma {
   export type MessageUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -37338,6 +37382,7 @@ export namespace Prisma {
     contactId?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -39730,6 +39775,7 @@ export namespace Prisma {
     contactId?: SortOrder
     phoneNumberId?: SortOrder
     waMessageId?: SortOrder
+    astMessageId?: SortOrder
     type?: SortOrder
     content?: SortOrder
     direction?: SortOrder
@@ -39746,6 +39792,7 @@ export namespace Prisma {
     contactId?: SortOrder
     phoneNumberId?: SortOrder
     waMessageId?: SortOrder
+    astMessageId?: SortOrder
     type?: SortOrder
     direction?: SortOrder
     status?: SortOrder
@@ -39761,6 +39808,7 @@ export namespace Prisma {
     contactId?: SortOrder
     phoneNumberId?: SortOrder
     waMessageId?: SortOrder
+    astMessageId?: SortOrder
     type?: SortOrder
     direction?: SortOrder
     status?: SortOrder
@@ -41587,10 +41635,12 @@ export namespace Prisma {
     deleteMany?: AutoReplyRuleScalarWhereInput | AutoReplyRuleScalarWhereInput[]
   }
 
-  export type WabaAccountUpdateOneRequiredWithoutPhoneNumbersNestedInput = {
+  export type WabaAccountUpdateOneWithoutPhoneNumbersNestedInput = {
     create?: XOR<WabaAccountCreateWithoutPhoneNumbersInput, WabaAccountUncheckedCreateWithoutPhoneNumbersInput>
     connectOrCreate?: WabaAccountCreateOrConnectWithoutPhoneNumbersInput
     upsert?: WabaAccountUpsertWithoutPhoneNumbersInput
+    disconnect?: WabaAccountWhereInput | boolean
+    delete?: WabaAccountWhereInput | boolean
     connect?: WabaAccountWhereUniqueInput
     update?: XOR<XOR<WabaAccountUpdateToOneWithWhereWithoutPhoneNumbersInput, WabaAccountUpdateWithoutPhoneNumbersInput>, WabaAccountUncheckedUpdateWithoutPhoneNumbersInput>
   }
@@ -43172,6 +43222,7 @@ export namespace Prisma {
   export type MessageCreateWithoutUserInput = {
     id?: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -43189,6 +43240,7 @@ export namespace Prisma {
     contactId: string
     phoneNumberId: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -43657,6 +43709,7 @@ export namespace Prisma {
     contactId?: StringFilter<"Message"> | string
     phoneNumberId?: StringFilter<"Message"> | string
     waMessageId?: StringNullableFilter<"Message"> | string | null
+    astMessageId?: StringNullableFilter<"Message"> | string | null
     type?: EnumMessageTypeFilter<"Message"> | $Enums.MessageType
     content?: JsonFilter<"Message">
     direction?: EnumMessageDirectionFilter<"Message"> | $Enums.MessageDirection
@@ -44317,7 +44370,7 @@ export namespace Prisma {
     verifiedAt?: DateTimeNullableFilter<"PhoneNumber"> | Date | string | null
     createdAt?: DateTimeFilter<"PhoneNumber"> | Date | string
     updatedAt?: DateTimeFilter<"PhoneNumber"> | Date | string
-    wabaId?: StringFilter<"PhoneNumber"> | string
+    wabaId?: StringNullableFilter<"PhoneNumber"> | string | null
   }
 
   export type WabaTemplateUpsertWithWhereUniqueWithoutWabaInput = {
@@ -45259,6 +45312,7 @@ export namespace Prisma {
   export type MessageCreateWithoutPhoneNumberInput = {
     id?: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -45276,6 +45330,7 @@ export namespace Prisma {
     userId: string
     contactId: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -45586,6 +45641,7 @@ export namespace Prisma {
   export type MessageCreateWithoutContactInput = {
     id?: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -45603,6 +45659,7 @@ export namespace Prisma {
     userId: string
     phoneNumberId: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -45872,7 +45929,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     autoReplyRules?: AutoReplyRuleCreateNestedManyWithoutPhoneNumberInput
-    waba: WabaAccountCreateNestedOneWithoutPhoneNumbersInput
+    waba?: WabaAccountCreateNestedOneWithoutPhoneNumbersInput
     chatbotConfig?: ChatbotConfigCreateNestedOneWithoutPhoneNumberInput
   }
 
@@ -45886,7 +45943,7 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    wabaId: string
+    wabaId?: string | null
     autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutPhoneNumberInput
     chatbotConfig?: ChatbotConfigUncheckedCreateNestedOneWithoutPhoneNumberInput
   }
@@ -46053,7 +46110,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     autoReplyRules?: AutoReplyRuleUpdateManyWithoutPhoneNumberNestedInput
-    waba?: WabaAccountUpdateOneRequiredWithoutPhoneNumbersNestedInput
+    waba?: WabaAccountUpdateOneWithoutPhoneNumbersNestedInput
     chatbotConfig?: ChatbotConfigUpdateOneWithoutPhoneNumberNestedInput
   }
 
@@ -46067,7 +46124,7 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    wabaId?: StringFieldUpdateOperationsInput | string
+    wabaId?: NullableStringFieldUpdateOperationsInput | string | null
     autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutPhoneNumberNestedInput
     chatbotConfig?: ChatbotConfigUncheckedUpdateOneWithoutPhoneNumberNestedInput
   }
@@ -46193,7 +46250,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     messages?: MessageCreateNestedManyWithoutPhoneNumberInput
-    waba: WabaAccountCreateNestedOneWithoutPhoneNumbersInput
+    waba?: WabaAccountCreateNestedOneWithoutPhoneNumbersInput
     chatbotConfig?: ChatbotConfigCreateNestedOneWithoutPhoneNumberInput
   }
 
@@ -46207,7 +46264,7 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    wabaId: string
+    wabaId?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutPhoneNumberInput
     chatbotConfig?: ChatbotConfigUncheckedCreateNestedOneWithoutPhoneNumberInput
   }
@@ -46300,7 +46357,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUpdateManyWithoutPhoneNumberNestedInput
-    waba?: WabaAccountUpdateOneRequiredWithoutPhoneNumbersNestedInput
+    waba?: WabaAccountUpdateOneWithoutPhoneNumbersNestedInput
     chatbotConfig?: ChatbotConfigUpdateOneWithoutPhoneNumberNestedInput
   }
 
@@ -46314,7 +46371,7 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    wabaId?: StringFieldUpdateOperationsInput | string
+    wabaId?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutPhoneNumberNestedInput
     chatbotConfig?: ChatbotConfigUncheckedUpdateOneWithoutPhoneNumberNestedInput
   }
@@ -47013,6 +47070,7 @@ export namespace Prisma {
   export type MessageCreateWithoutOrderInput = {
     id?: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -47031,6 +47089,7 @@ export namespace Prisma {
     contactId: string
     phoneNumberId: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -47649,7 +47708,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     messages?: MessageCreateNestedManyWithoutPhoneNumberInput
     autoReplyRules?: AutoReplyRuleCreateNestedManyWithoutPhoneNumberInput
-    waba: WabaAccountCreateNestedOneWithoutPhoneNumbersInput
+    waba?: WabaAccountCreateNestedOneWithoutPhoneNumbersInput
   }
 
   export type PhoneNumberUncheckedCreateWithoutChatbotConfigInput = {
@@ -47662,7 +47721,7 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    wabaId: string
+    wabaId?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutPhoneNumberInput
     autoReplyRules?: AutoReplyRuleUncheckedCreateNestedManyWithoutPhoneNumberInput
   }
@@ -47729,7 +47788,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUpdateManyWithoutPhoneNumberNestedInput
     autoReplyRules?: AutoReplyRuleUpdateManyWithoutPhoneNumberNestedInput
-    waba?: WabaAccountUpdateOneRequiredWithoutPhoneNumbersNestedInput
+    waba?: WabaAccountUpdateOneWithoutPhoneNumbersNestedInput
   }
 
   export type PhoneNumberUncheckedUpdateWithoutChatbotConfigInput = {
@@ -47742,7 +47801,7 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    wabaId?: StringFieldUpdateOperationsInput | string
+    wabaId?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutPhoneNumberNestedInput
     autoReplyRules?: AutoReplyRuleUncheckedUpdateManyWithoutPhoneNumberNestedInput
   }
@@ -48076,6 +48135,7 @@ export namespace Prisma {
     contactId: string
     phoneNumberId: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -48276,6 +48336,7 @@ export namespace Prisma {
   export type MessageUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -48293,6 +48354,7 @@ export namespace Prisma {
     contactId?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -48308,6 +48370,7 @@ export namespace Prisma {
     contactId?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -48834,6 +48897,7 @@ export namespace Prisma {
     userId: string
     contactId: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -48861,6 +48925,7 @@ export namespace Prisma {
   export type MessageUpdateWithoutPhoneNumberInput = {
     id?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -48878,6 +48943,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     contactId?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -48893,6 +48959,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     contactId?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -48950,6 +49017,7 @@ export namespace Prisma {
     userId: string
     phoneNumberId: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -48987,6 +49055,7 @@ export namespace Prisma {
   export type MessageUpdateWithoutContactInput = {
     id?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -49004,6 +49073,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -49019,6 +49089,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -49208,6 +49279,7 @@ export namespace Prisma {
     contactId: string
     phoneNumberId: string
     waMessageId?: string | null
+    astMessageId?: string | null
     type?: $Enums.MessageType
     content: JsonNullValueInput | InputJsonValue
     direction: $Enums.MessageDirection
@@ -49283,6 +49355,7 @@ export namespace Prisma {
   export type MessageUpdateWithoutOrderInput = {
     id?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -49301,6 +49374,7 @@ export namespace Prisma {
     contactId?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection
@@ -49316,6 +49390,7 @@ export namespace Prisma {
     contactId?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
     waMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    astMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     content?: JsonNullValueInput | InputJsonValue
     direction?: EnumMessageDirectionFieldUpdateOperationsInput | $Enums.MessageDirection

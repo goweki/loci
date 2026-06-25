@@ -28,7 +28,7 @@ ${dto.paymentLink}
         messaging_product: "whatsapp",
         recipient_type: "INDIVIDUAL",
         to: dto.phone,
-        type: "template",
+        type: "TEMPLATE",
         template: {
           name: "reset_account_password",
           language: { code: TemplateLanguage.en_US },

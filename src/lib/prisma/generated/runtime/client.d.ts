@@ -7,6 +7,7 @@ import { empty } from '@prisma/client-runtime-utils';
 import { isAnyNull } from '@prisma/client-runtime-utils';
 import { isDbNull } from '@prisma/client-runtime-utils';
 import { isJsonNull } from '@prisma/client-runtime-utils';
+import { isObjectEnumValue } from '@prisma/client-runtime-utils';
 import { join } from '@prisma/client-runtime-utils';
 import { JsonNull } from '@prisma/client-runtime-utils';
 import { JsonNullClass } from '@prisma/client-runtime-utils';
@@ -172,6 +173,8 @@ declare type BatchResponse = MultiBatchResponse | CompactedBatchResponse;
 
 declare type BatchTransactionOptions = {
     isolationLevel?: Transaction_2.IsolationLevel;
+    maxWait?: number;
+    timeout?: number;
 };
 
 /**
@@ -461,7 +464,7 @@ export declare function defineDmmfProperty(target: object, runtimeDataModel: Run
 
 declare function defineExtension(ext: ExtensionArgs | ((client: Client) => Client)): (client: Client) => Client;
 
-declare const denylist: readonly ["$connect", "$disconnect", "$on", "$transaction", "$extends"];
+declare const denylist: readonly ["$connect", "$disconnect", "$on", "$use", "$extends"];
 
 declare type Deprecation = ReadonlyDeep_2<{
     sinceVersion: string;
@@ -498,84 +501,84 @@ export declare type DevTypeMapFnDef = {
 export declare namespace DMMF {
     export {
         datamodelEnumToSchemaEnum,
-        Document_2 as Document,
-        Mappings,
-        OtherOperationMappings,
-        DatamodelEnum,
-        SchemaEnum,
-        EnumValue,
         Datamodel,
-        uniqueIndex,
-        PrimaryKey,
-        Model,
-        FieldKind,
-        FieldNamespace,
-        FieldLocation,
+        DatamodelEnum,
+        Deprecation,
+        Document_2 as Document,
+        EnumValue,
         Field,
         FieldDefault,
         FieldDefaultScalar,
+        FieldKind,
+        FieldLocation,
+        FieldNamespace,
+        FieldRefAllowType,
+        FieldRefType,
         Index,
-        IndexType,
         IndexField,
-        SortOrder,
-        Schema,
+        IndexType,
+        InputType,
+        InputTypeRef,
+        Mappings,
+        Model,
+        ModelAction,
+        ModelMapping,
+        OtherOperationMappings,
+        OutputType,
+        OutputTypeRef,
+        PrimaryKey,
         Query,
         QueryOutput,
-        TypeRef,
-        InputTypeRef,
+        ReadonlyDeep_2 as ReadonlyDeep,
+        Schema,
         SchemaArg,
-        OutputType,
+        SchemaEnum,
         SchemaField,
-        OutputTypeRef,
-        Deprecation,
-        InputType,
-        FieldRefType,
-        FieldRefAllowType,
-        ModelMapping,
-        ModelAction,
-        ReadonlyDeep_2 as ReadonlyDeep
+        SortOrder,
+        TypeRef,
+        uniqueIndex
     }
 }
 
 declare namespace DMMF_2 {
     export {
         datamodelEnumToSchemaEnum,
-        Document_2 as Document,
-        Mappings,
-        OtherOperationMappings,
-        DatamodelEnum,
-        SchemaEnum,
-        EnumValue,
         Datamodel,
-        uniqueIndex,
-        PrimaryKey,
-        Model,
-        FieldKind,
-        FieldNamespace,
-        FieldLocation,
+        DatamodelEnum,
+        Deprecation,
+        Document_2 as Document,
+        EnumValue,
         Field,
         FieldDefault,
         FieldDefaultScalar,
+        FieldKind,
+        FieldLocation,
+        FieldNamespace,
+        FieldRefAllowType,
+        FieldRefType,
         Index,
-        IndexType,
         IndexField,
-        SortOrder,
-        Schema,
+        IndexType,
+        InputType,
+        InputTypeRef,
+        Mappings,
+        Model,
+        ModelAction,
+        ModelMapping,
+        OtherOperationMappings,
+        OutputType,
+        OutputTypeRef,
+        PrimaryKey,
         Query,
         QueryOutput,
-        TypeRef,
-        InputTypeRef,
+        ReadonlyDeep_2 as ReadonlyDeep,
+        Schema,
         SchemaArg,
-        OutputType,
+        SchemaEnum,
         SchemaField,
-        OutputTypeRef,
-        Deprecation,
-        InputType,
-        FieldRefType,
-        FieldRefAllowType,
-        ModelMapping,
-        ModelAction,
-        ReadonlyDeep_2 as ReadonlyDeep
+        SortOrder,
+        TypeRef,
+        uniqueIndex
     }
 }
 
@@ -633,6 +636,8 @@ export declare type DynamicClientExtensionThisBuiltin<TypeMap extends TypeMapDef
         extArgs: ExtArgs;
     }>>;
     $transaction<P extends PrismaPromise<any>[]>(arg: [...P], options?: {
+        maxWait?: number;
+        timeout?: number;
         isolationLevel?: TypeMap['meta']['txIsolationLevel'];
     }): Promise<UnwrapTuple<P>>;
     $transaction<R>(fn: (client: Omit<DynamicClientExtensionThis<TypeMap, TypeMapCb, ExtArgs>, ITXClientDenyList>) => Promise<R>, options?: {
@@ -806,6 +811,13 @@ declare interface EngineConfig {
      * Runtime data model for enum lookups during parameterization.
      */
     runtimeDataModel: RuntimeDataModel;
+    /**
+     * Optional maximum size for the query plan cache. If not provided, a default size will be used.
+     * A value of `0` can be used to disable the cache entirely. A higher cache size can improve
+     * performance for applications that execute a large number of unique queries, while a smaller
+     * cache size can reduce memory usage.
+     */
+    queryPlanCacheMaxSize?: number;
 }
 
 declare type EngineEvent<E extends EngineEventType> = E extends QueryEventType ? QueryEvent : LogEvent;
@@ -1089,6 +1101,9 @@ declare type Fragment = {
     type: 'parameter';
 } | {
     type: 'parameterTuple';
+    itemPrefix: string;
+    itemSeparator: string;
+    itemSuffix: string;
 } | {
     type: 'parameterTupleList';
     itemPrefix: string;
@@ -1260,7 +1275,7 @@ export declare function getPrismaClient(config: GetPrismaClientConfig): {
             callback: (client: Client) => Promise<unknown>;
             options?: Options;
         }): Promise<unknown>;
-        _createItxClient(transaction: PrismaPromiseInteractiveTransaction): Client;
+        _createItxClient(transaction: PrismaPromiseInteractiveTransaction, scopeId: string, scopeState: ItxScopeState): Client;
         /**
          * Execute queries within a transaction
          * @param input a callback or a query list
@@ -1540,6 +1555,8 @@ export { isDbNull }
 
 export { isJsonNull }
 
+export { isObjectEnumValue }
+
 declare type IsolationLevel = 'READ UNCOMMITTED' | 'READ COMMITTED' | 'REPEATABLE READ' | 'SNAPSHOT' | 'SERIALIZABLE';
 
 declare type IsolationLevel_2 = 'ReadUncommitted' | 'ReadCommitted' | 'RepeatableRead' | 'Snapshot' | 'Serializable';
@@ -1551,6 +1568,10 @@ export declare function isTypedSql(value: unknown): value is UnknownTypedSql;
 export declare type ITXClientDenyList = (typeof denylist)[number];
 
 export declare const itxClientDenyList: readonly (string | symbol)[];
+
+declare type ItxScopeState = {
+    stack: string[];
+};
 
 declare interface Job {
     resolve: (data: any) => void;
@@ -1910,6 +1931,11 @@ declare type Options = {
     timeout?: number;
     /** Transaction isolation level */
     isolationLevel?: IsolationLevel_2;
+    /**
+     * Used for nested interactive transactions. When provided, the engine may
+     * re-use an existing open transaction instead of opening a new one.
+     */
+    newTxId?: string;
 };
 
 export declare type Or<A extends 1 | 0, B extends 1 | 0> = {
@@ -2045,6 +2071,21 @@ export declare type PrismaClientOptions = PrismaClientMutuallyExclusiveOptions &
      */
     comments?: SqlCommenterPlugin[];
     /**
+     * Optional maximum size for the query plan cache. If not provided, a default size will be used.
+     * A value of `0` can be used to disable the cache entirely. A higher cache size can improve
+     * performance for applications that execute a large number of unique queries, while a smaller
+     * cache size can reduce memory usage.
+     *
+     * @example
+     * ```
+     * const prisma = new PrismaClient({
+     *   adapter,
+     *   queryPlanCacheMaxSize: 100,
+     * })
+     * ```
+     */
+    queryPlanCacheMaxSize?: number;
+    /**
      * @internal
      * You probably don't want to use this. \`__internal\` is used by internal tooling.
      */
@@ -2108,6 +2149,8 @@ declare type PrismaPromiseBatchTransaction = {
     kind: 'batch';
     id: number;
     isolationLevel?: IsolationLevel_2;
+    maxWait?: number;
+    timeout?: number;
     index: number;
     lock: PromiseLike<void>;
 };
@@ -2191,7 +2234,7 @@ declare interface Queryable<Query, Result> extends AdapterInfo {
 }
 
 declare type QueryCompiler = {
-    compile(request: string): {};
+    compile(request: string): QueryPlanNode;
     compileBatch(batchRequest: string): BatchResponse;
     free(): void;
 };
@@ -2324,6 +2367,7 @@ declare type QueryPlanNode = {
     args: {
         parent: QueryPlanNode;
         children: JoinExpression[];
+        canAssumeStrictEquality: boolean;
     };
 } | {
     type: 'mapField';
@@ -3147,6 +3191,18 @@ declare interface Transaction extends AdapterInfo, SqlQueryable {
      * Roll back the transaction.
      */
     rollback(): Promise<void>;
+    /**
+     * Creates a savepoint within the currently running transaction.
+     */
+    createSavepoint?(name: string): Promise<void>;
+    /**
+     * Rolls back transaction state to a previously created savepoint.
+     */
+    rollbackToSavepoint?(name: string): Promise<void>;
+    /**
+     * Releases a previously created savepoint. Optional because not every connector supports this operation.
+     */
+    releaseSavepoint?(name: string): Promise<void>;
 }
 
 declare namespace Transaction_2 {
@@ -3276,14 +3332,14 @@ declare namespace Utils {
 }
 
 declare type ValidationError = {
-    error_identifier: 'RELATION_VIOLATION';
+    errorIdentifier: 'RELATION_VIOLATION';
     context: {
         relation: string;
         modelA: string;
         modelB: string;
     };
 } | {
-    error_identifier: 'MISSING_RELATED_RECORD';
+    errorIdentifier: 'MISSING_RELATED_RECORD';
     context: {
         model: string;
         relation: string;
@@ -3292,24 +3348,24 @@ declare type ValidationError = {
         neededFor?: string;
     };
 } | {
-    error_identifier: 'MISSING_RECORD';
+    errorIdentifier: 'MISSING_RECORD';
     context: {
         operation: string;
     };
 } | {
-    error_identifier: 'INCOMPLETE_CONNECT_INPUT';
+    errorIdentifier: 'INCOMPLETE_CONNECT_INPUT';
     context: {
         expectedRows: number;
     };
 } | {
-    error_identifier: 'INCOMPLETE_CONNECT_OUTPUT';
+    errorIdentifier: 'INCOMPLETE_CONNECT_OUTPUT';
     context: {
         expectedRows: number;
         relation: string;
         relationType: string;
     };
 } | {
-    error_identifier: 'RECORDS_NOT_CONNECTED';
+    errorIdentifier: 'RECORDS_NOT_CONNECTED';
     context: {
         relation: string;
         parent: string;

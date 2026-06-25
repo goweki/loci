@@ -34,7 +34,7 @@ import { signUpSchema } from "@/lib/validations/authentication";
 import { cn } from "@/lib/utils";
 import { removePlus } from "@/lib/utils/telHandlers";
 import { useI18n } from "@/lib/i18n";
-import { signUpUser } from "./_actions";
+import { signUpUser } from "@/actions/user.actions";
 
 // Mocking the enum if not imported
 enum NotificationChannel {

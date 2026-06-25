@@ -1,16 +1,30 @@
 // lib/validations/message.ts
 
 import { z } from "zod";
+import { MessageType } from "../prisma/generated";
+
+const templateMessageSchema = z.object({
+  type: z.literal(MessageType.TEMPLATE),
+  template: z.object({
+    name: z.string(),
+    language: z
+      .object({
+        code: z.string().default("en_US"),
+      })
+      .default({ code: "en_US" }),
+    components: z.array(z.any()).optional(),
+  }),
+});
 
 const textMessageSchema = z.object({
-  type: z.literal("text"),
+  type: z.literal(MessageType.TEXT),
   text: z.object({
     body: z.string().min(1),
   }),
 });
 
 const imageMessageSchema = z.object({
-  type: z.literal("image"),
+  type: z.literal(MessageType.IMAGE),
   image: z.object({
     link: z.url(),
     caption: z.string().optional(),
@@ -18,7 +32,7 @@ const imageMessageSchema = z.object({
 });
 
 const documentMessageSchema = z.object({
-  type: z.literal("document"),
+  type: z.literal(MessageType.DOCUMENT),
   document: z.object({
     link: z.url(),
     filename: z.string().optional(),
@@ -27,7 +41,7 @@ const documentMessageSchema = z.object({
 });
 
 const locationMessageSchema = z.object({
-  type: z.literal("location"),
+  type: z.literal(MessageType.LOCATION),
   location: z.object({
     latitude: z.string(),
     longitude: z.string(),
@@ -37,15 +51,15 @@ const locationMessageSchema = z.object({
 });
 
 const audioMessageSchema = z.object({
-  type: z.literal("audio"),
+  type: z.literal(MessageType.AUDIO),
   audio: z.object({
     id: z.string().optional(),
-    link: z.string().url().optional(),
+    link: z.url().optional(),
   }),
 });
 
 const contactsMessageSchema = z.object({
-  type: z.literal("contacts"),
+  type: z.literal(MessageType.CONTACT),
   contacts: z.array(
     z.object({
       phone: z.string(),
@@ -55,15 +69,15 @@ const contactsMessageSchema = z.object({
 });
 
 const videoMessageSchema = z.object({
-  type: z.literal("video"),
+  type: z.literal(MessageType.VIDEO),
   video: z.object({
-    link: z.string().url(),
+    link: z.url(),
     caption: z.string().optional(),
   }),
 });
 
 const stickerMessageSchema = z.object({
-  type: z.literal("sticker"),
+  type: z.literal("STICKER"),
   sticker: z.object({
     id: z.string().optional(),
     link: z.string().url().optional(),
@@ -71,7 +85,7 @@ const stickerMessageSchema = z.object({
 });
 
 const interactiveMessageSchema = z.object({
-  type: z.literal("interactive"),
+  type: z.literal("INTERACTIVE"),
   interactive: z.object({
     type: z.enum(["list", "button"]),
     body: z.object({ text: z.string() }),
@@ -83,23 +97,10 @@ const interactiveMessageSchema = z.object({
 });
 
 const reactionMessageSchema = z.object({
-  type: z.literal("reaction"),
+  type: z.literal("REACTION"),
   reaction: z.object({
     message_id: z.string(),
     emoji: z.string(),
-  }),
-});
-
-const templateMessageSchema = z.object({
-  type: z.literal("template"),
-  template: z.object({
-    name: z.string(),
-    language: z
-      .object({
-        code: z.string().default("en_US"),
-      })
-      .default({ code: "en_US" }),
-    components: z.array(z.any()).optional(),
   }),
 });
 

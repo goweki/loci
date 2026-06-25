@@ -65,3 +65,16 @@ export function getFriendlyErrorMessage(error: any): string {
   // 8. FINAL GLOBAL FALLBACK
   return IS_DEV ? message : "Something went wrong. Please try again.";
 }
+
+/**
+ * HTTP ERRORS
+ */
+
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}

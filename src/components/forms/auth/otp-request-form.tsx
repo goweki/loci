@@ -30,11 +30,10 @@ import { NotificationChannel } from "@/lib/prisma/generated";
 import { WhatsAppLogo } from "@/components/ui/svg";
 
 import { removePlus } from "@/lib/utils/telHandlers";
-import { sendOtp } from "./_actions";
 import { InputOTP } from "./_input-otp";
 import { signIn } from "next-auth/react";
 import { ERROR_MESSAGES } from "./_errorHandler";
-import { getUserByKeyAction } from "@/actions/user.actions";
+import { getUserByKeyAction, sendOtp } from "@/actions/user.actions";
 
 // ─────────────────────────────────────
 // Types

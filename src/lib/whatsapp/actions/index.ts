@@ -612,67 +612,67 @@ export async function buildWhatsAppMessage(input: Message) {
 
   // Validate and attach content based on type
   switch (type) {
-    case "text":
+    case MessageType.TEXT:
       if (!input.text)
         throw new Error(`text field is required for type "text"`);
       message.text = input.text;
       break;
 
-    case "audio":
+    case MessageType.AUDIO:
       if (!input.audio) throw new Error(`audio is required for type "audio"`);
       message.audio = input.audio;
       break;
 
-    case "contacts":
+    case MessageType.CONTACT:
       if (!input.contacts)
         throw new Error(`contacts is required for type "contacts"`);
       message.contacts = input.contacts;
       break;
 
-    case "document":
+    case MessageType.DOCUMENT:
       if (!input.document)
         throw new Error(`document is required for type "document"`);
       message.document = input.document;
       break;
 
-    case "image":
+    case MessageType.IMAGE:
       if (!input.image) throw new Error(`image is required for type "image"`);
       message.image = input.image;
       break;
 
-    case "interactive":
-      if (!input.interactive)
-        throw new Error(`interactive is required for type "interactive"`);
-      message.interactive = input.interactive;
-      break;
-
-    case "location":
+    case MessageType.LOCATION:
       if (!input.location)
         throw new Error(`location is required for type "location"`);
       message.location = input.location;
       break;
 
-    case "reaction":
+    case MessageType.VIDEO:
+      if (!input.video) throw new Error(`video is required for type "video"`);
+      message.video = input.video;
+      break;
+
+    case MessageType.TEMPLATE:
+      if (!input.template)
+        throw new Error(`template is required for type "template"`);
+      message.template = input.template;
+      break;
+
+    case "INTERACTIVE":
+      if (!input.interactive)
+        throw new Error(`interactive is required for type "interactive"`);
+      message.interactive = input.interactive;
+      break;
+
+    case "REACTION":
       if (!input.reaction)
         throw new Error(`reaction is required for type "reaction"`);
       message.reaction = input.reaction;
       break;
 
-    case "sticker":
+    case "STICKER":
       if (!input.sticker)
         throw new Error(`sticker is required for type "sticker"`);
       message.sticker = input.sticker;
-      break;
-
-    case "video":
-      if (!input.video) throw new Error(`video is required for type "video"`);
-      message.video = input.video;
-      break;
-
-    case "template":
-      if (!input.template)
-        throw new Error(`template is required for type "template"`);
-      message.template = input.template;
       break;
 
     default:

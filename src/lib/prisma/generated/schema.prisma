@@ -270,8 +270,8 @@ model PhoneNumber {
   messages       Message[]
   autoReplyRules AutoReplyRule[]
 
-  wabaId String
-  waba   WabaAccount @relation(fields: [wabaId], references: [id], onDelete: Restrict)
+  wabaId String?
+  waba   WabaAccount? @relation(fields: [wabaId], references: [id], onDelete: Restrict)
 
   chatbotConfig ChatbotConfig?
 
@@ -306,6 +306,7 @@ model Message {
   contactId     String
   phoneNumberId String
   waMessageId   String?
+  astMessageId  String?
   type          MessageType      @default(TEXT)
   content       Json
   direction     MessageDirection
