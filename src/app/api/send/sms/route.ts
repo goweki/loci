@@ -13,7 +13,6 @@ import { authorizeMessageSend } from "@/lib/auth/authorization";
 import { Message } from "@/lib/validations";
 
 const SmsSchema = z.object({
-  type: z.enum(MessageType),
   to: z.union([z.string(), z.array(z.string())]),
   message: z.string().trim().min(1).max(1600),
   from: z.string().optional(),

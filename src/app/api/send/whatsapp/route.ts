@@ -5,14 +5,12 @@ import {
   apiKeyMiddleware,
   type AuthenticatedHandler,
 } from "@/lib/auth/token-handlers";
-import { checkMessageLimits } from "@/lib/usage/limits";
 import { findOrCreateContact } from "@/data/contact";
 import { createMessage, getMessagesByUserId } from "@/data/message";
 import { MessageType } from "@/lib/prisma/generated";
-import { getSubscriptionStatusByUserId } from "@/data/subscription";
-import { SubscriptionStatusEnum } from "@/types";
 import z from "zod";
-import { validatePhoneNumberOwnershipAction } from "@/data/phoneNumber";
+import { authorizeMessageSend } from "@/lib/auth/authorization";
+import { removePlus } from "@/lib/utils/telHandlers";
 
 const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
   try {
@@ -31,55 +29,32 @@ const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
 
     console.log("New Message for sending...", message);
 
-    // 1. Concurrent Security & Limit Checks
-    const [subscription, limits] = await Promise.all([
-      getSubscriptionStatusByUserId(userId),
-      checkMessageLimits(userId),
-      message.phoneNumberId
-        ? validatePhoneNumberOwnershipAction(message.phoneNumberId, userId)
-        : Promise.resolve(),
-    ]);
+    await authorizeMessageSend(userId, message);
 
-    // 2. Authorization Logic
-    if (subscription.status !== SubscriptionStatusEnum.ACTIVE) {
-      // Logic: Only allow Templates for non-active users (if that is your intent)
-      if (message.type.toUpperCase() !== MessageType.TEMPLATE) {
-        return NextResponse.json(
-          { error: "Active subscription required for non-template messages" },
-          { status: 403 },
-        );
-      }
-    }
-
-    if (!limits.allowed) {
-      return NextResponse.json(
-        { error: "Usage limit exceeded or billing issue" },
-        { status: 403 },
-      );
-    }
-
-    // 3. Prepare Contact before external call (Ensures DB integrity)
-    const contact = await findOrCreateContact(userId, message.to);
-
-    // 4. Dispatch to Meta (External API)
+    // Dispatch to Meta (External API)
     const waResponse = await whatsapp.sendMessage(message);
 
     if ("error" in waResponse) {
       throw new Error(`Meta API Error: ${JSON.stringify(waResponse.error)}`);
     }
 
-    // 5. Async Log to Database (Don't block response if not strictly necessary)
-    // We get the ID from messages[0].id in the standard WABA response
-    const metaMessageId = waResponse.messages?.[0]?.id;
+    // // Extract receipient contact and messageId from response
+    const recipient = waResponse.contacts.map(({ input }) => input)[0];
+    const metaMessageId = waResponse.messages[0].id;
+    // save contact for db integrity
+    const localizedContact = await findOrCreateContact(
+      userId,
+      removePlus(recipient),
+    );
 
     await createMessage({
       userId: userId,
-      contactId: contact.id,
+      contactId: localizedContact.id,
       phoneNumberId:
         message.phoneNumberId || process.env.WHATSAPP_PHONE_NUMBER_ID || "",
       waMessageId: metaMessageId,
       type: message.type.toUpperCase() as MessageType,
-      content: message, // Usually better to store what you SENT rather than Meta's confirmation
+      content: message, // better to store what you SENT rather than Meta's confirmation
       direction: "OUTBOUND",
       status: "SENT",
       timestamp: new Date(),
