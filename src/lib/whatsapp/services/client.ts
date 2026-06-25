@@ -179,11 +179,11 @@ export class WhatsAppClient {
   async getPhoneNumbers(): Promise<WabaPhoneNumberListResponse> {
     const url = `${this.baseUrl}/${this.env.wabaId}/phone_numbers`;
 
-    this.logger.info("Fetching phone numbers");
-
     const headers = {
       Authorization: `Bearer ${this.env.wabaAccessToken}`,
     };
+
+    this.logger.info("Fetching phone numbers...");
 
     const res = await fetch(url, { headers });
     const json = await res.json();
@@ -192,6 +192,8 @@ export class WhatsAppClient {
       this.logger.error("WhatsApp API Error (getPhoneNumbers)", json);
       throw normalizeWhatsAppError(res.status, json);
     }
+
+    this.logger.info("Phone numbers fetched:", json);
 
     return json;
   }

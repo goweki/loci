@@ -350,7 +350,7 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
 
                             {/* IDs Section */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                              {phone.waba.userId && (
+                              {phone.waba?.userId && (
                                 <div className="bg-muted/50 rounded-lg p-3">
                                   <p className="text-xs text-muted-foreground mb-1">
                                     WABA ID
@@ -362,7 +362,7 @@ export default function ContactsComponent({ wabaAccount, contacts }: Props) {
                                     <button
                                       onClick={() =>
                                         handleCopyId(
-                                          phone.waba.userId ?? undefined,
+                                          phone.waba?.userId ?? undefined,
                                           "waba",
                                         )
                                       }

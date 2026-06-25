@@ -18,6 +18,7 @@ import {
   TemplateLanguage,
   TokenType,
   NotificationChannel,
+  MessageType,
 } from "@/lib/prisma/generated";
 import { sendMail } from "@/lib/mail";
 import { welcomeEmail } from "@/lib/mail/email-render";
@@ -128,7 +129,7 @@ export async function registerUser(
       messaging_product: "whatsapp",
       recipient_type: "INDIVIDUAL",
       to: tel,
-      type: "template",
+      type: MessageType.TEMPLATE,
       template: {
         name: "set_password",
         language: { code: TemplateLanguage.en_US },

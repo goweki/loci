@@ -21,9 +21,8 @@ import Loader from "@/components/ui/loaders";
 import { Divider, IconInput } from "./_shared";
 import { useI18n } from "@/lib/i18n";
 import { setPasswordSchema } from "@/lib/validations";
-import { setNewPassword } from "./_actions";
 import Link from "next/link";
-import { verifyResetTokenAction } from "@/actions/user.actions";
+import { setNewPassword, verifyResetTokenAction } from "@/actions/user.actions";
 import { User } from "@/lib/prisma/generated";
 
 export default function SetPasswordForm({

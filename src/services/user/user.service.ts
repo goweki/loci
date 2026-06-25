@@ -163,7 +163,7 @@ export class UserService {
     Prisma.UserGetPayload<T extends Prisma.UserInclude ? { include: T } : {}>
   > {
     console.log(`Searching for user: ${key}`);
-    console.log(`All users`, await prisma.user.findMany());
+    // console.log(`All users`, await prisma.user.findMany());
 
     const user = await prisma.user.findFirst({
       where: {
@@ -283,7 +283,7 @@ export class UserService {
         messaging_product: "whatsapp",
         recipient_type: "INDIVIDUAL",
         to: user_.tel,
-        type: "template",
+        type: "TEMPLATE",
         template: {
           name: "reset_account_password",
           language: { code: TemplateLanguage.en_US },
