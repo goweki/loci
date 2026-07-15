@@ -175,13 +175,6 @@ exports.Prisma.WabaTemplateScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.SessionScalarFieldEnum = {
-  id: 'id',
-  sessionToken: 'sessionToken',
-  userId: 'userId',
-  expires: 'expires'
-};
-
 exports.Prisma.SubscriptionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -624,7 +617,6 @@ exports.Prisma.ModelName = {
   Token: 'Token',
   WabaAccount: 'WabaAccount',
   WabaTemplate: 'WabaTemplate',
-  Session: 'Session',
   Subscription: 'Subscription',
   Payment: 'Payment',
   Plan: 'Plan',

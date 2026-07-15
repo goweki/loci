@@ -1,16 +1,15 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { NextAuthOptions } from "next-auth";
-import { createUser } from "@/data/user";
 import { User, UserRole, UserStatus } from "@/lib/prisma/generated";
 import { getSubscriptionStatusByUserId } from "@/data/subscription";
-import { upsertAccount } from "@/data/account";
 import { compareHash } from "../utils/passwordHandlers";
 import { SubscriptionStatusEnum } from "@/types";
 import prisma from "../prisma";
 import { hashToken } from "./token-handlers";
-import { getUserByKeyAction } from "@/actions/user.actions";
 import { UserService } from "@/services/user/user.service";
+import { cookies } from "next/headers";
+import { AuthFlow } from "./auth-types";
 
 if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("NEXTAUTH_SECRET is not set in environment variables");
@@ -94,7 +93,7 @@ export const authOptions: NextAuthOptions = {
   // --- Session configuration ---
   session: {
     strategy: "jwt",
-    maxAge: 14 * 24 * 60 * 60, // 14 days
+    maxAge: 7 * 24 * 60 * 60, // 7 days
   },
 
   // --- Page routes ---
@@ -172,56 +171,55 @@ export const authOptions: NextAuthOptions = {
      */
     async signIn({ user, account, profile }) {
       console.log(
-        "SIGN IN ATTEMPT....",
+        ` SIGN-IN ATTEMPT....`,
         ` >> user.email - ${user.email}`,
         ` >> account.provider - ${account?.provider}`,
         ` >> profile.email - ${profile?.email}`,
       );
 
       try {
-        if (account?.provider === "google" && profile?.email) {
-          const userEmail_ = profile?.email;
-          // 1️⃣ Find or create local user
-          const resLocalUser = await getUserByKeyAction(userEmail_);
-          let localUser: (Partial<User> & { id: string }) | null = null;
-
-          if (resLocalUser.ok) {
-            localUser = resLocalUser.data;
-          } else {
-            localUser = await createUser({
-              email: userEmail_,
-              name: profile.name ?? "",
-              image: profile.image ?? null,
-            });
-          }
-
-          if (!localUser.id) {
+        if (account?.provider === "google") {
+          const email = profile?.email;
+          if (!email) {
+            console.warn(" >> Google user has no email");
             return false;
           }
 
-          // Ensure linkage
-          await upsertAccount(localUser.id, {
-            user: { connect: { id: localUser.id } },
-            provider: account.provider,
-            providerAccountId: account.providerAccountId,
-            type: account.type,
-            access_token: account.access_token,
-            token_type: account.token_type,
-            scope: account.scope,
-            id_token: account.id_token,
-            expires_at: account.expires_at,
-            refresh_token: account.refresh_token,
+          // auth flow cookie
+          const cookieStore = await cookies();
+          const authFlowCookie = cookieStore.get("auth_flow")?.value;
+          const flow = authFlowCookie as AuthFlow | undefined;
+          if (!flow) {
+            console.warn(" > No flow provided for Google user");
+            return false;
+          }
+
+          // if exists already
+          const existingUser = await prisma.user.findUnique({
+            where: { email },
+            select: { id: true },
           });
 
-          // 3️⃣ Load subscription details and attach to session user
-          const subscription = await getSubscriptionStatusByUserId(
-            localUser.id,
-          );
+          if (flow === "signin" && !existingUser) {
+            console.warn(
+              `Google sign-in denied for ${user.email}. User not found.`,
+            );
+            return "/sign-in?error=AccountNotFound";
+          }
 
-          user.id = localUser.id;
-          user.role = localUser.role || UserRole.USER;
-          user.subscriptionStatus = subscription.status;
-          user.subscriptionPlan = subscription.plan;
+          if (flow === "signup" && !existingUser) {
+            // Create user
+
+            const createdUser = await prisma.user.create({
+              data: {
+                email,
+                name: profile.name,
+                image: profile.image,
+              },
+            });
+
+            console.log(" > Google user created:", createdUser);
+          }
         }
 
         return true;
@@ -238,7 +236,7 @@ export const authOptions: NextAuthOptions = {
       console.log(`✅ ${user.email} signed in via ${account?.provider}`);
     },
     async signOut({ session }) {
-      console.log(`👋 User signed out`);
+      console.log(`👋 User signed out. Sesssion ended:`, session);
     },
   },
 };

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 export const ERROR_MESSAGES: Record<string, string> = {
+  AccountNotFound: "Account not found: Please sign up first",
   OAuthSignin: "Error in constructing an authorization URL",
   OAuthCallback: "Error in handling the response from OAuth provider",
   OAuthCreateAccount: "Could not create user",

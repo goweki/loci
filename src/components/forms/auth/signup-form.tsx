@@ -35,6 +35,7 @@ import { cn } from "@/lib/utils";
 import { removePlus } from "@/lib/utils/telHandlers";
 import { useI18n } from "@/lib/i18n";
 import { signUpUser } from "@/actions/user.actions";
+import { signIn } from "next-auth/react";
 
 // Mocking the enum if not imported
 enum NotificationChannel {
@@ -118,7 +119,11 @@ export function SignUpForm() {
         type="button"
         variant="secondary"
         className="w-full gap-2.5 font-medium"
-        onClick={() => {}}
+        onClick={() => {
+          document.cookie =
+            "auth_flow=signup; Path=/; SameSite=Lax; Secure; Max-Age=60";
+          signIn("google", { callbackUrl: "/dashboard" });
+        }}
       >
         <GoogleIcon />
         Sign up with Google

@@ -40,24 +40,6 @@ export function excludeFields<User, Key extends keyof User>(
 }
 
 /**
- * Creates a new user (doesnt send Welcome email)
- */
-export async function createUser(
-  data: Prisma.UserCreateInput | Prisma.UserUncheckedCreateInput,
-): Promise<
-  Prisma.UserGetPayload<{
-    select: { id: true; name: true; email: true; tel: true };
-  }>
-> {
-  console.log("Creating user... ", data);
-
-  return await prisma.user.create({
-    data,
-    select: { id: true, name: true, email: true, tel: true },
-  });
-}
-
-/**
  * Creates a new user, and sends Welcome email.
  */
 export async function registerUser(
@@ -168,21 +150,6 @@ export async function registerUser(
 }
 
 /**
- * Get all users (paginated).
- */
-export async function getAllUsers(
-  skip = 0,
-  take = 20,
-): Promise<UserWithRelations[]> {
-  return prisma.user.findMany({
-    skip,
-    take,
-    orderBy: { createdAt: "desc" },
-    include: userInclude,
-  });
-}
-
-/**
  * Get all admin users (paginated).
  */
 
@@ -218,13 +185,6 @@ export async function searchUsers(query: string): Promise<User[]> {
 }
 
 /**
- * Count total users.
- */
-export async function countUsers(): Promise<number> {
-  return prisma.user.count();
-}
-
-/**
  * Find a user by a phoneNumberId (from the PhoneNumber model).
  */
 export async function getUserByPhoneNumberId(
@@ -242,34 +202,6 @@ export async function getUserByPhoneNumberId(
     },
     include: {
       waba: true,
-    },
-  });
-}
-
-/* -----------------------------
- *  UPDATE
- * ----------------------------- */
-
-/**
- * Update user details.
- */
-export async function updateUser(
-  id: string,
-  data: Partial<
-    Pick<User, "name" | "email" | "tel" | "image" | "role" | "status">
-  >,
-): Promise<Partial<User>> {
-  return prisma.user.update({
-    where: { id },
-    data,
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      tel: true,
-      image: true,
-      role: true,
-      status: true,
     },
   });
 }
@@ -312,62 +244,6 @@ export async function updateUserPassword(
     return updatedUser;
   });
 }
-
-/**
- * Update (or Create) user reset token using an Upsert.
- * respects the @@unique([type, userId]) constraint in schema.
- */
-
-/**
- * Update user status (e.g. ACTIVE, SUSPENDED).
- */
-export async function updateUserStatus(
-  id: string,
-  status: UserStatus,
-): Promise<User> {
-  return prisma.user.update({
-    where: { id },
-    data: { status },
-  });
-}
-
-/**
- * Promote or demote user role.
- */
-export async function updateUserRole(
-  id: string,
-  role: UserRole,
-): Promise<User> {
-  return prisma.user.update({
-    where: { id },
-    data: { role },
-  });
-}
-
-/* -----------------------------
- *  DELETE
- * ----------------------------- */
-
-/**
- * Soft-delete (mark as INACTIVE).
- */
-export async function deactivateUser(id: string): Promise<User> {
-  return prisma.user.update({
-    where: { id },
-    data: { status: UserStatus.INACTIVE },
-  });
-}
-
-/**
- * Permanently delete a user and cascade relations.
- */
-export async function deleteUser(id: string): Promise<User> {
-  return prisma.user.delete({ where: { id } });
-}
-
-/* -----------------------------
- *  RELATION HELPERS
- * ----------------------------- */
 
 /**
  * Get user subscriptions with plan details.

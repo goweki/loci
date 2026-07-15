@@ -40,7 +40,6 @@ model User {
   contacts        Contact[]
   messages        Message[]
   subscriptions   Subscription[]
-  sessions        Session[]
   tokens          Token[]
   autoreplyRules  AutoReplyRule[]
   wabaTemplates   WabaTemplate[]
@@ -146,16 +145,6 @@ enum TemplateApprovalStatus {
   PENDING
   REJECTED
   DISABLED
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("user_sessions")
 }
 
 enum NotificationChannel {

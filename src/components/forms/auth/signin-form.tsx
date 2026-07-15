@@ -18,7 +18,6 @@ import {
   ArrowRight,
   Check,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -28,10 +27,9 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import Loader from "@/components/ui/loaders";
 import InputPhone from "@/components/ui/input-phone";
-import AuthErrorHandler, { ERROR_MESSAGES } from "./_errorHandler";
+import AuthErrorHandler from "./_errorHandler";
 import { loginSchema } from "@/lib/validations/authentication";
 import { removePlus } from "@/lib/utils/telHandlers";
 import GoogleIcon from "@/components/ui/svg";
@@ -219,7 +217,11 @@ export function SignInForm() {
         type="button"
         variant="secondary"
         className="w-full gap-2.5 font-medium"
-        onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+        onClick={() => {
+          document.cookie =
+            "auth_flow=signin; Path=/; SameSite=Lax; Secure; Max-Age=60";
+          signIn("google", { callbackUrl: "/dashboard" });
+        }}
       >
         <GoogleIcon />
         Continue with Google
