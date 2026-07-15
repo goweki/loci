@@ -219,7 +219,7 @@ export function SignInForm() {
         className="w-full gap-2.5 font-medium"
         onClick={() => {
           document.cookie =
-            "auth_flow=signin; Path=/; SameSite=Lax; Secure; Max-Age=10";
+            "auth_flow=signin; Path=/; SameSite=Lax; Secure; Max-Age=60";
           signIn("google", { callbackUrl: "/dashboard" });
         }}
       >
