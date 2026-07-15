@@ -1,3 +1,4 @@
+import { generateUniqueUsernameFromSeed } from "@/lib/utils/username";
 import { PrismaClient, UserRole, UserStatus, TokenType } from "../generated";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -38,11 +39,13 @@ export async function seedUsers(prisma: PrismaClient) {
 
       if (!user) {
         const hashedPassword = await bcrypt.hash(userData.password, 10);
+        const username = await generateUniqueUsernameFromSeed(userData.name);
 
         user = await prisma.user.create({
           data: {
             ...userData,
             password: hashedPassword,
+            username,
           },
         });
 

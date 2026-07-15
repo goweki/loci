@@ -3732,6 +3732,7 @@ export namespace Prisma {
     password: string | null
     role: $Enums.UserRole | null
     status: $Enums.UserStatus | null
+    username: string | null
     createdAt: Date | null
     updatedAt: Date | null
     preferredCommunicationChannel: $Enums.CommunicationChannel | null
@@ -3748,6 +3749,7 @@ export namespace Prisma {
     password: string | null
     role: $Enums.UserRole | null
     status: $Enums.UserStatus | null
+    username: string | null
     createdAt: Date | null
     updatedAt: Date | null
     preferredCommunicationChannel: $Enums.CommunicationChannel | null
@@ -3764,6 +3766,7 @@ export namespace Prisma {
     password: number
     role: number
     status: number
+    username: number
     createdAt: number
     updatedAt: number
     preferredCommunicationChannel: number
@@ -3782,6 +3785,7 @@ export namespace Prisma {
     password?: true
     role?: true
     status?: true
+    username?: true
     createdAt?: true
     updatedAt?: true
     preferredCommunicationChannel?: true
@@ -3798,6 +3802,7 @@ export namespace Prisma {
     password?: true
     role?: true
     status?: true
+    username?: true
     createdAt?: true
     updatedAt?: true
     preferredCommunicationChannel?: true
@@ -3814,6 +3819,7 @@ export namespace Prisma {
     password?: true
     role?: true
     status?: true
+    username?: true
     createdAt?: true
     updatedAt?: true
     preferredCommunicationChannel?: true
@@ -3903,6 +3909,7 @@ export namespace Prisma {
     password: string | null
     role: $Enums.UserRole
     status: $Enums.UserStatus
+    username: string
     createdAt: Date
     updatedAt: Date
     preferredCommunicationChannel: $Enums.CommunicationChannel
@@ -3936,6 +3943,7 @@ export namespace Prisma {
     password?: boolean
     role?: boolean
     status?: boolean
+    username?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     preferredCommunicationChannel?: boolean
@@ -3965,6 +3973,7 @@ export namespace Prisma {
     password?: boolean
     role?: boolean
     status?: boolean
+    username?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     preferredCommunicationChannel?: boolean
@@ -3981,6 +3990,7 @@ export namespace Prisma {
     password?: boolean
     role?: boolean
     status?: boolean
+    username?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     preferredCommunicationChannel?: boolean
@@ -3997,12 +4007,13 @@ export namespace Prisma {
     password?: boolean
     role?: boolean
     status?: boolean
+    username?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     preferredCommunicationChannel?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "tel" | "telVerified" | "image" | "password" | "role" | "status" | "createdAt" | "updatedAt" | "preferredCommunicationChannel", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "tel" | "telVerified" | "image" | "password" | "role" | "status" | "username" | "createdAt" | "updatedAt" | "preferredCommunicationChannel", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     waba?: boolean | User$wabaArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
@@ -4048,6 +4059,7 @@ export namespace Prisma {
       password: string | null
       role: $Enums.UserRole
       status: $Enums.UserStatus
+      username: string
       createdAt: Date
       updatedAt: Date
       preferredCommunicationChannel: $Enums.CommunicationChannel
@@ -4496,6 +4508,7 @@ export namespace Prisma {
     readonly password: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'UserRole'>
     readonly status: FieldRef<"User", 'UserStatus'>
+    readonly username: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
     readonly preferredCommunicationChannel: FieldRef<"User", 'CommunicationChannel'>
@@ -32072,6 +32085,7 @@ export namespace Prisma {
     password: 'password',
     role: 'role',
     status: 'status',
+    username: 'username',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     preferredCommunicationChannel: 'preferredCommunicationChannel'
@@ -32921,6 +32935,7 @@ export namespace Prisma {
     password?: StringNullableFilter<"User"> | string | null
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     status?: EnumUserStatusFilter<"User"> | $Enums.UserStatus
+    username?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFilter<"User"> | $Enums.CommunicationChannel
@@ -32949,6 +32964,7 @@ export namespace Prisma {
     password?: SortOrderInput | SortOrder
     role?: SortOrder
     status?: SortOrder
+    username?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     preferredCommunicationChannel?: SortOrder
@@ -32970,6 +32986,7 @@ export namespace Prisma {
     id?: string
     email?: string
     tel?: string
+    username?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
@@ -32995,7 +33012,7 @@ export namespace Prisma {
     products?: ProductListRelationFilter
     orders?: OrderListRelationFilter
     invoices?: InvoiceListRelationFilter
-  }, "id" | "email" | "tel">
+  }, "id" | "email" | "tel" | "username">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
@@ -33008,6 +33025,7 @@ export namespace Prisma {
     password?: SortOrderInput | SortOrder
     role?: SortOrder
     status?: SortOrder
+    username?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     preferredCommunicationChannel?: SortOrder
@@ -33030,6 +33048,7 @@ export namespace Prisma {
     password?: StringNullableWithAggregatesFilter<"User"> | string | null
     role?: EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
     status?: EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
+    username?: StringWithAggregatesFilter<"User"> | string
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelWithAggregatesFilter<"User"> | $Enums.CommunicationChannel
@@ -34982,6 +35001,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -35010,6 +35030,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -35038,6 +35059,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -35066,6 +35088,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -35094,6 +35117,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -35110,6 +35134,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -35126,6 +35151,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -37456,6 +37482,7 @@ export namespace Prisma {
     password?: SortOrder
     role?: SortOrder
     status?: SortOrder
+    username?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     preferredCommunicationChannel?: SortOrder
@@ -37472,6 +37499,7 @@ export namespace Prisma {
     password?: SortOrder
     role?: SortOrder
     status?: SortOrder
+    username?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     preferredCommunicationChannel?: SortOrder
@@ -37488,6 +37516,7 @@ export namespace Prisma {
     password?: SortOrder
     role?: SortOrder
     status?: SortOrder
+    username?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     preferredCommunicationChannel?: SortOrder
@@ -42592,6 +42621,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -42619,6 +42649,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -42662,6 +42693,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -42689,6 +42721,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -42716,6 +42749,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -42743,6 +42777,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -42862,6 +42897,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -42889,6 +42925,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -42995,6 +43032,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -43022,6 +43060,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -43102,6 +43141,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -43129,6 +43169,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -43156,6 +43197,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -43183,6 +43225,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -43265,6 +43308,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -43292,6 +43336,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -44016,6 +44061,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -44043,6 +44089,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -44204,6 +44251,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -44231,6 +44279,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -44388,6 +44437,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -44415,6 +44465,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -44573,6 +44624,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -44600,6 +44652,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -44705,6 +44758,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -44732,6 +44786,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -44816,6 +44871,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -44843,6 +44899,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -44870,6 +44927,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -44897,6 +44955,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -44940,6 +44999,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -44967,6 +45027,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -44994,6 +45055,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -45021,6 +45083,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -45153,6 +45216,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -45180,6 +45244,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -45291,6 +45356,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -45318,6 +45384,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -45537,6 +45604,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -45564,6 +45632,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -45903,6 +45972,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -45930,6 +46000,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -46010,6 +46081,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -46037,6 +46109,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -46389,6 +46462,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -46416,6 +46490,7 @@ export namespace Prisma {
     password?: string | null
     role?: $Enums.UserRole
     status?: $Enums.UserStatus
+    username: string
     createdAt?: Date | string
     updatedAt?: Date | string
     preferredCommunicationChannel?: $Enums.CommunicationChannel
@@ -46459,6 +46534,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
@@ -46486,6 +46562,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    username?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     preferredCommunicationChannel?: EnumCommunicationChannelFieldUpdateOperationsInput | $Enums.CommunicationChannel
