@@ -204,7 +204,7 @@ export const authOptions: NextAuthOptions = {
             console.warn(
               `Google sign-in denied for ${user.email}. User not found.`,
             );
-            return false;
+            return "/sign-in?error=AccountNotFound";
           }
 
           if (flow === "signup" && !existingUser) {
