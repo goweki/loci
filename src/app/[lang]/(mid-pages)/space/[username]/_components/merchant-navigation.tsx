@@ -29,7 +29,7 @@ export function MerchantNavigation({ username }: Props) {
           </NavigationMenuLink>
         </NavigationMenuItem>
 
-        <NavigationMenuItem>
+        {/* <NavigationMenuItem>
           <NavigationMenuLink asChild>
             <Link
               href={`/space/${username}/about`}
@@ -39,7 +39,7 @@ export function MerchantNavigation({ username }: Props) {
               About
             </Link>
           </NavigationMenuLink>
-        </NavigationMenuItem>
+        </NavigationMenuItem> */}
       </NavigationMenuList>
     </NavigationMenu>
   );

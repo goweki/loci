@@ -1,10 +1,15 @@
+"use client";
+
 import Link from "next/link";
 
 import { Package2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n";
 
 export function ProductEmptyState() {
+  const { language } = useI18n();
+
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center">
       <div className="rounded-full bg-muted p-4">
@@ -19,7 +24,9 @@ export function ProductEmptyState() {
       </p>
 
       <Button className="mt-6" asChild>
-        <Link href="/dashboard/products/create">Create Product</Link>
+        <Link href={`/${language}/dashboard/products/create`}>
+          Create Product
+        </Link>
       </Button>
     </div>
   );

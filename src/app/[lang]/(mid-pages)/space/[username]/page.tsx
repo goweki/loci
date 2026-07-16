@@ -1,30 +1,16 @@
-import { Language } from "@/lib/i18n";
+import { MerchantProducts } from "./_components/merchant-products";
+import { getMerchantProducts } from "./_components/space-utils";
 
-const translations = {
-  en: {
-    title: "New Password",
-    subtitle: "Set a new password to continue", // Corrected 'contnue'
-  },
-  sw: {
-    title: "Nywila Mpya",
-    subtitle: "Weka nywila mpya ili kuendelea",
-  },
+type Props = {
+  params: Promise<{
+    username: string;
+  }>;
 };
 
-export default async function SpacePage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ lang: string; username: string }>;
-  searchParams: Promise<{ [key: string]: string | undefined }>;
-}) {
-  const { username, lang } = await params;
-  const { productId } = await searchParams;
-  const dict = translations[lang as Language];
+export default async function MerchantSpacePage({ params }: Props) {
+  const { username } = await params;
 
-  return (
-    <>
-      {/* Return component showing all products or if productId exists, show product  */}
-    </>
-  );
+  const products = await getMerchantProducts(username);
+
+  return <MerchantProducts products={products} />;
 }
