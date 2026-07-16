@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MerchantProduct } from "./space-utils";
+import Image from "next/image";
 
 type Props = {
   product: MerchantProduct;
@@ -20,7 +21,7 @@ export function ProductCard({ product }: Props) {
     <Card className="overflow-hidden">
       <div className="aspect-square overflow-hidden bg-muted">
         {product.imageUrl ? (
-          <img
+          <Image
             src={product.imageUrl}
             alt={product.name}
             className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"

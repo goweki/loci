@@ -15,8 +15,8 @@ export function MerchantProducts({ products }: Props) {
         <h2 className="text-lg font-semibold">No products available</h2>
 
         <p className="mt-2 max-w-md text-sm text-muted-foreground">
-          This merchant hasn't published any products yet. Please check back
-          later.
+          This merchant hasn&apos;t published any products yet. Please check
+          back later.
         </p>
       </div>
     );
