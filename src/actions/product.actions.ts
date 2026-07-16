@@ -16,8 +16,9 @@ import prisma from "@/lib/prisma";
 
 export async function createProductAction(data: {
   name: string;
+  description: string;
   price: number;
-  stockQty?: number;
+  stockQty: number;
 }): Promise<ActionResult<Product>> {
   try {
     const productService = await ProductService.create();

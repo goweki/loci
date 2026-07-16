@@ -184,7 +184,7 @@ model Payment {
   order   Order  @relation(fields: [orderId], references: [id])
 
   amount   Decimal       @db.Decimal(10, 2)
-  currency Currency      @default(KSH)
+  currency Currency      @default(KES)
   status   PaymentStatus @default(PENDING)
 
   paidAt DateTime?
@@ -196,8 +196,8 @@ model Payment {
 }
 
 enum Currency {
-  KSH
-  US
+  KES
+  USD
 }
 
 model Plan {

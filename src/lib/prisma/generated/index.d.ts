@@ -212,8 +212,8 @@ export type NotificationChannel = (typeof NotificationChannel)[keyof typeof Noti
 
 
 export const Currency: {
-  KSH: 'KSH',
-  US: 'US'
+  KES: 'KES',
+  USD: 'USD'
 };
 
 export type Currency = (typeof Currency)[keyof typeof Currency]

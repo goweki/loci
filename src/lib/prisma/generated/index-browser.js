@@ -523,8 +523,8 @@ exports.PaymentMethod = exports.$Enums.PaymentMethod = {
 };
 
 exports.Currency = exports.$Enums.Currency = {
-  KSH: 'KSH',
-  US: 'US'
+  KES: 'KES',
+  USD: 'USD'
 };
 
 exports.PaymentStatus = exports.$Enums.PaymentStatus = {
