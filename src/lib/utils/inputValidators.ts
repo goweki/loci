@@ -8,8 +8,8 @@ export function emailValidator(email: string): string {
   const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
 
   if (!email) return "Email can't be empty.";
-  if (!EMAIL_REGEX.test(email)) return 'Ooops! We need a valid email address.';
-  return '';
+  if (!EMAIL_REGEX.test(email)) return "Ooops! We need a valid email address.";
+  return "";
 }
 
 /**
@@ -20,8 +20,8 @@ export function emailValidator(email: string): string {
  */
 export function passwordValidator(password: string): string {
   if (!password) return "Password can't be empty";
-  if (password.length < 5) return 'Password must be at least 5 characters long';
-  return '';
+  if (password.length < 5) return "Password must be at least 5 characters long";
+  return "";
 }
 
 /**
@@ -33,11 +33,11 @@ export function passwordValidator(password: string): string {
 export function nameValidator(name: string, label?: string): string {
   const NAME_REGEX = /^[a-zA-Z0-9\s'-]{3,}$/;
 
-  if (!name) return `${label ? label : 'Name'}  field can't be empty`;
-  if (name.length < 3) return `${label ? label : 'Name'} too short`;
+  if (!name) return `${label ? label : "Name"}  field can't be empty`;
+  if (name.length < 3) return `${label ? label : "Name"} too short`;
   if (!NAME_REGEX.test(name))
     return `${
-      label ? label : 'Name'
+      label ? label : "Name"
     } should contain alphabets and numbers only`;
   return ``;
 }
@@ -61,12 +61,12 @@ export function locationValidator(location: string): string {
   const LOCATION_REGEX = /^[a-zA-Z\s,'-]{3,}$/;
 
   if (!location.trim()) return "Location field can't be empty";
-  if (location.trim().length < 3) return 'Location name too short';
+  if (location.trim().length < 3) return "Location name too short";
   if (!LOCATION_REGEX.test(location.trim())) {
-    return 'Location contains invalid characters';
+    return "Location contains invalid characters";
   }
 
-  return '';
+  return "";
 }
 
 /**
@@ -80,8 +80,8 @@ export function phoneValidator(tel: string): string {
 
   if (!tel) return "Tel field can't be empty";
   if (!TEL_REGEX.test(tel))
-    return 'Sorry, we only support KENYAN phone numbers';
-  return '';
+    return "Sorry, we only support KENYAN phone numbers";
+  return "";
 }
 
 /**
@@ -116,30 +116,30 @@ export function institutionNameValidator(name: string): string {
 
   // 2. Check if the name has more than one word (contains at least one space)
   // This is a direct interpretation of "more than one word".
-  if (!trimmedName.includes(' ')) {
-    return 'Law firm name must contain more than one word';
+  if (!trimmedName.includes(" ")) {
+    return "Law firm name must contain more than one word";
   }
 
   // 3. Check for allowed characters
   if (!NAME_REGEX.test(trimmedName)) {
-    return 'Law firm name contains invalid characters';
+    return "Law firm name contains invalid characters";
   }
 
-  return ''; // Name is valid
+  return ""; // Name is valid
 }
 
 // Validation function for stream names
 export function validateStreamName(streamName: string): boolean | string {
   if (streamName.length < 3) {
-    return 'Stream name cannot have less that 3 characters';
+    return "Stream name cannot have less that 3 characters";
   }
   if (streamName.length > 50) {
-    return 'Stream name must be less than 50 characters';
+    return "Stream name must be less than 50 characters";
   }
   // Check for valid characters (letters, numbers, spaces, and common punctuation)
   const validPattern = /^[a-zA-Z0-9\s\-_.()]+$/;
   if (!validPattern.test(streamName)) {
-    return 'Stream name contains invalid characters';
+    return "Stream name contains invalid characters";
   }
   return true;
 }

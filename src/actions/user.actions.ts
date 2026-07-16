@@ -16,6 +16,7 @@ import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import { BASE_URL } from "@/lib/utils/getUrl";
 import { generateRandom } from "@/lib/utils/passwordHandlers";
 import { buildResetUrlTail, generateResetToken } from "@/lib/utils/resetToken";
+import { generateUniqueUsernameFromSeed } from "@/lib/utils/username";
 import whatsapp from "@/lib/whatsapp";
 import { UserService } from "@/services/user/user.service";
 import { ActionResult } from "@/types";
@@ -249,7 +250,11 @@ export async function signUpUser(props: SignUpProps): Promise<
   }>
 > {
   try {
-    const signupRes = await registerUser(props);
+    const userDto = {
+      ...props,
+      username: await generateUniqueUsernameFromSeed(props.name),
+    };
+    const signupRes = await registerUser(userDto);
 
     let message = "Verification sent";
 

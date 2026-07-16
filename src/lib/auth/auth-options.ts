@@ -208,13 +208,33 @@ export const authOptions: NextAuthOptions = {
           }
 
           if (flow === "signup" && !existingUser) {
-            // Create user
+            /**
+             * Create user
+             */
+
+            const emailPrefix = email.split("@")[0].toLowerCase();
+            const randomDigits = Math.floor(
+              10000 + Math.random() * 90000,
+            ).toString();
+            let generatedUsername = `${emailPrefix}${randomDigits}`;
+
+            const existingUser = await prisma.user.findUnique({
+              where: { username: generatedUsername },
+            });
+
+            if (existingUser) {
+              const newDigits = Math.floor(
+                10000 + Math.random() * 90000,
+              ).toString();
+              generatedUsername = `${emailPrefix}${newDigits}`;
+            }
 
             const createdUser = await prisma.user.create({
               data: {
                 email,
                 name: profile.name,
                 image: profile.image,
+                username: generatedUsername,
               },
             });
 
