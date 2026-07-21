@@ -48,6 +48,8 @@ export class ProductService {
   static async create() {
     const user = await requireUser();
 
+    console.log("requireUser:", user);
+
     return new ProductService({
       userId: user.id,
       role: user.role as UserRole,
@@ -76,11 +78,15 @@ export class ProductService {
   async createProduct(
     data: Omit<Prisma.ProductUncheckedCreateInput, "userId">,
   ): Promise<Product> {
+    const prodDto = {
+      ...data,
+      userId: this.userId,
+    };
+
+    console.log("[CREATING PRODUCT]:", prodDto);
+
     return prisma.product.create({
-      data: {
-        ...data,
-        userId: this.userId,
-      },
+      data: prodDto,
     });
   }
 

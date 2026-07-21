@@ -23,7 +23,6 @@ export async function createProductAction(data: {
   imageUrl?: string;
 }): Promise<ActionResult<Product>> {
   try {
-    console.log("[CREATING PRODUCT]:", data);
     const productService = await ProductService.create();
     const product = await productService.createProduct(data);
 
