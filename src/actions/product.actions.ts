@@ -5,20 +5,27 @@ import { revalidatePath } from "next/cache";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import { ActionResult } from "@/types";
 import {
-  Product,
   ProductService,
   ProductWithRelations,
 } from "@/services/commerce/product.service";
-import { requireUser } from "@/lib/auth";
 import { notFound } from "next/navigation";
-import { PlanName } from "@/lib/prisma/generated";
+import { Currency, PlanName, Prisma } from "@/lib/prisma/generated";
 import prisma from "@/lib/prisma";
 
 export async function createProductAction(data: {
   name: string;
+  description: string;
   price: number;
+  currency: Currency;
   stockQty?: number;
-}): Promise<ActionResult<Product>> {
+  imageUrl?: string;
+}): Promise<
+  ActionResult<
+    Omit<Prisma.ProductGetPayload<{}>, "price"> & {
+      price: number;
+    }
+  >
+> {
   try {
     const productService = await ProductService.create();
     const product = await productService.createProduct(data);
@@ -77,9 +84,13 @@ export async function getProductById(
   }
 }
 
-export async function getProductByPlanName(
-  planName: PlanName,
-): Promise<ActionResult<Product>> {
+export async function getProductByPlanName(planName: PlanName): Promise<
+  ActionResult<
+    Omit<Prisma.ProductGetPayload<{}>, "price"> & {
+      price: number;
+    }
+  >
+> {
   try {
     const plan_ = await prisma.plan.findUnique({
       where: {

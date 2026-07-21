@@ -13,13 +13,13 @@ import { ConversationsCard } from "@/components/dashboard/overview/conversations
 import { RecentOrders } from "@/components/dashboard/overview/recent-orders";
 import { RecentInvoices } from "@/components/dashboard/overview/recent-invoices";
 
-import { QuickActions } from "@/components/dashboard/overview/quick-actions";
 import { RecentConversations } from "@/components/dashboard/overview/recent-conversations";
 import { InventoryAlerts } from "@/components/dashboard/overview/inventory-alerts";
 import { SalesChart } from "@/components/dashboard/overview/sales-chart";
 import { ActivityFeed } from "@/components/dashboard/overview/activity-feed";
 
 import { getDashboardStatsSummary } from "@/data/dashboard";
+import QuickActions from "@/components/dashboard/overview/quick-actions";
 
 const translations = {
   en: {

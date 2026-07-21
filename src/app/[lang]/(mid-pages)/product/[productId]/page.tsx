@@ -1,23 +1,22 @@
-import { notFound } from "next/navigation";
-
 import { getProductById } from "@/actions/product.actions";
+import { notFound } from "next/navigation";
 import ProductViewComponent from "@/components/dashboard/products/product-view";
 import { BASE_URL } from "@/lib/utils/getUrl";
-import { ShareLinkDialog } from "@/components/dashboard/products/product-view/share-dialog";
-import { BoxIcon } from "lucide-react";
 import TitleSection from "@/components/ui/page-title";
+import { BoxIcon } from "lucide-react";
+import { ShareLinkDialog } from "@/components/dashboard/products/product-view/share-dialog";
 
-interface ProductPageProps {
+type Props = {
   params: Promise<{
-    id: string;
+    productId: string;
     lang: string;
   }>;
-}
+};
 
-export default async function ProductPage({ params }: ProductPageProps) {
-  const { id, lang } = await params;
+export default async function ProductPage({ params }: Props) {
+  const { productId, lang } = await params;
 
-  const resProduct = await getProductById(id);
+  const resProduct = await getProductById(productId);
 
   if (!resProduct.ok) {
     notFound();
@@ -27,7 +26,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const shareLink = `${BASE_URL}/en/product/${product.id}`;
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <div className="flex items-center gap-4">
         <TitleSection
           title={product.name}
@@ -35,7 +34,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
           icon={BoxIcon}
           //   description={`${booking.scheduledDate} · ${booking.timeSlotStart} · ${booking.totalTonnage} T total`}
           breadcrumbs={[
-            { label: "Products", href: `/${lang}/dashboard/products` },
+            {
+              label: "Merchant",
+              href: `/${lang}/space/${product.user.username}`,
+            },
             { label: product.name },
           ]}
         />
@@ -50,10 +52,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </Button> */}
         </div>
       </div>
-      <ProductViewComponent
-        product={JSON.parse(JSON.stringify(product))}
-        merchantInfo
-      />
+      <ProductViewComponent product={JSON.parse(JSON.stringify(product))} />
     </div>
   );
 }

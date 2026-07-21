@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
 import Loader from "@/components/ui/loaders";
+import { EdgeStoreProvider } from "@/lib/storage/edgestore-client";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [UIstate, setUIstate] = useState("loading");
@@ -21,14 +22,16 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     <ThemeProvider enableSystem attribute="class" defaultTheme="system">
       <React.StrictMode>
         <SessionProvider>
-          {UIstate === "loading" ? (
-            <div className="flex items-center justify-center m-auto">
-              <Loader />
-            </div>
-          ) : (
-            children
-          )}
-          <Toaster />
+          <EdgeStoreProvider>
+            {UIstate === "loading" ? (
+              <div className="flex items-center justify-center m-auto">
+                <Loader />
+              </div>
+            ) : (
+              children
+            )}
+            <Toaster />
+          </EdgeStoreProvider>
         </SessionProvider>
       </React.StrictMode>
     </ThemeProvider>

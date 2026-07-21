@@ -109,23 +109,46 @@ export const authOptions: NextAuthOptions = {
     /**
      * JWT callback: runs on sign-in and whenever a session is checked or updated.
      */
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user, trigger, session, account, profile }) {
       // --- Initial sign-in ---
-      if (user) {
-        token.sub = user.id;
-        token.email = user.email;
-        token.role = user.role;
+      // if (user) {
+      //   token.sub = user.id;
+      //   token.email = user.email;
+      //   token.role = user.role;
 
-        // Always refresh subscription info on login
-        try {
-          const subscription = await getSubscriptionStatusByUserId(user.id);
-          token.subscriptionStatus = subscription.status;
-          token.subscriptionPlan = subscription.plan;
-        } catch (err) {
-          console.error("Error fetching subscription for user:", user.id, err);
-          token.subscriptionStatus = SubscriptionStatusEnum.INACTIVE;
-          token.subscriptionPlan = null;
+      //   // Always refresh subscription info on login
+      //   try {
+      //     const subscription = await getSubscriptionStatusByUserId(user.id);
+      //     token.subscriptionStatus = subscription.status;
+      //     token.subscriptionPlan = subscription.plan;
+      //   } catch (err) {
+      //     console.error("Error fetching subscription for user:", user.id, err);
+      //     token.subscriptionStatus = SubscriptionStatusEnum.INACTIVE;
+      //     token.subscriptionPlan = null;
+      //   }
+      // }
+      // Initial sign-in
+      if (account && user?.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: {
+            email: user.email,
+          },
+        });
+
+        if (!dbUser) {
+          throw new Error("Database user not found.");
         }
+
+        token.sub = dbUser.id;
+        token.email = dbUser.email;
+        token.name = dbUser.name;
+        token.role = dbUser.role;
+        token.picture = dbUser.image;
+
+        const subscription = await getSubscriptionStatusByUserId(dbUser.id);
+
+        token.subscriptionStatus = subscription.status;
+        token.subscriptionPlan = subscription.plan;
       }
 
       // --- Session update (manual trigger) ---

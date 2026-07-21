@@ -42,10 +42,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "loci",
     description: "Supercharging Engagement",
-    url:
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:3000"
-        : process.env.NEXTAUTH_URL,
+    url: BASE_URL,
     siteName: "loci",
     images: [
       {
