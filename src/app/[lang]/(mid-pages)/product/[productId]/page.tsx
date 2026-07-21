@@ -1,19 +1,17 @@
-import { notFound } from "next/navigation";
-
 import { getProductById } from "@/actions/product.actions";
+import { notFound } from "next/navigation";
 import ProductViewComponent from "@/components/dashboard/products/product-view";
 
-interface ProductPageProps {
+type Props = {
   params: Promise<{
-    id: string;
-    lang: string;
+    productId: string;
   }>;
-}
+};
 
-export default async function ProductPage({ params }: ProductPageProps) {
-  const { id, lang } = await params;
+export default async function ProductPage({ params }: Props) {
+  const { productId } = await params;
 
-  const resProduct = await getProductById(id);
+  const resProduct = await getProductById(productId);
 
   if (!resProduct.ok) {
     notFound();

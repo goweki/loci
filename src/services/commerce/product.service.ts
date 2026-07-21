@@ -4,6 +4,14 @@ import { Prisma, Product as Product_, UserRole } from "@/lib/prisma/generated";
 
 const productIncludeRelations: Prisma.ProductInclude = {
   orderItems: true,
+  user: {
+    select: {
+      name: true,
+      email: true,
+      products: true,
+      tel: true,
+    },
+  },
 };
 
 export type ProductWithRelations_ = Prisma.ProductGetPayload<{
@@ -23,11 +31,11 @@ export const prisma = _prisma.$extends({
   },
 });
 
-export type Product = Omit<Product_, "price"> & {
+export type ProductWithRelations = Omit<ProductWithRelations_, "price"> & {
   price: number;
 };
 
-export type ProductWithRelations = Omit<ProductWithRelations_, "price"> & {
+type ProductGet = Omit<Prisma.ProductGetPayload<{}>, "price"> & {
   price: number;
 };
 
@@ -77,7 +85,7 @@ export class ProductService {
    */
   async createProduct(
     data: Omit<Prisma.ProductUncheckedCreateInput, "userId">,
-  ): Promise<Product> {
+  ): Promise<ProductGet> {
     const prodDto = {
       ...data,
       userId: this.userId,
