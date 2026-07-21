@@ -19,6 +19,7 @@ interface InputPriceProps {
   onCurrencyChange: (currency: Currency) => void;
   id?: string;
   label?: string;
+  required?: boolean;
 }
 
 export default function InputPrice({
@@ -28,6 +29,7 @@ export default function InputPrice({
   onCurrencyChange,
   id = "price-input",
   label = "Price",
+  required = false,
 }: InputPriceProps) {
   // Handles safe decimal formatting on blur if needed, or keeps it clean
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +42,9 @@ export default function InputPrice({
 
   return (
     <div className="grid w-full max-w-sm items-center gap-1.5">
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id}>
+        {label} {required ? <span className="text-destructive"> *</span> : null}
+      </Label>
       <div className="relative flex items-center rounded-md shadow-sm">
         {/* Price Input */}
         <Input
@@ -51,6 +55,7 @@ export default function InputPrice({
           value={price}
           onChange={handlePriceChange}
           className="pl-3 pr-24 focus-visible:ring-1 focus-visible:ring-ring"
+          required={required}
         />
 
         {/* Currency Dropdown inside the Input */}
@@ -63,8 +68,8 @@ export default function InputPrice({
               <SelectValue placeholder="USD" />
             </SelectTrigger>
             <SelectContent align="end" className="w-24">
-              <SelectItem value="USD">USD ($)</SelectItem>
-              <SelectItem value="KES">KES (KSh)</SelectItem>
+              {/* <SelectItem value="USD">USD</SelectItem> */}
+              <SelectItem value="KES">KES</SelectItem>
               {/* <SelectItem value="EUR">EUR (€)</SelectItem> */}
             </SelectContent>
           </Select>

@@ -11,16 +11,19 @@ import {
 } from "@/services/commerce/product.service";
 import { requireUser } from "@/lib/auth";
 import { notFound } from "next/navigation";
-import { PlanName } from "@/lib/prisma/generated";
+import { Currency, PlanName } from "@/lib/prisma/generated";
 import prisma from "@/lib/prisma";
 
 export async function createProductAction(data: {
   name: string;
   description: string;
   price: number;
-  stockQty: number;
+  currency: Currency;
+  stockQty?: number;
+  imageUrl?: string;
 }): Promise<ActionResult<Product>> {
   try {
+    console.log("[CREATING PRODUCT]:", data);
     const productService = await ProductService.create();
     const product = await productService.createProduct(data);
 

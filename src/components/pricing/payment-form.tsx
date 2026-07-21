@@ -62,7 +62,7 @@ export function PaymentCheckout({
       }
 
       const orderRes = await createOrderAction({
-        currency: Currency.KSH,
+        currency: Currency.KES,
         notes: "LOCi subscription",
         items: [
           {

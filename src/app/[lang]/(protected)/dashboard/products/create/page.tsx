@@ -1,7 +1,7 @@
 import { requireUser } from "@/lib/auth";
-import { ProductForm } from "@/components/__dashboard/products/product-form";
 import TitleSection from "@/components/ui/page-title";
 import { BoxIcon } from "lucide-react";
+import { ProductForm } from "@/components/dashboard/products/product-form";
 
 type PageProps = {
   params: Promise<{
