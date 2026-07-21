@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import { ArrowRight } from "lucide-react";
@@ -11,12 +13,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { MerchantProduct } from "./space-utils";
 import Image from "next/image";
+import { useI18n } from "@/lib/i18n";
 
 type Props = {
   product: MerchantProduct;
 };
 
 export function ProductCard({ product }: Props) {
+  const { language } = useI18n();
   return (
     <Card className="overflow-hidden">
       <div className="aspect-square overflow-hidden bg-muted">
@@ -53,7 +57,7 @@ export function ProductCard({ product }: Props) {
 
       <CardFooter>
         <Button asChild className="w-full">
-          <Link href={`/products/${product.id}`}>
+          <Link href={`/${language}/product/${product.id}`}>
             View Product
             <ArrowRight className="ml-2 h-4 w-4" />
           </Link>

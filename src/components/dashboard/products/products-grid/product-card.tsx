@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -10,8 +12,10 @@ import { Button } from "@/components/ui/button";
 
 import { ProductActionsDropdown } from "./product-actions-dropdown";
 import { ProductWithRelations } from "@/services/commerce/product.service";
+import { useI18n } from "@/lib/i18n";
 
 export function ProductCard({ product }: { product: ProductWithRelations }) {
+  const { language } = useI18n();
   return (
     <Card className="overflow-hidden">
       <div className="relative aspect-square">
@@ -47,7 +51,9 @@ export function ProductCard({ product }: { product: ProductWithRelations }) {
 
       <CardFooter className="p-4 pt-0">
         <Button className="w-full" variant="outline" asChild>
-          <Link href={`/dashboard/products/${product.id}`}>View Product</Link>
+          <Link href={`/${language}/dashboard/products/${product.id}`}>
+            View Product
+          </Link>
         </Button>
       </CardFooter>
     </Card>

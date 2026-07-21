@@ -33,7 +33,10 @@ export function MerchantProducts({ products }: Props) {
       "
     >
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard
+          key={product.id}
+          product={JSON.parse(JSON.stringify(product))}
+        />
       ))}
     </section>
   );

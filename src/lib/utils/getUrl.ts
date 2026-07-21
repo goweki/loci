@@ -3,6 +3,7 @@
  * HINT: uses Vercel system environment variables.
  */
 export const BASE_URL =
+  process.env.NEXT_PUBLIC_URL ||
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
     ? `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
     : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"

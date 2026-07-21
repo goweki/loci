@@ -7,8 +7,8 @@ const productIncludeRelations: Prisma.ProductInclude = {
   user: {
     select: {
       name: true,
+      username: true,
       email: true,
-      products: true,
       tel: true,
     },
   },
@@ -55,8 +55,6 @@ export class ProductService {
 
   static async create() {
     const user = await requireUser();
-
-    console.log("requireUser:", user);
 
     return new ProductService({
       userId: user.id,
