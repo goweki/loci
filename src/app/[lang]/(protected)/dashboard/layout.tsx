@@ -17,7 +17,9 @@ const DashboardLayout = async ({
   return isValidLanguage(lang) ? (
     <>
       <Navbar user={user} />
-      <main className="flex-1 p-6 pt-16"> {children}</main>
+      <main className="flex flex-col flex-1 p-6 pt-16 mx-auto w-full max-w-7xl">
+        {children}
+      </main>
     </>
   ) : null;
 };
