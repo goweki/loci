@@ -30,12 +30,12 @@ export default async function ProductPage({ params }: Props) {
       <div className="flex items-center gap-4">
         <TitleSection
           title={product.name}
-          subtitle=" Product details and inventory information"
+          subtitle={` by ${product.user.username}`}
           icon={BoxIcon}
           //   description={`${booking.scheduledDate} · ${booking.timeSlotStart} · ${booking.totalTonnage} T total`}
           breadcrumbs={[
             {
-              label: "Merchant",
+              label: `${product.user.username}`,
               href: `/${lang}/space/${product.user.username}`,
             },
             { label: product.name },
@@ -43,7 +43,7 @@ export default async function ProductPage({ params }: Props) {
         />
 
         <div className="flex gap-2">
-          {shareLink && <ShareLinkDialog productLink={shareLink} />}
+          <ShareLinkDialog product={product} />
           {/* <Button onClick={() => setShowApproveDialog(true)}>
             <CheckCircle2Icon className="mr-2 h-4 w-4" /> Approve
           </Button>
