@@ -2,21 +2,13 @@
  * Resolves the base URL depending on the Vercel environment.
  * HINT: uses Vercel system environment variables.
  */
-export const BASE_URL =
-  process.env.NEXT_PUBLIC_URL ||
-  process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
-    ? `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
-    : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
-      : process.env.NEXTAUTH_URL || "http://localhost:3000";
+export const BASE_URL = process.env.NEXTAUTH_URL!;
 
 /**
  * BRAND IMAGES URL
  */
-export const BANNER_IMAGE_URL: string =
-  "https://loci.goweki.com/brand/banner.png";
-export const OG_IMAGE_URL: string =
-  "https://loci.goweki.com/brand/og_image.jpg";
+export const BANNER_IMAGE_URL: string = BASE_URL + "/brand/banner.png";
+export const OG_IMAGE_URL: string = BASE_URL + "/brand/og_image.jpg";
 
 /**
  * RegExp to check if a string starts with a forward slash `/`.

@@ -11,9 +11,13 @@ import { ProductWithRelations } from "@/services/commerce/product.service";
 
 interface PurchaseCardProps {
   product: ProductWithRelations;
+  canPurchase?: boolean;
 }
 
-export default function PurchaseCard({ product }: PurchaseCardProps) {
+export default function PurchaseCard({
+  product,
+  canPurchase = true,
+}: PurchaseCardProps) {
   const [quantity, setQuantity] = useState(1);
 
   const increment = () => {
@@ -29,6 +33,25 @@ export default function PurchaseCard({ product }: PurchaseCardProps) {
   };
 
   const total = quantity * Number(product.price);
+  const merchantEmail = product.user?.email;
+  const merchantTel = product.user?.tel;
+  const whatsappUrl = merchantTel
+    ? `https://wa.me/${merchantTel.replace(/\D/g, "")}`
+    : undefined;
+
+  const contactMerchant = () => {
+    if (whatsappUrl) {
+      window.open(whatsappUrl, "_blank");
+      return;
+    }
+
+    if (merchantEmail) {
+      window.location.href = `mailto:${merchantEmail}`;
+      return;
+    }
+
+    toast("Contact details are not available for this merchant.");
+  };
 
   return (
     <Card>
@@ -62,7 +85,7 @@ export default function PurchaseCard({ product }: PurchaseCardProps) {
               variant="ghost"
               size="icon"
               onClick={decrement}
-              disabled={quantity <= 1}
+              disabled={!canPurchase || quantity <= 1}
             >
               <Minus className="h-4 w-4" />
             </Button>
@@ -74,7 +97,7 @@ export default function PurchaseCard({ product }: PurchaseCardProps) {
               variant="ghost"
               size="icon"
               onClick={increment}
-              disabled={quantity >= product.stockQty}
+              disabled={!canPurchase || quantity >= product.stockQty}
             >
               <Plus className="h-4 w-4" />
             </Button>
@@ -89,14 +112,29 @@ export default function PurchaseCard({ product }: PurchaseCardProps) {
           </p>
         </div>
 
+        {!canPurchase ? (
+          <div className="rounded-lg border border-yellow-300 bg-yellow-50 p-4 text-sm text-yellow-900">
+            This merchant is not currently able to sell directly. Contact them
+            to place an order.
+          </div>
+        ) : null}
+
         <div className="grid gap-3">
-          <Button onClick={() => toast("Add to Cart coming soon.")}>
+          <Button
+            variant={canPurchase ? "secondary" : "default"}
+            onClick={() =>
+              canPurchase
+                ? toast("Add to Cart coming soon.")
+                : contactMerchant()
+            }
+          >
             <ShoppingCart className="mr-2 h-4 w-4" />
-            Add to Cart
+            {canPurchase ? "Add to Cart" : "Contact Merchant"}
           </Button>
 
           <Button
-            variant="secondary"
+            variant="default"
+            disabled={!canPurchase}
             onClick={() => toast("Checkout coming soon.")}
           >
             <CreditCard className="mr-2 h-4 w-4" />

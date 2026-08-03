@@ -12,43 +12,36 @@ import ProductMetadata from "./product-metadata";
 interface ProductViewProps {
   product: ProductWithRelations;
   merchantInfo?: boolean;
+  canPurchase?: boolean;
 }
 
 export default function ProductView({
   product,
   merchantInfo = false,
+  canPurchase = true,
 }: ProductViewProps) {
   const inventoryValue = Number(product.price) * product.stockQty;
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <ProductHeader product={product} merchantInfo={merchantInfo} />
+    <div className="grid gap-6 lg:grid-cols-3">
+      {/* Left */}
+      <div className="space-y-6">
+        <ProductImage product={product} />
+      </div>
 
-      {/* Main Content */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Left */}
-        <div className="space-y-6">
-          <ProductImage product={product} />
-        </div>
+      {/* Right */}
+      <div className="space-y-6 lg:col-span-2">
+        <ProductInformation product={product} />
 
-        {/* Right */}
-        <div className="space-y-6 lg:col-span-2">
-          <ProductInformation product={product} />
+        {merchantInfo ? (
+          <>
+            <InventoryStats product={product} inventoryValue={inventoryValue} />
 
-          {merchantInfo ? (
-            <>
-              <InventoryStats
-                product={product}
-                inventoryValue={inventoryValue}
-              />
-
-              <ProductMetadata product={product} />
-            </>
-          ) : (
-            <PurchaseCard product={product} />
-          )}
-        </div>
+            <ProductMetadata product={product} />
+          </>
+        ) : (
+          <PurchaseCard product={product} canPurchase={canPurchase} />
+        )}
       </div>
     </div>
   );

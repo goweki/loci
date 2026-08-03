@@ -3,7 +3,7 @@
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { getSubscriptionStatusByUserId } from "@/data/subscription";
+import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
 import { PhoneNumberStatus } from "@/lib/prisma/generated";
 import {
   createPhoneNumberAction,
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { phoneNumber, displayName, wabaId } = body;
 
-  const subscriptionStatus = await getSubscriptionStatusByUserId(
+  const subscriptionStatus = await getLociSubscriptionStatusByUserId(
     session.user.id,
   );
 

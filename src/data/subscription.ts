@@ -8,13 +8,20 @@ import { SubscriptionStatus, SubscriptionStatusEnum } from "@/types";
 /**
  * return full sunscription status info.
  */
-export async function getSubscriptionStatusByUserId(
+export async function getLociSubscriptionStatusByUserId(
   userId: string,
 ): Promise<SubscriptionStatus> {
   if (!userId) throw new Error("User ID is required");
 
   const subscriptions = await prisma.subscription.findMany({
-    where: { userId, product: { lociPlan: { isNot: null } } },
+    where: {
+      OR: [{ userId: userId }, { user: { username: userId } }],
+      product: {
+        lociPlan: {
+          isNot: null,
+        },
+      },
+    },
     include: subscriptionInclude,
   });
 
@@ -81,8 +88,22 @@ export async function getSubscriptionStatusByUserId(
 export async function isUserSubscribed(
   userId: string,
 ): Promise<SubscriptionStatusEnum> {
-  const subStatus = await getSubscriptionStatusByUserId(userId);
+  const subStatus = await getLociSubscriptionStatusByUserId(userId);
   return subStatus.status;
+}
+
+export async function canMerchantSell(subscriptionStatus: SubscriptionStatus) {
+  if (
+    subscriptionStatus.status !== SubscriptionStatusEnum.ACTIVE &&
+    subscriptionStatus.status !== SubscriptionStatusEnum.DUE
+  ) {
+    return false;
+  }
+
+  return (
+    subscriptionStatus.plan?.name === PlanName.STANDARD ||
+    subscriptionStatus.plan?.name === PlanName.PREMIUM
+  );
 }
 
 /**

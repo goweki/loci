@@ -2,7 +2,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { NextAuthOptions } from "next-auth";
 import { User, UserRole, UserStatus } from "@/lib/prisma/generated";
-import { getSubscriptionStatusByUserId } from "@/data/subscription";
+import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
 import { compareHash } from "../utils/passwordHandlers";
 import { SubscriptionStatusEnum } from "@/types";
 import prisma from "../prisma";
@@ -70,7 +70,7 @@ export const authOptions: NextAuthOptions = {
 
         if (!isPasswordValid) throw new Error("Invalid credentials");
 
-        const subscription = await getSubscriptionStatusByUserId(user.id);
+        const subscription = await getLociSubscriptionStatusByUserId(user.id);
 
         return {
           id: user.id,
@@ -145,7 +145,7 @@ export const authOptions: NextAuthOptions = {
         token.role = dbUser.role;
         token.picture = dbUser.image;
 
-        const subscription = await getSubscriptionStatusByUserId(dbUser.id);
+        const subscription = await getLociSubscriptionStatusByUserId(dbUser.id);
 
         token.subscriptionStatus = subscription.status;
         token.subscriptionPlan = subscription.plan;
@@ -163,7 +163,7 @@ export const authOptions: NextAuthOptions = {
 
       if (userId && elapsed > 24 * 60 * 60 * 1000) {
         try {
-          const subscription = await getSubscriptionStatusByUserId(userId);
+          const subscription = await getLociSubscriptionStatusByUserId(userId);
           token.subscriptionStatus = subscription.status;
           token.subscriptionPlan = subscription.plan;
         } catch (error) {
