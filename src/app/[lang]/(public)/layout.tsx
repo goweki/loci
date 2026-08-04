@@ -12,22 +12,19 @@ export default async function UnAuthLayout({
   params: Promise<{ lang: string }>;
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
-
   const { lang } = await params;
-  if (!isValidLanguage(lang)) {
-    redirect(`/en/dashboard`);
-  }
+  const session = await getServerSession(authOptions);
 
   if (session) {
     redirect(`/${lang}/dashboard`);
   }
 
+  if (!isValidLanguage(lang)) return null;
   const dict = await getDictionary(lang);
 
   const navigationLinks: RichNavMenuProps["navigation"] = [
-    { type: "link", href: "/", label: dict.navbar.home },
-    { type: "link", href: "/pricing", label: dict.navbar.pricing },
+    { type: "link", href: `/{lang}`, label: dict.navbar.home },
+    { type: "link", href: `/${lang}/pricing/`, label: dict.navbar.pricing },
   ];
 
   return (
