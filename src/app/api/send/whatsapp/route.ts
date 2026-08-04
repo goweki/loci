@@ -28,10 +28,8 @@ const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
     const userId = apiKey.user.id;
 
     console.log("New Message for sending...", message);
-
     await authorizeMessageSend(userId, message);
 
-    // Dispatch to Meta (External API)
     const waResponse = await whatsapp.sendMessage(message);
 
     if ("error" in waResponse) {

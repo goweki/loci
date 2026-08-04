@@ -14,13 +14,14 @@ export default async function UnAuthLayout({
 }) {
   const session = await getServerSession(authOptions);
 
-  if (session) {
-    redirect("/dashboard");
+  const { lang } = await params;
+  if (!isValidLanguage(lang)) {
+    redirect(`/en/dashboard`);
   }
 
-  const { lang } = await params;
-
-  if (!isValidLanguage(lang)) return null;
+  if (session) {
+    redirect(`/${lang}/dashboard`);
+  }
 
   const dict = await getDictionary(lang);
 
