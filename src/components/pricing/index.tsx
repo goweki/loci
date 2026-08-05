@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { PaymentCheckout } from "./payment-form";
 import { SubscriptionStatus, SubscriptionStatusEnum } from "@/types";
-import { getSubscriptionStatusByUserId } from "@/data/subscription";
+import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
 import SubscriptionInfoWrapper from "./subscription-info";
 
 interface PricingProps {
@@ -68,7 +68,7 @@ export default function PricingComponent({ t }: PricingProps) {
   const getSubscriptionStatus = useCallback(async () => {
     if (!session?.user.id) return;
 
-    const _subscriptionStatus = await getSubscriptionStatusByUserId(
+    const _subscriptionStatus = await getLociSubscriptionStatusByUserId(
       session.user.id,
     );
     setSubscriptionStatus(_subscriptionStatus);

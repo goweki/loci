@@ -1,5 +1,5 @@
 import { countMessagesThisMonthByUserId } from "@/data/message";
-import { getSubscriptionStatusByUserId } from "@/data/subscription";
+import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
 import { NextResponse } from "next/server";
 
 export async function checkMessageLimits(userId: string): Promise<{
@@ -8,7 +8,7 @@ export async function checkMessageLimits(userId: string): Promise<{
   limit?: number;
   used?: number;
 }> {
-  const subscriptionStatus = await getSubscriptionStatusByUserId(userId);
+  const subscriptionStatus = await getLociSubscriptionStatusByUserId(userId);
 
   let messageLimit: number = 0;
 

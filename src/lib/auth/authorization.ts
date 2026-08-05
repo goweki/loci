@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getSubscriptionStatusByUserId } from "@/data/subscription";
+import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
 import { checkMessageLimits } from "../usage/limits";
 import { validatePhoneNumberOwnershipAction } from "@/data/phoneNumber";
 import { SubscriptionStatusEnum } from "@/types";
@@ -18,7 +18,7 @@ export async function authorizeMessageSend(userId: string, message: Message) {
   }
 
   const [subscription, limits] = await Promise.all([
-    getSubscriptionStatusByUserId(userId),
+    getLociSubscriptionStatusByUserId(userId),
     checkMessageLimits(userId),
     message.phoneNumberId
       ? validatePhoneNumberOwnershipAction(message.phoneNumberId, userId)

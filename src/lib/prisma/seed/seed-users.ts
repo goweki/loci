@@ -1,4 +1,4 @@
-import { generateUniqueUsernameFromSeed } from "@/lib/utils/username";
+import { generateUniqueUsernameFromSeed } from "../../utils/username";
 import { PrismaClient, UserRole, UserStatus, TokenType } from "../generated";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";

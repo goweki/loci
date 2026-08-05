@@ -2,7 +2,7 @@ import { requireUser } from "@/lib/auth";
 import _prisma from "@/lib/prisma";
 import { Prisma, Product as Product_, UserRole } from "@/lib/prisma/generated";
 
-const productIncludeRelations: Prisma.ProductInclude = {
+const productIncludeRelations = {
   orderItems: true,
   user: {
     select: {
@@ -12,11 +12,16 @@ const productIncludeRelations: Prisma.ProductInclude = {
       tel: true,
     },
   },
-};
+} satisfies Prisma.ProductInclude;
 
-export type ProductWithRelations_ = Prisma.ProductGetPayload<{
-  include: typeof productIncludeRelations;
-}>;
+export type ProductWithRelations = Omit<
+  Prisma.ProductGetPayload<{
+    include: typeof productIncludeRelations;
+  }>,
+  "price"
+> & {
+  price: number;
+};
 
 export const prisma = _prisma.$extends({
   result: {
@@ -30,10 +35,6 @@ export const prisma = _prisma.$extends({
     },
   },
 });
-
-export type ProductWithRelations = Omit<ProductWithRelations_, "price"> & {
-  price: number;
-};
 
 type ProductGet = Omit<Prisma.ProductGetPayload<{}>, "price"> & {
   price: number;
@@ -59,6 +60,39 @@ export class ProductService {
     return new ProductService({
       userId: user.id,
       role: user.role as UserRole,
+    });
+  }
+
+  static async getPublicProductById(
+    productId: string,
+  ): Promise<ProductWithRelations | null> {
+    return prisma.product.findFirst({
+      where: {
+        id: productId,
+        isActive: true,
+        user: {
+          status: "ACTIVE",
+        },
+      },
+      include: productIncludeRelations,
+    });
+  }
+
+  static async getPublicProductsByUsername(
+    username: string,
+  ): Promise<ProductWithRelations[]> {
+    return prisma.product.findMany({
+      where: {
+        isActive: true,
+        user: {
+          username,
+          status: "ACTIVE",
+        },
+      },
+      include: productIncludeRelations,
+      orderBy: {
+        createdAt: "desc",
+      },
     });
   }
 

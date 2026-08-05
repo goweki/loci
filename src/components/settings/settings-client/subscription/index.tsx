@@ -15,7 +15,7 @@ import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import { SubscriptionStatus } from "@/types";
-import { getSubscriptionStatusByUserId } from "@/data/subscription";
+import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
 import Loader from "@/components/ui/loaders";
 import { getPaymentsByUserId } from "@/data/payment";
 import {
@@ -43,7 +43,8 @@ export default function TabSubscription() {
     if (!userId) return;
 
     const getSubStatus = async () => {
-      const _subscriptionStatus = await getSubscriptionStatusByUserId(userId);
+      const _subscriptionStatus =
+        await getLociSubscriptionStatusByUserId(userId);
       setSubscriptionStatus(_subscriptionStatus);
     };
     const getPayments = async () => {

@@ -84,6 +84,26 @@ export async function getProductById(
   }
 }
 
+export async function getPublicProductById(
+  productId: string,
+): Promise<ActionResult<ProductWithRelations>> {
+  try {
+    const product = await ProductService.getPublicProductById(productId);
+
+    if (!product) notFound();
+
+    return {
+      ok: true,
+      data: product,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      error: getFriendlyErrorMessage(error),
+    };
+  }
+}
+
 export async function getProductByPlanName(planName: PlanName): Promise<
   ActionResult<
     Omit<Prisma.ProductGetPayload<{}>, "price"> & {
