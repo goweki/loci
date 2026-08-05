@@ -23,7 +23,7 @@ export default async function UnAuthLayout({
   const dict = await getDictionary(lang);
 
   const navigationLinks: RichNavMenuProps["navigation"] = [
-    { type: "link", href: `/{lang}`, label: dict.navbar.home },
+    { type: "link", href: `/${lang}`, label: dict.navbar.home },
     { type: "link", href: `/${lang}/pricing/`, label: dict.navbar.pricing },
   ];
 
