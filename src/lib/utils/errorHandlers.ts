@@ -14,7 +14,7 @@ export function getFriendlyErrorMessage(error: any): string {
 
   // 2. LOG FOR DEVELOPER
   if (IS_DEV) {
-    console.error("--- DB ERROR DEBUG ---");
+    console.error("--- SERVER ERROR DEBUG ---");
     console.error(`Code: ${code}`);
     console.error(`Message:`, message);
     console.error("----------------------");
