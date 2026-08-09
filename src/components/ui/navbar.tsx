@@ -276,8 +276,8 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       logo = (
         <>
           <BrandSymbol height={24} />
-          <span className="hidden font-bold text-foreground text-xl md:inline-block">
-            Sync
+          <span className="hidden font-bold opacity-50 text-foreground text-xl md:inline-block">
+            loci
           </span>
         </>
       ),
