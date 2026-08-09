@@ -34,12 +34,6 @@ export default function SettingsNavbar() {
       href: `/${language}/settings`,
       label: t.settings,
     },
-    {
-      type: "link",
-      href: `/${language}/settings/templates`,
-      label: t.templates,
-    },
-    { type: "link", href: `/${language}/settings/billing`, label: t.billing },
   ];
 
   const logo = (

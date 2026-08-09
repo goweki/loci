@@ -7,14 +7,16 @@ import {
 } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
 import { Building2Icon, Phone } from "lucide-react";
-import { getStatusBadge } from "./utilities";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import WabaEmbeddedSignup from "@/components/ui/waba-embedded-signup";
-import { PhoneNumber, WabaAccount } from "@/lib/prisma/generated";
+import { PhoneNumber, WabaAccount, WabaTemplate } from "@/lib/prisma/generated";
+import { getStatusBadge } from "../utilities";
+import { TemplatesClient } from "./waba-templates";
 
 interface Waba extends WabaAccount {
   phoneNumbers: PhoneNumber[];
+  templates: WabaTemplate[];
 }
 
 export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
@@ -97,6 +99,17 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
           )}
         </CardContent>
       </Card>
+      {waba ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Whatsapp Templates</CardTitle>
+            <CardDescription>Manage your WhatsApp Templates</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <TemplatesClient wabaAccount={waba} />
+          </CardContent>
+        </Card>
+      ) : null}
     </>
   );
 }

@@ -21,42 +21,103 @@ import { PaymentCheckout } from "./payment-form";
 import { SubscriptionStatus, SubscriptionStatusEnum } from "@/types";
 import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
 import SubscriptionInfoWrapper from "./subscription-info";
+import PageTitle from "@/components/ui/page-title";
 
-interface PricingProps {
-  t: {
-    title: string;
-    subtitle: string;
-    popular: string;
-    cta: string;
-    plans: {
-      starter: { name: string; description: string };
-      standard: { name: string; description: string };
-      enterprise: { name: string; description: string };
-    };
+const translations = {
+  en: {
+    title: "Simple, Transparent Pricing",
+    subtitle: "Choose the perfect plan for your business needs.",
+    popular: "Most Popular",
+    unlimited: "Unlimited",
+    cta: "Get Started",
     billing: {
-      monthly: string;
-      annual: string;
-      saveUp: string;
-      month: string;
-      year: string;
-      save: string;
-    };
+      monthly: "Monthly",
+      annual: "Annual",
+      month: "month",
+      year: "year",
+      save: "Save",
+      saveUp: "Save up to 17%",
+    },
+    plans: {
+      starter: {
+        name: "Starter",
+        description:
+          "Perfect for small businesses just getting started with WhatsApp",
+      },
+      standard: {
+        name: "Standard",
+        description:
+          "Ideal for growing businesses with multiple customer touchpoints",
+      },
+      enterprise: {
+        name: "Enterprise",
+        description:
+          "Advanced features for large organizations with high volume needs",
+      },
+    },
     features: {
-      phoneNumbers: string;
-      messages: string;
-      basicTemplates: string;
-      emailSupport: string;
-      analytics: string;
-      automation: string;
-      prioritySupport: string;
-      customIntegrations: string;
-    };
-    footer: { text: string; contactLink: string };
-    unlimited: string;
-  };
-}
+      phoneNumbers: "Phone Numbers",
+      messages: "Messages per Month",
+      basicTemplates: "Message Templates",
+      emailSupport: "Email Support",
+      analytics: "Advanced Analytics",
+      automation: "Automation & Chatbots",
+      prioritySupport: "Priority Support",
+      customIntegrations: "Custom API Integrations",
+    },
+    footer: {
+      text: "Need a custom plan for your organization?",
+      contactLink: "Contact our sales team",
+    },
+  },
+  sw: {
+    title: "Bei Rahisi na Wazi",
+    subtitle: "Chagua mpango kamili kwa mahitaji ya biashara yako.",
+    popular: "Inayopendelewa",
+    unlimited: "Bila Kikomo",
+    cta: "Anza Sasa",
+    billing: {
+      monthly: "Kila Mwezi",
+      annual: "Kila Mwaka",
+      month: "mwezi",
+      year: "mwaka",
+      save: "Okoa",
+      saveUp: "Okoa hadi 17%",
+    },
+    plans: {
+      starter: {
+        name: "Mwanzo",
+        description: "Kamili kwa biashara ndogo zinazoanza na WhatsApp",
+      },
+      standard: {
+        name: "Wastani",
+        description:
+          "Bora kwa biashara zinazokua na mahali pa kuwasiliana na wateja wengi",
+      },
+      enterprise: {
+        name: "Makampuni",
+        description:
+          "Vipengele vya juu kwa mashirika makubwa yenye mahitaji ya kiasi kikubwa",
+      },
+    },
+    features: {
+      phoneNumbers: "Namba za Simu",
+      messages: "Ujumbe Kwa Mwezi",
+      basicTemplates: "Violezo vya Ujumbe",
+      emailSupport: "Msaada wa Barua Pepe",
+      analytics: "Takwimu za Hali ya Juu",
+      automation: "Otomatiki na Chatbots",
+      prioritySupport: "Msaada wa Kipaumbele",
+      customIntegrations: "Uunganisho wa API Maalum",
+    },
+    footer: {
+      text: "Unahitaji mpango maalum kwa shirika lako?",
+      contactLink: "Wasiliana na timu yetu ya mauzo",
+    },
+  },
+};
 
-export default function PricingComponent({ t }: PricingProps) {
+export default function PricingComponent() {
   const { language } = useI18n();
   const [billingInterval, setBillingInterval] = useState("monthly");
   const [plans, setPlans] = useState<PlanBasePayload[]>();
@@ -64,6 +125,8 @@ export default function PricingComponent({ t }: PricingProps) {
   const user = session?.user;
   const [subscriptionStatus, setSubscriptionStatus] =
     useState<SubscriptionStatus>();
+
+  const t = translations[language];
 
   const getSubscriptionStatus = useCallback(async () => {
     if (!session?.user.id) return;
@@ -110,159 +173,162 @@ export default function PricingComponent({ t }: PricingProps) {
   return !plans ? (
     <Loader />
   ) : (
-    <div className="flex flex-col">
-      {!subscriptionStatus ? null : <SubscriptionInfoWrapper />}
+    <div className="max-w-7xl mx-auto space-y-6 py-6">
+      <PageTitle title={t.title} subtitle={t.subtitle} />
 
-      {/* Billing interval toggle */}
-      <div className="flex justify-center pb-12">
-        <div className="inline-flex items-center bg-muted rounded-lg p-1">
-          <button
-            className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
-              billingInterval === "monthly"
-                ? "bg-background shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setBillingInterval("monthly")}
-          >
-            {t.billing.monthly}
-          </button>
-          <button
-            className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
-              billingInterval === "annual"
-                ? "bg-background shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setBillingInterval("annual")}
-          >
-            {t.billing.annual}
-            <span className="ml-2 text-xs text-primary font-semibold">
-              {t.billing.saveUp}
-            </span>
-          </button>
+      <div className="flex flex-col">
+        {!subscriptionStatus ? null : <SubscriptionInfoWrapper />}
+
+        {/* Billing interval toggle */}
+        <div className="flex justify-center pb-12">
+          <div className="inline-flex items-center bg-muted rounded-lg p-1">
+            <button
+              className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+                billingInterval === "monthly"
+                  ? "bg-background shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => setBillingInterval("monthly")}
+            >
+              {t.billing.monthly}
+            </button>
+            <button
+              className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+                billingInterval === "annual"
+                  ? "bg-background shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => setBillingInterval("annual")}
+            >
+              {t.billing.annual}
+              <span className="ml-2 text-xs text-primary font-semibold">
+                {t.billing.saveUp}
+              </span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Pricing cards */}
-      <div className="grid gap-8 lg:grid-cols-3 max-w-6xl mx-auto">
-        {plans.map((plan) => (
-          <Card
-            key={plan.id}
-            className={`relative flex flex-col ${
-              plan.popular
-                ? "border-primary shadow-lg scale-105"
-                : "border-border"
-            }`}
-          >
-            {plan.popular && (
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
-                  {t.popular}
-                </span>
-              </div>
-            )}
-
-            <CardHeader className="text-center pb-8 pt-8">
-              <CardTitle className="text-2xl font-bold mb-2 text-primary">
-                {plan.name}
-              </CardTitle>
-              <CardDescription className="text-muted-foreground">
-                {plan.description}
-              </CardDescription>
-
-              <div className="mt-6">
-                <div className="flex items-baseline justify-center">
-                  <span className="text-5xl lg:text-3xl font-bold underline">
-                    {formatPrice(getPrice(plan))}
-                  </span>
-                  <span className="text-muted-foreground ml-2">
-                    /
-                    {billingInterval === "monthly"
-                      ? t.billing.month
-                      : t.billing.year}
+        {/* Pricing cards */}
+        <div className="grid gap-8 lg:grid-cols-3 max-w-6xl mx-auto">
+          {plans.map((plan) => (
+            <Card
+              key={plan.id}
+              className={`relative flex flex-col ${
+                plan.popular
+                  ? "border-primary shadow-lg scale-105"
+                  : "border-border"
+              }`}
+            >
+              {plan.popular && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
+                    {t.popular}
                   </span>
                 </div>
-                {billingInterval === "annual" && (
-                  <p className="text-sm text-primary mt-2">
-                    {t.billing.save} {getSavings(plan)}%
-                  </p>
-                )}
-              </div>
-            </CardHeader>
+              )}
 
-            {!subscriptionStatus ? null : !user ||
-              subscriptionStatus.status ===
-                SubscriptionStatusEnum.ACTIVE ? null : (
-              <div className="mb-4 flex justify-center px-4">
-                <PaymentCheckout
-                  _email={user.email || undefined}
-                  amount={getPrice(plan)}
-                  planName={plan.name}
-                  billingInterval={billingInterval}
-                  userId={user.id}
-                />
-              </div>
-            )}
+              <CardHeader className="text-center pb-8 pt-8">
+                <CardTitle className="text-2xl font-bold mb-2 text-primary">
+                  {plan.name}
+                </CardTitle>
+                <CardDescription className="text-muted-foreground">
+                  {plan.description}
+                </CardDescription>
 
-            <CardContent className="flex-grow">
-              <ul className="space-y-3 w-fit m-auto">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-start">
-                    <span
-                      className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mr-3 mt-0.5 ${
-                        feature.enabled ? "bg-primary/10" : "bg-muted"
-                      }`}
-                    >
-                      {feature.enabled ? (
-                        <Check className="w-3 h-3 text-primary" />
-                      ) : (
-                        <X className="w-3 h-3 text-muted-foreground" />
-                      )}
+                <div className="mt-6">
+                  <div className="flex items-baseline justify-center">
+                    <span className="text-5xl lg:text-3xl font-bold underline">
+                      {formatPrice(getPrice(plan))}
                     </span>
-
-                    <span
-                      className={
-                        feature.enabled
-                          ? "text-foreground"
-                          : "text-muted-foreground line-through"
-                      }
-                    >
-                      {feature.feature.name ? (
-                        <>
-                          <span className="font-semibold">
-                            {feature.limitUse}
-                          </span>{" "}
-                          {feature.feature.name}
-                        </>
-                      ) : (
-                        feature.feature.name
-                      )}
+                    <span className="text-muted-foreground ml-2">
+                      /
+                      {billingInterval === "monthly"
+                        ? t.billing.month
+                        : t.billing.year}
                     </span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-
-            {!user ? (
-              <CardFooter className="pt-6">
-                <Link
-                  href={`/${language}/sign-up`}
-                  className={cn(
-                    "w-full",
-                    buttonVariants({
-                      variant: plan.popular ? "default" : "outline",
-                    }),
+                  </div>
+                  {billingInterval === "annual" && (
+                    <p className="text-sm text-primary mt-2">
+                      {t.billing.save} {getSavings(plan)}%
+                    </p>
                   )}
-                >
-                  {t.cta}
-                </Link>
-              </CardFooter>
-            ) : null}
-          </Card>
-        ))}
-      </div>
+                </div>
+              </CardHeader>
 
-      {/* FAQ or additional info */}
-      {/* <div className="max-w-3xl mx-auto text-center mt-16">
+              {!subscriptionStatus ? null : !user ||
+                subscriptionStatus.status ===
+                  SubscriptionStatusEnum.ACTIVE ? null : (
+                <div className="mb-4 flex justify-center px-4">
+                  <PaymentCheckout
+                    _email={user.email || undefined}
+                    amount={getPrice(plan)}
+                    planName={plan.name}
+                    billingInterval={billingInterval}
+                    userId={user.id}
+                  />
+                </div>
+              )}
+
+              <CardContent className="flex-grow">
+                <ul className="space-y-3 w-fit m-auto">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-start">
+                      <span
+                        className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mr-3 mt-0.5 ${
+                          feature.enabled ? "bg-primary/10" : "bg-muted"
+                        }`}
+                      >
+                        {feature.enabled ? (
+                          <Check className="w-3 h-3 text-primary" />
+                        ) : (
+                          <X className="w-3 h-3 text-muted-foreground" />
+                        )}
+                      </span>
+
+                      <span
+                        className={
+                          feature.enabled
+                            ? "text-foreground"
+                            : "text-muted-foreground line-through"
+                        }
+                      >
+                        {feature.feature.name ? (
+                          <>
+                            <span className="font-semibold">
+                              {feature.limitUse}
+                            </span>{" "}
+                            {feature.feature.name}
+                          </>
+                        ) : (
+                          feature.feature.name
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+
+              {!user ? (
+                <CardFooter className="pt-6">
+                  <Link
+                    href={`/${language}/sign-up`}
+                    className={cn(
+                      "w-full",
+                      buttonVariants({
+                        variant: plan.popular ? "default" : "outline",
+                      }),
+                    )}
+                  >
+                    {t.cta}
+                  </Link>
+                </CardFooter>
+              ) : null}
+            </Card>
+          ))}
+        </div>
+
+        {/* FAQ or additional info */}
+        {/* <div className="max-w-3xl mx-auto text-center mt-16">
         <p className="text-muted-foreground">
           {t.footer.text}{" "}
           <a href="#contact" className="text-primary hover:underline">
@@ -270,6 +336,7 @@ export default function PricingComponent({ t }: PricingProps) {
           </a>
         </p>
       </div> */}
+      </div>
     </div>
   );
 }
