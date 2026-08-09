@@ -1,28 +1,28 @@
 import { EditIcon, PlusIcon, RefreshCwIcon, Trash2Icon } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { TabsContent } from "../ui/tabs";
+} from "@/components/ui/card";
+import { TabsContent } from "@/components/ui/tabs";
 import { AutoReplyRule } from "@/lib/prisma/generated";
 import { useCallback, useEffect, useState } from "react";
 import { getAllAutoReplyRules } from "@/data/autoReplyRule";
-import Loader from "../ui/loaders";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
+import Loader from "@/components/ui/loaders";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { Textarea } from "../ui/textarea";
-import { Badge } from "../ui/badge";
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 
 export default function TabAutoreplyRules() {
   const [autoReplyRules, setAutoReplyRules] = useState<AutoReplyRule[]>();

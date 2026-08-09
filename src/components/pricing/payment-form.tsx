@@ -7,15 +7,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { initializePayment } from "@/lib/payments";
 import { createPayment } from "@/data/payment";
 import { createLociSubscription } from "@/data/subscription";
 import { Currency, PaymentMethod, PlanName } from "@/lib/prisma/generated";
-import Loader from "../ui/loaders";
+import Loader from "@/components/ui/loaders";
 import toast from "react-hot-toast";
 import { createOrderAction } from "@/actions/order.actions";
 import { getProductByPlanName } from "@/actions/product.actions";
