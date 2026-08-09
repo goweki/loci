@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "@/components/settings/navbar";
+import Navbar from "@/components/manager/navbar";
 import { isValidLanguage, Language } from "@/lib/i18n";
 
 export default async function ManagerLayout({

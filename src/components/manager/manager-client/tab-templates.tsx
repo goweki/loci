@@ -9,21 +9,21 @@ import {
   Trash2Icon,
   XCircleIcon,
 } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { TabsContent } from "../ui/tabs";
-import { Input } from "../ui/input";
-import { Badge } from "../ui/badge";
+} from "@/components/ui/card";
+import { TabsContent } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { JSX, useCallback, useEffect, useState } from "react";
 import { TemplateApprovalStatus, WabaTemplate } from "@/lib/prisma/generated";
 import { findWabaTemplatesAction, synchronizeMeta } from "./actions";
-import Loader from "../ui/loaders";
+import Loader from "@/components/ui/loaders";
 
 const getStatusBadge = (status: TemplateApprovalStatus) => {
   const variants: Record<

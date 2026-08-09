@@ -1,19 +1,18 @@
 import { SettingsIcon } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { TabsContent } from "../ui/tabs";
+} from "@/components/ui/card";
+import { TabsContent } from "@/components/ui/tabs";
 import { useCallback, useEffect, useState } from "react";
 import { _getUserById, synchronizeMeta } from "./actions";
-import Loader from "../ui/loaders";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { Alert, AlertDescription } from "../ui/alert";
+import Loader from "@/components/ui/loaders";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useSession } from "next-auth/react";
 import { getUserByIdAction } from "@/actions/user.actions";
 import { userInclude, type UserWithRelations } from "@/services/user/user.dto";

@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { submitContactForm } from "../forms/contact-us/actions";
 import toast from "react-hot-toast";
-import Loader from "../ui/loaders";
+import Loader from "@/components/ui/loaders";
 
 export default function ComingSoon({
   launchDateString,

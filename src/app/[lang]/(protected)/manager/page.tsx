@@ -1,4 +1,4 @@
-import ManagerComponent from "@/components/manager";
+import ManagerComponent from "@/components/manager/manager-client";
 import PageTitle from "@/components/ui/page-title";
 import { authOptions } from "@/lib/auth";
 import { isValidLanguage } from "@/lib/i18n";
