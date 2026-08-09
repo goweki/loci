@@ -30,6 +30,8 @@ import { dateShort } from "@/lib/utils/dateHandlers";
 import { useSession } from "next-auth/react";
 import SubscriptionInfo from "./subscription-info";
 import BillingInfo from "./billing-info";
+import PricingComponent from "@/components/pricing";
+import PageTitle from "@/components/ui/page-title";
 
 export default function TabSubscription() {
   const { language } = useI18n();
@@ -85,12 +87,8 @@ export default function TabSubscription() {
                   Choose a plan to access paid features
                 </p>
               </div>
-              <Link
-                href={`/${language}/settings/billing`}
-                className={buttonVariants({ variant: "default" })}
-              >
-                View Plans
-              </Link>
+
+              <PricingComponent pageTitle={false} />
             </div>
           )}
         </CardContent>

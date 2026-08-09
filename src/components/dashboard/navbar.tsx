@@ -1,13 +1,3 @@
-// "use client";
-
-// import { useI18n } from "@/lib/i18n";
-// import { Navbar as DefaultNavbar, NavbarNavLink } from "../ui/navbar";
-
-// export default function DashboardNavbar() {
-
-//   return <DefaultNavbar navigationLinks={navigationLinks} authenticated />;
-// }
-
 "use client";
 
 import { Navbar } from "@/components/ui/navbar";
@@ -66,12 +56,6 @@ const translations = {
     },
   },
 };
-
-//   const navigationLinks: NavbarNavLink[] = [
-//     { href: `/${language}/dashboard`, label: t.dashboard },
-//     { href: `/${language}/dashboard/conversations`,  },
-//     { href: `/${language}/dashboard/contacts`, label: t.contacts },
-//   ];
 
 export default function DashboardNavbar({
   user,
