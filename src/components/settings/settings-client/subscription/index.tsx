@@ -88,7 +88,7 @@ export default function TabSubscription() {
                 </p>
               </div>
 
-              <PricingComponent />
+              <PricingComponent pageTitle={false} />
             </div>
           )}
         </CardContent>

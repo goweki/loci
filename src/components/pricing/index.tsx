@@ -117,7 +117,8 @@ const translations = {
   },
 };
 
-export default function PricingComponent() {
+export default function PricingComponent(props: { pageTitle?: boolean }) {
+  const { pageTitle = true } = props;
   const { language } = useI18n();
   const [billingInterval, setBillingInterval] = useState("monthly");
   const [plans, setPlans] = useState<PlanBasePayload[]>();
@@ -174,7 +175,7 @@ export default function PricingComponent() {
     <Loader />
   ) : (
     <div className="max-w-7xl mx-auto space-y-6 py-6">
-      <PageTitle title={t.title} subtitle={t.subtitle} />
+      {pageTitle && <PageTitle title={t.title} subtitle={t.subtitle} />}
 
       <div className="flex flex-col">
         {!subscriptionStatus ? null : <SubscriptionInfoWrapper />}
