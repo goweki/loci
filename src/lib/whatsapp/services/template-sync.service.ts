@@ -2,293 +2,283 @@
 
 import "server-only";
 
+import prisma from "@/lib/prisma";
 import {
-  WabaTemplateFilters,
-  WabaTemplateRepository,
-} from "@/data/repositories/waba-template";
-
-import {
-  WabaTemplate,
+  PhoneNumberStatus,
+  Prisma,
   TemplateApprovalStatus,
   TemplateCategory,
   TemplateLanguage,
-  WabaOwnership,
   WabaAccount,
-  Prisma,
-  PhoneNumberStatus,
+  WabaOwnership,
+  WabaTemplate,
 } from "@/lib/prisma/generated";
-import type { WhatsAppClient } from "./client";
-import { getAdminUsers } from "@/data/user";
-import prisma from "@/lib/prisma";
 import { WabaService } from "@/services/waba/waba.service";
 import { User } from "next-auth";
+import type { WhatsAppClient } from "./client";
 
 /**
- * Service that syncs templates between Meta's API and our database
- * Combines WabaApiService (external API) with WabaTemplateRepository (database)
+ * Service that syncs templates and assets between Meta's API and our database
  */
 export class MetaSyncService {
   constructor(private WaClient: WhatsAppClient) {}
 
   /**
-   * Sync all templates from Meta to local database
-   * This will fetch templates from Meta and update/create them in the database
+   * Sync all templates and assets from Meta to the local database
    */
   async syncFromMeta(user?: User): Promise<{
     created: number;
     updated: number;
     errors: string[];
   }> {
-    console.log("Syncronizing meta assets...");
+    console.log("Synchronizing Meta assets...");
     const result = {
       created: 0,
       updated: 0,
       errors: [] as string[],
     };
 
-    //sync owned waba
-
+    // -----------------------------------------------------
+    // 1. SYNC WABA ACCOUNT
+    // -----------------------------------------------------
     const ownedWabaInCloud = await this.WaClient.getWaba();
     const wabaService = await WabaService.create(user);
+
     let ownedWabaInDb: Awaited<
       ReturnType<typeof wabaService.getWabaAccountById>
     > | null = null;
+
     try {
       ownedWabaInDb = await wabaService.getWabaAccountById(ownedWabaInCloud.id);
     } catch {
-      console.warn("No waba found in db");
+      console.warn("No WABA found in DB for Cloud ID:", ownedWabaInCloud.id);
     }
-
-    const adminUsers = await getAdminUsers();
 
     try {
       if (!ownedWabaInDb) {
-        console.log(`waba id-${ownedWabaInCloud.id} not found in db`);
+        console.log(
+          `WABA ID ${ownedWabaInCloud.id} not found in DB. Resolving admin fallback...`,
+        );
 
-        const adminId = adminUsers[0].id;
-        console.log(` >> assigning to admin id-${adminId}`);
+        // Get fallback admin if no user is assigned
+        const adminUser = await prisma.user.findFirst({
+          where: { role: "ADMIN" },
+          select: { id: true },
+        });
+
+        if (!adminUser) {
+          throw new Error(
+            "No admin user found in database to assign WABA ownership.",
+          );
+        }
 
         const appendedWaba: Prisma.WabaAccountUncheckedCreateInput = {
           id: ownedWabaInCloud.id,
           name: ownedWabaInCloud.name,
-          userId: adminId,
+          userId: adminUser.id,
           ownership: WabaOwnership.OWNED,
           timezoneId: ownedWabaInCloud.timezone_id,
           messageTemplateNamespace: ownedWabaInCloud.message_template_namespace,
         };
-        const ownedWabaInDb = await wabaService.createWabaAccount(appendedWaba);
+
+        // Reassign to outer scope variable so Phone Number sync can access it
+        ownedWabaInDb = await wabaService.createWabaAccount(appendedWaba);
         result.created++;
 
-        console.log(` >> saved waba:`, ownedWabaInDb);
+        console.log(` >> Created WABA Account:`, ownedWabaInDb.id);
       } else {
-        const adminId = ownedWabaInDb.userId ?? adminUsers[0].id;
+        const adminUser = await prisma.user.findFirst({
+          where: { role: "ADMIN" },
+          select: { id: true },
+        });
 
-        const appendedWaba: Partial<WabaAccount> = {
+        const adminId = ownedWabaInDb.userId ?? adminUser?.id;
+
+        const appendedWaba: Prisma.WabaAccountUpdateInput = {
           name: ownedWabaInCloud.name,
-          userId: adminId,
           ownership: WabaOwnership.OWNED,
           timezoneId: ownedWabaInCloud.timezone_id,
           messageTemplateNamespace: ownedWabaInCloud.message_template_namespace,
+          ...(adminId ? { user: { connect: { id: adminId } } } : {}),
         };
 
-        const updatedWaba = await wabaService.updateWabaAccount(
+        ownedWabaInDb = await wabaService.updateWabaAccount(
           ownedWabaInDb.id,
           appendedWaba,
         );
         result.updated++;
 
-        console.log(`. >> updated waba:`, updatedWaba);
+        console.log(` >> Updated WABA Account:`, ownedWabaInDb.id);
       }
     } catch (error) {
       result.errors.push(
-        ` >> Failed to update Waba Account ${ownedWabaInCloud.name}: ${
+        `Failed to update WABA Account ${ownedWabaInCloud.name}: ${
           error instanceof Error ? error.message : "Unknown error"
         }`,
       );
     }
-    // // sync shared wabas
-    // const clientUsers = await getAllUsers();
-    // const sharedWabas = clientUsers
-    //   .filter(({ waba }) => waba?.id)
-    //   .map(({ waba }) => waba);
 
-    // for (const waba of sharedWabas) {
-    //   try {
-    //     if (!waba) continue;
-    //     const sharedWabaInDb = await getWabaAccountById(waba.id);
-    //     if (!sharedWabaInDb) {
-    //       const appendedWaba: Prisma.WabaAccountUncheckedCreateInput = {
-    //         id: ownedWabaInCloud.id,
-    //         name: ownedWabaInCloud.name,
-    //         ownership: WabaOwnership.OWNED,
-    //         timezoneId: ownedWabaInCloud.timezone_id,
-    //         messageTemplateNamespace:
-    //           ownedWabaInCloud.message_template_namespace,
-    //       };
-    //       createWabaAccount(appendedWaba);
-    //       result.created++;
-    //     } else {
-    //       const appendedWaba: Partial<WabaAccount> = {
-    //         name: ownedWabaInCloud.name,
-    //         ownership: WabaOwnership.OWNED,
-    //         timezoneId: ownedWabaInCloud.timezone_id,
-    //         messageTemplateNamespace:
-    //           ownedWabaInCloud.message_template_namespace,
-    //       };
-
-    //       updateWabaAccount(sharedWabaInDb.id, appendedWaba);
-    //       result.updated++;
-    //     }
-    //   } catch (error) {
-    //     result.errors.push(
-    //       `Failed to update Waba Account ${waba?.name}: ${error instanceof Error ? error.message : "Unknown error"}`
-    //     );
-    //   }
-    // }
-
-    // sync phone numbers
-    const ownedWabaPhoneNumbersInCloud = (await this.WaClient.getPhoneNumbers())
-      .data;
-    // const ownedWabaPhoneNumbersInDb = await getAllPhoneNumbers();
-
+    // -----------------------------------------------------
+    // 2. SYNC PHONE NUMBERS
+    // -----------------------------------------------------
+    let ownedWabaPhoneNumbersInCloud: any[] = [];
     try {
+      const response = await this.WaClient.getPhoneNumbers();
+      ownedWabaPhoneNumbersInCloud = response?.data || [];
+
       if (!ownedWabaInDb) {
-        throw new Error("no waba account saved in db, skipping saving numbers");
+        throw new Error(
+          "No WABA account available in DB. Skipping phone numbers sync.",
+        );
       }
 
-      if (ownedWabaPhoneNumbersInCloud.length == 0) {
-        console.log(`no owned phone numbers found in cloud`);
-        throw new Error(`no owned phone numbers found in cloud`);
-      }
-
-      const wabaId = ownedWabaInDb.id;
-      console.log(`saving phone numbers for waba id-${wabaId}`);
-
-      const appendedPhoneNumbers: Prisma.PhoneNumberUncheckedCreateInput[] =
-        ownedWabaPhoneNumbersInCloud.map(
-          ({ verified_name, display_phone_number, id }) => ({
-            id,
-            phoneNumber: display_phone_number,
-            displayName: verified_name,
-            wabaId,
-            status: PhoneNumberStatus.VERIFIED,
-          }),
+      if (ownedWabaPhoneNumbersInCloud.length === 0) {
+        console.log(`No owned phone numbers found in Meta Cloud.`);
+      } else {
+        const wabaId = ownedWabaInDb.id;
+        console.log(
+          `Saving ${ownedWabaPhoneNumbersInCloud.length} phone numbers for WABA ID: ${wabaId}`,
         );
 
-      for (const phoneNo of appendedPhoneNumbers) {
-        await prisma.phoneNumber.upsert({
-          where: { id: phoneNo.id },
-          update: {
-            phoneNumber: phoneNo.phoneNumber,
-            displayName: phoneNo.displayName,
-            status: phoneNo.status,
+        const phoneNumberOperations = ownedWabaPhoneNumbersInCloud.map(
+          (phone) => {
+            return prisma.phoneNumber.upsert({
+              where: { id: phone.id },
+              update: {
+                phoneNumber: phone.display_phone_number,
+                displayName: phone.verified_name,
+                status: PhoneNumberStatus.VERIFIED,
+                wabaId,
+              },
+              create: {
+                id: phone.id,
+                phoneNumber: phone.display_phone_number,
+                displayName: phone.verified_name,
+                wabaId,
+                status: PhoneNumberStatus.VERIFIED,
+              },
+            });
           },
-          create: phoneNo,
-        });
-      }
-      result.created++;
+        );
 
-      console.log(`saved phone numbers:`, appendedPhoneNumbers);
+        await prisma.$transaction(phoneNumberOperations);
+        result.created += ownedWabaPhoneNumbersInCloud.length;
+        console.log(`Successfully synced phone numbers for WABA: ${wabaId}`);
+      }
     } catch (error) {
       result.errors.push(
-        `Failed to update owned Phone numbers ${JSON.stringify(ownedWabaPhoneNumbersInCloud)}: ${
+        `Failed to sync phone numbers: ${
           error instanceof Error ? error.message : "Unknown error"
         }`,
       );
     }
 
-    // sync templates
-    const localWabas = await wabaService.getAllWabaAccounts();
-    const templatesCreationArray: (Prisma.WabaTemplateUncheckedCreateInput & {
-      id: string;
-    })[] = [];
+    // -----------------------------------------------------
+    // 3. SYNC TEMPLATES
+    // -----------------------------------------------------
+    try {
+      const localWabas = await wabaService.getAllWabaAccounts();
+      const templatesToSync: (Prisma.WabaTemplateUncheckedCreateInput & {
+        id: string;
+      })[] = [];
 
-    for (const waba of localWabas) {
-      const remoteTemplates = await this.WaClient.getTemplates(waba.id);
-      if (remoteTemplates.length > 0) {
-        const appendedTemplates: (Prisma.WabaTemplateUncheckedCreateInput & {
-          id: string;
-        })[] = remoteTemplates.map(
-          ({ id, name, language, category, status, components }) => ({
-            id,
-            name,
-            wabaId: waba.id,
-            status: status as TemplateApprovalStatus,
-            category: category as TemplateCategory,
-            language: language as TemplateLanguage,
-            components,
-          }),
-        );
-        templatesCreationArray.push(...appendedTemplates);
-      }
-    }
+      for (const waba of localWabas) {
+        const remoteTemplates = await this.WaClient.getTemplates(waba.id);
 
-    for (const template of templatesCreationArray) {
-      try {
-        const existingTemplate = await WabaTemplateRepository.findById(
-          template.id,
-        );
-        if (existingTemplate) {
-          // Update existing template
-          await WabaTemplateRepository.update(existingTemplate.id, {
-            status: template.status as TemplateApprovalStatus,
-            components: template.components || undefined,
-            rejectedReason:
-              template.status == TemplateApprovalStatus.REJECTED
-                ? "template rejected - shrug"
-                : null,
-            language: template.language as TemplateLanguage,
-            category: template.category,
-          });
-          result.updated++;
-        } else {
-          // Create new template
-          await WabaTemplateRepository.create(template);
-          result.created++;
+        if (remoteTemplates && remoteTemplates.length > 0) {
+          const formatted = remoteTemplates.map(
+            ({ id, name, language, category, status, components }) => ({
+              id,
+              name,
+              wabaId: waba.id,
+              status: status as TemplateApprovalStatus,
+              category: category as TemplateCategory,
+              language: language as TemplateLanguage,
+              components: components as Prisma.InputJsonValue,
+            }),
+          );
+          templatesToSync.push(...formatted);
         }
-      } catch (error) {
-        result.errors.push(
-          `Failed to sync template ${template.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
+      }
+
+      if (templatesToSync.length > 0) {
+        const templateOperations = templatesToSync.map((template) => {
+          const rejectedReason =
+            template.status === TemplateApprovalStatus.REJECTED
+              ? "Rejected by Meta"
+              : null;
+
+          return prisma.wabaTemplate.upsert({
+            where: { id: template.id },
+            update: {
+              status: template.status,
+              category: template.category,
+              language: template.language,
+              components: template.components,
+              rejectedReason,
+            },
+            create: {
+              id: template.id,
+              name: template.name,
+              wabaId: template.wabaId,
+              status: template.status,
+              category: template.category,
+              language: template.language,
+              components: template.components,
+              rejectedReason,
+            },
+          });
+        });
+
+        const syncedTemplates = await prisma.$transaction(templateOperations);
+        result.updated += syncedTemplates.length;
+        console.log(
+          `Successfully batch-synced ${syncedTemplates.length} templates.`,
         );
       }
+    } catch (error) {
+      result.errors.push(
+        `Failed during template batch sync: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+      );
     }
 
     return result;
   }
 
   /**
-   * Update template status from Meta (useful for checking approval status)
+   * Refresh template approval status directly from Meta
    */
   async refreshTemplateStatus(templateId: string): Promise<WabaTemplate> {
-    // Get template from database
-    const template = await WabaTemplateRepository.findById(templateId);
+    const template = await prisma.wabaTemplate.findUnique({
+      where: { id: templateId },
+    });
 
     if (!template) {
-      throw new Error("Template not found or access denied");
+      throw new Error("Template not found in local database.");
     }
 
-    // Fetch latest status from Meta
     const metaTemplate = await this.WaClient.getTemplateByName(template.name);
 
     if (!metaTemplate) {
-      throw new Error("Template not found in Meta");
+      throw new Error(`Template "${template.name}" not found in Meta Cloud.`);
     }
 
-    // Update database with latest status
-    const updated = await WabaTemplateRepository.update(templateId, {
-      status: metaTemplate.status as TemplateApprovalStatus,
-      rejectedReason:
-        metaTemplate.status == TemplateApprovalStatus.REJECTED
-          ? "template rejected - shrug"
-          : null,
+    return prisma.wabaTemplate.update({
+      where: { id: templateId },
+      data: {
+        status: metaTemplate.status as TemplateApprovalStatus,
+        rejectedReason:
+          metaTemplate.status === TemplateApprovalStatus.REJECTED
+            ? "Rejected by Meta"
+            : null,
+      },
     });
-
-    return updated;
   }
 
   /**
-   * Compare local templates with Meta templates
-   * Returns templates that are out of sync
+   * Compare local templates against Meta Cloud templates
    */
   async compareWithMeta(): Promise<{
     inSync: string[];
@@ -297,7 +287,7 @@ export class MetaSyncService {
     onlyInMeta: string[];
   }> {
     const [localTemplates, metaTemplates] = await Promise.all([
-      WabaTemplateRepository.findMany(),
+      prisma.wabaTemplate.findMany(),
       this.WaClient.getTemplates(),
     ]);
 
@@ -319,6 +309,7 @@ export class MetaSyncService {
       const metaTemplate = metaTemplates.find(
         (t) => t.name === localTemplate.name,
       );
+
       if (metaTemplate) {
         if (localTemplate.status === metaTemplate.status) {
           inSync.push(localTemplate.name);

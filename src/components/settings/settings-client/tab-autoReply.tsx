@@ -10,7 +10,6 @@ import {
 import { TabsContent } from "@/components/ui/tabs";
 import { AutoReplyRule } from "@/lib/prisma/generated";
 import { useCallback, useEffect, useState } from "react";
-import { getAllAutoReplyRules } from "@/data/autoReplyRule";
 import Loader from "@/components/ui/loaders";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -24,6 +23,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { NewAutoReplyRuleDialogue } from "./forms";
+import { getAllAutoReplyRules } from "@/actions/autoReplyRule.actions";
 
 export default function TabAutoreplyRules() {
   const [autoReplyRules, setAutoReplyRules] = useState<AutoReplyRule[]>();

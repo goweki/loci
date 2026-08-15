@@ -11,10 +11,8 @@ import { Payment } from "@/lib/prisma/generated";
 import { CreditCardIcon } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
-import { SubscriptionStatus } from "@/types";
-import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
+import { SubscriptionStatusCheck } from "@/types";
 import Loader from "@/components/ui/loaders";
-import { getPaymentsByUserId } from "@/data/payment";
 import {
   Table,
   TableBody,
@@ -28,32 +26,18 @@ import { useSession } from "next-auth/react";
 import SubscriptionInfo from "../settings/settings-client/subscription/subscription-info";
 import BillingInfo from "../settings/settings-client/subscription/billing-info";
 
-export default function SubscriptionInfoWrapper() {
+export default function SubscriptionInfoWrapper({
+  subscriptionStatusCheck,
+}: {
+  subscriptionStatusCheck: SubscriptionStatusCheck;
+}) {
   const { language } = useI18n();
-  const [subscriptionStatus, setSubscriptionStatus] =
-    useState<SubscriptionStatus>();
-  const [payments, setPayments] = useState<Payment[]>();
   const { data: session } = useSession();
-  const userId = session?.user.id;
+  const subscription = subscriptionStatusCheck.subscription;
 
-  useEffect(() => {
-    if (!userId) return;
-
-    const getSubStatus = async () => {
-      const _subscriptionStatus =
-        await getLociSubscriptionStatusByUserId(userId);
-      setSubscriptionStatus(_subscriptionStatus);
-    };
-    const getPayments = async () => {
-      const _payments = await getPaymentsByUserId(userId);
-      setPayments(_payments);
-    };
-
-    getSubStatus();
-    getPayments();
-  }, [userId]);
-
-  return subscriptionStatus?.plan || (payments && payments?.length > 0) ? (
+  return subscription &&
+    subscription.payments &&
+    subscription.payments.length > 0 ? (
     <div className="space-y-6 my-12">
       <Card>
         <CardHeader>
@@ -61,15 +45,15 @@ export default function SubscriptionInfoWrapper() {
           <CardDescription>Your subscriptions</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {!subscriptionStatus ? (
-            <Loader />
-          ) : subscriptionStatus?.plan ? (
+          {subscription?.plan ? (
             <>
-              <SubscriptionInfo subscriptionStatus={subscriptionStatus} />
+              <SubscriptionInfo
+                subscriptionStatusCheck={subscriptionStatusCheck}
+              />
 
               <Separator />
 
-              <BillingInfo subscriptionStatus={subscriptionStatus} />
+              <BillingInfo subscriptionStatusCheck={subscriptionStatusCheck} />
             </>
           ) : (
             <div className="text-center py-12 space-y-4">
@@ -95,9 +79,7 @@ export default function SubscriptionInfoWrapper() {
           </div>
         </CardHeader>
         <CardContent>
-          {!payments ? (
-            <Loader />
-          ) : payments.length === 0 ? (
+          {subscription.payments.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               No payment history available
             </div>
@@ -113,7 +95,7 @@ export default function SubscriptionInfoWrapper() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {payments.map((payment) => (
+                {subscription.payments.map((payment) => (
                   <TableRow key={payment.id}>
                     <TableCell className="font-mono text-xs">
                       {payment.transactionId}

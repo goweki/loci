@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { tokenRepository } from "@/data/repositories/token.repository";
 import z from "zod";
-import { compareHash } from "@/lib/utils/passwordHandlers";
+import { bcryptCompare } from "@/lib/utils/passwordHandlers";
 import { addToDate } from "@/lib/utils/dateHandlers";
-import { excludeFields } from "@/lib/utils/dataHandlers";
 import { UserService } from "@/services/user/user.service";
-import { generateUserApiKey } from "@/actions/api-key";
+import { generateUserApiKey } from "@/actions/api-key.actions";
 
 const LoginSchema = z.object({
   username: z.string().min(6),
@@ -54,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify Password
-    const isPasswordValid = await compareHash(password, user.password);
+    const isPasswordValid = await bcryptCompare(password, user.password);
     if (!isPasswordValid) {
       return NextResponse.json(
         { error: "Invalid email or password" },

@@ -1,6 +1,11 @@
 import { requireUser } from "@/lib/auth";
 import _prisma from "@/lib/prisma";
-import { Prisma, Product as Product_, UserRole } from "@/lib/prisma/generated";
+import {
+  Prisma,
+  Product as Product_,
+  SubscriptionStatus,
+  UserRole,
+} from "@/lib/prisma/generated";
 
 const productIncludeRelations = {
   orderItems: true,
@@ -10,6 +15,17 @@ const productIncludeRelations = {
       username: true,
       email: true,
       tel: true,
+      subscriptions: {
+        where: {
+          status: {
+            in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.INCOMPLETE],
+          },
+        },
+        select: {
+          status: true,
+          plan: true,
+        },
+      },
     },
   },
 } satisfies Prisma.ProductInclude;

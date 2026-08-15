@@ -18,6 +18,12 @@ enum CommunicationChannel {
   EMAIL
 }
 
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
 model User {
   id            String     @id @default(cuid())
   name          String?
@@ -39,7 +45,6 @@ model User {
 
   waba WabaAccount?
 
-  accounts        Account[]
   contacts        Contact[]
   messages        Message[]
   subscriptions   Subscription[]
@@ -79,6 +84,103 @@ model Token {
   @@unique([type, userId])
   @@index([type, hashedToken])
   @@map("auth_tokens")
+}
+
+enum PlanName {
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
+enum PlanInterval {
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  INCOMPLETE // Created but payment pending
+  ACTIVE // Active and paid
+  PAST_DUE // Payment failed on renewal
+  CANCELED // Canceled, but retains access until period ends
+  EXPIRED // Period ended without renewal
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum PaymentMethod {
+  PAYSTACK
+  MPESA
+  CARD
+  BANK
+}
+
+model Plan {
+  id                  String         @id @default(cuid())
+  name                PlanName       @unique
+  description         String?
+  monthlyPrice        Int
+  maxPhoneNumbers     Int
+  maxMessagesPerMonth Int
+  active              Boolean        @default(true)
+  popular             Boolean        @default(false)
+  subscriptions       Subscription[]
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  planFeatures PlanFeature[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  planId String
+  plan   Plan   @relation(fields: [planId], references: [id])
+
+  status   SubscriptionStatus @default(INCOMPLETE)
+  interval PlanInterval       @default(MONTHLY)
+
+  // Explicit tracking dates
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean   @default(false)
+  canceledAt         DateTime?
+
+  payments SubscriptionPayment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@map("subscriptions")
+}
+
+model SubscriptionPayment {
+  id            String        @id @default(cuid())
+  transactionId String        @unique
+  paymentMethod PaymentMethod
+
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  amount   Decimal       @db.Decimal(10, 2)
+  currency Currency      @default(KES)
+  status   PaymentStatus @default(PENDING)
+
+  paidAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("subscription_payments")
 }
 
 enum WabaOwnership {
@@ -156,25 +258,6 @@ enum NotificationChannel {
   SMS
 }
 
-model Subscription {
-  id String @id @default(cuid())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  cancelDate DateTime?
-  startDate  DateTime?
-
-  @@unique([userId, productId])
-  @@index([userId])
-  @@map("subscriptions")
-}
-
 model Payment {
   id            String        @id @default(cuid())
   transactionId String        @unique
@@ -198,27 +281,6 @@ model Payment {
 enum Currency {
   KES
   USD
-}
-
-model Plan {
-  id      String  @id @default(cuid())
-  product Product @relation(fields: [id], references: [id])
-
-  name PlanName @unique
-
-  description         String?
-  price               Int
-  popular             Boolean      @default(false)
-  interval            PlanInterval
-  maxPhoneNumbers     Int
-  maxMessagesPerMonth Int
-  active              Boolean      @default(true)
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
-
-  features PlanFeature[]
-
-  @@map("plans")
 }
 
 model Feature {
@@ -342,7 +404,6 @@ model AutoReplyRule {
   priority      Int         @default(0)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-  active        Boolean     @default(true)
   phoneNumber   PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
 
   createdById String
@@ -361,54 +422,11 @@ model WebhookEvent {
   @@map("webhook_events")
 }
 
-model Account {
-  id                String      @id @default(cuid())
-  userId            String
-  type              AccountType
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@map("accounts")
-}
-
 enum TriggerType {
   KEYWORD
   MESSAGE_TYPE
   TIME_BASED
   DEFAULT
-}
-
-enum PlanName {
-  BASIC
-  STANDARD
-  PREMIUM
-}
-
-enum UserStatus {
-  ACTIVE
-  SUSPENDED
-  INACTIVE
-}
-
-enum AccountType {
-  oauth
-  oidc
-  email
-  credentials
-}
-
-enum PlanInterval {
-  MONTHLY
-  YEARLY
 }
 
 enum PhoneNumberStatus {
@@ -442,15 +460,6 @@ enum MessageStatus {
   FAILED
 }
 
-enum PaymentMethod {
-  PAYSTACK
-  MPESA
-  CARD
-  BANK
-  CASH
-  WHATSAPP
-}
-
 // ecommerce
 
 model Product {
@@ -463,8 +472,8 @@ model Product {
   description String?
   sku         String?
 
-  price    Decimal @db.Decimal(10, 2)
-  currency String  @default("KES")
+  price    Decimal  @db.Decimal(10, 2)
+  currency Currency @default(KES)
 
   stockQty Int @default(0)
 
@@ -475,10 +484,9 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  lociPlan Plan?
+  orderItems OrderItem[]
 
-  orderItems    OrderItem[]
-  subscriptions Subscription[]
+  @@map("products")
 }
 
 model Order {
@@ -491,7 +499,7 @@ model Order {
   contact   Contact? @relation(fields: [contactId], references: [id])
 
   status      OrderStatus @default(PENDING)
-  currency    String      @default("KES")
+  currency    Currency    @default(KES)
   notes       String?
   paymentLink String?
 
@@ -504,6 +512,8 @@ model Order {
   items    OrderItem[]
   payments Payment[]
   messages Message[]
+
+  @@map("orders")
 }
 
 model OrderItem {
@@ -522,6 +532,10 @@ model OrderItem {
   unitPrice Decimal @db.Decimal(10, 2)
 
   total Decimal @db.Decimal(10, 2)
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
 }
 
 enum OrderStatus {
@@ -530,12 +544,6 @@ enum OrderStatus {
   PARTIALLY_PAID
   PAID
   CANCELLED
-}
-
-enum PaymentStatus {
-  PENDING
-  SUCCESS
-  FAILED
 }
 
 enum InvoiceStatus {
@@ -558,7 +566,7 @@ model Invoice {
 
   invoiceNumber String @unique
 
-  currency String @default("KES")
+  currency Currency @default(KES)
 
   subtotal   Decimal @db.Decimal(10, 2)
   tax        Decimal @db.Decimal(10, 2)
@@ -579,6 +587,7 @@ model Invoice {
   @@index([userId, status])
   @@index([invoiceNumber])
   @@index([dueDate])
+  @@map("invoices")
 }
 
 // AI chatbot configs
@@ -674,6 +683,7 @@ model ContactUs {
   @@index([email])
   @@index([status])
   @@index([createdAt])
+  @@map("contact_us")
 }
 
 enum ContactStatus {

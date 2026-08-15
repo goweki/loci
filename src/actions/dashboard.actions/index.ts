@@ -1,7 +1,12 @@
+"use server";
+
+import { requireUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { OrderStatus } from "@/lib/prisma/generated";
 
-export async function getDashboardStatsSummary(userId: string) {
+export async function getDashboardStatsSummary() {
+  const actor = await requireUser();
+  const userId = actor.id;
   const [
     totalContacts,
     totalProducts,

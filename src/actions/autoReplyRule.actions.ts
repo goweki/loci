@@ -2,33 +2,17 @@
 
 import { Prisma, TriggerType, AutoReplyRule } from "@/lib/prisma/generated";
 import prisma from "@/lib/prisma";
+import { AutoReplyService } from "@/services/autoReply/autoreply.service";
 
 /**
  * Get all auto-reply rules
  * Optional filters: phoneNumberId, createdById, activeOnly
  */
-export async function getAllAutoReplyRules(input?: {
-  phoneNumberId?: string;
-  createdById?: string;
-  activeOnly?: boolean;
-}): Promise<Prisma.AutoReplyRuleGetPayload<{}>[]> {
-  return prisma.autoReplyRule.findMany({
-    where: {
-      phoneNumberId: input?.phoneNumberId,
-      createdById: input?.createdById,
-      ...(input?.activeOnly
-        ? {
-            active: true,
-            isActive: true,
-          }
-        : {}),
-    },
-    orderBy: [
-      { phoneNumberId: "asc" },
-      { priority: "asc" },
-      { createdAt: "desc" },
-    ],
-  });
+export async function getAllAutoReplyRules(): Promise<
+  Prisma.AutoReplyRuleGetPayload<{}>[]
+> {
+  const autorepService = await AutoReplyService.create();
+  return autorepService.getAllAutoReplyRules();
 }
 
 /**
@@ -63,7 +47,7 @@ export async function createAutoReplyRule(input: {
  * Get all active rules for a phone number (ordered by priority)
  */
 export async function getAutoReplyRulesByPhoneNumber(
-  phoneNumberId: string
+  phoneNumberId: string,
 ): Promise<Prisma.AutoReplyRuleGetPayload<{}>[]> {
   return prisma.autoReplyRule.findMany({
     where: {
@@ -81,7 +65,7 @@ export async function getAutoReplyRulesByPhoneNumber(
  * Get a single rule by ID
  */
 export async function getAutoReplyRuleById(
-  ruleId: string
+  ruleId: string,
 ): Promise<Prisma.AutoReplyRuleGetPayload<{}> | null> {
   return prisma.autoReplyRule.findUnique({
     where: { id: ruleId },
@@ -100,7 +84,7 @@ export async function updateAutoReplyRule(
     replyMessage: string;
     priority: number;
     isActive: boolean;
-  }>
+  }>,
 ): Promise<Prisma.AutoReplyRuleGetPayload<{}>> {
   return prisma.autoReplyRule.update({
     where: { id: ruleId },
@@ -112,7 +96,7 @@ export async function updateAutoReplyRule(
  * Soft-disable a rule (recommended over delete)
  */
 export async function deactivateAutoReplyRule(
-  ruleId: string
+  ruleId: string,
 ): Promise<Prisma.AutoReplyRuleGetPayload<{}>> {
   return prisma.autoReplyRule.update({
     where: { id: ruleId },

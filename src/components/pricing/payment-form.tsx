@@ -12,13 +12,18 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { initializePayment } from "@/lib/payments";
-import { createPayment } from "@/data/payment";
-import { createLociSubscription } from "@/data/subscription";
-import { Currency, PaymentMethod, PlanName } from "@/lib/prisma/generated";
+import {
+  Currency,
+  PaymentMethod,
+  PlanInterval,
+  PlanName,
+} from "@/lib/prisma/generated";
 import Loader from "@/components/ui/loaders";
 import toast from "react-hot-toast";
 import { createOrderAction } from "@/actions/order.actions";
-import { getProductByPlanName } from "@/actions/product.actions";
+import { getPlanByName } from "@/actions/product.actions";
+import { createPaymentAction } from "@/actions/payment.actions";
+import { createSubscription } from "@/actions/subscription.actions";
 
 export function PaymentCheckout({
   _email,
@@ -30,7 +35,7 @@ export function PaymentCheckout({
   _email?: string;
   amount: number;
   planName: PlanName;
-  billingInterval: string;
+  billingInterval: PlanInterval;
   userId: string;
 }) {
   const packag = `${planName}_${billingInterval}`;
@@ -48,17 +53,20 @@ export function PaymentCheckout({
 
     try {
       // 1️⃣ Create subscription
-      const subscription = await createLociSubscription(
+      const subscription = await createSubscription({
         userId,
-        planName as PlanName,
-      );
+        planName: planName as PlanName,
+        interval: billingInterval,
+        paymentMethod: PaymentMethod.PAYSTACK,
+        amount,
+      });
 
       // 2️⃣ Create payment record in DB
       const reference = `${packag}_${userId}_${Date.now()}`;
-      const productRes = await getProductByPlanName(planName);
+      const planRes = await getPlanByName(planName);
 
-      if (!productRes.ok) {
-        throw new Error(`Plan product does not exist: ${planName}`);
+      if (!planRes.ok) {
+        throw new Error(`Plan does not exist: ${planName}`);
       }
 
       const orderRes = await createOrderAction({
@@ -66,7 +74,7 @@ export function PaymentCheckout({
         notes: "LOCi subscription",
         items: [
           {
-            productId: productRes.data.id,
+            productId: planRes.data.id,
             quantity: 1,
           },
         ],
@@ -76,7 +84,7 @@ export function PaymentCheckout({
         throw new Error(`Order creation for plan failed: ${planName}`);
       }
 
-      await createPayment({
+      await createPaymentAction({
         reference,
         orderId: orderRes.data.id,
         amount,

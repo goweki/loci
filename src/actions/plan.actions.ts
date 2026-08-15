@@ -5,7 +5,7 @@ import { PlanName, Prisma } from "@/lib/prisma/generated";
 
 export type PlanBasePayload = Prisma.PlanGetPayload<{
   include: {
-    features: { include: { feature: true } };
+    planFeatures: { include: { feature: true } };
   };
 }>;
 
@@ -27,7 +27,7 @@ export async function createPlan(data: Prisma.PlanCreateInput) {
   return prisma.plan.create({
     data,
     include: {
-      features: {
+      planFeatures: {
         include: { feature: true },
       },
     },
@@ -38,12 +38,12 @@ export async function createPlan(data: Prisma.PlanCreateInput) {
  * Get a plan by ID.
  */
 export async function getPlanById(
-  id: PlanName
+  id: PlanName,
 ): Promise<PlanBasePayload | null> {
   return prisma.plan.findUnique({
     where: { id },
     include: {
-      features: {
+      planFeatures: {
         include: { feature: true },
       },
     },
@@ -56,9 +56,9 @@ export async function getPlanById(
 export async function getAllActivePlans(): Promise<PlanBasePayload[]> {
   return prisma.plan.findMany({
     where: { active: true },
-    orderBy: { price: "asc" },
+    orderBy: { monthlyPrice: "asc" },
     include: {
-      features: {
+      planFeatures: {
         include: { feature: true },
       },
     },
@@ -73,7 +73,7 @@ export async function updatePlan(id: PlanName, data: Prisma.PlanUpdateInput) {
     where: { id },
     data,
     include: {
-      features: {
+      planFeatures: {
         include: { feature: true },
       },
     },
@@ -105,7 +105,7 @@ export async function getPlanByName(name: string) {
   return prisma.plan.findFirst({
     where: { name: name as any, active: true },
     include: {
-      features: { include: { feature: true } },
+      planFeatures: { include: { feature: true } },
     },
   });
 }
@@ -145,7 +145,7 @@ export async function getFeatureById(id: string) {
  */
 export async function updateFeature(
   id: string,
-  data: Prisma.FeatureUpdateInput
+  data: Prisma.FeatureUpdateInput,
 ) {
   return prisma.feature.update({
     where: { id },
@@ -175,7 +175,7 @@ export async function addFeatureToPlan(
     enabled?: boolean;
     limitUse?: number;
     configValue?: string;
-  }
+  },
 ) {
   return prisma.planFeature.create({
     data: {
@@ -194,7 +194,7 @@ export async function addFeatureToPlan(
  */
 export async function removeFeatureFromPlan(
   planId: PlanName,
-  featureId: string
+  featureId: string,
 ) {
   return prisma.planFeature.delete({
     where: { planId_featureId: { planId, featureId } },
@@ -217,7 +217,7 @@ export async function getFeaturesForPlan(planId: PlanName) {
 export async function togglePlanFeature(
   planId: PlanName,
   featureId: string,
-  enabled: boolean
+  enabled: boolean,
 ) {
   return prisma.planFeature.update({
     where: { planId_featureId: { planId, featureId } },
@@ -231,7 +231,7 @@ export async function togglePlanFeature(
 export async function updatePlanFeature(
   planId: PlanName,
   featureId: string,
-  data: Prisma.PlanFeatureUpdateInput
+  data: Prisma.PlanFeatureUpdateInput,
 ) {
   return prisma.planFeature.update({
     where: { planId_featureId: { planId, featureId } },
@@ -250,7 +250,7 @@ export async function getPlanDetails(planId: PlanName) {
   return prisma.plan.findUnique({
     where: { id: planId },
     include: {
-      features: {
+      planFeatures: {
         include: { feature: true },
       },
     },

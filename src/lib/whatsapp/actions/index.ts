@@ -10,12 +10,11 @@ import {
   Prisma,
   PhoneNumber,
   PhoneNumberStatus,
+  UserRole,
 } from "@/lib/prisma/generated";
 import { InboundMessage, WabaPhoneNumberDetailsResponse } from "../types";
 import { Message } from "../../validations";
-import { getAdminUsers, getUserByPhoneNumberId } from "@/data/user";
 import whatsapp from "../";
-import { findContactByPhoneNumber } from "@/data/contact";
 import {
   GetTokenUsingWabaAuthCodeResult,
   PreVerifiedNumberResponse,
@@ -26,7 +25,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth";
 import { env_ } from "../types/environment-variables";
 import { UserService } from "@/services/user/user.service";
-import { createPhoneNumberAction } from "@/data/phoneNumber";
+import { findContactByPhoneNumber } from "@/actions/contact";
+import { createPhoneNumberAction } from "@/actions/phoneNumber.actions";
 
 const BASE_URL = `https://graph.facebook.com/${env_.apiVersion}`;
 
@@ -71,7 +71,12 @@ export async function processIncomingMessage(
       return;
     }
 
-    let user = await getUserByPhoneNumberId(phoneNumberId);
+    const phoneNoWithUser = await prisma.phoneNumber.findUnique({
+      where: { id: phoneNumberId },
+      include: { waba: { include: { user: { include: { waba: true } } } } },
+    });
+    let user = phoneNoWithUser?.waba?.user;
+
     if (!user) {
       console.warn(
         `No user assigned the phoneNumberId:${phoneNumberId}, assigning it to admin...`,
@@ -79,7 +84,11 @@ export async function processIncomingMessage(
 
       const phoneNumberDetails: WabaPhoneNumberDetailsResponse =
         await whatsapp.getPhoneNumberDetails(phoneNumberId);
-      user = (await getAdminUsers())[0];
+      user = await prisma.user.findFirstOrThrow({
+        where: { role: UserRole.ADMIN },
+        include: { waba: true },
+      });
+
       if (!user.waba)
         throw new Error(
           `No waba account found to save phone number - ${phoneNumberDetails.verified_name}`,

@@ -1,6 +1,8 @@
-import { countMessagesThisMonthByUserId } from "@/data/message";
-import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
+import { countMessagesThisMonthByUserId } from "@/actions/message.actions";
+import { getUserSubscription } from "@/actions/subscription.actions";
+import { SubscriptionService } from "@/services/subscription/subscription.service";
 import { NextResponse } from "next/server";
+import { SubscriptionStatus } from "../prisma/generated";
 
 export async function checkMessageLimits(userId: string): Promise<{
   allowed: boolean;
@@ -8,12 +10,13 @@ export async function checkMessageLimits(userId: string): Promise<{
   limit?: number;
   used?: number;
 }> {
-  const subscriptionStatus = await getLociSubscriptionStatusByUserId(userId);
+  const subscriptionStatus =
+    await SubscriptionService.getSubscriptionByUserId(userId);
 
   let messageLimit: number = 0;
 
-  if (!subscriptionStatus.plan) {
-    if (subscriptionStatus.status === "TRIALING") {
+  if (!subscriptionStatus.subscription) {
+    if (subscriptionStatus.status === SubscriptionStatus.INCOMPLETE) {
       messageLimit = 10;
     } else {
       return {
@@ -25,7 +28,7 @@ export async function checkMessageLimits(userId: string): Promise<{
       };
     }
   } else {
-    messageLimit = subscriptionStatus.plan.maxMessagesPerMonth;
+    messageLimit = subscriptionStatus.subscription.plan.maxMessagesPerMonth;
   }
 
   const sentMessages = await countMessagesThisMonthByUserId(userId);

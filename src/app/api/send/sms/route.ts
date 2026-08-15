@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createMessage, getMessagesByUserId } from "@/data/message";
 import {
   apiKeyMiddleware,
   type AuthenticatedHandler,
@@ -7,10 +6,11 @@ import {
 import { MessageStatus, MessageType } from "@/lib/prisma/generated";
 import z from "zod";
 import sendSms, { getDefaultSmsPhoneNumberId } from "@/lib/sms";
-import { findOrCreateContact } from "@/data/contact";
 import { removePlus } from "@/lib/utils/telHandlers";
 import { authorizeMessageSend } from "@/lib/auth/authorization";
 import { Message } from "@/lib/validations";
+import { findOrCreateContact } from "@/actions/contact";
+import { createMessage, getMessagesByUserId } from "@/actions/message.actions";
 
 const SmsSchema = z.object({
   to: z.union([z.string(), z.array(z.string())]),

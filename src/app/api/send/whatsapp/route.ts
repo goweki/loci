@@ -5,12 +5,12 @@ import {
   apiKeyMiddleware,
   type AuthenticatedHandler,
 } from "@/lib/auth/token-handlers";
-import { findOrCreateContact } from "@/data/contact";
-import { createMessage, getMessagesByUserId } from "@/data/message";
 import { MessageType } from "@/lib/prisma/generated";
 import z from "zod";
 import { authorizeMessageSend } from "@/lib/auth/authorization";
 import { removePlus } from "@/lib/utils/telHandlers";
+import { findOrCreateContact } from "@/actions/contact";
+import { createMessage, getMessagesByUserId } from "@/actions/message.actions";
 
 const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
   try {

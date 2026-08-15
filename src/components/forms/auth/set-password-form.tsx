@@ -96,7 +96,13 @@ export default function SetPasswordForm({
       console.log("Submitting");
       setIsUpdating(true);
       try {
-        const res_ = await setNewPassword(values);
+        const setNewPassDTO = {
+          username: values.username,
+          token: values.token,
+          password: values.password,
+        };
+
+        const res_ = await setNewPassword(setNewPassDTO);
         if (res_.ok) {
           toast.success("Successfully set password");
           return router.push(`/${language}/sign-in`);

@@ -1,26 +1,23 @@
-import { Plan } from "@/lib/prisma/generated";
+import { Prisma, SubscriptionStatus } from "@/lib/prisma/generated";
 
 // ============================================
 // shared ACTION RESULT type
 // ============================================
 
 export type ActionResult<T = void> =
-  | { ok: true; data: T }
-  | { ok: false; error: string };
+  { ok: true; data: T } | { ok: false; error: string };
 
 // ============================================
 // SUBSCRIPTION type
 // ============================================
 
-export enum SubscriptionStatusEnum {
-  ACTIVE = "ACTIVE",
-  DUE = "DUE",
-  TRIALING = "TRIALING",
-  INACTIVE = "INACTIVE",
-}
-
-export interface SubscriptionStatus {
-  status: SubscriptionStatusEnum;
-  plan?: Plan;
-  expiresAt?: Date | null; // optional — useful for UI
+export interface SubscriptionStatusCheck {
+  hasAccess: boolean;
+  status: SubscriptionStatus;
+  subscription?: Prisma.SubscriptionGetPayload<{
+    include: {
+      plan: true;
+      payments: true; // Note: Use SubscriptionPayment if using the separated model
+    };
+  }>;
 }

@@ -1,8 +1,6 @@
 "use server";
 
-import { tokenRepository } from "@/data/repositories/token.repository";
-import { registerUser, updateUserPassword } from "@/data/user";
-import { hashToken } from "@/lib/auth/token-handlers";
+import prisma from "@/lib/prisma";
 import {
   MessageType,
   NotificationChannel,
@@ -13,35 +11,16 @@ import {
 import sendSms from "@/lib/sms";
 import { addToDate } from "@/lib/utils/dateHandlers";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
-import { BASE_URL } from "@/lib/utils/getUrl";
-import { generateRandom } from "@/lib/utils/passwordHandlers";
-import { buildResetUrlTail, generateResetToken } from "@/lib/utils/resetToken";
+import {
+  bcryptHash,
+  generateRandom,
+  hashSha256,
+} from "@/lib/utils/passwordHandlers";
 import { generateUniqueUsernameFromSeed } from "@/lib/utils/username";
 import whatsapp from "@/lib/whatsapp";
 import { UserService } from "@/services/user/user.service";
 import { ActionResult } from "@/types";
-
-/**
- * sends link to reset password.
- */
-export async function sendResetLink(data: {
-  username: string;
-  sendTo?: NotificationChannel;
-}): Promise<
-  ActionResult<{
-    username: string;
-    sentTo: NotificationChannel;
-  }>
-> {
-  try {
-    const resSend = await UserService.sendResetLink(data);
-
-    return { ok: true, data: resSend };
-  } catch (error) {
-    const errorMessage = getFriendlyErrorMessage(error);
-    return { ok: false, error: errorMessage };
-  }
-}
+import { SendOtpProps } from "./user.actions.dto";
 
 // ======================================================
 // USER ACTIONS
@@ -52,6 +31,33 @@ export async function getAdminUserAction(): Promise<
 > {
   try {
     const user = await UserService.getAdminUser();
+
+    return {
+      ok: true,
+      data: user,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      error: getFriendlyErrorMessage(error),
+    };
+  }
+}
+
+export async function getUserByIdAction<
+  T extends Prisma.UserInclude | undefined = undefined,
+>(
+  userId: string,
+  include?: T,
+): Promise<
+  ActionResult<
+    Prisma.UserGetPayload<T extends Prisma.UserInclude ? { include: T } : {}>
+  >
+> {
+  try {
+    const service = await UserService.create();
+
+    const user = await service.getUserById(userId, include);
 
     return {
       ok: true,
@@ -113,33 +119,6 @@ export async function getUsersAction(params?: {
   }
 }
 
-export async function getUserByIdAction<
-  T extends Prisma.UserInclude | undefined = undefined,
->(
-  userId: string,
-  include?: T,
-): Promise<
-  ActionResult<
-    Prisma.UserGetPayload<T extends Prisma.UserInclude ? { include: T } : {}>
-  >
-> {
-  try {
-    const service = await UserService.create();
-
-    const user = await service.getUserById(userId, include);
-
-    return {
-      ok: true,
-      data: user,
-    };
-  } catch (error) {
-    return {
-      ok: false,
-      error: getFriendlyErrorMessage(error),
-    };
-  }
-}
-
 export async function getUserStatsAction(): Promise<
   ActionResult<Awaited<ReturnType<UserService["getUserStats"]>>>
 > {
@@ -171,11 +150,11 @@ export async function sendResetLinkAction(params: {
   ActionResult<Awaited<ReturnType<typeof UserService.sendResetLink>>>
 > {
   try {
-    const result = await UserService.sendResetLink(params);
+    const res = await UserService.sendResetLink(params);
 
     return {
       ok: true,
-      data: result,
+      data: res,
     };
   } catch (error) {
     return {
@@ -254,11 +233,14 @@ export async function signUpUser(props: SignUpProps): Promise<
       ...props,
       username: await generateUniqueUsernameFromSeed(props.name),
     };
-    const signupRes = await registerUser(userDto);
 
-    let message = "Verification sent";
+    const newUser = await prisma.user.create({ data: userDto });
 
-    switch (signupRes.verificationMethod) {
+    const resLinkSent = await UserService.sendWelcomeLink(newUser);
+
+    let message = "";
+
+    switch (resLinkSent.sentTo) {
       case NotificationChannel.EMAIL:
         message = `Verification link sent to Email: ${props.email}`;
         break;
@@ -277,7 +259,7 @@ export async function signUpUser(props: SignUpProps): Promise<
 
       data: {
         message,
-        verificationMethod: signupRes.verificationMethod,
+        verificationMethod: resLinkSent.sentTo,
       },
     };
   } catch (error) {
@@ -330,9 +312,36 @@ export async function setNewPassword(
       };
     }
 
-    await updateUserPassword(user.id, {
-      password,
+    console.log(
+      `[TOKEN VALIDATED]: ${tokenValidation.message} - user-${user.username}`,
+    );
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: await bcryptHash(password),
+        ...(tokenValidation.verifiedChannel === NotificationChannel.EMAIL
+          ? {
+              emailVerified: new Date(),
+            }
+          : tokenValidation.verifiedChannel === NotificationChannel.WHATSAPP ||
+              tokenValidation.verifiedChannel === NotificationChannel.SMS
+            ? { telVerified: new Date() }
+            : {}),
+      },
     });
+
+    await prisma.token.update({
+      where: { type_userId: { userId: user.id, type: TokenType.RESET } },
+      data: { isActive: false },
+    });
+
+    if (!tokenValidation.verifiedChannel) {
+      return {
+        ok: false,
+        error: tokenValidation.message,
+      };
+    }
 
     return {
       ok: true,
@@ -354,11 +363,6 @@ export async function setNewPassword(
 // SEND OTP
 // ======================================================
 
-interface SendOtpProps {
-  notificationChannel: NotificationChannel;
-  contact: string;
-}
-
 export async function sendOtp(
   props: SendOtpProps,
 ): Promise<ActionResult<{ sent: boolean }>> {
@@ -374,16 +378,20 @@ export async function sendOtp(
       };
     }
 
-    const otpCode = await generateRandom(6);
+    const otpCode = generateRandom(6);
 
-    const hashedToken = hashToken(otpCode);
+    const hashedToken = hashSha256(otpCode);
 
-    await tokenRepository.upsertToken({
-      hashedToken,
-      type: TokenType.SIGN_IN,
-      expiresAt: addToDate({ hours: 1 }),
-      userId: user.id,
-      description: `OTCode-sent-to-${user.id}`,
+    await prisma.token.upsert({
+      where: { type_userId: { type: TokenType.SIGN_IN, userId: user.id } },
+      create: {
+        hashedToken,
+        type: TokenType.SIGN_IN,
+        expiresAt: addToDate({ hours: 1 }),
+        userId: user.id,
+        description: `OTCode-sent-to-${user.id}`,
+      },
+      update: {},
     });
 
     console.log(`New OTCode generated for user-${user.id}`);
@@ -460,154 +468,3 @@ export async function sendOtp(
     };
   }
 }
-
-// ///
-// ///
-
-// "use server";
-
-// import { tokenRepository } from "@/data/repositories/token.repository";
-// import { registerUser, updateUserPassword } from "@/data/user";
-
-// import { hashToken } from "@/lib/auth/token-handlers";
-
-// import prisma from "@/lib/prisma";
-
-// import { NotificationChannel, TokenType } from "@/lib/prisma/generated";
-
-// import sendSms from "@/lib/sms";
-
-// import { addToDate } from "@/lib/utils/dateHandlers";
-// import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
-// import { generateRandom } from "@/lib/utils/passwordHandlers";
-
-// import whatsapp from "@/lib/whatsapp";
-
-// import { UserService } from "@/services/user/user.service";
-// import { ActionResult } from "@/types";
-
-// // ======================================================
-// // VERIFY OTP
-// // ======================================================
-
-// interface VerifyOtpProps {
-//   userId: string;
-//   otpVal: string;
-// }
-
-// export async function verifyAndClearOtp(
-//   props: VerifyOtpProps,
-// ): Promise<ActionResult<{ verified: boolean }>> {
-//   try {
-//     const { userId, otpVal } = props;
-
-//     if (!otpVal) {
-//       return {
-//         ok: false,
-//         error: "OTP is required",
-//       };
-//     }
-
-//     const hashedToken = hashToken(otpVal);
-
-//     const deleteResult = await prisma.token.deleteMany({
-//       where: {
-//         hashedToken,
-//         userId,
-
-//         expiresAt: {
-//           gt: new Date(),
-//         },
-//       },
-//     });
-
-//     return {
-//       ok: true,
-//       data: {
-//         verified: deleteResult.count > 0,
-//       },
-//     };
-//   } catch (error) {
-//     console.error("OTP Verification Error:", error);
-
-//     return {
-//       ok: false,
-//       error: getFriendlyErrorMessage(error),
-//     };
-//   }
-// }
-
-// // ======================================================
-// // SEND RESET LINK
-// // ======================================================
-
-// interface SendResetLinkProps {
-//   username: string;
-//   sendTo: NotificationChannel;
-// }
-
-// export async function sendResetLink(props: SendResetLinkProps): Promise<
-//   ActionResult<{
-//     sentTo: NotificationChannel;
-//   }>
-// > {
-//   try {
-//     const result = await UserService.sendResetLink({
-//       username: props.username,
-//       sendTo: props.sendTo,
-//     });
-
-//     return {
-//       ok: true,
-
-//       data: {
-//         sentTo: result.sentTo,
-//       },
-//     };
-//   } catch (error) {
-//     return {
-//       ok: false,
-//       error: getFriendlyErrorMessage(error),
-//     };
-//   }
-// }
-
-// // ======================================================
-// // VERIFY RESET TOKEN
-// // ======================================================
-
-// interface VerifyResetTokenProps {
-//   username: string;
-//   token: string;
-// }
-
-// export async function verifyResetToken(props: VerifyResetTokenProps): Promise<
-//   ActionResult<{
-//     verification: boolean;
-//     message: string;
-//   }>
-// > {
-//   try {
-//     const { username, token } = props;
-
-//     const result = await UserService.verifyToken({
-//       username,
-//       token,
-//       type: TokenType.RESET,
-//     });
-
-//     return {
-//       ok: true,
-
-//       data: {
-//         verification: result.verification,
-//         message: result.message,
-//       },
-//     };
-//   } catch (error) {
-//     return {
-//       ok: false,
-//       error: getFriendlyErrorMessage(error),
-//     };
-//   }
-// }

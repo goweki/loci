@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { SubscriptionStatus } from "@/types";
+import { SubscriptionStatusCheck } from "@/types";
 
 export default function BillingInfo({
-  subscriptionStatus,
+  subscriptionStatusCheck,
 }: {
-  subscriptionStatus: SubscriptionStatus;
+  subscriptionStatusCheck: SubscriptionStatusCheck;
 }) {
+  const subscription = subscriptionStatusCheck.subscription;
   return (
     <div className="space-y-4">
       <h3 className="font-semibold">Billing Information</h3>
@@ -15,8 +15,8 @@ export default function BillingInfo({
             Next billing date
           </span>
           <span className="font-medium">
-            {subscriptionStatus.expiresAt &&
-              new Date(subscriptionStatus.expiresAt).toLocaleDateString()}
+            {subscription?.currentPeriodEnd &&
+              new Date(subscription?.currentPeriodEnd).toLocaleDateString()}
           </span>
         </div>
         {/* <div className="flex items-center justify-between py-2">

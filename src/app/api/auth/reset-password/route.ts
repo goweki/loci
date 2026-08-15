@@ -1,10 +1,9 @@
 import { type NextRequest } from "next/server";
-import { compareHash, hash } from "@/lib/utils/passwordHandlers";
-import { updateUserPassword } from "@/data/user";
+import { bcryptCompare, bcryptHash } from "@/lib/utils/passwordHandlers";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
-import { tokenRepository } from "@/data/repositories/token.repository";
 import { TokenType } from "@/lib/prisma/generated";
 import { UserService } from "@/services/user/user.service";
+import prisma from "@/lib/prisma";
 
 //validates token
 export async function GET(request: NextRequest) {
@@ -22,16 +21,15 @@ export async function GET(request: NextRequest) {
       return Response.json({ error: "Invalid reset-link" }, { status: 400 });
     }
 
-    const resetToken = await tokenRepository.findValidTokenByTypeUserId(
-      TokenType.RESET,
-      userExists.id,
+    const resetToken = userExists.tokens.find(
+      ({ isActive, type }) => isActive && type === TokenType.RESET,
     );
 
     if (!resetToken) {
       return Response.json({ error: "Invalid link" }, { status: 400 });
     }
 
-    const _isTokenValid: boolean = await compareHash(
+    const _isTokenValid: boolean = await bcryptCompare(
       token,
       resetToken?.hashedToken,
     );
@@ -63,16 +61,15 @@ export async function PUT(request: Request) {
       return Response.json({ error: "Invalid reset-link" }, { status: 400 });
     }
 
-    const resetToken = await tokenRepository.findValidTokenByTypeUserId(
-      TokenType.RESET,
-      userExists.id,
+    const resetToken = userExists.tokens.find(
+      ({ isActive, type }) => isActive && type === TokenType.RESET,
     );
 
     if (!resetToken) {
       return Response.json({ error: "Invalid link" }, { status: 400 });
     }
 
-    const _isTokenValid = await compareHash(token, resetToken.hashedToken);
+    const _isTokenValid = await bcryptCompare(token, resetToken.hashedToken);
     if (!_isTokenValid)
       return Response.json(
         { error: "Invalid token. Try Resetting your password." },
@@ -82,11 +79,14 @@ export async function PUT(request: Request) {
       );
 
     const userUpdates = {
-      password: await hash(password),
+      password: await bcryptHash(password),
       resetToken: null,
       resetTokenExpiry: null,
     };
-    const updatedUser = await updateUserPassword(userExists.id, userUpdates);
+    const updatedUser = await prisma.user.update({
+      where: { id: userExists.id },
+      data: userUpdates,
+    });
 
     if (!updatedUser)
       return Response.json(
