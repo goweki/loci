@@ -1,17 +1,15 @@
-"use client";
-
 import { BoxIcon, MessageCircle, Package, Phone, Store } from "lucide-react";
 import { ProductWithRelations } from "@/services/commerce/product.service";
 import TitleSection from "@/components/ui/page-title";
 import { ShareLinkDialog } from "@/components/dashboard/products/product-view/share-dialog";
-import { useI18n } from "@/lib/i18n";
+import { BASE_URL } from "@/lib/utils/getUrl";
 
 type Props = {
+  lang: string;
   product: ProductWithRelations;
 };
 
-export function ProductHeader({ product }: Props) {
-  const { language } = useI18n();
+export async function ProductHeader({ lang, product }: Props) {
   const merchant = product.user;
 
   return (
@@ -24,7 +22,7 @@ export function ProductHeader({ product }: Props) {
         breadcrumbs={[
           {
             label: `${merchant.username}`,
-            href: `/${language}/space/${merchant.username}`,
+            href: `/${lang}/space/${merchant.username}`,
           },
           { label: product.name },
         ]}
@@ -32,8 +30,8 @@ export function ProductHeader({ product }: Props) {
 
       <div className="flex gap-2">
         <ShareLinkDialog
-          // product={product}
           product={JSON.parse(JSON.stringify(product))}
+          link={`${BASE_URL}/en/product/${product.id}`}
         />
       </div>
     </div>

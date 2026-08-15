@@ -31,7 +31,10 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-      <ProductHeader product={JSON.parse(JSON.stringify(product))} />
+      <ProductHeader
+        lang={lang}
+        product={JSON.parse(JSON.stringify(product))}
+      />
 
       <ProductViewComponent
         product={JSON.parse(JSON.stringify(product))}
