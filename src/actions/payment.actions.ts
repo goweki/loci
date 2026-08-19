@@ -68,10 +68,14 @@ export async function markPaymentSuccessful(reference: string): Promise<true> {
     });
 
   if (!payment) {
-    payment = await prisma.subscriptionPayment.update({
-      where: { transactionId: reference },
-      data: { status: PaymentStatus.SUCCESS },
-    });
+    try {
+      payment = await prisma.subscriptionPayment.update({
+        where: { transactionId: reference },
+        data: { status: PaymentStatus.SUCCESS },
+      });
+    } catch (error) {
+      console.warn(`[PAYMENT NOT FOUND]: reference:${reference}`);
+    }
   }
 
   if (!payment) {
