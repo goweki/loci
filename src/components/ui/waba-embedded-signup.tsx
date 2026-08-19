@@ -84,41 +84,70 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
 
     setLoading(true);
 
+    const handleLoginResponse = async (response: any) => {
+      try {
+        if (response.authResponse?.code) {
+          const code = response.authResponse.code;
+          const wabaData = wabaDetailsRef.current;
+
+          if (!wabaData) {
+            throw new Error("WhatsApp Business account details are missing");
+          }
+
+          const res = await connectWhatsAppAction({
+            code,
+            waba_id: wabaData.waba_id,
+            phone_number_id: wabaData.phone_number_id,
+            business_id: wabaData.business_id,
+          });
+
+          if (res.ok) {
+            toast.success("WhatsApp account connected and saved!");
+            setIsLinked(true);
+          } else {
+            toast.error(res.error || "Failed to process linkage");
+          }
+        } else {
+          toastWarn("Meta authentication cancelled");
+        }
+      } catch (error) {
+        console.error("WhatsApp connection error:", error);
+
+        toastWarn(
+          error instanceof Error
+            ? error.message
+            : "Meta authentication failed, try again later",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
     try {
       (window as any).FB.login(
-        async (response: any) => {
-          if (response.authResponse?.code) {
-            const code = response.authResponse.code;
-            const wabaData = wabaDetailsRef.current;
-
-            // Execute Server Action directly
-            const res = await connectWhatsAppAction({
-              code,
-              waba_id: wabaData.waba_id,
-              phone_number_id: wabaData.phone_number_id,
-              business_id: wabaData.business_id,
-            });
-
-            if (res.ok) {
-              toast.success("WhatsApp account connected and saved!");
-              setIsLinked(true);
-            } else {
-              toast.error(res.error || "Failed to process linkage");
-            }
-          } else {
-            toastWarn("Meta authentication cancelled");
-          }
-          setLoading(false);
+        (response: any) => {
+          // FB.login requires a regular synchronous callback.
+          // Start the async operation without returning its Promise.
+          void handleLoginResponse(response);
         },
         {
           config_id: META_EMBEDDED_CONFIG_ID,
           response_type: "code",
           override_default_response_type: true,
-          extras: { setup: {} },
+          extras: {
+            setup: {},
+          },
         },
       );
-    } catch {
-      toastWarn("Meta authentication failed, try again later");
+    } catch (error) {
+      console.error("Facebook login error:", error);
+
+      toastWarn(
+        error instanceof Error
+          ? error.message
+          : "Meta authentication failed, try again later",
+      );
+
       setLoading(false);
     }
   };
