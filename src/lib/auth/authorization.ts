@@ -19,18 +19,25 @@ import { UserService } from "@/services/user/user.service";
 import prisma from "../prisma";
 
 export async function authorizeMessageSend(userId: string, message: Message) {
+  console.log(`[AUTHORIZING]: ${userId}`);
   const userRes = await getUserByKeyAction(userId);
 
+  if (!userRes.ok) {
+    throw new Error("[AUTHORIZING]: user not found ");
+  }
+
   // if actor is admin
-  if (userRes.ok && userRes.data.role === UserRole.ADMIN) {
+  if (userRes.data.role === UserRole.ADMIN) {
     return;
   }
+
+  console.log(`[AUTHORIZING]: user role is - ${userRes.data.role}`);
 
   const resPhoneOwnership = message.phoneNumberId
     ? await validatePhoneNumberOwnershipAction(message.phoneNumberId, userId)
     : null;
 
-  if (!resPhoneOwnership?.ok) {
+  if (resPhoneOwnership && !resPhoneOwnership?.ok) {
     throw new Error(resPhoneOwnership?.error);
   }
 
