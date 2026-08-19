@@ -75,6 +75,7 @@ export async function markPaymentSuccessful(reference: string): Promise<true> {
       });
     } catch (error) {
       console.warn(`[PAYMENT NOT FOUND]: reference:${reference}`);
+      console.warn(error);
     }
   }
 
