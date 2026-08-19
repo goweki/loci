@@ -99,7 +99,7 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
               business_id: wabaData.business_id,
             });
 
-            if (res.success) {
+            if (res.ok) {
               toast.success("WhatsApp account connected and saved!");
               setIsLinked(true);
             } else {

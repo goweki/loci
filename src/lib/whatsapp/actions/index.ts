@@ -8,7 +8,6 @@ import {
   MessageDirection,
   MessageStatus,
   Prisma,
-  PhoneNumber,
   PhoneNumberStatus,
   UserRole,
 } from "@/lib/prisma/generated";
@@ -22,7 +21,7 @@ import {
   VerifyNumberResponse,
 } from "..//types/waba-api-reponses";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth";
+import { authOptions, requireUser } from "../../auth";
 import { env_ } from "../types/environment-variables";
 import { UserService } from "@/services/user/user.service";
 import { findContactByPhoneNumber } from "@/actions/contact";

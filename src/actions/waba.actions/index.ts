@@ -3,6 +3,8 @@
 import { requireUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { PhoneNumberStatus, WabaOwnership } from "@/lib/prisma/generated";
+import whatsapp from "@/lib/whatsapp";
+import { ActionResult } from "@/types";
 
 interface ConnectWabaParams {
   code: string;
@@ -15,53 +17,50 @@ export async function connectWhatsAppAction({
   code,
   waba_id,
   phone_number_id,
-}: ConnectWabaParams) {
+}: ConnectWabaParams): Promise<ActionResult<string>> {
   const actor = await requireUser();
+
   try {
     if (!code) {
-      return { success: false, error: "Missing authorization code" };
+      return { ok: false, error: "Missing authorization code" };
     }
 
-    // 1. Exchange OAuth code for User Access Token
-    const tokenUrl = new URL(
-      "https://graph.facebook.com/v22.0/oauth/access_token",
-    );
-    tokenUrl.searchParams.append(
-      "client_id",
-      process.env.NEXT_PUBLIC_META_APP_ID!,
-    );
-    tokenUrl.searchParams.append("client_secret", process.env.META_APP_SECRET!);
-    tokenUrl.searchParams.append("code", code);
+    // 1. Exchange OAuth code via WhatsAppClient
+    const resTokenData = await whatsapp.getTokenUsingWabaAuthCode(code);
+    if (!resTokenData.ok) {
+      throw new Error(resTokenData.error);
+    }
+    const access_token = resTokenData.data;
 
-    const tokenRes = await fetch(tokenUrl.toString());
-    const tokenData = await tokenRes.json();
-
-    if (tokenData.error) {
-      return { success: false, error: tokenData.error.message };
+    if (!access_token) {
+      return {
+        ok: false,
+        error: "Failed to obtain access token from authorization code",
+      };
     }
 
-    const { access_token } = tokenData;
-
-    // 2. Fetch WABA Metadata from Meta Graph API if waba_id exists
+    // 2. Fetch WABA Metadata via WhatsAppClient
     let wabaMeta = {
       name: "WhatsApp Account",
       currency: "USD",
       timezone_id: "1",
-      message_template_namespace: null,
+      message_template_namespace: null as string | null,
     };
 
     if (waba_id) {
-      const wabaRes = await fetch(
-        `https://graph.facebook.com/v22.0/${waba_id}?fields=name,currency,timezone_id,message_template_namespace&access_token=${access_token}`,
-      );
-      if (wabaRes.ok) {
-        const data = await wabaRes.json();
+      try {
+        const data = await whatsapp.getWaba(waba_id, access_token);
         wabaMeta = {
           name: data.name || wabaMeta.name,
           currency: data.currency || wabaMeta.currency,
           timezone_id: data.timezone_id || wabaMeta.timezone_id,
           message_template_namespace: data.message_template_namespace || null,
         };
+      } catch (err) {
+        console.warn(
+          "Could not fetch WABA metadata, proceeding with defaults:",
+          err,
+        );
       }
     }
 
@@ -88,19 +87,18 @@ export async function connectWhatsAppAction({
       },
     });
 
-    // 4. Fetch and Store Phone Number details if phone_number_id exists
+    // 4. Fetch and Store Phone Number details via WhatsAppClient
     if (phone_number_id) {
-      const phoneRes = await fetch(
-        `https://graph.facebook.com/v22.0/${phone_number_id}?fields=display_phone_number,verified_name&access_token=${access_token}`,
-      );
-
-      if (phoneRes.ok) {
-        const phoneData = await phoneRes.json();
+      try {
+        const phoneData = await whatsapp.getPhoneNumberDetails(
+          phone_number_id,
+          access_token,
+        );
+        const phoneNumberStr =
+          phoneData.display_phone_number || phone_number_id;
 
         await prisma.phoneNumber.upsert({
-          where: {
-            phoneNumber: phoneData.display_phone_number || phone_number_id,
-          },
+          where: { phoneNumber: phoneNumberStr },
           update: {
             displayName: phoneData.verified_name || null,
             status: PhoneNumberStatus.VERIFIED,
@@ -108,21 +106,26 @@ export async function connectWhatsAppAction({
             wabaId: wabaAccount.id,
           },
           create: {
-            phoneNumber: phoneData.display_phone_number || phone_number_id,
+            phoneNumber: phoneNumberStr,
             displayName: phoneData.verified_name || null,
             status: PhoneNumberStatus.VERIFIED,
             verifiedAt: new Date(),
             wabaId: wabaAccount.id,
           },
         });
+      } catch (err) {
+        console.warn(
+          "Could not fetch phone number details, skipping phone save:",
+          err,
+        );
       }
     }
 
-    return { success: true, wabaId: wabaAccount.id };
+    return { ok: true, data: wabaAccount.id };
   } catch (error: any) {
     console.error("WhatsApp Action Error:", error);
     return {
-      success: false,
+      ok: false,
       error: error.message || "Failed to link WhatsApp account",
     };
   }
