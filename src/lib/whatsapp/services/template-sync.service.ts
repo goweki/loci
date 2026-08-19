@@ -902,41 +902,61 @@ export class MetaSyncService {
       throw new Error("WhatsApp phone number ID is required.");
     }
 
-    // -------------------------------------------------------
-    // Fast path
-    // -------------------------------------------------------
-
+    // 1. Fast path: Check local DB
     const existing = await prisma.phoneNumber.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
     });
 
     if (existing) {
       return existing;
     }
 
-    // -------------------------------------------------------
-    // Synchronize from Meta
-    // -------------------------------------------------------
-
     console.log(
-      `Phone number ${id} is not locally registered. Synchronizing from Meta...`,
+      `Phone number ${id} is not locally registered. Fetching directly from Meta...`,
     );
 
-    const { phoneNumbers } = await this.syncPhoneNumbers(undefined, user);
+    // 2. Fetch user's WABA Account to get their access token if needed
+    const wabaAccount = user?.id
+      ? await prisma.wabaAccount.findFirst({ where: { userId: user.id } })
+      : null;
 
-    // -------------------------------------------------------
-    // Find requested number
-    // -------------------------------------------------------
+    try {
+      // 3. Query Meta directly for THIS specific phone number ID
+      const phoneDetails = await this.WaClient.getPhoneNumberDetails(
+        id,
+        // wabaAccount?.accessToken,
+      );
 
-    const phoneNumber = phoneNumbers.find((phone) => phone.id === id);
+      if (!phoneDetails) {
+        throw new Error(`WhatsApp phone number ${id} was not found in Meta.`);
+      }
 
-    if (!phoneNumber) {
-      throw new Error(`WhatsApp phone number ${id} was not found in Meta.`);
+      // 4. Save/Upsert the phone number directly to Prisma
+      const phoneNumber = await prisma.phoneNumber.upsert({
+        where: { id },
+        update: {
+          displayName: phoneDetails.verified_name || null,
+          status: PhoneNumberStatus.VERIFIED,
+          verifiedAt: new Date(),
+          wabaId: wabaAccount?.id,
+        },
+        create: {
+          id: id, // Ensure this matches Meta's phone_number_id
+          phoneNumber: phoneDetails.display_phone_number || id,
+          displayName: phoneDetails.verified_name || null,
+          status: PhoneNumberStatus.VERIFIED,
+          verifiedAt: new Date(),
+          wabaId: wabaAccount?.id,
+        },
+      });
+
+      return phoneNumber;
+    } catch (error: any) {
+      console.error(`Failed to fetch phone number ${id} from Meta:`, error);
+      throw new Error(
+        `WhatsApp phone number ${id} was not found in Meta or access was denied.`,
+      );
     }
-
-    return phoneNumber;
   }
 
   /**
