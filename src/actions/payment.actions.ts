@@ -78,30 +78,41 @@ export async function getPaymentByReferenceAction(reference: string) {
  * Mark payment as verified (after webhook or manual check)
  */
 export async function markPaymentSuccessful(reference: string): Promise<true> {
-  console.log(`Marking successful ${reference}`);
-  let payment: Payment | SubscriptionPayment | null =
-    await prisma.payment.update({
-      where: { transactionId: reference },
-      data: { status: PaymentStatus.SUCCESS },
-    });
+  console.log(`Marking successful: ${reference}`);
 
-  if (!payment) {
-    try {
-      payment = await prisma.subscriptionPayment.update({
-        where: { transactionId: reference },
-        data: { status: PaymentStatus.SUCCESS },
-      });
-    } catch (error) {
-      console.warn(`[PAYMENT NOT FOUND]: reference:${reference}`);
-      console.warn(error);
-    }
+  // Try regular payments first
+  const paymentResult = await prisma.payment.updateMany({
+    where: {
+      transactionId: reference,
+    },
+    data: {
+      status: PaymentStatus.SUCCESS,
+    },
+  });
+
+  if (paymentResult.count > 0) {
+    return true;
   }
 
-  if (!payment) {
-    throw new Error("Failed to mark payment as successful");
+  // Try subscription payments
+  const subscriptionPaymentResult = await prisma.subscriptionPayment.updateMany(
+    {
+      where: {
+        transactionId: reference,
+      },
+      data: {
+        status: PaymentStatus.SUCCESS,
+      },
+    },
+  );
+
+  if (subscriptionPaymentResult.count > 0) {
+    return true;
   }
 
-  return true;
+  console.warn(`[PAYMENT NOT FOUND]: reference=${reference}`);
+
+  throw new Error(`Failed to mark payment as successful: ${reference}`);
 }
 
 /**
