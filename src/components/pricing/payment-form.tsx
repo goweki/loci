@@ -20,10 +20,8 @@ import {
 } from "@/lib/prisma/generated";
 import Loader from "@/components/ui/loaders";
 import toast from "react-hot-toast";
-import { createOrderAction } from "@/actions/order.actions";
-import { getPlanByName } from "@/actions/product.actions";
 import { createPaymentAction } from "@/actions/payment.actions";
-import { createSubscription } from "@/actions/subscription.actions";
+import { createSubscriptionAction } from "@/actions/subscription.actions";
 
 export function PaymentCheckout({
   _email,
@@ -52,54 +50,33 @@ export function PaymentCheckout({
     setIsProcessing(true);
 
     try {
+      const paymentReference = `${packag}_${userId}_${Date.now()}`;
+
       // 1️⃣ Create subscription
-      const subscription = await createSubscription({
+      const resSubscription = await createSubscriptionAction({
         userId,
         planName: planName as PlanName,
         interval: billingInterval,
         paymentMethod: PaymentMethod.PAYSTACK,
+        paymentReference,
         amount,
       });
 
-      // 2️⃣ Create payment record in DB
-      const reference = `${packag}_${userId}_${Date.now()}`;
-      const planRes = await getPlanByName(planName);
-
-      if (!planRes.ok) {
-        throw new Error(`Plan does not exist: ${planName}`);
+      if (!resSubscription.ok) {
+        toast.error(resSubscription.error);
+        return;
       }
 
-      const orderRes = await createOrderAction({
-        currency: Currency.KES,
-        notes: "LOCi subscription",
-        items: [
-          {
-            productId: planRes.data.id,
-            quantity: 1,
-          },
-        ],
-      });
-
-      if (!orderRes.ok) {
-        throw new Error(`Order creation for plan failed: ${planName}`);
-      }
-
-      await createPaymentAction({
-        reference,
-        orderId: orderRes.data.id,
-        amount,
-        method: PaymentMethod.PAYSTACK,
-      });
-
-      // 3️⃣ Initialize Paystack payment
-      const result = await initializePayment(email, amount, reference);
+      // 2️⃣  Initialize Paystack payment
+      const result = await initializePayment(email, amount, paymentReference);
 
       if (result?.authorization_url) {
-        // 4️⃣ Redirect user to Paystack checkout
+        //  3️⃣  Redirect user to Paystack checkout
         window.location.href = result.authorization_url;
       } else {
-        // Payment initialization failed
+        //  4️⃣  Payment initialization failed
         console.error("Payment initialization failed", result);
+        toast.error(`${result?.access_code} - Payment initialization failed`);
         setIsProcessing(false);
       }
     } catch (error) {

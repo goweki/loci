@@ -2,32 +2,12 @@
 
 import { requireUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { PaymentMethod, PaymentStatus } from "@/lib/prisma/generated";
-
-async function updatePaymentStatus(reference: string, status: PaymentStatus) {
-  const payment = await prisma.payment.findUniqueOrThrow({
-    where: { transactionId: reference },
-    include: {
-      order: {
-        include: {
-          items: {
-            include: {
-              product: {
-                include: { user: true },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  // update payment status
-  return prisma.payment.updateMany({
-    where: { transactionId: reference },
-    data: { status },
-  });
-}
+import {
+  Payment,
+  PaymentMethod,
+  PaymentStatus,
+  SubscriptionPayment,
+} from "@/lib/prisma/generated";
 
 /**
  * Create a new payment record when transaction is initialized
@@ -80,13 +60,47 @@ export async function getPaymentByReferenceAction(reference: string) {
 /**
  * Mark payment as verified (after webhook or manual check)
  */
-export async function markPaymentSuccessful(reference: string) {
-  return updatePaymentStatus(reference, PaymentStatus.SUCCESS);
+export async function markPaymentSuccessful(reference: string): Promise<true> {
+  let payment: Payment | SubscriptionPayment | null =
+    await prisma.payment.update({
+      where: { transactionId: reference },
+      data: { status: PaymentStatus.SUCCESS },
+    });
+
+  if (!payment) {
+    payment = await prisma.subscriptionPayment.update({
+      where: { transactionId: reference },
+      data: { status: PaymentStatus.SUCCESS },
+    });
+  }
+
+  if (!payment) {
+    throw new Error("Failed to mark payment as successful");
+  }
+
+  return true;
 }
 
 /**
  * Mark payment as failed
  */
-export async function markPaymentFailed(reference: string) {
-  return updatePaymentStatus(reference, PaymentStatus.FAILED);
+export async function markPaymentFailed(reference: string): Promise<boolean> {
+  let payment: Payment | SubscriptionPayment | null =
+    await prisma.payment.update({
+      where: { transactionId: reference },
+      data: { status: PaymentStatus.FAILED },
+    });
+
+  if (!payment) {
+    payment = await prisma.subscriptionPayment.update({
+      where: { transactionId: reference },
+      data: { status: PaymentStatus.FAILED },
+    });
+  }
+
+  if (!payment) {
+    throw new Error("Failed to mark payment as failed");
+  }
+
+  return true;
 }

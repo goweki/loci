@@ -149,7 +149,7 @@ export default function PricingComponent(props: { pageTitle?: boolean }) {
 
   const fetchPlans = useCallback(async () => {
     const plans_ = await getAllActivePlans();
-    console.log(plans_);
+    // console.log(plans_);
     setPlans(plans_);
   }, []);
 

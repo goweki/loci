@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "scripts": {
     "dev:http": "npx prisma migrate dev && prisma generate && next dev",
@@ -73,6 +73,7 @@
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.69.0",
     "react-hot-toast": "^2.4.1",
+    "react-image-file-resizer": "^0.4.8",
     "react-phone-number-input": "^3.4.13",
     "react-social-icons": "^6.25.0",
     "react-transition-group": "^4.4.5",

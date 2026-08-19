@@ -8,7 +8,7 @@ import {
   SubscriptionStatus,
   PaymentStatus,
   PlanName,
-  Subscription,
+  Prisma,
 } from "@/lib/prisma/generated";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import { SubscriptionService } from "@/services/subscription/subscription.service";
@@ -29,19 +29,27 @@ function getPeriodEndDate(startDate: Date, interval: PlanInterval): Date {
 /**
  * 1. CREATE SUBSCRIPTION (Initial Checkout Flow)
  */
-export async function createSubscription({
+export async function createSubscriptionAction({
   userId,
   planName,
   interval,
   paymentMethod,
+  paymentReference,
   amount,
 }: {
   userId: string;
   planName: PlanName;
   interval: PlanInterval;
   paymentMethod: PaymentMethod;
+  paymentReference: string;
   amount: number;
-}) {
+}): Promise<
+  ActionResult<
+    Prisma.SubscriptionGetPayload<{
+      include: { payments: true };
+    }>
+  >
+> {
   try {
     const plan = await prisma.plan.findUniqueOrThrow({
       where: { name: planName },
@@ -61,7 +69,7 @@ export async function createSubscription({
         currentPeriodEnd: periodEnd,
         payments: {
           create: {
-            transactionId: `SUB-TX-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+            transactionId: paymentReference,
             paymentMethod,
             amount,
             status: PaymentStatus.PENDING,
@@ -73,11 +81,13 @@ export async function createSubscription({
       },
     });
 
-    revalidatePath("/dashboard");
-    return { success: true, subscription, payment: subscription.payments[0] };
+    revalidatePath("/en/dashboard");
+    return {
+      ok: true,
+      data: subscription,
+    };
   } catch (error) {
-    console.error("Create Subscription Error:", error);
-    return { success: false, error: "Failed to create subscription" };
+    return { ok: false, error: getFriendlyErrorMessage(error) };
   }
 }
 
@@ -159,12 +169,14 @@ export async function getUserSubscription(): Promise<
       actor.id,
     );
 
+    console.log(`Sub status:`, subscriptionCheck);
+
     return {
       ok: true,
       data: subscriptionCheck,
     };
   } catch (error) {
-    console.error("Get Subscription Error:", error);
+    console.error(`[ERROR GETTING SUBSCRIPTION]: userId-${actor.id}`, error);
     return {
       ok: false,
       error: getFriendlyErrorMessage(error),

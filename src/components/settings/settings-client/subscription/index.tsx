@@ -55,6 +55,8 @@ export default function TabSubscription() {
         return;
       }
 
+      console.log("subscription:", resSubscriptionStatus.data);
+
       setSubscriptionStatus(resSubscriptionStatus.data);
     };
     const getPayments = async () => {
