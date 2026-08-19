@@ -41,10 +41,16 @@ export async function createPaymentAction({
 
 export async function getPaymentsByUserId() {
   const actor = await requireUser();
-  return prisma.payment.findMany({
+
+  const payments = await prisma.payment.findMany({
     where: { order: { userId: actor.id } },
     orderBy: { createdAt: "desc" },
   });
+
+  return payments.map((payment) => ({
+    ...payment,
+    amount: payment.amount.toNumber(),
+  }));
 }
 
 /**

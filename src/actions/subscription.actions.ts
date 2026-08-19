@@ -45,9 +45,23 @@ export async function createSubscriptionAction({
   amount: number;
 }): Promise<
   ActionResult<
-    Prisma.SubscriptionGetPayload<{
-      include: { payments: true };
-    }>
+    Omit<
+      Prisma.SubscriptionGetPayload<{
+        include: { payments: true };
+      }>,
+      "payments"
+    > & {
+      payments: Array<
+        Omit<
+          Prisma.SubscriptionGetPayload<{
+            include: { payments: true };
+          }>["payments"][number],
+          "amount"
+        > & {
+          amount: number;
+        }
+      >;
+    }
   >
 > {
   try {
@@ -81,10 +95,18 @@ export async function createSubscriptionAction({
       },
     });
 
+    const serializedSubscription = {
+      ...subscription,
+      payments: subscription.payments.map((payment) => ({
+        ...payment,
+        amount: payment.amount.toNumber(),
+      })),
+    };
+
     revalidatePath("/en/dashboard");
     return {
       ok: true,
-      data: subscription,
+      data: serializedSubscription,
     };
   } catch (error) {
     return { ok: false, error: getFriendlyErrorMessage(error) };
