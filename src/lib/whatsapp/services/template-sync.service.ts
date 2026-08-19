@@ -525,6 +525,7 @@ import {
   TemplateApprovalStatus,
   TemplateCategory,
   TemplateLanguage,
+  UserRole,
   WabaOwnership,
   WabaTemplate,
 } from "@/lib/prisma/generated";
@@ -565,7 +566,7 @@ export class MetaSyncService {
    * Creates the WABA if it does not exist locally, otherwise
    * updates the existing record.
    */
-  async syncWaba(user?: User): Promise<{
+  async syncWaba(user?: { id: string; role: UserRole }): Promise<{
     waba: Awaited<
       ReturnType<
         Awaited<ReturnType<typeof WabaService.create>>["getWabaAccountById"]
@@ -707,7 +708,7 @@ export class MetaSyncService {
    */
   async syncPhoneNumbers(
     wabaId?: string,
-    user?: User,
+    user?: { id: string; role: UserRole },
   ): Promise<{
     phoneNumbers: PhoneNumber[];
     created: number;
@@ -893,7 +894,7 @@ export class MetaSyncService {
    */
   async ensurePhoneNumber(
     phoneNumberId: string,
-    user?: User,
+    user?: { id: string; role: UserRole },
   ): Promise<PhoneNumber> {
     const id = phoneNumberId?.trim();
 

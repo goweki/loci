@@ -1,5 +1,11 @@
 // import { generateUniqueUsernameFromSeed } from "../../utils/username";
-import { PrismaClient, UserRole, UserStatus, TokenType } from "../generated";
+import {
+  PrismaClient,
+  UserRole,
+  UserStatus,
+  TokenType,
+  User,
+} from "../generated";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import prisma from "..";
@@ -80,6 +86,7 @@ export async function seedUsers(prisma: PrismaClient) {
 
   let createdCount = 0;
   let skippedCount = 0;
+  let users: User[] = [];
 
   for (const userData of usersData) {
     try {
@@ -99,16 +106,17 @@ export async function seedUsers(prisma: PrismaClient) {
           },
         });
 
+        // 🔥 ONLY FOR ADMIN → ensure API KEY
+        if (user.role === UserRole.ADMIN) {
+          await ensureApiKey(prisma, user.id);
+        }
+
+        users.push(user);
         console.log(` ➕ ✔ ${user.role} created: ${user.email}`);
         createdCount++;
       } else {
         console.log(` ✔ ${user.role} already exists: ${user.email}`);
         skippedCount++;
-      }
-
-      // 🔥 ONLY FOR ADMIN → ensure API KEY
-      if (user.role === UserRole.ADMIN) {
-        await ensureApiKey(prisma, user.id);
       }
     } catch (error) {
       console.error(`❌ Error creating user ${userData.email}:`, error);
@@ -119,6 +127,8 @@ export async function seedUsers(prisma: PrismaClient) {
   console.log(
     `✅ Users seeding completed: ${createdCount} created, ${skippedCount} skipped\n`,
   );
+
+  return users;
 }
 
 async function ensureApiKey(prisma: PrismaClient, userId: string) {
