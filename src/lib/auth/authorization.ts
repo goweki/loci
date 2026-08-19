@@ -51,6 +51,8 @@ export async function authorizeMessageSend(userId: string, message: Message) {
   if (!limits.allowed) {
     throw new ApiError(403, "Usage Limit exceeded");
   }
+
+  console.log("[AUTHORIZATION PASSED]");
 }
 
 /**

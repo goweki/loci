@@ -9,7 +9,7 @@ import { hashSha256 } from "../utils/passwordHandlers";
 
 export type ApiKeyAuth = {
   id: string;
-  user: { id: string };
+  user: { id: string; username: string };
 };
 
 export type ApiKeyValidationResult = ApiKeyAuth | NextResponse;
@@ -132,7 +132,7 @@ export function extractApiKey(req: Request): string {
 
 export type AuthenticatedHandler = (
   request: NextRequest,
-  apiKey: { id: string; user: { id: string } },
+  apiKey: { id: string; user: { id: string; username: string } },
 ) => Promise<Response | NextResponse> | Response | NextResponse;
 
 export function apiKeyMiddleware(handler: AuthenticatedHandler) {
