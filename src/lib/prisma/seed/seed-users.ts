@@ -106,17 +106,17 @@ export async function seedUsers(prisma: PrismaClient) {
           },
         });
 
-        // 🔥 ONLY FOR ADMIN → ensure API KEY
-        if (user.role === UserRole.ADMIN) {
-          await ensureApiKey(prisma, user.id);
-        }
-
         users.push(user);
         console.log(` ➕ ✔ ${user.role} created: ${user.email}`);
         createdCount++;
       } else {
         console.log(` ✔ ${user.role} already exists: ${user.email}`);
         skippedCount++;
+      }
+
+      // 🔥 ONLY FOR ADMIN → ensure API KEY
+      if (user.role === UserRole.ADMIN) {
+        await ensureApiKey(prisma, user.id);
       }
     } catch (error) {
       console.error(`❌ Error creating user ${userData.email}:`, error);

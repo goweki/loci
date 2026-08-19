@@ -1,5 +1,5 @@
-import prisma from "../index";
-import { PrismaClient, TokenType, UserRole } from "../generated";
+import prisma from "@/lib/prisma";
+import { TokenType } from "@/lib/prisma/generated";
 import crypto from "crypto";
 
 async function createOrRotateAdminApiKey() {

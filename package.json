@@ -6,6 +6,9 @@
     "node": "24.x"
   },
   "scripts": {
+    "db:seed": "tsx src/lib/prisma/seed",
+    "db:dump": "tsx src/lib/prisma/dump",
+    "rotate-key": "tsx ./scripts/rotate-admin-api-key.ts",
     "dev:http": "npx prisma migrate dev && prisma generate && next dev",
     "dev": "npx prisma migrate dev && prisma generate && next dev --experimental-https",
     "build": "next build",
@@ -23,10 +26,7 @@
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
     "type-check": "tsc --noEmit",
-    "pre-commit": "lint-staged",
-    "seed-key": "tsx ./src/lib/prisma/seed/seed-api-key.ts",
-    "db:seed": "tsx src/lib/prisma/seed",
-    "db:dump": "tsx src/lib/prisma/dump"
+    "pre-commit": "lint-staged"
   },
   "dependencies": {
     "@edgestore/react": "^0.7.0",
