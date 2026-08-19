@@ -10,8 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { TabsContent } from "@/components/ui/tabs";
-import { Payment } from "@/lib/prisma/generated";
 import { CheckCircle2Icon, CreditCardIcon } from "lucide-react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
@@ -35,12 +33,13 @@ import { getUserSubscription } from "@/actions/subscription.actions";
 import { SubscriptionStatusCheck } from "@/types";
 import toast from "react-hot-toast";
 import { getPaymentsByUserId } from "@/actions/payment.actions";
+import { PaymentWithNumberAmount } from "@/actions/payment.actions.dto";
 
 export default function TabSubscription() {
   const { language } = useI18n();
   const [subscriptionStatus, setSubscriptionStatus] =
     useState<SubscriptionStatusCheck>();
-  const [payments, setPayments] = useState<Payment[]>();
+  const [payments, setPayments] = useState<PaymentWithNumberAmount[]>();
   const { data: session } = useSession();
   const userId = session?.user.id;
 

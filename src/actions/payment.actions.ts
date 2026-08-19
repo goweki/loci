@@ -6,8 +6,11 @@ import {
   Payment,
   PaymentMethod,
   PaymentStatus,
+  Prisma,
   SubscriptionPayment,
 } from "@/lib/prisma/generated";
+import { PrismaClientInitializationError } from "@/lib/prisma/generated/runtime/client";
+import { PaymentWithNumberAmount } from "./payment.actions.dto";
 
 /**
  * Create a new payment record when transaction is initialized
@@ -39,12 +42,20 @@ export async function createPaymentAction({
  * List payments for a user
  */
 
-export async function getPaymentsByUserId() {
+export async function getPaymentsByUserId(): Promise<
+  PaymentWithNumberAmount[]
+> {
   const actor = await requireUser();
 
   const payments = await prisma.payment.findMany({
-    where: { order: { userId: actor.id } },
-    orderBy: { createdAt: "desc" },
+    where: {
+      order: {
+        userId: actor.id,
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   return payments.map((payment) => ({
