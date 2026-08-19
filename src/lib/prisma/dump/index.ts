@@ -1,10 +1,10 @@
 import "dotenv/config";
-import { exec } from "child_process";
+import { execFile } from "child_process";
 import { promisify } from "util";
 import path from "path";
 import fs from "fs";
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 async function main() {
   const dbUrl = process.env.DATABASE_URL;
@@ -13,24 +13,56 @@ async function main() {
     throw new Error("❌ DATABASE_URL environment variable is missing.");
   }
 
+  // -----------------------------------------------------
+  // Configure PostgreSQL SSL
+  // -----------------------------------------------------
+
+  const databaseUrl = new URL(dbUrl);
+
+  /**
+   * Keep full TLS certificate and hostname verification.
+   *
+   * sslrootcert=system tells libpq/pg_dump to use the
+   * operating system's trusted CA certificates instead of
+   * expecting ~/.postgresql/root.crt.
+   */
+  databaseUrl.searchParams.set("sslmode", "verify-full");
+  databaseUrl.searchParams.set("sslrootcert", "system");
+
   // Create dumps directory if it doesn't exist
   const dumpDir = path.join(__dirname, "./dumps");
-  if (!fs.existsSync(dumpDir)) {
-    fs.mkdirSync(dumpDir, { recursive: true });
-  }
+
+  fs.mkdirSync(dumpDir, {
+    recursive: true,
+  });
 
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+
   const outputPath = path.join(dumpDir, `backup-${timestamp}.sql`);
 
-  console.log("📦 Starting database dump...\n");
+  console.log("📦 Starting database dump...");
+  console.log(`📁 Output: ${outputPath}`);
 
   try {
-    await execAsync(`pg_dump "${dbUrl}" -F p -f "${outputPath}"`);
+    await execFileAsync("pg_dump", [
+      databaseUrl.toString(),
+      "-F",
+      "p",
+      "-f",
+      outputPath,
+    ]);
 
-    console.log(`✅ Database dump created successfully!`);
+    console.log("\n✅ Database dump created successfully!");
     console.log(`📁 File saved to: ${outputPath}`);
   } catch (error) {
-    console.error("❌ Error creating database dump:", error);
+    console.error("\n❌ Error creating database dump:");
+
+    if (error instanceof Error) {
+      console.error(error.message);
+    } else {
+      console.error(error);
+    }
+
     throw error;
   }
 }
