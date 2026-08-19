@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { Prisma, UserRole } from "@/lib/prisma/generated";
+import { Prisma, User, UserRole } from "@/lib/prisma/generated";
 import { seedUsers } from "@/lib/prisma/seed/seed-users";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import { metaSyncService } from "@/lib/whatsapp";
@@ -84,9 +84,14 @@ export async function ensureDefaultPhoneNumberExists() {
     throw new Error("[MISSING ENV] WHATSAPP_PHONE_NUMBER_ID");
   }
 
-  const users = await seedUsers(prisma);
+  let adminUser: User | null = await prisma.user.findFirst({
+    where: { role: UserRole.ADMIN },
+  });
 
-  const adminUser = users.find(({ role }) => role === UserRole.ADMIN);
+  if (!adminUser) {
+    const seededUsers = await seedUsers(prisma);
+    adminUser = seededUsers.find(({ role }) => role === UserRole.ADMIN) ?? null;
+  }
 
   if (!adminUser) {
     throw new Error("Admin user not found");
