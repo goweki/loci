@@ -78,6 +78,7 @@ export async function getPaymentByReferenceAction(reference: string) {
  * Mark payment as verified (after webhook or manual check)
  */
 export async function markPaymentSuccessful(reference: string): Promise<true> {
+  console.log(`Marking successful ${reference}`);
   let payment: Payment | SubscriptionPayment | null =
     await prisma.payment.update({
       where: { transactionId: reference },

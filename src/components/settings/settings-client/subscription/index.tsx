@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle2Icon, CreditCardIcon } from "lucide-react";
+import { CreditCardIcon } from "lucide-react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
@@ -28,7 +28,6 @@ import { useSession } from "next-auth/react";
 import SubscriptionInfo from "./subscription-info";
 import BillingInfo from "./billing-info";
 import PricingComponent from "@/components/pricing";
-import PageTitle from "@/components/ui/page-title";
 import { getUserSubscription } from "@/actions/subscription.actions";
 import { SubscriptionStatusCheck } from "@/types";
 import toast from "react-hot-toast";
