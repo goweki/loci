@@ -2,10 +2,6 @@ import { notFound } from "next/navigation";
 
 import { getProductById } from "@/actions/product.actions";
 import ProductViewComponent from "@/components/dashboard/products/product-view";
-import { BASE_URL } from "@/lib/utils/getUrl";
-import { ShareLinkDialog } from "@/components/dashboard/products/product-view/share-dialog";
-import { BoxIcon } from "lucide-react";
-import TitleSection from "@/components/ui/page-title";
 
 interface ProductPageProps {
   params: Promise<{

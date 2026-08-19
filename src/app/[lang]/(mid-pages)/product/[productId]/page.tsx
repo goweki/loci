@@ -1,23 +1,9 @@
 import { getPublicProductById } from "@/actions/product.actions";
-import {
-  getLociSubscriptionStatusByUserId,
-  canMerchantSell,
-} from "@/data/subscription";
 import { notFound } from "next/navigation";
 import ProductViewComponent from "@/components/dashboard/products/product-view";
-import { BASE_URL } from "@/lib/utils/getUrl";
-import TitleSection from "@/components/ui/page-title";
-import {
-  ArrowLeftIcon,
-  BoxIcon,
-  CheckCircle2Icon,
-  XCircleIcon,
-} from "lucide-react";
-import { ShareLinkDialog } from "@/components/dashboard/products/product-view/share-dialog";
 import { ProductHeader } from "./_components/product-header";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import prisma from "@/lib/prisma";
+import { canMerchantSell } from "@/actions/merchant.actions/merchant.helpers";
 
 type Props = {
   params: Promise<{
@@ -37,15 +23,18 @@ export default async function ProductPage({ params }: Props) {
 
   const product = resProduct.data;
 
-  const monetizationStatus = await getLociSubscriptionStatusByUserId(
-    product.user.username,
-  );
-  const canPurchase = await canMerchantSell(monetizationStatus);
-  // const shareLink = `${BASE_URL}/en/product/${product.id}`;
+  const merchantSubscriptions = product.user.subscriptions.map((sub) => ({
+    status: sub.status,
+  }));
+
+  const canPurchase = canMerchantSell(merchantSubscriptions);
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-      <ProductHeader product={JSON.parse(JSON.stringify(product))} />
+      <ProductHeader
+        lang={lang}
+        product={JSON.parse(JSON.stringify(product))}
+      />
 
       <ProductViewComponent
         product={JSON.parse(JSON.stringify(product))}

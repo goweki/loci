@@ -1,6 +1,29 @@
-import { PrismaClient, PlanInterval, PlanName } from "../generated";
+import { PrismaClient, PlanName } from "../generated";
 
-const featuresData = [
+interface FeatureSeedData {
+  name: string;
+  description: string;
+  useMetric: string;
+}
+
+interface PlanFeatureItem {
+  name: string;
+  enabled?: boolean;
+  limitUse?: number | null;
+  configValue?: string | null;
+}
+
+interface PlanSeedData {
+  name: PlanName;
+  description: string;
+  monthlyPrice: number;
+  maxPhoneNumbers: number;
+  maxMessagesPerMonth: number;
+  popular: boolean;
+  features: PlanFeatureItem[];
+}
+
+const featuresData: FeatureSeedData[] = [
   // Communication Core
   {
     name: "Phone Numbers",
@@ -88,13 +111,11 @@ const featuresData = [
   },
 ];
 
-const plansData = [
+const plansData: PlanSeedData[] = [
   {
-    id: PlanName.BASIC,
     name: PlanName.BASIC,
     description: "For solo businesses and startups",
-    price: 2499,
-    interval: PlanInterval.MONTHLY,
+    monthlyPrice: 2499,
     maxPhoneNumbers: 1,
     maxMessagesPerMonth: 1000,
     popular: false,
@@ -107,9 +128,7 @@ const plansData = [
       { name: "Orders", limitUse: 100 },
 
       { name: "Payment Links", enabled: true },
-
       { name: "WhatsApp Templates", enabled: true },
-
       { name: "Bulk Messaging", enabled: false },
 
       { name: "Automation", enabled: false },
@@ -124,11 +143,9 @@ const plansData = [
     ],
   },
   {
-    id: PlanName.STANDARD,
     name: PlanName.STANDARD,
     description: "For growing teams and online businesses",
-    price: 9999,
-    interval: PlanInterval.MONTHLY,
+    monthlyPrice: 9999,
     maxPhoneNumbers: 5,
     maxMessagesPerMonth: 10000,
     popular: true,
@@ -141,7 +158,6 @@ const plansData = [
       { name: "Orders", limitUse: 5000 },
 
       { name: "Payment Links", enabled: true },
-
       { name: "WhatsApp Templates", enabled: true },
       { name: "Bulk Messaging", enabled: true },
 
@@ -157,11 +173,9 @@ const plansData = [
     ],
   },
   {
-    id: PlanName.PREMIUM,
     name: PlanName.PREMIUM,
     description: "For enterprises and large-scale commerce",
-    price: 49999,
-    interval: PlanInterval.MONTHLY,
+    monthlyPrice: 49999,
     maxPhoneNumbers: 999,
     maxMessagesPerMonth: 100000,
     popular: false,
@@ -169,13 +183,11 @@ const plansData = [
     features: [
       { name: "Phone Numbers", configValue: "UNLIMITED" },
       { name: "Messages", configValue: "UNLIMITED" },
-
       { name: "Contacts", configValue: "UNLIMITED" },
       { name: "Products", configValue: "UNLIMITED" },
       { name: "Orders", configValue: "UNLIMITED" },
 
       { name: "Payment Links", enabled: true },
-
       { name: "WhatsApp Templates", enabled: true },
       { name: "Bulk Messaging", enabled: true },
 
@@ -207,49 +219,20 @@ export async function seedPlans(prisma: PrismaClient) {
   console.log("📦 Seeding plans & plan features...");
 
   for (const plan of plansData) {
-    const adminUser = await prisma.user.findFirst({ where: { role: "ADMIN" } });
-
-    if (!adminUser) {
-      throw new Error(
-        "❌ Seed an Admin user first before seeding plans, because products require a userId.",
-      );
-    }
-
-    await prisma.product.upsert({
-      where: { id: plan.id },
-      update: {
-        name: plan.name,
-        price: plan.price,
-        description: plan.description,
-      },
-      create: {
-        id: plan.id,
-        userId: adminUser.id,
-        name: plan.name,
-        price: plan.price,
-        description: plan.description,
-      },
-    });
-
     const dbPlan = await prisma.plan.upsert({
       where: { name: plan.name },
       update: {
-        id: plan.id,
-        name: plan.name,
         description: plan.description,
-        price: plan.price,
-        interval: plan.interval,
+        monthlyPrice: plan.monthlyPrice,
         popular: plan.popular,
         maxPhoneNumbers: plan.maxPhoneNumbers,
         maxMessagesPerMonth: plan.maxMessagesPerMonth,
         active: true,
       },
       create: {
-        id: plan.id,
         name: plan.name,
         description: plan.description,
-        price: plan.price,
-        interval: plan.interval,
+        monthlyPrice: plan.monthlyPrice,
         popular: plan.popular,
         maxPhoneNumbers: plan.maxPhoneNumbers,
         maxMessagesPerMonth: plan.maxMessagesPerMonth,
@@ -264,6 +247,10 @@ export async function seedPlans(prisma: PrismaClient) {
 
       if (!feature) continue;
 
+      const enabled = pf.enabled ?? true;
+      const limitUse = pf.limitUse ?? null;
+      const configValue = pf.configValue ?? null;
+
       await prisma.planFeature.upsert({
         where: {
           planId_featureId: {
@@ -272,16 +259,16 @@ export async function seedPlans(prisma: PrismaClient) {
           },
         },
         update: {
-          enabled: "enabled" in pf ? pf.enabled : true,
-          limitUse: "limitUse" in pf ? pf.limitUse : null,
-          configValue: "configValue" in pf ? pf.configValue : null,
+          enabled,
+          limitUse,
+          configValue,
         },
         create: {
           planId: dbPlan.id,
           featureId: feature.id,
-          enabled: "enabled" in pf ? pf.enabled : true,
-          limitUse: "limitUse" in pf ? pf.limitUse : null,
-          configValue: "configValue" in pf ? pf.configValue : null,
+          enabled,
+          limitUse,
+          configValue,
         },
       });
     }

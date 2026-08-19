@@ -1,6 +1,6 @@
 "use server";
 
-import { contactUsRepository } from "@/data/repositories/contact-us";
+import prisma from "@/lib/prisma";
 import z from "zod";
 
 const nullableToUndefined = (v: unknown) => (v === null ? undefined : v);
@@ -37,13 +37,15 @@ export async function submitContactForm(formData: FormData) {
 
   try {
     // Save to database
-    await contactUsRepository.create({
-      email: validation.data.email,
-      message: validation.data.message,
-      name: validation.data.name || undefined,
-      subject: validation.data.subject || undefined,
-      phone: validation.data.phone || undefined,
-      company: validation.data.company || undefined,
+    await prisma.contactUs.create({
+      data: {
+        email: validation.data.email,
+        message: validation.data.message,
+        name: validation.data.name || undefined,
+        subject: validation.data.subject || undefined,
+        phone: validation.data.phone || undefined,
+        company: validation.data.company || undefined,
+      },
     });
 
     // Optional: Send email notification here

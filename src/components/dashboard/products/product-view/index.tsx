@@ -2,7 +2,6 @@
 
 import { ProductWithRelations } from "@/services/commerce/product.service";
 
-import ProductHeader from "./product-header";
 import ProductImage from "./product-image";
 import ProductInformation from "./product-information";
 import PurchaseCard from "./purchase-card";

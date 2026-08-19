@@ -10,7 +10,6 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Check, X } from "lucide-react";
-import { getAllActivePlans, PlanBasePayload } from "@/data/plan";
 import Loader from "@/components/ui/loaders";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
@@ -18,10 +17,13 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { PaymentCheckout } from "./payment-form";
-import { SubscriptionStatus, SubscriptionStatusEnum } from "@/types";
-import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
+import { SubscriptionStatusCheck } from "@/types";
 import SubscriptionInfoWrapper from "./subscription-info";
 import PageTitle from "@/components/ui/page-title";
+import { getUserSubscription } from "@/actions/subscription.actions";
+import toast from "react-hot-toast";
+import { PlanInterval, SubscriptionStatus } from "@/lib/prisma/generated";
+import { getAllActivePlans, PlanBasePayload } from "@/actions/plan.actions";
 
 const translations = {
   en: {
@@ -120,22 +122,25 @@ const translations = {
 export default function PricingComponent(props: { pageTitle?: boolean }) {
   const { pageTitle = true } = props;
   const { language } = useI18n();
-  const [billingInterval, setBillingInterval] = useState("monthly");
+  const [billingInterval, setBillingInterval] =
+    useState<PlanInterval>("MONTHLY");
   const [plans, setPlans] = useState<PlanBasePayload[]>();
   const { data: session } = useSession();
   const user = session?.user;
   const [subscriptionStatus, setSubscriptionStatus] =
-    useState<SubscriptionStatus>();
+    useState<SubscriptionStatusCheck>();
 
   const t = translations[language];
 
   const getSubscriptionStatus = useCallback(async () => {
     if (!session?.user.id) return;
 
-    const _subscriptionStatus = await getLociSubscriptionStatusByUserId(
-      session.user.id,
-    );
-    setSubscriptionStatus(_subscriptionStatus);
+    const resSubscriptionStatus = await getUserSubscription();
+    if (!resSubscriptionStatus.ok) {
+      toast.error(resSubscriptionStatus.error);
+      return;
+    }
+    setSubscriptionStatus(resSubscriptionStatus.data);
   }, [session?.user.id]);
 
   useEffect(() => {
@@ -144,7 +149,7 @@ export default function PricingComponent(props: { pageTitle?: boolean }) {
 
   const fetchPlans = useCallback(async () => {
     const plans_ = await getAllActivePlans();
-    console.log(plans_);
+    // console.log(plans_);
     setPlans(plans_);
   }, []);
 
@@ -160,13 +165,13 @@ export default function PricingComponent(props: { pageTitle?: boolean }) {
     }).format(price);
   };
 
-  const getPrice = ({ price }: { price: number }) => {
-    return billingInterval === "monthly" ? price : price * 10;
+  const getPrice = ({ monthlyPrice }: { monthlyPrice: number }) => {
+    return billingInterval === "MONTHLY" ? monthlyPrice : monthlyPrice * 10;
   };
 
-  const getSavings = ({ price }: { price: number }) => {
-    const grossCost = price * 12;
-    const netCost = price * 10;
+  const getSavings = ({ monthlyPrice }: { monthlyPrice: number }) => {
+    const grossCost = monthlyPrice * 12;
+    const netCost = monthlyPrice * 10;
     const savings = grossCost - netCost;
     return Math.round((savings / grossCost) * 100);
   };
@@ -178,28 +183,32 @@ export default function PricingComponent(props: { pageTitle?: boolean }) {
       {pageTitle && <PageTitle title={t.title} subtitle={t.subtitle} />}
 
       <div className="flex flex-col">
-        {!subscriptionStatus ? null : <SubscriptionInfoWrapper />}
+        {!subscriptionStatus ? null : (
+          <SubscriptionInfoWrapper
+            subscriptionStatusCheck={subscriptionStatus}
+          />
+        )}
 
         {/* Billing interval toggle */}
         <div className="flex justify-center pb-12">
           <div className="inline-flex items-center bg-muted rounded-lg p-1">
             <button
               className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
-                billingInterval === "monthly"
+                billingInterval === "MONTHLY"
                   ? "bg-background shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
-              onClick={() => setBillingInterval("monthly")}
+              onClick={() => setBillingInterval("MONTHLY")}
             >
               {t.billing.monthly}
             </button>
             <button
               className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
-                billingInterval === "annual"
+                billingInterval === "YEARLY"
                   ? "bg-background shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
-              onClick={() => setBillingInterval("annual")}
+              onClick={() => setBillingInterval("YEARLY")}
             >
               {t.billing.annual}
               <span className="ml-2 text-xs text-primary font-semibold">
@@ -243,12 +252,12 @@ export default function PricingComponent(props: { pageTitle?: boolean }) {
                     </span>
                     <span className="text-muted-foreground ml-2">
                       /
-                      {billingInterval === "monthly"
+                      {billingInterval === PlanInterval.MONTHLY
                         ? t.billing.month
                         : t.billing.year}
                     </span>
                   </div>
-                  {billingInterval === "annual" && (
+                  {billingInterval === PlanInterval.YEARLY && (
                     <p className="text-sm text-primary mt-2">
                       {t.billing.save} {getSavings(plan)}%
                     </p>
@@ -258,7 +267,7 @@ export default function PricingComponent(props: { pageTitle?: boolean }) {
 
               {!subscriptionStatus ? null : !user ||
                 subscriptionStatus.status ===
-                  SubscriptionStatusEnum.ACTIVE ? null : (
+                  SubscriptionStatus.ACTIVE ? null : (
                 <div className="mb-4 flex justify-center px-4">
                   <PaymentCheckout
                     _email={user.email || undefined}
@@ -272,7 +281,7 @@ export default function PricingComponent(props: { pageTitle?: boolean }) {
 
               <CardContent className="flex-grow">
                 <ul className="space-y-3 w-fit m-auto">
-                  {plan.features.map((feature, index) => (
+                  {plan.planFeatures.map((feature, index) => (
                     <li key={index} className="flex items-start">
                       <span
                         className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mr-3 mt-0.5 ${

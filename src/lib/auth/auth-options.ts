@@ -1,15 +1,18 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { NextAuthOptions } from "next-auth";
-import { User, UserRole, UserStatus } from "@/lib/prisma/generated";
-import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
-import { compareHash } from "../utils/passwordHandlers";
-import { SubscriptionStatusEnum } from "@/types";
+import {
+  SubscriptionStatus,
+  User,
+  UserRole,
+  UserStatus,
+} from "@/lib/prisma/generated";
+import { bcryptCompare, hashSha256 } from "../utils/passwordHandlers";
 import prisma from "../prisma";
-import { hashToken } from "./token-handlers";
 import { UserService } from "@/services/user/user.service";
 import { cookies } from "next/headers";
 import { AuthFlow } from "./auth-types";
+import { SubscriptionService } from "@/services/subscription/subscription.service";
 
 if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("NEXTAUTH_SECRET is not set in environment variables");
@@ -49,13 +52,13 @@ export const authOptions: NextAuthOptions = {
         }
 
         if (user.password) {
-          isPasswordValid = await compareHash(
+          isPasswordValid = await bcryptCompare(
             credentials.password,
             user.password,
           );
         }
         if (!isPasswordValid) {
-          const hashedPassword = hashToken(credentials.password);
+          const hashedPassword = hashSha256(credentials.password);
           const validOtp = validTokens.find(
             ({ hashedToken }) => hashedToken === hashedPassword,
           );
@@ -70,7 +73,10 @@ export const authOptions: NextAuthOptions = {
 
         if (!isPasswordValid) throw new Error("Invalid credentials");
 
-        const subscription = await getLociSubscriptionStatusByUserId(user.id);
+        const subscriptionCheck =
+          await SubscriptionService.getSubscriptionByUserId(user.id);
+
+        const subscription = subscriptionCheck.subscription;
 
         return {
           id: user.id,
@@ -78,8 +84,9 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           image: user.image,
           role: user.role,
-          subscriptionPlan: subscription.plan,
-          subscriptionStatus: subscription.status,
+          subscriptionStatus:
+            subscription?.status || SubscriptionStatus.INCOMPLETE,
+          // subscriptionPlan: subscription?.plan,
         };
       },
     }),
@@ -145,10 +152,14 @@ export const authOptions: NextAuthOptions = {
         token.role = dbUser.role;
         token.picture = dbUser.image;
 
-        const subscription = await getLociSubscriptionStatusByUserId(dbUser.id);
+        const subscriptionCheck =
+          await SubscriptionService.getSubscriptionByUserId(dbUser.id);
 
-        token.subscriptionStatus = subscription.status;
-        token.subscriptionPlan = subscription.plan;
+        const subscription = subscriptionCheck.subscription;
+
+        token.subscriptionStatus =
+          subscription?.status || SubscriptionStatus.INCOMPLETE;
+        token.subscriptionPlan = subscription?.plan;
       }
 
       // --- Session update (manual trigger) ---
@@ -163,9 +174,14 @@ export const authOptions: NextAuthOptions = {
 
       if (userId && elapsed > 24 * 60 * 60 * 1000) {
         try {
-          const subscription = await getLociSubscriptionStatusByUserId(userId);
-          token.subscriptionStatus = subscription.status;
-          token.subscriptionPlan = subscription.plan;
+          // const subscription = await getLociSubscriptionStatusByUserId(userId);
+          const subscriptionCheck =
+            await SubscriptionService.getSubscriptionByUserId(userId);
+          const subscription = subscriptionCheck.subscription;
+
+          token.subscriptionStatus =
+            subscription?.status || SubscriptionStatus.INCOMPLETE;
+          // token.subscriptionPlan = subscription?.plan;
         } catch (error) {
           console.error("Error refreshing user subscription:", error);
         }
@@ -183,8 +199,8 @@ export const authOptions: NextAuthOptions = {
       session.user.id = token.sub!;
       session.user.role = token.role || "USER";
       session.user.subscriptionStatus =
-        token.subscriptionStatus ?? SubscriptionStatusEnum.INACTIVE;
-      session.user.subscriptionPlan = token.subscriptionPlan ?? null;
+        token.subscriptionStatus ?? SubscriptionStatus.INCOMPLETE;
+      // session.user.subscriptionPlan = token.subscriptionPlan ?? null;
 
       return session;
     },

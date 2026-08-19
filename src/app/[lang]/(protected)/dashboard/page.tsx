@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 import { authOptions } from "@/lib/auth";
-import { Language } from "@/lib/i18n";
 
 import TitleSection from "@/components/ui/page-title";
 
@@ -18,8 +17,8 @@ import { InventoryAlerts } from "@/components/dashboard/overview/inventory-alert
 import { SalesChart } from "@/components/dashboard/overview/sales-chart";
 import { ActivityFeed } from "@/components/dashboard/overview/activity-feed";
 
-import { getDashboardStatsSummary } from "@/data/dashboard";
 import QuickActions from "@/components/dashboard/overview/quick-actions";
+import { getDashboardStatsSummary } from "@/actions/dashboard.actions";
 
 const translations = {
   en: {
@@ -47,7 +46,7 @@ export default async function DashboardPage({
 
   const t = translations[lang as keyof typeof translations] ?? translations.en;
 
-  const stats = await getDashboardStatsSummary(session.user.id);
+  const stats = await getDashboardStatsSummary();
 
   return (
     <div className="space-y-8 p-6">

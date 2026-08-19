@@ -1,3 +1,5 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -8,16 +10,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { TabsContent } from "@/components/ui/tabs";
-import { Payment } from "@/lib/prisma/generated";
-import { CheckCircle2Icon, CreditCardIcon } from "lucide-react";
+import { CreditCardIcon } from "lucide-react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
-import { SubscriptionStatus } from "@/types";
-import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
 import Loader from "@/components/ui/loaders";
-import { getPaymentsByUserId } from "@/data/payment";
 import {
   Table,
   TableBody,
@@ -31,13 +28,17 @@ import { useSession } from "next-auth/react";
 import SubscriptionInfo from "./subscription-info";
 import BillingInfo from "./billing-info";
 import PricingComponent from "@/components/pricing";
-import PageTitle from "@/components/ui/page-title";
+import { getUserSubscription } from "@/actions/subscription.actions";
+import { SubscriptionStatusCheck } from "@/types";
+import toast from "react-hot-toast";
+import { getPaymentsByUserId } from "@/actions/payment.actions";
+import { PaymentWithNumberAmount } from "@/actions/payment.actions.dto";
 
 export default function TabSubscription() {
   const { language } = useI18n();
   const [subscriptionStatus, setSubscriptionStatus] =
-    useState<SubscriptionStatus>();
-  const [payments, setPayments] = useState<Payment[]>();
+    useState<SubscriptionStatusCheck>();
+  const [payments, setPayments] = useState<PaymentWithNumberAmount[]>();
   const { data: session } = useSession();
   const userId = session?.user.id;
 
@@ -45,12 +46,19 @@ export default function TabSubscription() {
     if (!userId) return;
 
     const getSubStatus = async () => {
-      const _subscriptionStatus =
-        await getLociSubscriptionStatusByUserId(userId);
-      setSubscriptionStatus(_subscriptionStatus);
+      const resSubscriptionStatus = await getUserSubscription();
+
+      if (!resSubscriptionStatus.ok) {
+        toast.error(resSubscriptionStatus.error);
+        return;
+      }
+
+      console.log("subscription:", resSubscriptionStatus.data);
+
+      setSubscriptionStatus(resSubscriptionStatus.data);
     };
     const getPayments = async () => {
-      const _payments = await getPaymentsByUserId(userId);
+      const _payments = await getPaymentsByUserId();
       setPayments(_payments);
     };
 
@@ -68,13 +76,13 @@ export default function TabSubscription() {
         <CardContent className="space-y-6">
           {!subscriptionStatus ? (
             <Loader />
-          ) : subscriptionStatus?.plan ? (
+          ) : subscriptionStatus.subscription ? (
             <>
-              <SubscriptionInfo subscriptionStatus={subscriptionStatus} />
+              <SubscriptionInfo subscriptionStatusCheck={subscriptionStatus} />
 
               <Separator />
 
-              <BillingInfo subscriptionStatus={subscriptionStatus} />
+              <BillingInfo subscriptionStatusCheck={subscriptionStatus} />
             </>
           ) : (
             <div className="text-center py-12 space-y-4">

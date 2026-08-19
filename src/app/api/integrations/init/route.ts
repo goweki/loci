@@ -6,61 +6,91 @@ import {
 import { metaSyncService } from "@/lib/whatsapp";
 import { UserRole } from "@/lib/prisma/generated";
 import { UserService } from "@/services/user/user.service";
-import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
+import prisma from "@/lib/prisma";
 
-const postInit: AuthenticatedHandler = async (request, apiKey) => {
+const postInit: AuthenticatedHandler = async (request: NextRequest, apiKey) => {
   try {
-    const user = await UserService.getUserByKey(apiKey.user.id);
-    const subscriptionStatus = await getLociSubscriptionStatusByUserId(user.id);
+    // 1. Fetch user by the user ID bound to the API Key
+    const actor = await prisma.user.findUnique({where:{id:apiKey.user.id}});
 
-    if (user?.role !== UserRole.ADMIN)
-      return NextResponse.json({ error: "uskue mjanja" }, { status: 400 });
+    if (!actor) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized user account" },
+        { status: 401 },
+      );
+    }
 
-    const body = await request.json();
+    // 2. Role Check (ADMIN guard)
+    if (actor.role !== UserRole.ADMIN) {
+      return NextResponse.json(
+        { success: false, error: "Access denied. Admin privileges required." },
+        { status: 403 },
+      );
+    }
 
-    const launchDate = body.launchDate;
+    // 3. Safe JSON Body Parsing
+    const body = await request.json().catch(() => ({}));
+    const { launchDate } = body;
 
-    if (launchDate !== process.env.LAUNCH_DATE) {
-      console.error("invalid launch date", launchDate, process.env.LAUNCH_DATE);
+    // 4. Validate Environment Secret Launch Parameter
+    if (!launchDate || launchDate !== process.env.LAUNCH_DATE) {
+      console.error(
+        "[META_SYNC_ROUTE]: Invalid launch date verification:",
+        launchDate,
+        "Expected:",
+        process.env.LAUNCH_DATE,
+      );
       return NextResponse.json(
         {
           success: false,
-          details: "Invalid info, bro...",
+          error: "Invalid launch verification date.",
         },
         { status: 400 },
       );
     }
 
-    const user_ = {
-      id: user.id,
-      role: user.role,
-      email: user.email,
-      subscriptionStatus,
+    // 5. Construct User context for Sync Service
+    const userPayload = {
+      id: actor.id,
+      role: actor.role,
+      email: actor.email,
+      name: actor.name ?? undefined,
     };
 
-    const syncRes = await metaSyncService.syncFromMeta(user_);
+    // 6. Execute Meta Sync
+    const syncRes = await metaSyncService.syncFromMeta(userPayload as any);
 
+    // 7. Handle partial or total sync failures
     if (syncRes.errors.length > 0) {
       return NextResponse.json(
         {
           success: false,
-          error: "synchronization failed",
-          details: JSON.stringify(syncRes.errors),
+          error: "Synchronization encountered errors",
+          created: syncRes.created,
+          updated: syncRes.updated,
+          errors: syncRes.errors,
         },
         { status: 500 },
       );
     }
 
+    // 8. Success Response
     return NextResponse.json({
       success: true,
-      details: `synchronized: created-${syncRes.created}, updated-${syncRes.updated}`,
+      message: `Synchronization successful: created ${syncRes.created}, updated ${syncRes.updated}`,
+      created: syncRes.created,
+      updated: syncRes.updated,
     });
   } catch (error: any) {
     console.error(`[WABA_DISPATCH_ERROR]:`, error);
 
     return NextResponse.json(
-      { error: "Failed to init", details: error.message },
-      { status: error.status || 502 },
+      {
+        success: false,
+        error: "Failed to initialize Meta synchronization",
+        details: error?.message || "Internal Server Error",
+      },
+      { status: error?.status || 500 },
     );
   }
 };

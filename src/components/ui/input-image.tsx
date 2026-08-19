@@ -4,6 +4,7 @@ import * as React from "react";
 import { ImagePlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { resizeImageFile } from "@/lib/utils/reactImageHandlers";
 
 interface ImageInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   name?: string;
@@ -17,7 +18,7 @@ export const ImageInput = React.forwardRef<HTMLInputElement, ImageInputProps>(
     {
       name = "image",
       defaultPreview,
-      maxSizeMB = 5,
+      maxSizeMB = 2.4,
       onFileSelect,
       className,
       disabled,
@@ -36,7 +37,7 @@ export const ImageInput = React.forwardRef<HTMLInputElement, ImageInputProps>(
     );
     const [error, setError] = React.useState<string | null>(null);
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       setError(null);
 
@@ -45,7 +46,7 @@ export const ImageInput = React.forwardRef<HTMLInputElement, ImageInputProps>(
         return;
       }
 
-      // Optional file size check
+      // file size check
       if (file.size > maxSizeMB * 1024 * 1024) {
         setError(`File size exceeds ${maxSizeMB}MB limit.`);
         if (inputRef.current) inputRef.current.value = "";
@@ -53,10 +54,11 @@ export const ImageInput = React.forwardRef<HTMLInputElement, ImageInputProps>(
         return;
       }
 
-      // Generate a lightweight blob URL string for rendering the image preview
-      const objectUrl = URL.createObjectURL(file);
+      const resizedFile = await resizeImageFile(file);
+
+      const objectUrl = URL.createObjectURL(resizedFile);
       setPreviewUrl(objectUrl);
-      onFileSelect?.(file);
+      onFileSelect?.(resizedFile);
     };
 
     const handleRemove = () => {

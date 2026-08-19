@@ -3,13 +3,10 @@
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
 import { PhoneNumberStatus } from "@/lib/prisma/generated";
-import {
-  createPhoneNumberAction,
-  getPhoneNumbersByUserAction,
-} from "@/data/phoneNumber";
 import prisma from "@/lib/prisma";
+import { getUserSubscription } from "@/actions/subscription.actions";
+import { createPhoneNumberAction } from "@/actions/phoneNumber.actions";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -18,18 +15,18 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { phoneNumber, displayName, wabaId } = body;
 
-  const subscriptionStatus = await getLociSubscriptionStatusByUserId(
-    session.user.id,
-  );
+  const subscriptionStatus = await getUserSubscription();
 
-  if (!subscriptionStatus.plan) {
+  if (!subscriptionStatus.ok || !subscriptionStatus.data.subscription) {
     return NextResponse.json(
       { error: "Get a plan to add a phone number" },
       { status: 402 },
     );
   }
 
-  const maxPhoneNumbers = subscriptionStatus.plan.maxPhoneNumbers;
+  const subscription = subscriptionStatus.data.subscription;
+
+  const maxPhoneNumbers = subscription.plan.maxPhoneNumbers;
   const phoneNumbers = await prisma.phoneNumber.findMany({
     where: { waba: { userId: session.user.id } },
   });

@@ -28,12 +28,12 @@ import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { dateLong, datetimeStamp } from "@/lib/utils/dateHandlers";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ApiKey } from "@/actions/api-key.actions/api-key.actions.dto";
 import {
-  ApiKey,
   generateUserApiKey,
   getUserApiKeys,
   revokeApiKey,
-} from "@/actions/api-key";
+} from "@/actions/api-key.actions";
 
 export function TabSecurity() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>();
@@ -41,7 +41,7 @@ export function TabSecurity() {
 
   const fetchApiKeys = useCallback(async () => {
     if (!session?.user.id) return;
-    const _apiKeys = await getUserApiKeys(session.user.id);
+    const _apiKeys = await getUserApiKeys();
     setApiKeys(_apiKeys);
   }, [session?.user]);
 
@@ -227,8 +227,14 @@ export function TabSecurity() {
     const handleRevoke = async (id: string) => {
       if (!confirm("Are you sure? This action cannot be undone.")) return;
       try {
-        const delkeyName = await revokeApiKey(id);
-        toast.success(`Key revoked: ${delkeyName}`);
+        const resRevoke = await revokeApiKey(id);
+        if (!resRevoke.ok) {
+          toast.error(resRevoke.error);
+          return;
+        }
+
+        toast.success(`Key revoked`);
+
         refreshKeys();
       } catch (err) {
         toast.error("Failed to revoke key");

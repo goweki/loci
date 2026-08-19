@@ -12,13 +12,16 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { initializePayment } from "@/lib/payments";
-import { createPayment } from "@/data/payment";
-import { createLociSubscription } from "@/data/subscription";
-import { Currency, PaymentMethod, PlanName } from "@/lib/prisma/generated";
+import {
+  Currency,
+  PaymentMethod,
+  PlanInterval,
+  PlanName,
+} from "@/lib/prisma/generated";
 import Loader from "@/components/ui/loaders";
 import toast from "react-hot-toast";
-import { createOrderAction } from "@/actions/order.actions";
-import { getProductByPlanName } from "@/actions/product.actions";
+import { createPaymentAction } from "@/actions/payment.actions";
+import { createSubscriptionAction } from "@/actions/subscription.actions";
 
 export function PaymentCheckout({
   _email,
@@ -30,7 +33,7 @@ export function PaymentCheckout({
   _email?: string;
   amount: number;
   planName: PlanName;
-  billingInterval: string;
+  billingInterval: PlanInterval;
   userId: string;
 }) {
   const packag = `${planName}_${billingInterval}`;
@@ -47,51 +50,33 @@ export function PaymentCheckout({
     setIsProcessing(true);
 
     try {
+      const paymentReference = `${packag}_${userId}_${Date.now()}`;
+
       // 1️⃣ Create subscription
-      const subscription = await createLociSubscription(
+      const resSubscription = await createSubscriptionAction({
         userId,
-        planName as PlanName,
-      );
-
-      // 2️⃣ Create payment record in DB
-      const reference = `${packag}_${userId}_${Date.now()}`;
-      const productRes = await getProductByPlanName(planName);
-
-      if (!productRes.ok) {
-        throw new Error(`Plan product does not exist: ${planName}`);
-      }
-
-      const orderRes = await createOrderAction({
-        currency: Currency.KES,
-        notes: "LOCi subscription",
-        items: [
-          {
-            productId: productRes.data.id,
-            quantity: 1,
-          },
-        ],
-      });
-
-      if (!orderRes.ok) {
-        throw new Error(`Order creation for plan failed: ${planName}`);
-      }
-
-      await createPayment({
-        reference,
-        orderId: orderRes.data.id,
+        planName: planName as PlanName,
+        interval: billingInterval,
+        paymentMethod: PaymentMethod.PAYSTACK,
+        paymentReference,
         amount,
-        method: PaymentMethod.PAYSTACK,
       });
 
-      // 3️⃣ Initialize Paystack payment
-      const result = await initializePayment(email, amount, reference);
+      if (!resSubscription.ok) {
+        toast.error(resSubscription.error);
+        return;
+      }
+
+      // 2️⃣  Initialize Paystack payment
+      const result = await initializePayment(email, amount, paymentReference);
 
       if (result?.authorization_url) {
-        // 4️⃣ Redirect user to Paystack checkout
+        //  3️⃣  Redirect user to Paystack checkout
         window.location.href = result.authorization_url;
       } else {
-        // Payment initialization failed
+        //  4️⃣  Payment initialization failed
         console.error("Payment initialization failed", result);
+        toast.error(`${result?.access_code} - Payment initialization failed`);
         setIsProcessing(false);
       }
     } catch (error) {

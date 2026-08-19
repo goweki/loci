@@ -218,12 +218,13 @@ import { BASE_URL } from "@/lib/utils/getUrl";
 
 interface ShareLinkDialogProps {
   product: ProductWithRelations;
+  link: string;
 }
 
-export function ShareLinkDialog({ product }: ShareLinkDialogProps) {
+export function ShareLinkDialog({ product, link }: ShareLinkDialogProps) {
   const [copied, setCopied] = useState(false);
 
-  const productLink = `${BASE_URL}/en/product/${product.id}`;
+  const productLink = link;
   const shareText = `Check out ${product.name}`;
 
   async function copyLink() {

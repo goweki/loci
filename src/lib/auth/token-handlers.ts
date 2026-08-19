@@ -4,13 +4,12 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { TokenType } from "../prisma/generated";
-import { addToDate } from "../utils/dateHandlers";
-import { tokenRepository } from "@/data/repositories/token.repository";
 import { UserService } from "@/services/user/user.service";
+import { hashSha256 } from "../utils/passwordHandlers";
 
 export type ApiKeyAuth = {
   id: string;
-  user: { id: string };
+  user: { id: string; username: string };
 };
 
 export type ApiKeyValidationResult = ApiKeyAuth | NextResponse;
@@ -19,14 +18,10 @@ export type ApiKeyValidationResult = ApiKeyAuth | NextResponse;
  * Generate secure API key string
  */
 function generateApiKeyString() {
-  return "loc_i_" + crypto.randomBytes(32).toString("hex");
-}
-
-/**
- * Hash API key before storage
- */
-export function hashToken(token: string) {
-  return crypto.createHash("sha256").update(token).digest("hex");
+  return (
+    `loc_${TokenType.API_KEY.toLocaleLowerCase()}_` +
+    crypto.randomBytes(32).toString("hex")
+  );
 }
 
 /**
@@ -45,15 +40,29 @@ export async function createApiKey(options: {
 
   const rawKey = generateApiKeyString();
 
-  const keyHash = hashToken(rawKey);
+  const keyHash = hashSha256(rawKey);
 
-  const apiKey = await tokenRepository.upsertToken({
-    userId: options.userId,
-    description: options.description,
-    type: TokenType.API_KEY,
-    hashedToken: keyHash,
-    expiresAt: options.expiresAt,
-    isActive: true,
+  const apiKey = await prisma.token.upsert({
+    where: {
+      type_userId: {
+        type: TokenType.API_KEY,
+        userId: options.userId,
+      },
+    },
+    create: {
+      userId: options.userId,
+      description: options.description,
+      type: TokenType.API_KEY,
+      hashedToken: keyHash,
+      expiresAt: options.expiresAt,
+      isActive: true,
+    },
+    update: {
+      description: options.description,
+      hashedToken: keyHash,
+      expiresAt: options.expiresAt,
+      isActive: true,
+    },
   });
 
   return {
@@ -73,9 +82,12 @@ export async function validateToken(
     return NextResponse.json({ error: "Missing API key" }, { status: 401 });
   }
 
-  const hashedToken = hashToken(token);
+  const hashedToken = hashSha256(token);
 
-  const apiKey_inDb = await tokenRepository.findValidToken(hashedToken, type);
+  const apiKey_inDb = await prisma.token.findFirst({
+    where: { hashedToken, type },
+    include: { user: true },
+  });
 
   if (!apiKey_inDb) {
     return NextResponse.json({ error: "Invalid API key" }, { status: 401 });
@@ -92,7 +104,10 @@ export async function validateToken(
   /**
    * Update last used timestamp
    */
-  await tokenRepository.touch(apiKey_inDb.id);
+  await prisma.token.update({
+    where: { id: apiKey_inDb.id },
+    data: { lastUsedAt: new Date() },
+  });
 
   return {
     id: apiKey_inDb.id,
@@ -117,7 +132,7 @@ export function extractApiKey(req: Request): string {
 
 export type AuthenticatedHandler = (
   request: NextRequest,
-  apiKey: { id: string; user: { id: string } },
+  apiKey: { id: string; user: { id: string; username: string } },
 ) => Promise<Response | NextResponse> | Response | NextResponse;
 
 export function apiKeyMiddleware(handler: AuthenticatedHandler) {

@@ -104,30 +104,30 @@ export async function getPublicProductById(
   }
 }
 
-export async function getProductByPlanName(planName: PlanName): Promise<
+export async function getPlanByName(planName: PlanName): Promise<
   ActionResult<
-    Omit<Prisma.ProductGetPayload<{}>, "price"> & {
-      price: number;
-    }
+    Prisma.PlanGetPayload<{
+      include: {
+        subscriptions: true;
+      };
+    }>
   >
 > {
   try {
-    const plan_ = await prisma.plan.findUnique({
+    const plan = await prisma.plan.findUnique({
       where: {
         name: planName,
       },
       include: {
-        product: true,
+        subscriptions: true,
       },
     });
 
-    const product = plan_?.product;
-
-    if (!product) notFound();
+    if (!plan) notFound();
 
     return {
       ok: true,
-      data: { ...product, price: product.price.toNumber() },
+      data: plan,
     };
   } catch (error) {
     return {

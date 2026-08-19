@@ -8,7 +8,6 @@ import {
   Search,
   Check,
   X,
-  Download,
   PhoneCall,
   Copy,
   TrendingUp,
@@ -37,10 +36,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import NewContactForm from "./new-contact-form";
-import {
-  getPhoneNumberByIdAction,
-  PhoneNumberWithRelations,
-} from "@/data/phoneNumber";
+import { getPhoneNumberByIdAction } from "@/actions/phoneNumber.actions";
+import { PhoneNumberWithRelations } from "@/services/waba/waba.service";
 
 const isNotNull = <T,>(value: T | null): value is T => value !== null;
 

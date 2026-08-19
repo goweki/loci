@@ -1,3 +1,5 @@
+"use client";
+
 import { EditIcon, PlusIcon, RefreshCwIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +13,7 @@ import { TabsContent } from "@/components/ui/tabs";
 import { PhoneNumber } from "@/lib/prisma/generated";
 import { useCallback, useEffect, useState } from "react";
 import Loader from "@/components/ui/loaders";
-import { getAllPhoneNumbersAction } from "@/data/phoneNumber";
+import { getAllPhoneNumbersAction } from "@/actions/phoneNumber.actions";
 
 export default function TabPhoneNumbers() {
   const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumber[]>();

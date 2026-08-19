@@ -37,6 +37,7 @@ import {
 import type { WhatsAppClientEnv } from "../types/environment-variables";
 import { Prisma } from "@/lib/prisma/generated";
 import { Template as TemplateOptions } from "../types/waba-template";
+import { ActionResult } from "@/types";
 
 export class WhatsAppClient {
   private logger = new WhatsAppLogger({ maskSecrets: true });
@@ -198,22 +199,52 @@ export class WhatsAppClient {
     return json;
   }
 
+  // async getPhoneNumberDetails(
+  //   phoneNumberId: string,
+  // ): Promise<WabaPhoneNumberDetailsResponse> {
+  //   const url = `${this.baseUrl}/${phoneNumberId}`;
+
+  //   this.logger.info("Fetching phone number details", { phoneNumberId });
+
+  //   const headers = {
+  //     Authorization: `Bearer ${this.env.wabaAccessToken}`,
+  //   };
+
+  //   const res = await fetch(url, { headers });
+  //   const json = await res.json();
+
+  //   if (!res.ok) {
+  //     this.logger.error("WhatsApp API Error (phoneDetails)", json);
+  //     throw normalizeWhatsAppError(res.status, json);
+  //   }
+
+  //   return json;
+  // }
   async getPhoneNumberDetails(
     phoneNumberId: string,
-  ): Promise<WabaPhoneNumberDetailsResponse> {
-    const url = `${this.baseUrl}/${phoneNumberId}`;
+    accessToken?: string,
+  ): Promise<
+    WabaPhoneNumberDetailsResponse & {
+      display_phone_number?: string;
+      verified_name?: string;
+    }
+  > {
+    const token = accessToken ?? this.env.wabaAccessToken;
+    const url = `${this.baseUrl}/${phoneNumberId}?fields=display_phone_number,verified_name`;
 
     this.logger.info("Fetching phone number details", { phoneNumberId });
 
-    const headers = {
-      Authorization: `Bearer ${this.env.wabaAccessToken}`,
-    };
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-    const res = await fetch(url, { headers });
     const json = await res.json();
 
     if (!res.ok) {
-      this.logger.error("WhatsApp API Error (phoneDetails)", json);
+      this.logger.error("WhatsApp API Error (getPhoneNumberDetails)", json);
       throw normalizeWhatsAppError(res.status, json);
     }
 
@@ -490,23 +521,55 @@ export class WhatsAppClient {
   // WABA
   // ---------------------------------------------------------------------
 
-  async getWaba(wabaId?: string): Promise<{
+  // async getWaba(wabaId?: string): Promise<{
+  //   id: string;
+  //   name: string;
+  //   timezone_id?: string;
+  //   message_template_namespace: string;
+  // }> {
+  //   const url = `${this.baseUrl}/${wabaId ?? this.env.wabaId}`;
+  //   const _res = await fetch(url, {
+  //     headers: {
+  //       Authorization: `Bearer ${this.env.wabaAccessToken}`,
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
+  //   if (!_res.ok) {
+  //     throw new Error(`Failed to fetch WABA ${wabaId}: ${_res.statusText}`);
+  //   }
+  //   return await _res.json();
+  // }
+
+  // Fetch WABA Details (Accepts optional dynamic access_token)
+  async getWaba(
+    wabaId?: string,
+    accessToken?: string,
+  ): Promise<{
     id: string;
     name: string;
+    currency?: string;
     timezone_id?: string;
-    message_template_namespace: string;
+    message_template_namespace?: string;
   }> {
-    const url = `${this.baseUrl}/${wabaId ?? this.env.wabaId}`;
-    const _res = await fetch(url, {
+    const token = accessToken ?? this.env.wabaAccessToken;
+    const id = wabaId ?? this.env.wabaId;
+    const url = `${this.baseUrl}/${id}?fields=name,currency,timezone_id,message_template_namespace`;
+
+    const res = await fetch(url, {
       headers: {
-        Authorization: `Bearer ${this.env.wabaAccessToken}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
-    if (!_res.ok) {
-      throw new Error(`Failed to fetch WABA ${wabaId}: ${_res.statusText}`);
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      this.logger.error("WhatsApp API Error (getWaba)", json);
+      throw normalizeWhatsAppError(res.status, json);
     }
-    return await _res.json();
+
+    return json;
   }
 
   async getOwnedWabas(businessId?: string): Promise<
@@ -621,14 +684,48 @@ export class WhatsAppClient {
     );
   }
 
-  async getTokenUsingWabaAuthCode(
-    code: string,
-  ): Promise<GetTokenUsingWabaAuthCodeResult> {
-    return _getTokenUsingWabaAuthCode(
-      this.baseUrl,
-      code,
-      this.env.fbAppId,
-      this.env.appSecret,
-    );
+  async getTokenUsingWabaAuthCode(code: string): Promise<ActionResult<string>> {
+    try {
+      const url = new URL(`${this.baseUrl}/oauth/access_token`);
+      url.searchParams.append("client_id", this.env.fbAppId);
+      url.searchParams.append("client_secret", this.env.appSecret);
+      url.searchParams.append("code", code);
+
+      this.logger.info("Exchanging auth code for access token...");
+
+      const res = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || json.error) {
+        this.logger.error(
+          "WhatsApp API Error (getTokenUsingWabaAuthCode)",
+          json,
+        );
+        return {
+          ok: false,
+          error:
+            json.error?.message ||
+            "Failed to exchange authorization code for access token",
+        };
+      }
+
+      return {
+        ok: true,
+        data: json.access_token,
+      };
+    } catch (error: any) {
+      this.logger.error("Error exchanging WABA auth code:", error);
+      return {
+        ok: false,
+        error:
+          error.message || "An unexpected error occurred during token exchange",
+      };
+    }
   }
 }

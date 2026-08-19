@@ -1,7 +1,7 @@
 // lib/whatsapp/generate-template.ts
 "use server";
 
-import { WabaTemplateRepository } from "@/data/repositories/waba-template";
+import prisma from "@/lib/prisma";
 import { TemplateLanguage } from "@/lib/prisma/generated";
 import whatsapp from "@/lib/whatsapp";
 import {
@@ -27,7 +27,7 @@ export async function createTemplate(
     createdById: string;
     language?: TemplateLanguage;
     wabaId?: string;
-  }
+  },
 ) {
   const wabaId_ = data.wabaId || process.env.WABA_ID;
   if (!wabaId_) {
@@ -37,14 +37,16 @@ export async function createTemplate(
 
   const { id, status, category } = res;
 
-  return WabaTemplateRepository.create({
-    id,
-    name: data.name,
-    status,
-    category,
-    language: data.language || TemplateLanguage.en_US,
-    components: data.components,
-    wabaId: wabaId_,
-    createdById: data.createdById,
+  return prisma.wabaTemplate.create({
+    data: {
+      id,
+      name: data.name,
+      status,
+      category,
+      language: data.language || TemplateLanguage.en_US,
+      components: data.components,
+      wabaId: wabaId_,
+      createdById: data.createdById,
+    },
   });
 }

@@ -1,6 +1,6 @@
 "use server";
 
-import { hash, generateRandom } from "@/lib/utils/passwordHandlers";
+import { bcryptHash, generateRandom } from "@/lib/utils/passwordHandlers";
 
 export async function generateResetToken(): Promise<{
   plain: string;
@@ -8,7 +8,7 @@ export async function generateResetToken(): Promise<{
   expiry: Date;
 }> {
   const plain = await generateRandom(11);
-  const hashed = await hash(plain);
+  const hashed = await bcryptHash(plain);
   const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
   return { plain, hashed, expiry };

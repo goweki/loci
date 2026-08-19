@@ -24,12 +24,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 7.8.0
- * Query Engine version: 3c6e192761c0362d496ed980de936e2f3cebcd3a
+ * Prisma Client JS version: 7.9.1
+ * Query Engine version: e922089b7d7502aff4249d5da3420f6fa55fc6ad
  */
 Prisma.prismaVersion = {
-  client: "7.8.0",
-  engine: "3c6e192761c0362d496ed980de936e2f3cebcd3a"
+  client: "7.9.1",
+  engine: "e922089b7d7502aff4249d5da3420f6fa55fc6ad"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -150,6 +150,46 @@ exports.Prisma.TokenScalarFieldEnum = {
   lastUsedAt: 'lastUsedAt'
 };
 
+exports.Prisma.PlanScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  monthlyPrice: 'monthlyPrice',
+  maxPhoneNumbers: 'maxPhoneNumbers',
+  maxMessagesPerMonth: 'maxMessagesPerMonth',
+  active: 'active',
+  popular: 'popular',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  planId: 'planId',
+  status: 'status',
+  interval: 'interval',
+  currentPeriodStart: 'currentPeriodStart',
+  currentPeriodEnd: 'currentPeriodEnd',
+  cancelAtPeriodEnd: 'cancelAtPeriodEnd',
+  canceledAt: 'canceledAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SubscriptionPaymentScalarFieldEnum = {
+  id: 'id',
+  transactionId: 'transactionId',
+  paymentMethod: 'paymentMethod',
+  subscriptionId: 'subscriptionId',
+  amount: 'amount',
+  currency: 'currency',
+  status: 'status',
+  paidAt: 'paidAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.WabaAccountScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -176,16 +216,6 @@ exports.Prisma.WabaTemplateScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.SubscriptionScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  productId: 'productId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  cancelDate: 'cancelDate',
-  startDate: 'startDate'
-};
-
 exports.Prisma.PaymentScalarFieldEnum = {
   id: 'id',
   transactionId: 'transactionId',
@@ -195,20 +225,6 @@ exports.Prisma.PaymentScalarFieldEnum = {
   currency: 'currency',
   status: 'status',
   paidAt: 'paidAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.PlanScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  description: 'description',
-  price: 'price',
-  popular: 'popular',
-  interval: 'interval',
-  maxPhoneNumbers: 'maxPhoneNumbers',
-  maxMessagesPerMonth: 'maxMessagesPerMonth',
-  active: 'active',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -294,7 +310,6 @@ exports.Prisma.AutoReplyRuleScalarFieldEnum = {
   priority: 'priority',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  active: 'active',
   createdById: 'createdById'
 };
 
@@ -304,21 +319,6 @@ exports.Prisma.WebhookEventScalarFieldEnum = {
   payload: 'payload',
   processed: 'processed',
   createdAt: 'createdAt'
-};
-
-exports.Prisma.AccountScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  type: 'type',
-  provider: 'provider',
-  providerAccountId: 'providerAccountId',
-  refresh_token: 'refresh_token',
-  access_token: 'access_token',
-  expires_at: 'expires_at',
-  token_type: 'token_type',
-  scope: 'scope',
-  id_token: 'id_token',
-  session_state: 'session_state'
 };
 
 exports.Prisma.ProductScalarFieldEnum = {
@@ -488,6 +488,43 @@ exports.NotificationChannel = exports.$Enums.NotificationChannel = {
   SMS: 'SMS'
 };
 
+exports.PlanName = exports.$Enums.PlanName = {
+  BASIC: 'BASIC',
+  STANDARD: 'STANDARD',
+  PREMIUM: 'PREMIUM'
+};
+
+exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
+  INCOMPLETE: 'INCOMPLETE',
+  ACTIVE: 'ACTIVE',
+  PAST_DUE: 'PAST_DUE',
+  CANCELED: 'CANCELED',
+  EXPIRED: 'EXPIRED'
+};
+
+exports.PlanInterval = exports.$Enums.PlanInterval = {
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY'
+};
+
+exports.PaymentMethod = exports.$Enums.PaymentMethod = {
+  PAYSTACK: 'PAYSTACK',
+  MPESA: 'MPESA',
+  CARD: 'CARD',
+  BANK: 'BANK'
+};
+
+exports.Currency = exports.$Enums.Currency = {
+  KES: 'KES',
+  USD: 'USD'
+};
+
+exports.PaymentStatus = exports.$Enums.PaymentStatus = {
+  PENDING: 'PENDING',
+  SUCCESS: 'SUCCESS',
+  FAILED: 'FAILED'
+};
+
 exports.WabaOwnership = exports.$Enums.WabaOwnership = {
   OWNED: 'OWNED',
   SHARED: 'SHARED'
@@ -511,37 +548,6 @@ exports.TemplateLanguage = exports.$Enums.TemplateLanguage = {
   en_GB: 'en_GB',
   fr_FR: 'fr_FR',
   sw_KE: 'sw_KE'
-};
-
-exports.PaymentMethod = exports.$Enums.PaymentMethod = {
-  PAYSTACK: 'PAYSTACK',
-  MPESA: 'MPESA',
-  CARD: 'CARD',
-  BANK: 'BANK',
-  CASH: 'CASH',
-  WHATSAPP: 'WHATSAPP'
-};
-
-exports.Currency = exports.$Enums.Currency = {
-  KES: 'KES',
-  USD: 'USD'
-};
-
-exports.PaymentStatus = exports.$Enums.PaymentStatus = {
-  PENDING: 'PENDING',
-  SUCCESS: 'SUCCESS',
-  FAILED: 'FAILED'
-};
-
-exports.PlanName = exports.$Enums.PlanName = {
-  BASIC: 'BASIC',
-  STANDARD: 'STANDARD',
-  PREMIUM: 'PREMIUM'
-};
-
-exports.PlanInterval = exports.$Enums.PlanInterval = {
-  MONTHLY: 'MONTHLY',
-  YEARLY: 'YEARLY'
 };
 
 exports.PhoneNumberStatus = exports.$Enums.PhoneNumberStatus = {
@@ -582,13 +588,6 @@ exports.TriggerType = exports.$Enums.TriggerType = {
   DEFAULT: 'DEFAULT'
 };
 
-exports.AccountType = exports.$Enums.AccountType = {
-  oauth: 'oauth',
-  oidc: 'oidc',
-  email: 'email',
-  credentials: 'credentials'
-};
-
 exports.OrderStatus = exports.$Enums.OrderStatus = {
   PENDING: 'PENDING',
   SENT: 'SENT',
@@ -616,11 +615,12 @@ exports.ContactStatus = exports.$Enums.ContactStatus = {
 exports.Prisma.ModelName = {
   User: 'User',
   Token: 'Token',
+  Plan: 'Plan',
+  Subscription: 'Subscription',
+  SubscriptionPayment: 'SubscriptionPayment',
   WabaAccount: 'WabaAccount',
   WabaTemplate: 'WabaTemplate',
-  Subscription: 'Subscription',
   Payment: 'Payment',
-  Plan: 'Plan',
   Feature: 'Feature',
   PlanFeature: 'PlanFeature',
   PhoneNumber: 'PhoneNumber',
@@ -629,7 +629,6 @@ exports.Prisma.ModelName = {
   MessageUnprocessed: 'MessageUnprocessed',
   AutoReplyRule: 'AutoReplyRule',
   WebhookEvent: 'WebhookEvent',
-  Account: 'Account',
   Product: 'Product',
   Order: 'Order',
   OrderItem: 'OrderItem',

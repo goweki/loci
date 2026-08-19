@@ -1,25 +1,12 @@
-// app/api/messages/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { NextResponse } from "next/server";
 import db from "@/lib/prisma";
-import { extractApiKey, hashToken } from "@/lib/auth/token-handlers";
-import { tokenRepository } from "@/data/repositories/token.repository";
-import { TokenType } from "@/lib/prisma/generated";
+import {
+  apiKeyMiddleware,
+  AuthenticatedHandler,
+} from "@/lib/auth/token-handlers";
 
-export async function GET(request: NextRequest) {
-  let userId: string | null = null;
-
-  const session = await getServerSession(authOptions);
-  if (session?.user.id) userId = session?.user.id;
-  else {
-    const apiKey = extractApiKey(request);
-    const token_inDb = await tokenRepository.findValidToken(
-      hashToken(apiKey),
-      TokenType.API_KEY,
-    );
-    userId = token_inDb?.user.id || null;
-  }
+const getMessages: AuthenticatedHandler = async (request, apiKey) => {
+  let userId = apiKey.id;
 
   if (!userId) {
     return new NextResponse("Unauthorized", { status: 401 });
@@ -47,4 +34,6 @@ export async function GET(request: NextRequest) {
   });
 
   return NextResponse.json({ messages });
-}
+};
+
+export const GET = apiKeyMiddleware(getMessages);

@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { parsePaystackWebhook } from "./parser";
-import { markPaymentSuccessful, markPaymentFailed } from "@/data/payment";
+import {
+  markPaymentFailed,
+  markPaymentSuccessful,
+} from "@/actions/payment.actions";
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
@@ -10,7 +13,7 @@ export async function POST(req: NextRequest) {
     console.error("Missing PAYSTACK_SECRET_KEY in environment");
     return NextResponse.json(
       { error: "Payment configuration failure. Contact admin" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
