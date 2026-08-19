@@ -38,7 +38,7 @@ export async function authorizeMessageSend(userId: string, message: Message) {
     : null;
 
   if (resPhoneOwnership && !resPhoneOwnership?.ok) {
-    throw new Error(resPhoneOwnership?.error);
+    throw new Error(resPhoneOwnership?.error || "Phone number ownership error");
   }
 
   const [subscription, limits] = await Promise.all<
