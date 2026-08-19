@@ -8,6 +8,7 @@ import {
   PaymentStatus,
   Prisma,
   SubscriptionPayment,
+  SubscriptionStatus,
 } from "@/lib/prisma/generated";
 import { PrismaClientInitializationError } from "@/lib/prisma/generated/runtime/client";
 import { PaymentWithNumberAmount } from "./payment.actions.dto";
@@ -80,7 +81,7 @@ export async function getPaymentByReferenceAction(reference: string) {
 export async function markPaymentSuccessful(reference: string): Promise<true> {
   console.log(`Marking successful: ${reference}`);
 
-  // Try regular payments first
+  // Regular payment
   const paymentResult = await prisma.payment.updateMany({
     where: {
       transactionId: reference,
@@ -94,25 +95,44 @@ export async function markPaymentSuccessful(reference: string): Promise<true> {
     return true;
   }
 
-  // Try subscription payments
-  const subscriptionPaymentResult = await prisma.subscriptionPayment.updateMany(
-    {
+  // Subscription payment
+  const subscriptionPayment = await prisma.subscriptionPayment.findUnique({
+    where: {
+      transactionId: reference,
+    },
+    select: {
+      id: true,
+      subscriptionId: true,
+    },
+  });
+
+  if (!subscriptionPayment) {
+    console.warn(`[PAYMENT NOT FOUND]: reference=${reference}`);
+    throw new Error(`Failed to mark payment as successful: ${reference}`);
+  }
+
+  // Update payment + subscription atomically
+  await prisma.$transaction([
+    prisma.subscriptionPayment.update({
       where: {
-        transactionId: reference,
+        id: subscriptionPayment.id,
       },
       data: {
         status: PaymentStatus.SUCCESS,
       },
-    },
-  );
+    }),
 
-  if (subscriptionPaymentResult.count > 0) {
-    return true;
-  }
+    prisma.subscription.update({
+      where: {
+        id: subscriptionPayment.subscriptionId,
+      },
+      data: {
+        status: SubscriptionStatus.ACTIVE,
+      },
+    }),
+  ]);
 
-  console.warn(`[PAYMENT NOT FOUND]: reference=${reference}`);
-
-  throw new Error(`Failed to mark payment as successful: ${reference}`);
+  return true;
 }
 
 /**
