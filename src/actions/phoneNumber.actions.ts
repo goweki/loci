@@ -1,7 +1,9 @@
 "use server";
 
+import prisma from "@/lib/prisma";
 import { Prisma } from "@/lib/prisma/generated";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
+import { metaSyncService } from "@/lib/whatsapp";
 import {
   PhoneNumberWithRelations,
   WabaService,
@@ -72,4 +74,14 @@ export async function createPhoneNumberAction(
       error: getFriendlyErrorMessage(error),
     };
   }
+}
+
+export async function ensureDefaultPhoneNumberExists() {
+  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+
+  if (!phoneNumberId) {
+    throw new Error("[MISSING ENV] WHATSAPP_PHONE_NUMBER_ID");
+  }
+
+  return metaSyncService.ensurePhoneNumber(phoneNumberId);
 }
