@@ -4,6 +4,7 @@ import { connectWhatsAppAction } from "@/actions/waba.actions";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/ui/loaders";
 import { toastWarn } from "@/components/ui/toast-warn";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -22,6 +23,7 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
   const [loading, setLoading] = useState(false);
   const [isLinked, setIsLinked] = useState(false);
   const wabaDetailsRef = useRef<WabaDetails>({});
+  const router = useRouter();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -104,6 +106,7 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
           if (res.ok) {
             toast.success("WhatsApp account connected and saved!");
             setIsLinked(true);
+            router.refresh();
           } else {
             toast.error(res.error || "Failed to process linkage");
           }
