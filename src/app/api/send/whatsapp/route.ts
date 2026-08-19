@@ -11,6 +11,7 @@ import { authorizeMessageSend } from "@/lib/auth/authorization";
 import { removePlus } from "@/lib/utils/telHandlers";
 import { findOrCreateContact } from "@/actions/contact";
 import { createMessage, getMessagesByUserId } from "@/actions/message.actions";
+import { ensureDefaultPhoneNumberExists } from "@/actions/phoneNumber.actions";
 
 const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
   try {
@@ -27,9 +28,11 @@ const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
     const message = parse.data;
     const userId = apiKey.user.id;
 
-    console.log("New Message for sending...", message);
     await authorizeMessageSend(userId, message);
 
+    console.log("New Message for sending...", message);
+
+    // Dispatch to Meta (External API)
     const waResponse = await whatsapp.sendMessage(message);
 
     if ("error" in waResponse) {
@@ -45,11 +48,13 @@ const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
       removePlus(recipient),
     );
 
+    let resolvedPhoneNumberId: string =
+      message.phoneNumberId || (await ensureDefaultPhoneNumberExists()).id;
+
     await createMessage({
       userId: userId,
       contactId: localizedContact.id,
-      phoneNumberId:
-        message.phoneNumberId || process.env.WHATSAPP_PHONE_NUMBER_ID || "",
+      phoneNumberId: resolvedPhoneNumberId,
       waMessageId: metaMessageId,
       type: message.type.toUpperCase() as MessageType,
       content: message, // better to store what you SENT rather than Meta's confirmation
