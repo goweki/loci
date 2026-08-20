@@ -82,7 +82,7 @@ export default async function sendSms(options: SMSprops) {
   try {
     console.log("[SENDING SMS] :", smsOptions);
     const response = await sms.send(smsOptions);
-    console.log("✅ SMS sent successfully:", response);
+    console.log("[SMS service response]:", response);
 
     return {
       message: response.Message,
