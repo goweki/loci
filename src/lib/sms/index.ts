@@ -52,22 +52,24 @@ export interface SMSprops {
   from?: string;
 }
 
-export interface SMSRecipient {
+export interface ATRecipient {
+  statusCode: number;
   number: string;
-  status: string; // "Success", "Failed", etc.
+  status: string;
   cost: string;
   messageId: string;
 }
 
-export interface SMSMessageResponse {
+export interface SendSmsResult {
+  success: boolean;
   message: string;
-  recipients: unknown;
+  recipients: ATRecipient[];
+  error?: string;
 }
 
-/**
- * Reusable Next.js 15 Server-Safe SMS dispatcher via Africa's Talking SDK
- */
-export default async function sendSms(options: SMSprops) {
+export default async function sendSms(
+  options: SMSprops,
+): Promise<SendSmsResult> {
   const activeSender = options.from || SENDER_ID;
   if (!activeSender) {
     throw new Error("[AFRICASTALKING] Missing sender identifier.");
@@ -80,24 +82,56 @@ export default async function sendSms(options: SMSprops) {
   };
 
   try {
-    console.log("[SENDING SMS] :", smsOptions);
-    const response = await sms.send(smsOptions);
+    console.log("[SENDING SMS]:", smsOptions);
+    const rawResponse = (await sms.send(smsOptions)) as any;
 
-    // Cast through unknown to override the inaccurate SDK typing
-    const rawResponse = response as unknown as SMSResponse;
-    const messageData = rawResponse.SMSMessageData;
+    // 1. Safe extraction (handles both wrapped and unwrapped response shapes)
+    const payload = rawResponse?.SMSMessageData || rawResponse;
+    const message = payload?.Message || "No message summary returned";
+    const recipients: ATRecipient[] = Array.isArray(payload?.Recipients)
+      ? payload.Recipients
+      : [];
 
-    console.log("[SMS service response]: Full Payload-", messageData);
-    console.log("[SMS service response]: Message-", messageData.Message);
-    console.log("[SMS service response]: Recipients-", messageData.Recipients);
+    console.log("[SMS service response]: Message-", message);
+    console.log("[SMS service response]: Recipients-", recipients);
+
+    // 2. Handle empty recipients or API-level error status messages
+    if (recipients.length === 0) {
+      console.warn(`⚠️ SMS dispatch warning: ${message}`);
+      return {
+        success: false,
+        message,
+        recipients: [],
+        error: `Provider returned non-success state: ${message}`,
+      };
+    }
+
+    // 3. Inspect individual recipient statuses (e.g., status code 101/100 is successful)
+    const failedRecipients = recipients.filter(
+      (r) =>
+        r.status !== "Success" && r.statusCode !== 101 && r.statusCode !== 100,
+    );
+
+    if (failedRecipients.length > 0) {
+      console.warn(
+        "⚠️ Some recipients failed to receive the message:",
+        failedRecipients,
+      );
+    }
 
     return {
-      message: response.Message,
-      recipients: response.Recipients,
+      success: failedRecipients.length < recipients.length,
+      message,
+      recipients,
     };
-  } catch (error) {
-    console.error("❌ SMS transmission failed:", error);
-    throw error;
+  } catch (error: any) {
+    console.error("❌ SMS network or SDK error:", error?.message || error);
+    return {
+      success: false,
+      message: "SDK Network or Authentication Error",
+      recipients: [],
+      error: error?.message || "Unknown error",
+    };
   }
 }
 
