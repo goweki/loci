@@ -83,6 +83,8 @@ export default async function sendSms(options: SMSprops) {
     console.log("[SENDING SMS] :", smsOptions);
     const response = await sms.send(smsOptions);
     console.log("[SMS service response]:", response);
+    console.log("[SMS service response]: Receipients-", response.Recipients);
+    console.log("[SMS service response]: Message-", response.Message);
 
     return {
       message: response.Message,
