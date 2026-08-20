@@ -48,11 +48,33 @@ const postSms: AuthenticatedHandler = async (request, apiKey) => {
     };
     await authorizeMessageSend(userId, authorizationInput);
 
-    const response = await sendSms(sms);
+    const smsRes = await sendSms(sms);
 
-    const recipients = Array.isArray(response.recipients)
-      ? response.recipients
-      : [response.recipients];
+    if (!smsRes.success) {
+      return NextResponse.json(
+        {
+          error: smsRes.error || smsRes.message,
+        },
+        { status: 500 },
+      );
+    }
+
+    const isSent = smsRes.recipients.some(
+      (recipient) =>
+        recipient.status === "Success" || recipient.statusCode === 101,
+    );
+
+    if (!isSent) {
+      return NextResponse.json(
+        {
+          error:
+            smsRes.error || smsRes.message || "SMS not sent. Try again later",
+        },
+        { status: 500 },
+      );
+    }
+
+    const recipients = smsRes.recipients;
     const recipientContacts = recipients
       .filter(({ status }) => status === "fulfilled")
       .map(({ number }) => number);
@@ -105,8 +127,8 @@ const postSms: AuthenticatedHandler = async (request, apiKey) => {
     return NextResponse.json({
       success: true,
       provider: "AFRICASTALKING",
-      message: response.message,
-      recipients: response.recipients,
+      message: smsRes.message,
+      recipients: smsRes.recipients,
     });
   } catch (error: any) {
     console.error("[SMS_DISPATCH_ERROR]", error);

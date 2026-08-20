@@ -8,7 +8,7 @@ import {
   TokenType,
   UserRole,
 } from "@/lib/prisma/generated";
-import sendSms from "@/lib/sms";
+import sendSms, { ATRecipient } from "@/lib/sms";
 import { addToDate } from "@/lib/utils/dateHandlers";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import {
@@ -363,9 +363,12 @@ export async function setNewPassword(
 // SEND OTP
 // ======================================================
 
-export async function sendOtp(
-  props: SendOtpProps,
-): Promise<ActionResult<{ sent: boolean }>> {
+export async function sendOtp(props: SendOtpProps): Promise<
+  ActionResult<{
+    sent: boolean;
+    details?: ATRecipient[];
+  }>
+> {
   try {
     const { notificationChannel, contact } = props;
 
@@ -403,10 +406,31 @@ export async function sendOtp(
           message: `Hi, your Loci authentication code is ${otpCode}`,
         });
 
+        // Check overall helper success flag
+        if (!smsRes.success) {
+          return {
+            ok: false,
+            error: smsRes.error || smsRes.message,
+          };
+        }
+
+        const isSent = smsRes.recipients.some(
+          (recipient) =>
+            recipient.status === "Success" || recipient.statusCode === 101,
+        );
+
+        if (!isSent) {
+          return {
+            ok: false,
+            error: smsRes.message || "SMS failed to reach recipient",
+          };
+        }
+
         return {
           ok: true,
           data: {
-            sent: smsRes.recipients.status === "fulfilled",
+            sent: true,
+            details: smsRes.recipients,
           },
         };
       }
