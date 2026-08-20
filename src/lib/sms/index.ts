@@ -40,7 +40,7 @@
 // }
 
 import "server-only";
-import { sms } from "./client";
+import { sms, SMSResponse } from "./client";
 import prisma from "../prisma";
 import { PhoneNumberStatus } from "../prisma/generated";
 
@@ -82,9 +82,14 @@ export default async function sendSms(options: SMSprops) {
   try {
     console.log("[SENDING SMS] :", smsOptions);
     const response = await sms.send(smsOptions);
-    console.log("[SMS service response]:", JSON.stringify(response));
-    console.log("[SMS service response]: Receipients-", response.Recipients);
-    console.log("[SMS service response]: Message-", response.Message);
+
+    // Cast through unknown to override the inaccurate SDK typing
+    const rawResponse = response as unknown as SMSResponse;
+    const messageData = rawResponse.SMSMessageData;
+
+    console.log("[SMS service response]: Full Payload-", messageData);
+    console.log("[SMS service response]: Message-", messageData.Message);
+    console.log("[SMS service response]: Recipients-", messageData.Recipients);
 
     return {
       message: response.Message,

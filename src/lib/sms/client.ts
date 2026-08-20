@@ -16,6 +16,21 @@ if (!senderId) {
   );
 }
 
+export interface SMSRecipient {
+  statusCode: number;
+  number: string;
+  status: string; // e.g., "Success", "Failed", "RiskHold"
+  cost: string; // e.g., "KES 0.8000"
+  messageId: string;
+}
+
+export interface SMSResponse {
+  SMSMessageData: {
+    Message: string;
+    Recipients: SMSRecipient[]; // Array instead of single object
+  };
+}
+
 const africasTalking = AfricasTalking({
   apiKey,
   username,
