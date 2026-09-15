@@ -29,6 +29,8 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
     if (typeof window === "undefined") return;
 
     const handleMessage = (event: MessageEvent) => {
+      // 1. Verify origin
+
       if (
         !event.origin.includes("facebook.com") &&
         !event.origin.includes("whatsapp.com")
@@ -36,21 +38,35 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
         return;
       }
 
+      // 2. Ignore non-string or non-JSON payloads safely
+      if (typeof event.data !== "string" && typeof event.data !== "object") {
+        return;
+      }
+
       console.log("[INFO] handling SDK event:", event);
 
       try {
-        const payload =
-          typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        let payload = event.data;
 
+        // Parse string only if it looks like JSON
+        if (typeof payload === "string") {
+          if (!payload.trim().startsWith("{")) {
+            // Ignores Meta's internal query string parameters like "cb=f8f9..."
+            return;
+          }
+          payload = JSON.parse(payload);
+        }
+
+        // 3. Process WhatsApp Embedded Signup event
         if (
-          payload.type === "WA_EMBEDDED_SIGNUP" &&
-          payload.event === "FINISH"
+          payload?.type === "WA_EMBEDDED_SIGNUP" &&
+          payload?.event === "FINISH"
         ) {
           const { waba_id, phone_number_id, business_id } = payload.data || {};
           wabaDetailsRef.current = { waba_id, phone_number_id, business_id };
         }
       } catch (err) {
-        console.error("[ERROR] handling SDK event:", err);
+        // Ignore unparseable message events silently
       }
     };
 
