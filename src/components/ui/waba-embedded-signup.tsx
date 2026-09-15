@@ -36,6 +36,8 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
         return;
       }
 
+      console.log("handling SDK event:", event);
+
       try {
         const payload =
           typeof event.data === "string" ? JSON.parse(event.data) : event.data;
@@ -48,7 +50,7 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
           wabaDetailsRef.current = { waba_id, phone_number_id, business_id };
         }
       } catch (err) {
-        // Ignore unrelated messages
+        console.error("[ERROR] handling SDK event:", err);
       }
     };
 
@@ -87,6 +89,7 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
     setLoading(true);
 
     const handleLoginResponse = async (response: any) => {
+      console.log("SDK response:", response);
       try {
         if (response.authResponse?.code) {
           const code = response.authResponse.code;

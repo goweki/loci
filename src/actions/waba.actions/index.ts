@@ -41,7 +41,7 @@ export async function connectWhatsAppAction({
 
     // 2. Fetch WABA Metadata via WhatsAppClient
     let wabaMeta = {
-      name: "WhatsApp Account",
+      name: "Unknown WhatsApp Account",
       currency: "USD",
       timezone_id: "1",
       message_template_namespace: null as string | null,
