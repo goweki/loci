@@ -26,7 +26,7 @@
     "pre-commit": "lint-staged",
     "db:seed": "tsx src/lib/prisma/seed",
     "db:backup": "tsx src/lib/prisma/scripts/backup",
-    "db:restore": "tsx src/lib/prisma/scripts/restore",
+    "db:restore": "tsx src/lib/prisma/scripts/restore -f",
     "db:reset": "prisma migrate reset && prisma db seed",
     "db:mirror": "npx tsx src/lib/prisma/scripts/restore_live_to_local.ts"
   },
