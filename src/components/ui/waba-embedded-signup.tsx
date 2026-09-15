@@ -13,6 +13,7 @@ const META_EMBEDDED_CONFIG_ID = process.env.NEXT_PUBLIC_WABA_EMBEDDED_CONFIG_ID;
 const API_VERSION = "v22.0";
 
 interface WabaDetails {
+  code?: string;
   waba_id?: string;
   phone_number_id?: string;
   business_id?: string;
@@ -22,15 +23,16 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
   const [sdkReady, setSdkReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isLinked, setIsLinked] = useState(false);
-  const wabaDetailsRef = useRef<WabaDetails>({});
+
+  const wabaDetailsRef = useRef<WabaDetails | null>(null);
   const router = useRouter();
 
+  // 1. PostMessage Listener for Meta Auth & Embedded Signup Data
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const handleMessage = (event: MessageEvent) => {
-      // 1. Verify origin
-
+      // Basic origin check
       if (
         !event.origin.includes("facebook.com") &&
         !event.origin.includes("whatsapp.com")
@@ -38,35 +40,51 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
         return;
       }
 
-      // 2. Ignore non-string or non-JSON payloads safely
-      if (typeof event.data !== "string" && typeof event.data !== "object") {
-        return;
-      }
-
-      console.log("[INFO] handling SDK event:", event);
-
       try {
-        let payload = event.data;
+        let rawData = event.data;
 
-        // Parse string only if it looks like JSON
-        if (typeof payload === "string") {
-          if (!payload.trim().startsWith("{")) {
-            // Ignores Meta's internal query string parameters like "cb=f8f9..."
-            return;
+        // CASE A: Query string format (e.g. "cb=fdb9...&code=AQI3trlz...")
+        if (typeof rawData === "string" && rawData.includes("code=")) {
+          const params = new URLSearchParams(rawData);
+          const code = params.get("code");
+
+          if (code) {
+            console.log("Captured Auth Code from postMessage:", code);
+            wabaDetailsRef.current = {
+              ...wabaDetailsRef.current,
+              code,
+            };
           }
-          payload = JSON.parse(payload);
+          return;
         }
 
-        // 3. Process WhatsApp Embedded Signup event
-        if (
-          payload?.type === "WA_EMBEDDED_SIGNUP" &&
-          payload?.event === "FINISH"
-        ) {
-          const { waba_id, phone_number_id, business_id } = payload.data || {};
-          wabaDetailsRef.current = { waba_id, phone_number_id, business_id };
+        // CASE B: JSON format (standard payload schema)
+        if (typeof rawData === "string") {
+          if (!rawData.trim().startsWith("{")) return;
+          rawData = JSON.parse(rawData);
+        }
+
+        const dataObj = rawData?.data || rawData;
+        const waba_id = dataObj?.waba_id || rawData?.waba_id;
+        const phone_number_id =
+          dataObj?.phone_number_id || rawData?.phone_number_id;
+        const business_id = dataObj?.business_id || rawData?.business_id;
+
+        if (waba_id || phone_number_id || business_id) {
+          console.log("Captured WABA details from postMessage JSON:", {
+            waba_id,
+            phone_number_id,
+            business_id,
+          });
+          wabaDetailsRef.current = {
+            ...wabaDetailsRef.current,
+            waba_id,
+            phone_number_id,
+            business_id,
+          };
         }
       } catch (err) {
-        // Ignore unparseable message events silently
+        // Ignore parsing errors from unknown window messages
       }
     };
 
@@ -96,30 +114,51 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
     };
   }, []);
 
+  // 2. Poll helper to wait until the code or details arrive
+  const waitForAuthData = (timeoutMs = 4000): Promise<WabaDetails | null> => {
+    return new Promise((resolve) => {
+      const startTime = Date.now();
+      const interval = setInterval(() => {
+        if (wabaDetailsRef.current?.code || wabaDetailsRef.current?.waba_id) {
+          clearInterval(interval);
+          resolve(wabaDetailsRef.current);
+        } else if (Date.now() - startTime > timeoutMs) {
+          clearInterval(interval);
+          resolve(wabaDetailsRef.current); // Return whatever was captured, if anything
+        }
+      }, 100);
+    });
+  };
+
+  // 3. Initiate Login Flow
   const handleLogin = () => {
     if (!sdkReady) {
       toast.error("Facebook SDK not ready");
       return;
     }
 
+    wabaDetailsRef.current = null; // Clear previous attempt
     setLoading(true);
 
-    const handleLoginResponse = async (response: any) => {
-      console.log("SDK response:", response);
-      try {
-        if (response.authResponse?.code) {
-          const code = response.authResponse.code;
-          const wabaData = wabaDetailsRef.current;
+    const onLoginCallback = (response: any) => {
+      const processLogin = async () => {
+        try {
+          // Wait up to 4s for postMessage to capture the payload data
+          const capturedData = await waitForAuthData();
 
-          if (!wabaData) {
-            throw new Error("WhatsApp Business account details are missing");
+          // Code can come from either response.authResponse or postMessage parameters
+          const code = response.authResponse?.code || capturedData?.code;
+
+          if (!code) {
+            toastWarn("Meta authentication cancelled or code missing");
+            return;
           }
 
           const res = await connectWhatsAppAction({
             code,
-            waba_id: wabaData.waba_id,
-            phone_number_id: wabaData.phone_number_id,
-            business_id: wabaData.business_id,
+            waba_id: capturedData?.waba_id,
+            phone_number_id: capturedData?.phone_number_id,
+            business_id: capturedData?.business_id,
           });
 
           if (res.ok) {
@@ -129,47 +168,35 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
           } else {
             toast.error(res.error || "Failed to process linkage");
           }
-        } else {
-          toastWarn("Meta authentication cancelled");
+        } catch (error) {
+          console.error("WhatsApp connection error:", error);
+          toastWarn(
+            error instanceof Error
+              ? error.message
+              : "Meta authentication failed, try again later",
+          );
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("WhatsApp connection error:", error);
+      };
 
-        toastWarn(
-          error instanceof Error
-            ? error.message
-            : "Meta authentication failed, try again later",
-        );
-      } finally {
-        setLoading(false);
-      }
+      void processLogin();
     };
 
     try {
-      (window as any).FB.login(
-        (response: any) => {
-          // FB.login requires a regular synchronous callback.
-          // Start the async operation without returning its Promise.
-          void handleLoginResponse(response);
-        },
-        {
-          config_id: META_EMBEDDED_CONFIG_ID,
-          response_type: "code",
-          override_default_response_type: true,
-          extras: {
-            setup: {},
-          },
-        },
-      );
+      (window as any).FB.login(onLoginCallback, {
+        config_id: META_EMBEDDED_CONFIG_ID,
+        response_type: "code",
+        override_default_response_type: true,
+        extras: { setup: {} },
+      });
     } catch (error) {
       console.error("Facebook login error:", error);
-
       toastWarn(
         error instanceof Error
           ? error.message
           : "Meta authentication failed, try again later",
       );
-
       setLoading(false);
     }
   };

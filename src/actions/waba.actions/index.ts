@@ -39,7 +39,52 @@ export async function connectWhatsAppAction({
       };
     }
 
-    // 2. Fetch WABA Metadata via WhatsAppClient
+    // --- FALLBACK RESOLUTION FOR CASE A (Missing IDs) ---
+    let targetWabaId = waba_id;
+    let targetPhoneNumberId = phone_number_id;
+
+    // 2. Fetch WABA ID via Meta /debug_token if missing
+    if (!targetWabaId) {
+      try {
+        const appAccessToken = `${process.env.NEXT_PUBLIC_META_APP_ID}|${process.env.META_APP_SECRET}`;
+        const debugRes = await fetch(
+          `https://graph.facebook.com/v22.0/debug_token?input_token=${access_token}&access_token=${appAccessToken}`,
+        );
+        const debugData = await debugRes.json();
+
+        const scopes = debugData?.data?.granular_scopes || [];
+        const whatsappScope = scopes.find(
+          (s: any) => s.scope === "whatsapp_business_management",
+        );
+
+        targetWabaId = whatsappScope?.target_ids?.[0];
+      } catch (err) {
+        console.warn("Could not resolve WABA ID from debug_token:", err);
+      }
+    }
+
+    if (!targetWabaId) {
+      return {
+        ok: false,
+        error: "Could not locate WhatsApp Business Account ID from Meta",
+      };
+    }
+
+    // 3. Fetch Phone Number ID via WABA endpoint if missing
+    if (!targetPhoneNumberId) {
+      try {
+        const phoneListRes = await fetch(
+          `https://graph.facebook.com/v22.0/${targetWabaId}/phone_numbers?access_token=${access_token}`,
+        );
+        const phoneListData = await phoneListRes.json();
+        targetPhoneNumberId = phoneListData?.data?.[0]?.id;
+      } catch (err) {
+        console.warn("Could not resolve Phone Number ID from WABA:", err);
+      }
+    }
+    // --- END FALLBACK RESOLUTION ---
+
+    // 4. Fetch WABA Metadata via WhatsAppClient
     let wabaMeta = {
       name: "Unknown WhatsApp Account",
       currency: "USD",
@@ -47,26 +92,22 @@ export async function connectWhatsAppAction({
       message_template_namespace: null as string | null,
     };
 
-    if (waba_id) {
-      try {
-        const data = await whatsapp.getWaba(waba_id, access_token);
-        wabaMeta = {
-          name: data.name || wabaMeta.name,
-          currency: data.currency || wabaMeta.currency,
-          timezone_id: data.timezone_id || wabaMeta.timezone_id,
-          message_template_namespace: data.message_template_namespace || null,
-        };
-      } catch (err) {
-        console.warn(
-          "Could not fetch WABA metadata, proceeding with defaults:",
-          err,
-        );
-      }
+    try {
+      const data = await whatsapp.getWaba(targetWabaId, access_token);
+      wabaMeta = {
+        name: data.name || wabaMeta.name,
+        currency: data.currency || wabaMeta.currency,
+        timezone_id: data.timezone_id || wabaMeta.timezone_id,
+        message_template_namespace: data.message_template_namespace || null,
+      };
+    } catch (err) {
+      console.warn(
+        "Could not fetch WABA metadata, proceeding with defaults:",
+        err,
+      );
     }
 
-    // 3. Persist WABA Account in Prisma DB
-    const targetWabaId = waba_id || `waba_${Date.now()}`;
-
+    // 5. Persist WABA Account in Prisma DB
     const wabaAccount = await prisma.wabaAccount.upsert({
       where: { id: targetWabaId },
       update: {
@@ -87,15 +128,15 @@ export async function connectWhatsAppAction({
       },
     });
 
-    // 4. Fetch and Store Phone Number details via WhatsAppClient
-    if (phone_number_id) {
+    // 6. Fetch and Store Phone Number details via WhatsAppClient
+    if (targetPhoneNumberId) {
       try {
         const phoneData = await whatsapp.getPhoneNumberDetails(
-          phone_number_id,
+          targetPhoneNumberId,
           access_token,
         );
         const phoneNumberStr =
-          phoneData.display_phone_number || phone_number_id;
+          phoneData.display_phone_number || targetPhoneNumberId;
 
         await prisma.phoneNumber.upsert({
           where: { phoneNumber: phoneNumberStr },

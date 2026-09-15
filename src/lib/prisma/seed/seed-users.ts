@@ -61,7 +61,7 @@ async function generateUniqueUsernameFromSeed(seed: string): Promise<string> {
 
 const usersData = [
   {
-    id: "system_" + new Date(),
+    id: "system_user",
     name: "System User",
     email: process.env.SYSTEM_EMAIL || "system@goweki.com",
     tel: process.env.SYSTEM_TEL,
@@ -70,7 +70,7 @@ const usersData = [
     status: UserStatus.ACTIVE,
   },
   {
-    id: "demo_" + new Date(),
+    id: "demo_user",
     name: "Demo User",
     email: "demo@goweki.com",
     password: "pass1234",
