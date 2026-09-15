@@ -28,7 +28,7 @@
     "db:backup": "tsx src/lib/prisma/scripts/backup",
     "db:restore": "tsx src/lib/prisma/scripts/restore -f",
     "db:reset": "prisma migrate reset && prisma db seed",
-    "db:mirror": "npx tsx src/lib/prisma/scripts/restore_live_to_local.ts"
+    "db:mirror": "npx tsx src/lib/prisma/scripts/restore_live_to_local"
   },
   "dependencies": {
     "@edgestore/react": "^0.7.0",
