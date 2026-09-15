@@ -36,7 +36,7 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
         return;
       }
 
-      console.log("handling SDK event:", event);
+      console.log("[INFO] handling SDK event:", event);
 
       try {
         const payload =
