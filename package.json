@@ -6,11 +6,6 @@
     "node": "24.x"
   },
   "scripts": {
-    "db:seed": "tsx src/lib/prisma/seed",
-    "db:backup": "tsx src/lib/prisma/scripts/backup",
-    "db:restore": "tsx src/lib/prisma/scripts/restore",
-    "db:replicate": "tsx src/lib/prisma/scripts/restore_live_to_local.ts",
-    "rotate-key": "tsx ./scripts/rotate-admin-api-key.ts",
     "dev:http": "npx prisma migrate dev && prisma generate && next dev",
     "dev": "npx prisma migrate dev && prisma generate && next dev --experimental-https",
     "build": "next build",
@@ -28,7 +23,12 @@
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
     "type-check": "tsc --noEmit",
-    "pre-commit": "lint-staged"
+    "pre-commit": "lint-staged",
+    "db:seed": "tsx src/lib/prisma/seed",
+    "db:backup": "tsx src/lib/prisma/scripts/backup",
+    "db:restore": "tsx src/lib/prisma/scripts/restore -f",
+    "db:reset": "prisma migrate reset && prisma db seed",
+    "db:mirror": "npx tsx src/lib/prisma/scripts/restore_live_to_local"
   },
   "dependencies": {
     "@edgestore/react": "^0.7.0",
