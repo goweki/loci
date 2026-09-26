@@ -49,6 +49,8 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
       if (subStatus.status !== SubscriptionStatus.ACTIVE) {
         return;
       }
+
+      setHasActiveSub(true);
     };
 
     try {
