@@ -109,7 +109,11 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold">Whatsapp Numbers</h3>
-                  <Button size="sm">Add Number</Button>
+                  {subCheck.subscription?.plan &&
+                    subCheck.subscription.plan.maxPhoneNumbers >
+                      waba.phoneNumbers.length && (
+                      <Button size="sm">Add Number</Button>
+                    )}
                 </div>
 
                 {waba.phoneNumbers.length > 0 ? (
