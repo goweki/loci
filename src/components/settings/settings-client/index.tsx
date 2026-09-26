@@ -43,8 +43,8 @@ export default function SettingsClient({ user }: { user: UserWithRelations }) {
       icon: <WhatsAppLogo className="h-4 w-4" />,
       badge: !isWhatsAppEnabled ? "Soon" : undefined, // Adds badge when disabled
     },
-    { tabName: "subscription", icon: <CreditCard className="w-4 h-4" /> },
     { tabName: "auto-reply", icon: <MessageSquareIcon className="w-4 h-4" /> },
+    { tabName: "subscription", icon: <CreditCard className="w-4 h-4" /> },
     { tabName: "security", icon: <Shield className="w-4 h-4" /> },
   ];
 
@@ -103,14 +103,28 @@ export default function SettingsClient({ user }: { user: UserWithRelations }) {
         )}
       </TabsContent>
 
+      {/* AutoReply Tab */}
+      <TabsContent value="auto-reply" className="space-y-4">
+        {isWhatsAppEnabled ? (
+          <TabAutoreplyRules />
+        ) : (
+          /* Under Development Placeholder */
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
+            <div className="rounded-full bg-amber-500/10 p-3 text-amber-500 mb-4">
+              <Construction className="w-8 h-8" />
+            </div>
+            <h3 className="text-lg font-semibold">Under Active Development</h3>
+            <p className="mt-1 text-sm text-muted-foreground max-w-sm">
+              Autoreply Rules feature is currently being built and will be
+              available in a future update.
+            </p>
+          </div>
+        )}
+      </TabsContent>
+
       {/* Subscription Tab */}
       <TabsContent value="subscription" className="space-y-6">
         <TabSubscription />
-      </TabsContent>
-
-      {/* AutoReply Tab */}
-      <TabsContent value="auto-reply" className="space-y-4">
-        <TabAutoreplyRules />
       </TabsContent>
 
       {/* Security Tab */}

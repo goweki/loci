@@ -12,12 +12,14 @@ interface ProductViewProps {
   product: ProductWithRelations;
   merchantInfo?: boolean;
   canPurchase?: boolean;
+  lang?: string;
 }
 
 export default function ProductView({
   product,
   merchantInfo = false,
   canPurchase = true,
+  lang = "en",
 }: ProductViewProps) {
   const inventoryValue = Number(product.price) * product.stockQty;
 
@@ -39,7 +41,11 @@ export default function ProductView({
             <ProductMetadata product={product} />
           </>
         ) : (
-          <PurchaseCard product={product} canPurchase={canPurchase} />
+          <PurchaseCard
+            product={product}
+            canPurchase={canPurchase}
+            lang={lang}
+          />
         )}
       </div>
     </div>

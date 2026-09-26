@@ -55,6 +55,10 @@ model User {
   products        Product[]
   orders          Order[]
   invoices        Invoice[]
+  payouts         OrderPayout[]
+
+  paystackRecipientCode     String?
+  paystackRecipientCurrency Currency?
 
   @@map("users")
 }
@@ -116,6 +120,44 @@ enum PaymentMethod {
   MPESA
   CARD
   BANK
+}
+
+enum FulfillmentStatus {
+  UNFULFILLED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  DISPUTED
+  CANCELLED
+}
+
+enum PayoutStatus {
+  NOT_DUE
+  QUEUED
+  PENDING
+  PAID
+  FAILED
+  REVERSED
+  ON_HOLD
+}
+
+enum LedgerTransactionType {
+  PAYMENT_RECEIVED
+  PAYOUT_SENT
+  REFUND_ISSUED
+  PAYOUT_REVERSED
+}
+
+enum LedgerAccount {
+  PAYMENT_CLEARING
+  SELLER_PAYABLE
+  PLATFORM_REVENUE
+  REFUND_CLEARING
+}
+
+enum LedgerSide {
+  DEBIT
+  CREDIT
 }
 
 model Plan {
@@ -270,7 +312,8 @@ model Payment {
   currency Currency      @default(KES)
   status   PaymentStatus @default(PENDING)
 
-  paidAt DateTime?
+  paidAt   DateTime?
+  metadata Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -413,11 +456,14 @@ model AutoReplyRule {
 }
 
 model WebhookEvent {
-  id        String   @id @default(cuid())
-  type      String
-  payload   Json
-  processed Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  eventKey    String?   @unique
+  type        String
+  payload     Json
+  processed   Boolean   @default(false)
+  processedAt DateTime?
+  error       String?
+  createdAt   DateTime  @default(now())
 
   @@map("webhook_events")
 }
@@ -498,20 +544,33 @@ model Order {
   contactId String?
   contact   Contact? @relation(fields: [contactId], references: [id])
 
-  status      OrderStatus @default(PENDING)
-  currency    Currency    @default(KES)
-  notes       String?
-  paymentLink String?
+  status                 OrderStatus       @default(PENDING)
+  fulfillmentStatus      FulfillmentStatus @default(UNFULFILLED)
+  currency               Currency          @default(KES)
+  notes                  String?
+  paymentLink            String?
+  buyerName              String?
+  buyerEmail             String?
+  buyerPhone             String?
+  deliveryTokenHash      String?           @unique
+  deliveryTokenExpiresAt DateTime?
+  deliveryConfirmedAt    DateTime?
+  disputeOpenedAt        DateTime?
+  disputeReason          String?
+  platformFee            Decimal           @default(0) @db.Decimal(10, 2)
+  payoutStatus           PayoutStatus      @default(NOT_DUE)
 
   total Decimal @db.Decimal(10, 2)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  invoice  Invoice?
-  items    OrderItem[]
-  payments Payment[]
-  messages Message[]
+  invoice            Invoice?
+  items              OrderItem[]
+  payments           Payment[]
+  messages           Message[]
+  ledgerTransactions LedgerTransaction[]
+  payout             OrderPayout?
 
   @@map("orders")
 }
@@ -544,6 +603,55 @@ enum OrderStatus {
   PARTIALLY_PAID
   PAID
   CANCELLED
+}
+
+model OrderPayout {
+  id            String       @id @default(cuid())
+  orderId       String       @unique
+  order         Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  merchantId    String
+  merchant      User         @relation(fields: [merchantId], references: [id], onDelete: Restrict)
+  amount        Decimal      @db.Decimal(10, 2)
+  currency      Currency
+  recipientCode String
+  reference     String       @unique
+  transferCode  String?
+  status        PayoutStatus @default(NOT_DUE)
+  requestedAt   DateTime?
+  paidAt        DateTime?
+  lastError     String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([status, createdAt])
+  @@map("order_payouts")
+}
+
+model LedgerTransaction {
+  id        String                @id @default(cuid())
+  eventKey  String                @unique
+  type      LedgerTransactionType
+  orderId   String
+  order     Order                 @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  lines     LedgerEntry[]
+  createdAt DateTime              @default(now())
+
+  @@index([orderId, createdAt])
+  @@map("ledger_transactions")
+}
+
+model LedgerEntry {
+  id            String            @id @default(cuid())
+  transactionId String
+  transaction   LedgerTransaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  account       LedgerAccount
+  side          LedgerSide
+  amount        Decimal           @db.Decimal(10, 2)
+  currency      Currency
+  createdAt     DateTime          @default(now())
+
+  @@index([transactionId])
+  @@map("ledger_entries")
 }
 
 enum InvoiceStatus {

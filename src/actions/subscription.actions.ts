@@ -1,187 +1,176 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
+import { revalidatePath } from "next/cache";
+
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import {
-  PlanInterval,
+  Currency,
   PaymentMethod,
-  SubscriptionStatus,
   PaymentStatus,
+  PlanInterval,
   PlanName,
-  Prisma,
+  SubscriptionStatus,
 } from "@/lib/prisma/generated";
+import {
+  initializePaystackTransaction,
+  PaystackApiError,
+} from "@/lib/payments/paystack-api";
+import { BASE_URL } from "@/lib/utils/getUrl";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import { SubscriptionService } from "@/services/subscription/subscription.service";
 import { ActionResult, SubscriptionStatusCheck } from "@/types";
-import { revalidatePath } from "next/cache";
 
-// Helper: Calculate standard billing interval
 function getPeriodEndDate(startDate: Date, interval: PlanInterval): Date {
   const endDate = new Date(startDate);
-  if (interval === "MONTHLY") {
+  if (interval === PlanInterval.MONTHLY) {
     endDate.setMonth(endDate.getMonth() + 1);
-  } else if (interval === "YEARLY") {
+  } else {
     endDate.setFullYear(endDate.getFullYear() + 1);
   }
   return endDate;
 }
 
-/**
- * 1. CREATE SUBSCRIPTION (Initial Checkout Flow)
- */
 export async function createSubscriptionAction({
-  userId,
   planName,
   interval,
-  paymentMethod,
-  paymentReference,
-  amount,
+  lang = "en",
+  email,
 }: {
-  userId: string;
   planName: PlanName;
   interval: PlanInterval;
-  paymentMethod: PaymentMethod;
-  paymentReference: string;
-  amount: number;
-}): Promise<
-  ActionResult<
-    Omit<
-      Prisma.SubscriptionGetPayload<{
-        include: { payments: true };
-      }>,
-      "payments"
-    > & {
-      payments: Array<
-        Omit<
-          Prisma.SubscriptionGetPayload<{
-            include: { payments: true };
-          }>["payments"][number],
-          "amount"
-        > & {
-          amount: number;
-        }
-      >;
-    }
-  >
-> {
+  lang?: string;
+  email?: string;
+}): Promise<ActionResult<{ authorizationUrl: string; reference: string }>> {
+  const actor = await requireUser();
+  let subscriptionId: string | undefined;
+  let paymentReference: string | undefined;
+
   try {
-    const plan = await prisma.plan.findUniqueOrThrow({
-      where: { name: planName },
-    });
+    const [plan, user] = await Promise.all([
+      prisma.plan.findUnique({ where: { name: planName } }),
+      prisma.user.findUnique({
+        where: { id: actor.id },
+        select: { email: true },
+      }),
+    ]);
 
+    if (!plan?.active) {
+      throw new Error("Selected subscription plan is unavailable");
+    }
+    const payerEmail = email?.trim() || user?.email;
+    if (!payerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payerEmail)) {
+      throw new Error("Add an email address before subscribing");
+    }
+
+    const amount =
+      plan.monthlyPrice * (interval === PlanInterval.YEARLY ? 10 : 1);
+    paymentReference = `loci-${randomUUID()}`;
     const now = new Date();
-    const periodEnd = getPeriodEndDate(now, interval);
-
-    // Create INCOMPLETE subscription along with pending payment
     const subscription = await prisma.subscription.create({
       data: {
-        userId,
+        userId: actor.id,
         planId: plan.id,
         interval,
         status: SubscriptionStatus.INCOMPLETE,
         currentPeriodStart: now,
-        currentPeriodEnd: periodEnd,
+        currentPeriodEnd: getPeriodEndDate(now, interval),
         payments: {
           create: {
             transactionId: paymentReference,
-            paymentMethod,
+            paymentMethod: PaymentMethod.PAYSTACK,
             amount,
+            currency: Currency.KES,
             status: PaymentStatus.PENDING,
           },
         },
       },
-      include: {
-        payments: { orderBy: { createdAt: "desc" }, take: 1 },
-      },
+      select: { id: true },
+    });
+    subscriptionId = subscription.id;
+
+    const callbackUrl = new URL(
+      `/${encodeURIComponent(lang)}/settings`,
+      BASE_URL,
+    );
+    callbackUrl.searchParams.set("tab", "subscription");
+    callbackUrl.searchParams.set("reference", paymentReference);
+
+    const checkout = await initializePaystackTransaction({
+      email: payerEmail,
+      amount,
+      currency: Currency.KES,
+      reference: paymentReference,
+      callbackUrl: callbackUrl.toString(),
+      metadata: { subscriptionId, userId: actor.id, planName },
     });
 
-    const serializedSubscription = {
-      ...subscription,
-      payments: subscription.payments.map((payment) => ({
-        ...payment,
-        amount: payment.amount.toNumber(),
-      })),
-    };
-
-    revalidatePath("/en/dashboard");
+    revalidatePath(`/${lang}/dashboard`);
     return {
       ok: true,
-      data: serializedSubscription,
+      data: {
+        authorizationUrl: checkout.authorization_url,
+        reference: paymentReference,
+      },
     };
   } catch (error) {
+    if (error instanceof PaystackApiError && error.outcomeUnknown) {
+      return {
+        ok: false,
+        error: `Payment setup status is unknown. Do not retry yet. Reference: ${paymentReference ?? "pending"}`,
+      };
+    }
+
+    if (subscriptionId && paymentReference) {
+      await prisma
+        .$transaction([
+          prisma.subscriptionPayment.updateMany({
+            where: {
+              transactionId: paymentReference,
+              status: PaymentStatus.PENDING,
+            },
+            data: { status: PaymentStatus.FAILED },
+          }),
+          prisma.subscription.updateMany({
+            where: {
+              id: subscriptionId,
+              status: SubscriptionStatus.INCOMPLETE,
+            },
+            data: { status: SubscriptionStatus.CANCELED },
+          }),
+        ])
+        .catch(() => undefined);
+    }
+
     return { ok: false, error: getFriendlyErrorMessage(error) };
   }
 }
 
-/**
- * 2. ACTIVATE / RENEW SUBSCRIPTION (Hook for Webhook / Verification)
- */
-export async function handlePaymentSuccess(transactionId: string) {
-  try {
-    const payment = await prisma.subscriptionPayment.findUnique({
-      where: { transactionId },
-      include: { subscription: true },
-    });
-
-    if (!payment) throw new Error("Transaction record not found");
-
-    const now = new Date();
-    const newPeriodEnd = getPeriodEndDate(now, payment.subscription.interval);
-
-    await prisma.$transaction([
-      // Mark Payment Success
-      prisma.subscriptionPayment.update({
-        where: { id: payment.id },
-        data: {
-          status: PaymentStatus.SUCCESS,
-          paidAt: now,
-        },
-      }),
-      // Transition Subscription to ACTIVE
-      prisma.subscription.update({
-        where: { id: payment.subscriptionId },
-        data: {
-          status: SubscriptionStatus.ACTIVE,
-          currentPeriodStart: now,
-          currentPeriodEnd: newPeriodEnd,
-          cancelAtPeriodEnd: false,
-        },
-      }),
-    ]);
-
-    revalidatePath("/dashboard");
-    return { success: true };
-  } catch (error) {
-    console.error("Payment Handler Error:", error);
-    return { success: false, error: "Failed to activate subscription" };
-  }
-}
-
-/**
- * 3. CANCEL AT PERIOD END (User-Initiated Cancellation)
- */
 export async function cancelSubscription(subscriptionId: string) {
+  const actor = await requireUser();
   try {
-    const subscription = await prisma.subscription.update({
-      where: { id: subscriptionId },
+    const subscription = await prisma.subscription.findFirst({
+      where: { id: subscriptionId, userId: actor.id },
+    });
+    if (!subscription) throw new Error("Subscription not found");
+
+    const updated = await prisma.subscription.update({
+      where: { id: subscription.id },
       data: {
         cancelAtPeriodEnd: true,
         canceledAt: new Date(),
-        status: SubscriptionStatus.CANCELED,
       },
     });
 
     revalidatePath("/dashboard/billing");
-    return { success: true, subscription };
+    return { success: true, subscription: updated };
   } catch (error) {
     console.error("Cancel Subscription Error:", error);
     return { success: false, error: "Failed to cancel subscription" };
   }
 }
 
-/**
- * 4. GET ACTIVE USER SUBSCRIPTION WITH ACCESS CHECK
- */
 export async function getUserSubscription(): Promise<
   ActionResult<SubscriptionStatusCheck>
 > {
@@ -190,18 +179,8 @@ export async function getUserSubscription(): Promise<
     const subscriptionCheck = await SubscriptionService.getSubscriptionByUserId(
       actor.id,
     );
-
-    console.log(`Sub status:`, subscriptionCheck);
-
-    return {
-      ok: true,
-      data: subscriptionCheck,
-    };
+    return { ok: true, data: subscriptionCheck };
   } catch (error) {
-    console.error(`[ERROR GETTING SUBSCRIPTION]: userId-${actor.id}`, error);
-    return {
-      ok: false,
-      error: getFriendlyErrorMessage(error),
-    };
+    return { ok: false, error: getFriendlyErrorMessage(error) };
   }
 }

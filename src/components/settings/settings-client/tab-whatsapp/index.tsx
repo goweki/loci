@@ -5,14 +5,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { TabsContent } from "@/components/ui/tabs";
 import { Building2Icon, Phone } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import WabaEmbeddedSignup from "@/components/ui/waba-embedded-signup";
-import { PhoneNumber, WabaAccount, WabaTemplate } from "@/lib/prisma/generated";
+import {
+  PhoneNumber,
+  SubscriptionStatus,
+  WabaAccount,
+  WabaTemplate,
+} from "@/lib/prisma/generated";
 import { getStatusBadge } from "../utilities";
 import { TemplatesClient } from "./waba-templates";
+import { getUserSubscription } from "@/actions/subscription.actions";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import Link from "next/link";
+import { useI18n } from "@/lib/i18n";
+import Loader from "@/components/ui/loaders";
+import { SubscriptionStatusCheck } from "@/types";
 
 interface Waba extends WabaAccount {
   phoneNumbers: PhoneNumber[];
@@ -20,7 +31,41 @@ interface Waba extends WabaAccount {
 }
 
 export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
-  return (
+  const [isLoading, setLoading] = useState<boolean>(true);
+  const [subCheck, setSubCheck] = useState<SubscriptionStatusCheck | undefined>(
+    undefined,
+  );
+  const { language } = useI18n();
+
+  useEffect(() => {
+    const checkSub = async () => {
+      const subsResult = await getUserSubscription();
+
+      if (!subsResult.ok) {
+        toast.error(subsResult.error);
+        return;
+      }
+
+      const subStatus = subsResult.data;
+
+      if (subStatus.status !== SubscriptionStatus.ACTIVE) {
+        setSubCheck(subStatus);
+        return;
+      }
+
+      setSubCheck(subStatus);
+    };
+
+    try {
+      checkSub();
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return isLoading ? (
+    <Loader />
+  ) : (
     <>
       <Card>
         <CardHeader>
@@ -30,7 +75,21 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {waba ? (
+          {subCheck?.status !== SubscriptionStatus.ACTIVE ? (
+            <div className="text-center py-12 space-y-4">
+              <Building2Icon className="w-16 h-16 mx-auto text-muted-foreground" />
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold">
+                  You need an active subscription to continue
+                </h3>
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                  <Link href={`/${language}/settings?tab=subscription`}>
+                    Select A Subscription
+                  </Link>
+                </p>
+              </div>
+            </div>
+          ) : waba ? (
             <>
               <div className="flex items-center gap-4 p-4 border rounded-lg">
                 <Building2Icon className="w-10 h-10 text-green-600" />
@@ -50,7 +109,11 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold">Whatsapp Numbers</h3>
-                  <Button size="sm">Add Number</Button>
+                  {subCheck.subscription?.plan &&
+                    subCheck.subscription.plan.maxPhoneNumbers >
+                      waba.phoneNumbers.length && (
+                      <Button size="sm">Add Number</Button>
+                    )}
                 </div>
 
                 {waba.phoneNumbers.length > 0 ? (
