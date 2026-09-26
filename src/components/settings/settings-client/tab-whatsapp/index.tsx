@@ -39,7 +39,9 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
   useEffect(() => {
     const checkSub = async () => {
       const subsResult = await getUserSubscription();
+
       if (!subsResult.ok) {
+        setHasActiveSub(false);
         toast.error(subsResult.error);
         return;
       }
@@ -47,6 +49,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
       const subStatus = subsResult.data;
 
       if (subStatus.status !== SubscriptionStatus.ACTIVE) {
+        setHasActiveSub(false);
         return;
       }
 
