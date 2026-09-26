@@ -23,6 +23,7 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import Loader from "@/components/ui/loaders";
+import { SubscriptionStatusCheck } from "@/types";
 
 interface Waba extends WabaAccount {
   phoneNumbers: PhoneNumber[];
@@ -31,9 +32,9 @@ interface Waba extends WabaAccount {
 
 export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
   const [isLoading, setLoading] = useState<boolean>(true);
-  const [hasActiveSubscription, setHasActiveSub] = useState<
-    boolean | undefined
-  >(undefined);
+  const [subCheck, setSubCheck] = useState<SubscriptionStatusCheck | undefined>(
+    undefined,
+  );
   const { language } = useI18n();
 
   useEffect(() => {
@@ -41,7 +42,6 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
       const subsResult = await getUserSubscription();
 
       if (!subsResult.ok) {
-        setHasActiveSub(false);
         toast.error(subsResult.error);
         return;
       }
@@ -49,11 +49,11 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
       const subStatus = subsResult.data;
 
       if (subStatus.status !== SubscriptionStatus.ACTIVE) {
-        setHasActiveSub(false);
+        setSubCheck(subStatus);
         return;
       }
 
-      setHasActiveSub(true);
+      setSubCheck(subStatus);
     };
 
     try {
@@ -75,12 +75,12 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {hasActiveSubscription === false ? (
+          {subCheck?.status !== SubscriptionStatus.ACTIVE ? (
             <div className="text-center py-12 space-y-4">
               <Building2Icon className="w-16 h-16 mx-auto text-muted-foreground" />
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold">
-                  You need an active subscription to Continue
+                  You need an active subscription to continue
                 </h3>
                 <p className="text-sm text-muted-foreground max-w-md mx-auto">
                   <Link href={`/${language}/settings?tab=subscription`}>
@@ -158,7 +158,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
           )}
         </CardContent>
       </Card>
-      {hasActiveSubscription && waba ? (
+      {waba ? (
         <Card>
           <CardHeader>
             <CardTitle>Whatsapp Templates</CardTitle>
