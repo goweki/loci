@@ -55,23 +55,23 @@ export default function TabAutoreplyRules() {
         <div className="rounded-md border overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b bg-slate-50">
-                <th className="px-4 py-3 text-left text-sm font-medium text-slate-900">
+              <tr className="border-b">
+                <th className="px-4 py-3 text-left text-sm font-medium">
                   Rule Name
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-slate-900">
+                <th className="px-4 py-3 text-left text-sm font-medium">
                   Trigger Type
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-slate-900">
+                <th className="px-4 py-3 text-left text-sm font-medium">
                   Phone Number
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-slate-900">
+                <th className="px-4 py-3 text-left text-sm font-medium">
                   Priority
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-slate-900">
+                <th className="px-4 py-3 text-left text-sm font-medium">
                   Status
                 </th>
-                <th className="px-4 py-3 text-right text-sm font-medium text-slate-900">
+                <th className="px-4 py-3 text-right text-sm font-medium">
                   Actions
                 </th>
               </tr>
