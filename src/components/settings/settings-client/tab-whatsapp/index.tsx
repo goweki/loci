@@ -158,7 +158,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
           )}
         </CardContent>
       </Card>
-      {waba ? (
+      {hasActiveSubscription && waba ? (
         <Card>
           <CardHeader>
             <CardTitle>Whatsapp Templates</CardTitle>
