@@ -44,9 +44,9 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
         return;
       }
 
-      const sunStatus = subsResult.data;
+      const subStatus = subsResult.data;
 
-      if (sunStatus.status !== SubscriptionStatus.ACTIVE) {
+      if (subStatus.status !== SubscriptionStatus.ACTIVE) {
         return;
       }
     };
