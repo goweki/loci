@@ -83,10 +83,11 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
                   You need an active subscription to Continue
                 </h3>
                 <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                  <Link href={`/${language}/settings?tab=subscription`}></Link>
+                  <Link href={`/${language}/settings?tab=subscription`}>
+                    Select A Subscription
+                  </Link>
                 </p>
               </div>
-              <WabaEmbeddedSignup label="Create WhatsApp Integration" />
             </div>
           ) : waba ? (
             <>
