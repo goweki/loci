@@ -103,14 +103,14 @@ export default function SettingsClient({ user }: { user: UserWithRelations }) {
         )}
       </TabsContent>
 
-      {/* Subscription Tab */}
-      <TabsContent value="subscription" className="space-y-6">
-        <TabSubscription />
-      </TabsContent>
-
       {/* AutoReply Tab */}
       <TabsContent value="auto-reply" className="space-y-4">
         <TabAutoreplyRules />
+      </TabsContent>
+
+      {/* Subscription Tab */}
+      <TabsContent value="subscription" className="space-y-6">
+        <TabSubscription />
       </TabsContent>
 
       {/* Security Tab */}
