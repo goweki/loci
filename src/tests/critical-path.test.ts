@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
   bcryptCompare: vi.fn(),
   hashSha256: vi.fn(),
   getSubscriptionByUserId: vi.fn(),
+  verifyPaystackTransaction: vi.fn(),
+  verifyPaystackTransfer: vi.fn(),
   prisma: {
     $extends: vi.fn(),
     $transaction: vi.fn(),
@@ -17,14 +19,32 @@ const mocks = vi.hoisted(() => ({
       findFirst: vi.fn(),
       findMany: vi.fn(),
     },
+    order: {
+      findUnique: vi.fn(),
+    },
+    orderPayout: {
+      upsert: vi.fn(),
+      findMany: vi.fn(),
+      updateMany: vi.fn(),
+    },
+    user: {
+      findUnique: vi.fn(),
+    },
     payment: {
+      findUnique: vi.fn(),
       updateMany: vi.fn(),
     },
     subscriptionPayment: {
       findUnique: vi.fn(),
-      update: vi.fn(),
+      updateMany: vi.fn(),
     },
     subscription: {
+      findUniqueOrThrow: vi.fn(),
+      update: vi.fn(),
+    },
+    webhookEvent: {
+      create: vi.fn(),
+      findUnique: vi.fn(),
       update: vi.fn(),
     },
     token: {
@@ -69,6 +89,14 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
+vi.mock("@/lib/payments/paystack-api", () => ({
+  initializePaystackTransaction: vi.fn(),
+  initiatePaystackTransfer: vi.fn(),
+  createPaystackTransferRecipient: vi.fn(),
+  verifyPaystackTransaction: mocks.verifyPaystackTransaction,
+  verifyPaystackTransfer: mocks.verifyPaystackTransfer,
+}));
+
 vi.mock("next-auth/providers/credentials", () => ({
   default: (provider: Record<string, unknown>) => ({
     id: "credentials",
@@ -103,7 +131,7 @@ const merchantProduct = {
     username: "test-merchant",
     email: "merchant@example.com",
     tel: "254700000000",
-    subscriptions: [{ status: "ACTIVE" }],
+    subscriptions: [{ status: "ACTIVE", plan: { name: "STANDARD" } }],
   },
 };
 
@@ -246,21 +274,38 @@ describe("merchant launch critical path", () => {
       .update(payload)
       .digest("hex");
 
-    mocks.prisma.payment.updateMany.mockResolvedValue({ count: 0 });
+    mocks.prisma.webhookEvent.create.mockResolvedValue({ id: "webhook-1" });
+    mocks.verifyPaystackTransaction.mockResolvedValue({
+      status: "success",
+      reference: "subscription-payment-1",
+      amount: 150000,
+      currency: "KES",
+      paid_at: "2026-09-26T12:00:00.000Z",
+    });
+    mocks.prisma.payment.findUnique.mockResolvedValue(null);
     mocks.prisma.subscriptionPayment.findUnique.mockResolvedValue({
       id: "subscription-payment-row-1",
       subscriptionId: "subscription-1",
+      amount: { toNumber: () => 1500 },
+      currency: "KES",
     });
-    mocks.prisma.subscriptionPayment.update.mockResolvedValue({
-      id: "subscription-payment-row-1",
-      status: "SUCCESS",
-    });
-    mocks.prisma.subscription.update.mockResolvedValue({
+    const paymentClaim = vi.fn().mockResolvedValue({ count: 1 });
+    const subscriptionLookup = vi.fn().mockResolvedValue({
       id: "subscription-1",
-      status: "ACTIVE",
+      interval: "MONTHLY",
     });
+    const subscriptionUpdate = vi
+      .fn()
+      .mockResolvedValue({ id: "subscription-1" });
     mocks.prisma.$transaction.mockImplementation(
-      (operations: Promise<unknown>[]) => Promise.all(operations),
+      async (callback: (tx: unknown) => unknown) =>
+        callback({
+          subscriptionPayment: { updateMany: paymentClaim },
+          subscription: {
+            findUniqueOrThrow: subscriptionLookup,
+            update: subscriptionUpdate,
+          },
+        }),
     );
 
     const response = await POST(
@@ -273,19 +318,27 @@ describe("merchant launch critical path", () => {
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ received: true });
+    expect(mocks.verifyPaystackTransaction).toHaveBeenCalledWith(
+      "subscription-payment-1",
+    );
     expect(mocks.prisma.subscriptionPayment.findUnique).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { transactionId: "subscription-payment-1" },
       }),
     );
-    expect(mocks.prisma.subscriptionPayment.update).toHaveBeenCalledWith({
-      where: { id: "subscription-payment-row-1" },
-      data: { status: "SUCCESS" },
+    expect(paymentClaim).toHaveBeenCalledWith({
+      where: { id: "subscription-payment-row-1", status: "PENDING" },
+      data: expect.objectContaining({ status: "SUCCESS" }),
     });
-    expect(mocks.prisma.subscription.update).toHaveBeenCalledWith({
+    expect(subscriptionUpdate).toHaveBeenCalledWith({
       where: { id: "subscription-1" },
-      data: { status: "ACTIVE" },
+      data: expect.objectContaining({ status: "ACTIVE" }),
     });
+    expect(mocks.prisma.webhookEvent.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ processed: true }),
+      }),
+    );
   });
 
   it("rejects a Paystack event with an invalid signature", async () => {
@@ -305,5 +358,40 @@ describe("merchant launch critical path", () => {
 
     expect(response.status).toBe(401);
     expect(mocks.prisma.payment.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("does not process marketplace payouts while the feature flag is false", async () => {
+    vi.stubEnv("PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED", "false");
+    const { MarketplacePaymentService } =
+      await import("@/services/commerce/marketplace-payment.service");
+    const service = new MarketplacePaymentService();
+
+    await expect(service.processQueuedPayouts()).resolves.toEqual({
+      processed: 0,
+      disabled: true,
+    });
+    expect(mocks.verifyPaystackTransfer).not.toHaveBeenCalled();
+  });
+
+  it("does not queue a seller payout before the dispute window expires", async () => {
+    vi.stubEnv("PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED", "false");
+    vi.stubEnv("MARKETPLACE_DISPUTE_WINDOW_HOURS", "72");
+    const { MarketplacePaymentService } =
+      await import("@/services/commerce/marketplace-payment.service");
+    mocks.prisma.order.findUnique.mockResolvedValue({
+      id: "order-1",
+      userId: "user-1",
+      status: "PAID",
+      deliveryConfirmedAt: new Date(Date.now() - 60 * 60 * 1000),
+      disputeOpenedAt: null,
+      payout: null,
+    });
+
+    const service = new MarketplacePaymentService();
+    const result = await service.requestSellerPayout("order-1");
+
+    expect(result.released).toBe(false);
+    expect(result.reason).toContain("becomes eligible after");
+    expect(mocks.prisma.orderPayout.upsert).not.toHaveBeenCalled();
   });
 });

@@ -134,7 +134,9 @@ exports.Prisma.UserScalarFieldEnum = {
   username: 'username',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  preferredCommunicationChannel: 'preferredCommunicationChannel'
+  preferredCommunicationChannel: 'preferredCommunicationChannel',
+  paystackRecipientCode: 'paystackRecipientCode',
+  paystackRecipientCurrency: 'paystackRecipientCurrency'
 };
 
 exports.Prisma.TokenScalarFieldEnum = {
@@ -225,6 +227,7 @@ exports.Prisma.PaymentScalarFieldEnum = {
   currency: 'currency',
   status: 'status',
   paidAt: 'paidAt',
+  metadata: 'metadata',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -315,9 +318,12 @@ exports.Prisma.AutoReplyRuleScalarFieldEnum = {
 
 exports.Prisma.WebhookEventScalarFieldEnum = {
   id: 'id',
+  eventKey: 'eventKey',
   type: 'type',
   payload: 'payload',
   processed: 'processed',
+  processedAt: 'processedAt',
+  error: 'error',
   createdAt: 'createdAt'
 };
 
@@ -341,9 +347,20 @@ exports.Prisma.OrderScalarFieldEnum = {
   userId: 'userId',
   contactId: 'contactId',
   status: 'status',
+  fulfillmentStatus: 'fulfillmentStatus',
   currency: 'currency',
   notes: 'notes',
   paymentLink: 'paymentLink',
+  buyerName: 'buyerName',
+  buyerEmail: 'buyerEmail',
+  buyerPhone: 'buyerPhone',
+  deliveryTokenHash: 'deliveryTokenHash',
+  deliveryTokenExpiresAt: 'deliveryTokenExpiresAt',
+  deliveryConfirmedAt: 'deliveryConfirmedAt',
+  disputeOpenedAt: 'disputeOpenedAt',
+  disputeReason: 'disputeReason',
+  platformFee: 'platformFee',
+  payoutStatus: 'payoutStatus',
   total: 'total',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -357,6 +374,41 @@ exports.Prisma.OrderItemScalarFieldEnum = {
   quantity: 'quantity',
   unitPrice: 'unitPrice',
   total: 'total'
+};
+
+exports.Prisma.OrderPayoutScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  merchantId: 'merchantId',
+  amount: 'amount',
+  currency: 'currency',
+  recipientCode: 'recipientCode',
+  reference: 'reference',
+  transferCode: 'transferCode',
+  status: 'status',
+  requestedAt: 'requestedAt',
+  paidAt: 'paidAt',
+  lastError: 'lastError',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.LedgerTransactionScalarFieldEnum = {
+  id: 'id',
+  eventKey: 'eventKey',
+  type: 'type',
+  orderId: 'orderId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.LedgerEntryScalarFieldEnum = {
+  id: 'id',
+  transactionId: 'transactionId',
+  account: 'account',
+  side: 'side',
+  amount: 'amount',
+  currency: 'currency',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.InvoiceScalarFieldEnum = {
@@ -443,6 +495,11 @@ exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -473,6 +530,11 @@ exports.CommunicationChannel = exports.$Enums.CommunicationChannel = {
   WHATSAPP: 'WHATSAPP',
   SMS: 'SMS',
   EMAIL: 'EMAIL'
+};
+
+exports.Currency = exports.$Enums.Currency = {
+  KES: 'KES',
+  USD: 'USD'
 };
 
 exports.TokenType = exports.$Enums.TokenType = {
@@ -512,11 +574,6 @@ exports.PaymentMethod = exports.$Enums.PaymentMethod = {
   MPESA: 'MPESA',
   CARD: 'CARD',
   BANK: 'BANK'
-};
-
-exports.Currency = exports.$Enums.Currency = {
-  KES: 'KES',
-  USD: 'USD'
 };
 
 exports.PaymentStatus = exports.$Enums.PaymentStatus = {
@@ -596,6 +653,44 @@ exports.OrderStatus = exports.$Enums.OrderStatus = {
   CANCELLED: 'CANCELLED'
 };
 
+exports.FulfillmentStatus = exports.$Enums.FulfillmentStatus = {
+  UNFULFILLED: 'UNFULFILLED',
+  PROCESSING: 'PROCESSING',
+  SHIPPED: 'SHIPPED',
+  DELIVERED: 'DELIVERED',
+  DISPUTED: 'DISPUTED',
+  CANCELLED: 'CANCELLED'
+};
+
+exports.PayoutStatus = exports.$Enums.PayoutStatus = {
+  NOT_DUE: 'NOT_DUE',
+  QUEUED: 'QUEUED',
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  FAILED: 'FAILED',
+  REVERSED: 'REVERSED',
+  ON_HOLD: 'ON_HOLD'
+};
+
+exports.LedgerTransactionType = exports.$Enums.LedgerTransactionType = {
+  PAYMENT_RECEIVED: 'PAYMENT_RECEIVED',
+  PAYOUT_SENT: 'PAYOUT_SENT',
+  REFUND_ISSUED: 'REFUND_ISSUED',
+  PAYOUT_REVERSED: 'PAYOUT_REVERSED'
+};
+
+exports.LedgerAccount = exports.$Enums.LedgerAccount = {
+  PAYMENT_CLEARING: 'PAYMENT_CLEARING',
+  SELLER_PAYABLE: 'SELLER_PAYABLE',
+  PLATFORM_REVENUE: 'PLATFORM_REVENUE',
+  REFUND_CLEARING: 'REFUND_CLEARING'
+};
+
+exports.LedgerSide = exports.$Enums.LedgerSide = {
+  DEBIT: 'DEBIT',
+  CREDIT: 'CREDIT'
+};
+
 exports.InvoiceStatus = exports.$Enums.InvoiceStatus = {
   DRAFT: 'DRAFT',
   PENDING: 'PENDING',
@@ -632,6 +727,9 @@ exports.Prisma.ModelName = {
   Product: 'Product',
   Order: 'Order',
   OrderItem: 'OrderItem',
+  OrderPayout: 'OrderPayout',
+  LedgerTransaction: 'LedgerTransaction',
+  LedgerEntry: 'LedgerEntry',
   Invoice: 'Invoice',
   ChatbotConfig: 'ChatbotConfig',
   ChatbotConversation: 'ChatbotConversation',

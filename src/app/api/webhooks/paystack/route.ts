@@ -1,77 +1,184 @@
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
-import { parsePaystackWebhook } from "./parser";
+
+import prisma from "@/lib/prisma";
 import {
-  markPaymentFailed,
-  markPaymentSuccessful,
-} from "@/actions/payment.actions";
+  verifyPaystackTransaction,
+  verifyPaystackTransfer,
+} from "@/lib/payments/paystack-api";
+import { MarketplacePaymentService } from "@/services/commerce/marketplace-payment.service";
 
-const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
+const marketplacePayments = new MarketplacePaymentService();
 
-export async function POST(req: NextRequest) {
-  if (!PAYSTACK_SECRET_KEY) {
-    console.error("Missing PAYSTACK_SECRET_KEY in environment");
+type PaystackEventBody = {
+  event?: unknown;
+  data?: {
+    id?: unknown;
+    reference?: unknown;
+    transfer_code?: unknown;
+  };
+};
+
+function isUniqueConstraintError(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === "P2002"
+  );
+}
+
+export async function POST(request: NextRequest) {
+  const secret = process.env.PAYSTACK_SECRET_KEY;
+  if (!secret) {
     return NextResponse.json(
-      { error: "Payment configuration failure. Contact admin" },
+      { error: "Payment service is not configured" },
       { status: 500 },
     );
   }
 
+  const rawBody = await request.text();
+  const signature = request.headers.get("x-paystack-signature") ?? "";
+  if (!/^[a-f0-9]{128}$/i.test(signature)) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+  }
+
+  const expectedSignature = createHmac("sha512", secret)
+    .update(rawBody)
+    .digest();
+  const receivedSignature = Buffer.from(signature, "hex");
+  if (
+    receivedSignature.length !== expectedSignature.length ||
+    !timingSafeEqual(expectedSignature, receivedSignature)
+  ) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+  }
+
+  let eventBody: PaystackEventBody;
   try {
-    // Read raw body for signature verification
-    const rawBody = await req.text();
-    const signature = req.headers.get("x-paystack-signature");
+    eventBody = JSON.parse(rawBody) as PaystackEventBody;
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid event payload" },
+      { status: 400 },
+    );
+  }
 
-    console.log("received paystack webhook:", rawBody);
+  if (
+    typeof eventBody.event !== "string" ||
+    !eventBody.data ||
+    typeof eventBody.data !== "object"
+  ) {
+    return NextResponse.json(
+      { error: "Invalid event payload" },
+      { status: 400 },
+    );
+  }
 
-    if (!signature) {
-      console.warn("Missing Paystack signature header");
-      return NextResponse.json({ error: "Missing signature" }, { status: 400 });
+  const eventType = eventBody.event;
+  const reference =
+    typeof eventBody.data.reference === "string"
+      ? eventBody.data.reference
+      : undefined;
+  const eventId =
+    typeof eventBody.data.id === "string" ||
+    typeof eventBody.data.id === "number"
+      ? String(eventBody.data.id)
+      : reference || createHash("sha256").update(rawBody).digest("hex");
+  const eventKey = `${eventType}:${eventId}`;
+
+  let eventRecord;
+  try {
+    eventRecord = await prisma.webhookEvent.create({
+      data: {
+        eventKey,
+        type: eventType,
+        payload: {
+          event: eventType,
+          data: {
+            ...(typeof eventBody.data.id === "string" ||
+            typeof eventBody.data.id === "number"
+              ? { id: eventBody.data.id }
+              : {}),
+            ...(reference ? { reference } : {}),
+            ...(typeof eventBody.data.transfer_code === "string"
+              ? { transfer_code: eventBody.data.transfer_code }
+              : {}),
+          },
+        },
+      },
+    });
+  } catch (error) {
+    if (!isUniqueConstraintError(error)) {
+      return NextResponse.json(
+        { error: "Unable to record webhook" },
+        { status: 500 },
+      );
+    }
+    eventRecord = await prisma.webhookEvent.findUnique({ where: { eventKey } });
+    if (eventRecord?.processed) return NextResponse.json({ received: true });
+    if (!eventRecord)
+      return NextResponse.json(
+        { error: "Unable to load webhook" },
+        { status: 500 },
+      );
+  }
+
+  try {
+    if (eventType === "charge.success") {
+      if (!reference) throw new Error("Charge event has no reference");
+      const verified = await verifyPaystackTransaction(reference);
+      await marketplacePayments.markPaymentSuccessful(reference, verified);
+    } else if (eventType === "charge.failed") {
+      if (!reference) throw new Error("Charge event has no reference");
+      await marketplacePayments.markPaymentFailed(reference);
+    } else if (eventType === "transfer.success") {
+      if (!reference) throw new Error("Transfer event has no reference");
+      const verified = await verifyPaystackTransfer(reference);
+      await marketplacePayments.markTransferStatus(
+        reference,
+        "SUCCESS",
+        typeof eventBody.data.transfer_code === "string"
+          ? eventBody.data.transfer_code
+          : undefined,
+        eventKey,
+        verified,
+      );
+    } else if (
+      eventType === "transfer.failed" ||
+      eventType === "transfer.reversed"
+    ) {
+      if (!reference) throw new Error("Transfer event has no reference");
+      await marketplacePayments.markTransferStatus(
+        reference,
+        eventType === "transfer.failed" ? "FAILED" : "REVERSED",
+        typeof eventBody.data.transfer_code === "string"
+          ? eventBody.data.transfer_code
+          : undefined,
+        eventKey,
+      );
     }
 
-    // Compute HMAC SHA-512 hash of the payload
-    const hash = crypto
-      .createHmac("sha512", PAYSTACK_SECRET_KEY)
-      .update(rawBody)
-      .digest("hex");
-
-    // Use timing-safe comparison to prevent subtle attacks
-    if (!crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(signature))) {
-      console.error("Invalid webhook signature");
-      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-    }
-
-    // Parse and validate payload
-    const rawEvent: unknown = JSON.parse(rawBody);
-    const parsedEvent = parsePaystackWebhook(rawEvent);
-
-    console.log("✅ Parsed Paystack event:", parsedEvent);
-
-    // Handle events
-    switch (parsedEvent.event) {
-      case "charge.success":
-        await markPaymentSuccessful(parsedEvent.reference);
-        break;
-
-      case "charge.failed":
-        await markPaymentFailed(parsedEvent.reference);
-        break;
-
-      case "transfer.success":
-        console.log("✅ Transfer successful:", parsedEvent);
-        break;
-
-      case "transfer.failed":
-        console.warn("⚠️ Transfer failed:", parsedEvent);
-        break;
-
-      default:
-        console.info("ℹ️ Unhandled Paystack event:", parsedEvent.event);
-    }
-
-    return NextResponse.json({ received: true }, { status: 200 });
-  } catch (error: any) {
-    console.error("❌ Webhook processing error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    await prisma.webhookEvent.update({
+      where: { id: eventRecord.id },
+      data: { processed: true, processedAt: new Date(), error: null },
+    });
+    return NextResponse.json({ received: true });
+  } catch (error) {
+    await prisma.webhookEvent
+      .update({
+        where: { id: eventRecord.id },
+        data: {
+          error:
+            error instanceof Error
+              ? error.message.slice(0, 1000)
+              : "Webhook processing failed",
+        },
+      })
+      .catch(() => undefined);
+    return NextResponse.json(
+      { error: "Webhook processing failed" },
+      { status: 500 },
+    );
   }
 }

@@ -274,7 +274,6 @@ export default function PricingComponent(props: { pageTitle?: boolean }) {
                     amount={getPrice(plan)}
                     planName={plan.name}
                     billingInterval={billingInterval}
-                    userId={user.id}
                   />
                 </div>
               )}

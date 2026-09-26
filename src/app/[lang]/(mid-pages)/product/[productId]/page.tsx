@@ -2,7 +2,6 @@ import { getPublicProductById } from "@/actions/product.actions";
 import { notFound } from "next/navigation";
 import ProductViewComponent from "@/components/dashboard/products/product-view";
 import { ProductHeader } from "./_components/product-header";
-import prisma from "@/lib/prisma";
 import { canMerchantSell } from "@/actions/merchant.actions/merchant.helpers";
 
 type Props = {
@@ -25,6 +24,7 @@ export default async function ProductPage({ params }: Props) {
 
   const merchantSubscriptions = product.user.subscriptions.map((sub) => ({
     status: sub.status,
+    plan: sub.plan,
   }));
 
   const canPurchase = canMerchantSell(merchantSubscriptions);
@@ -39,6 +39,7 @@ export default async function ProductPage({ params }: Props) {
       <ProductViewComponent
         product={JSON.parse(JSON.stringify(product))}
         canPurchase={canPurchase}
+        lang={lang}
       />
     </div>
   );
