@@ -34,8 +34,11 @@ export function hashSha256(token: string) {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
-// HMAC signature
-function generateHmacSignature(
+// ========================
+// ==== HMAC signature ====
+// ========================
+
+export function generateHmacSignature(
   method: string,
   url: string,
   timestamp: string,
@@ -43,7 +46,7 @@ function generateHmacSignature(
   body: string,
 ): string {
   if (!hmacSecret) {
-    throw new Error("Missing env HMAC_SECRET");
+    throw new Error("Missing env LOCI_HMAC_SECRET");
   }
 
   const payload = [method.toUpperCase(), url, timestamp, nonce, body].join(".");
