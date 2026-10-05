@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
-import { bcryptCompare } from "@/lib/utils/passwordHandlers";
+import { bcryptCompare } from "@/lib/utils/authHandlers";
 import { addToDate } from "@/lib/utils/dateHandlers";
 import { UserService } from "@/services/user/user.service";
 import { generateUserApiKey } from "@/actions/api-key.actions";

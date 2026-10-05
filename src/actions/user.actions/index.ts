@@ -15,7 +15,7 @@ import {
   bcryptHash,
   generateRandom,
   hashSha256,
-} from "@/lib/utils/passwordHandlers";
+} from "@/lib/utils/authHandlers";
 import { generateUniqueUsernameFromSeed } from "@/lib/utils/username";
 import whatsapp from "@/lib/whatsapp";
 import { UserService } from "@/services/user/user.service";

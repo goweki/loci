@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import { bcryptCompare, bcryptHash } from "@/lib/utils/passwordHandlers";
+import { bcryptCompare, bcryptHash } from "@/lib/utils/authHandlers";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import { TokenType } from "@/lib/prisma/generated";
 import { UserService } from "@/services/user/user.service";

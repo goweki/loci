@@ -1,6 +1,6 @@
 "use server";
 
-import { bcryptHash, generateRandom } from "@/lib/utils/passwordHandlers";
+import { bcryptHash, generateRandom } from "@/lib/utils/authHandlers";
 
 export async function generateResetToken(): Promise<{
   plain: string;

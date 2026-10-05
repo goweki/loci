@@ -69,12 +69,12 @@ vi.mock("@/services/user/user.service", () => ({
   },
 }));
 
-vi.mock("@/utils/passwordHandlers", () => ({
+vi.mock("@/utils/authHandlers", () => ({
   bcryptCompare: mocks.bcryptCompare,
   hashSha256: mocks.hashSha256,
 }));
 
-vi.mock("@/lib/utils/passwordHandlers", () => ({
+vi.mock("@/lib/utils/authHandlers", () => ({
   bcryptCompare: mocks.bcryptCompare,
   hashSha256: mocks.hashSha256,
 }));

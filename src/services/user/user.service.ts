@@ -14,7 +14,7 @@ import {
 } from "@/lib/prisma/generated";
 import sendSms, { SMSprops } from "@/lib/sms";
 import { BANNER_IMAGE_URL, BASE_URL } from "@/lib/utils/getUrl";
-import { bcryptCompare } from "@/lib/utils/passwordHandlers";
+import { bcryptCompare } from "@/lib/utils/authHandlers";
 import { buildResetUrlTail, generateResetToken } from "@/lib/utils/resetToken";
 import { Message } from "@/lib/validations";
 import whatsapp from "@/lib/whatsapp";
