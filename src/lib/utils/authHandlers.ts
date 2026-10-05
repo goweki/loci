@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 const saltRounds = Number(process.env.BCRYPT_SALTROUNDS || 9);
 import crypto from "crypto";
 import { TokenType } from "../prisma/generated";
+const hmacSecret = process.env.HMAC_SECRET;
 
 // hash a password
 export async function bcryptHash(plaintext: string) {
@@ -31,4 +32,24 @@ export function generateRawToken(type: TokenType): string {
 
 export function hashSha256(token: string) {
   return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+// HMAC signature
+function generateHmacSignature(
+  method: string,
+  url: string,
+  timestamp: string,
+  nonce: string,
+  body: string,
+): string {
+  if (!hmacSecret) {
+    throw new Error("Missing env HMAC_SECRET");
+  }
+
+  const payload = [method.toUpperCase(), url, timestamp, nonce, body].join(".");
+
+  return crypto
+    .createHmac("sha256", hmacSecret)
+    .update(payload, "utf8")
+    .digest("hex");
 }

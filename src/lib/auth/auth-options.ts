@@ -7,7 +7,7 @@ import {
   UserRole,
   UserStatus,
 } from "@/lib/prisma/generated";
-import { bcryptCompare, hashSha256 } from "../utils/passwordHandlers";
+import { bcryptCompare, hashSha256 } from "../utils/authHandlers";
 import prisma from "../prisma";
 import { UserService } from "@/services/user/user.service";
 import { cookies } from "next/headers";

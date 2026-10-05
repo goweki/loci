@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { TokenType } from "../prisma/generated";
 import { UserService } from "@/services/user/user.service";
-import { hashSha256 } from "../utils/passwordHandlers";
+import { hashSha256 } from "../utils/authHandlers";
 
 export type ApiKeyAuth = {
   id: string;

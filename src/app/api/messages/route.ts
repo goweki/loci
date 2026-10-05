@@ -6,7 +6,7 @@ import {
 } from "@/lib/auth/token-handlers";
 
 const getMessages: AuthenticatedHandler = async (request, apiKey) => {
-  let userId = apiKey.id;
+  let userId = apiKey.user.id;
 
   if (!userId) {
     return new NextResponse("Unauthorized", { status: 401 });

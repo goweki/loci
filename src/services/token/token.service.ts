@@ -8,7 +8,7 @@ import {
   Token,
   TokenType,
 } from "@/lib/prisma/generated";
-import { generateRawToken, hashSha256 } from "@/lib/utils/passwordHandlers";
+import { generateRawToken, hashSha256 } from "@/lib/utils/authHandlers";
 
 export type TokenServiceContext = {
   userId: string;
