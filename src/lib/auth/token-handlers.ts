@@ -18,10 +18,7 @@ export type ApiKeyValidationResult = ApiKeyAuth | NextResponse;
  * Generate secure API key string
  */
 function generateApiKeyString() {
-  return (
-    `loc_${TokenType.API_KEY.toLocaleLowerCase()}_` +
-    crypto.randomBytes(32).toString("hex")
-  );
+  return `loc_ak_` + crypto.randomBytes(32).toString("hex");
 }
 
 /**
