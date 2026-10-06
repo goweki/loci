@@ -1,6 +1,5 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth";
@@ -21,6 +20,7 @@ import { BASE_URL } from "@/lib/utils/getUrl";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import { SubscriptionService } from "@/services/subscription/subscription.service";
 import { ActionResult, SubscriptionStatusCheck } from "@/types";
+import { generateRandom } from "@/lib/utils/authHandlers";
 
 function getPeriodEndDate(startDate: Date, interval: PlanInterval): Date {
   const endDate = new Date(startDate);
@@ -66,8 +66,10 @@ export async function createSubscriptionAction({
 
     const amount =
       plan.monthlyPrice * (interval === PlanInterval.YEARLY ? 10 : 1);
-    paymentReference = `loci-${randomUUID()}`;
+
+    paymentReference = `${payerEmail.slice(0, 5)}-${Date.now()}`;
     const now = new Date();
+
     const subscription = await prisma.subscription.create({
       data: {
         userId: actor.id,
@@ -82,7 +84,6 @@ export async function createSubscriptionAction({
             paymentMethod: PaymentMethod.PAYSTACK,
             amount,
             currency: Currency.KES,
-            status: PaymentStatus.PENDING,
           },
         },
       },

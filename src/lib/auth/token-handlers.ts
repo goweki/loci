@@ -75,7 +75,7 @@ export async function createApiKey(options: {
  * Validate Token
  */
 export async function validateToken(
-  token: string,
+  token: string | null,
   type: TokenType,
 ): Promise<ApiKeyValidationResult> {
   if (!token) {
@@ -118,14 +118,13 @@ export async function validateToken(
 /**
  * Extract API key from request
  */
-export function extractApiKey(req: Request): string {
+export function extractApiKey(req: Request): string | null {
   const headerKey = req.headers.get("api-key") || req.headers.get("x-api-key");
   if (headerKey) return headerKey;
 
   const auth = req.headers.get("Authorization");
   if (!auth) {
-    console.error("Authorization failed");
-    return "";
+    return null;
   }
   return auth.replace(/^Bearer\s+/i, "");
 }
@@ -137,11 +136,8 @@ export type AuthenticatedHandler = (
 
 export function apiKeyMiddleware(handler: AuthenticatedHandler) {
   return async (request: NextRequest) => {
-    const apiKey =
-      request.headers.get("api-key") ||
-      request.headers.get("authorization")?.replace("Bearer ", "");
-
-    const auth = await validateToken(apiKey || "", TokenType.API_KEY);
+    const apiKey = extractApiKey(request);
+    const auth = await validateToken(apiKey, TokenType.API_KEY);
 
     if (auth instanceof NextResponse) {
       return auth;

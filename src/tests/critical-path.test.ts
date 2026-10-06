@@ -362,9 +362,9 @@ describe("merchant launch critical path", () => {
 
   it("does not process marketplace payouts while the feature flag is false", async () => {
     vi.stubEnv("PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED", "false");
-    const { MarketplacePaymentService } =
+    const { marketplacePayments } =
       await import("@/services/commerce/marketplace-payment.service");
-    const service = new MarketplacePaymentService();
+    const service = marketplacePayments;
 
     await expect(service.processQueuedPayouts()).resolves.toEqual({
       processed: 0,
@@ -376,7 +376,7 @@ describe("merchant launch critical path", () => {
   it("does not queue a seller payout before the dispute window expires", async () => {
     vi.stubEnv("PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED", "false");
     vi.stubEnv("MARKETPLACE_DISPUTE_WINDOW_HOURS", "72");
-    const { MarketplacePaymentService } =
+    const { marketplacePayments } =
       await import("@/services/commerce/marketplace-payment.service");
     mocks.prisma.order.findUnique.mockResolvedValue({
       id: "order-1",
@@ -387,7 +387,7 @@ describe("merchant launch critical path", () => {
       payout: null,
     });
 
-    const service = new MarketplacePaymentService();
+    const service = marketplacePayments;
     const result = await service.requestSellerPayout("order-1");
 
     expect(result.released).toBe(false);

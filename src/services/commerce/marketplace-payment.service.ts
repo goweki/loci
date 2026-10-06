@@ -842,3 +842,5 @@ export class MarketplacePaymentService {
     });
   }
 }
+
+export const marketplacePayments = new MarketplacePaymentService();

@@ -1,7 +1,7 @@
 import "server-only";
 
 // import { getLociSubscriptionStatusByUserId } from "@/data/subscription";
-import { checkMessageLimits } from "../usage/limits";
+import { checkMessageLimits, MessageLimitResponse } from "../usage/limits";
 // import { validatePhoneNumberOwnershipAction } from "@/data/phoneNumber";
 import {
   MessageType,
@@ -42,7 +42,7 @@ export async function authorizeMessageSend(userId: string, message: Message) {
   }
 
   const [subscription, limits] = await Promise.all<
-    [Promise<SubscriptionStatusCheck>, ReturnType<typeof checkMessageLimits>]
+    [Promise<SubscriptionStatusCheck>, Promise<MessageLimitResponse>]
   >([
     SubscriptionService.getSubscriptionByUserId(userId),
     checkMessageLimits(userId),
