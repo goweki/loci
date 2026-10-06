@@ -1,4 +1,4 @@
-import { countMessagesThisMonthByUserId } from "@/actions/message.actions";
+import { countMessagesSentByUserId } from "@/actions/message.actions";
 import { getUserSubscription } from "@/actions/subscription.actions";
 import { SubscriptionService } from "@/services/subscription/subscription.service";
 import { NextResponse } from "next/server";
@@ -14,10 +14,12 @@ export async function checkMessageLimits(userId: string): Promise<{
     await SubscriptionService.getSubscriptionByUserId(userId);
 
   let messageLimit: number = 0;
+  let sentMessages: number = 0;
 
   if (!subscriptionStatus.subscription) {
     if (subscriptionStatus.status === SubscriptionStatus.INCOMPLETE) {
       messageLimit = 10;
+      sentMessages = await countMessagesSentByUserId(userId);
     } else {
       return {
         allowed: false,
@@ -29,9 +31,11 @@ export async function checkMessageLimits(userId: string): Promise<{
     }
   } else {
     messageLimit = subscriptionStatus.subscription.plan.maxMessagesPerMonth;
-  }
 
-  const sentMessages = await countMessagesThisMonthByUserId(userId);
+    const subscriptionStartDate =
+      subscriptionStatus.subscription.currentPeriodStart;
+    sentMessages = await countMessagesSentByUserId(userId);
+  }
 
   if (sentMessages >= messageLimit) {
     return {

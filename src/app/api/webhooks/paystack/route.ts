@@ -6,9 +6,7 @@ import {
   verifyPaystackTransaction,
   verifyPaystackTransfer,
 } from "@/lib/payments/paystack-api";
-import { MarketplacePaymentService } from "@/services/commerce/marketplace-payment.service";
-
-const marketplacePayments = new MarketplacePaymentService();
+import { marketplacePayments } from "@/services/commerce/marketplace-payment.service";
 
 type PaystackEventBody = {
   event?: unknown;

@@ -14,11 +14,9 @@ import { createPaystackTransferRecipient } from "@/lib/payments/paystack-api";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import { ActionResult } from "@/types";
 import {
-  MarketplacePaymentService,
+  marketplacePayments,
   PublicOrderInput,
 } from "@/services/commerce/marketplace-payment.service";
-
-const marketplacePayments = new MarketplacePaymentService();
 
 export async function createMarketplaceCheckoutAction(
   input: PublicOrderInput,

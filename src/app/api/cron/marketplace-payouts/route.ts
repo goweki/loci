@@ -1,9 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-
-import { MarketplacePaymentService } from "@/services/commerce/marketplace-payment.service";
-
-const marketplacePayments = new MarketplacePaymentService();
+import { marketplacePayments } from "@/services/commerce/marketplace-payment.service";
 
 export async function POST(request: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
