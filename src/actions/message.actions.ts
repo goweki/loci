@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { Prisma } from "@/lib/prisma/generated";
+import { Prisma, SubscriptionStatus } from "@/lib/prisma/generated";
 import { getUserSubscription } from "./subscription.actions";
 
 export async function getMessagesByUserId(userId: string, limit = 50) {
@@ -24,21 +24,6 @@ export async function countMessagesSentByUserId(userId: string) {
     },
   });
 }
-
-// export async function countMessagesThisMonthByUserId(userId: string) {
-
-//   const subscription = await prisma.subscription.findFirstOrThrow
-//   const now = new Date();
-//   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-//   return prisma.message.count({
-//     where: {
-//       userId,
-//       direction: "OUTBOUND",
-//       createdAt: { gte: startOfMonth },
-//     },
-//   });
-// }
 
 export async function createMessage(
   data: Prisma.MessageCreateInput | Prisma.MessageUncheckedCreateInput,
