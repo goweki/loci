@@ -64,7 +64,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
     }
   }, []);
 
-  return isLoading ? (
+  return isLoading || !subCheck ? (
     <Loader />
   ) : (
     <>
@@ -76,7 +76,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {subCheck?.status !== SubscriptionStatus.ACTIVE ? (
+          {subCheck.status !== SubscriptionStatus.ACTIVE ? (
             <div className="text-center py-12 space-y-4">
               <Building2Icon className="w-16 h-16 mx-auto text-muted-foreground" />
               <div className="space-y-2">
@@ -163,9 +163,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
           )}
         </CardContent>
       </Card>
-      {waba ? (
-        <AssistantConfig />
-      ) : null}
+      {waba ? <AssistantConfig /> : null}
       {waba ? (
         <Card>
           <CardHeader>
