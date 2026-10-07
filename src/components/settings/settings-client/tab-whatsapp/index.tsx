@@ -24,6 +24,7 @@ import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import Loader from "@/components/ui/loaders";
 import { SubscriptionStatusCheck } from "@/types";
+import { AssistantConfig } from "./assistant-config";
 
 interface Waba extends WabaAccount {
   phoneNumbers: PhoneNumber[];
@@ -162,6 +163,9 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
           )}
         </CardContent>
       </Card>
+      {waba ? (
+        <AssistantConfig />
+      ) : null}
       {waba ? (
         <Card>
           <CardHeader>

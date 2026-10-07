@@ -31620,6 +31620,7 @@ export namespace Prisma {
     id: string | null
     phoneNumberId: string | null
     systemPrompt: string | null
+    profileContext: string | null
     model: string | null
     temperature: number | null
     maxTokens: number | null
@@ -31637,6 +31638,7 @@ export namespace Prisma {
     id: string | null
     phoneNumberId: string | null
     systemPrompt: string | null
+    profileContext: string | null
     model: string | null
     temperature: number | null
     maxTokens: number | null
@@ -31654,9 +31656,11 @@ export namespace Prisma {
     id: number
     phoneNumberId: number
     systemPrompt: number
+    profileContext: number
     model: number
     temperature: number
     maxTokens: number
+    enabledTools: number
     isActive: number
     fallbackToHuman: number
     humanHandoffKeywords: number
@@ -31690,6 +31694,7 @@ export namespace Prisma {
     id?: true
     phoneNumberId?: true
     systemPrompt?: true
+    profileContext?: true
     model?: true
     temperature?: true
     maxTokens?: true
@@ -31707,6 +31712,7 @@ export namespace Prisma {
     id?: true
     phoneNumberId?: true
     systemPrompt?: true
+    profileContext?: true
     model?: true
     temperature?: true
     maxTokens?: true
@@ -31724,9 +31730,11 @@ export namespace Prisma {
     id?: true
     phoneNumberId?: true
     systemPrompt?: true
+    profileContext?: true
     model?: true
     temperature?: true
     maxTokens?: true
+    enabledTools?: true
     isActive?: true
     fallbackToHuman?: true
     humanHandoffKeywords?: true
@@ -31829,9 +31837,11 @@ export namespace Prisma {
     id: string
     phoneNumberId: string
     systemPrompt: string
+    profileContext: string | null
     model: string
     temperature: number
     maxTokens: number
+    enabledTools: string[]
     isActive: boolean
     fallbackToHuman: boolean
     humanHandoffKeywords: string[]
@@ -31866,9 +31876,11 @@ export namespace Prisma {
     id?: boolean
     phoneNumberId?: boolean
     systemPrompt?: boolean
+    profileContext?: boolean
     model?: boolean
     temperature?: boolean
     maxTokens?: boolean
+    enabledTools?: boolean
     isActive?: boolean
     fallbackToHuman?: boolean
     humanHandoffKeywords?: boolean
@@ -31887,9 +31899,11 @@ export namespace Prisma {
     id?: boolean
     phoneNumberId?: boolean
     systemPrompt?: boolean
+    profileContext?: boolean
     model?: boolean
     temperature?: boolean
     maxTokens?: boolean
+    enabledTools?: boolean
     isActive?: boolean
     fallbackToHuman?: boolean
     humanHandoffKeywords?: boolean
@@ -31906,9 +31920,11 @@ export namespace Prisma {
     id?: boolean
     phoneNumberId?: boolean
     systemPrompt?: boolean
+    profileContext?: boolean
     model?: boolean
     temperature?: boolean
     maxTokens?: boolean
+    enabledTools?: boolean
     isActive?: boolean
     fallbackToHuman?: boolean
     humanHandoffKeywords?: boolean
@@ -31925,9 +31941,11 @@ export namespace Prisma {
     id?: boolean
     phoneNumberId?: boolean
     systemPrompt?: boolean
+    profileContext?: boolean
     model?: boolean
     temperature?: boolean
     maxTokens?: boolean
+    enabledTools?: boolean
     isActive?: boolean
     fallbackToHuman?: boolean
     humanHandoffKeywords?: boolean
@@ -31939,7 +31957,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ChatbotConfigOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "phoneNumberId" | "systemPrompt" | "model" | "temperature" | "maxTokens" | "isActive" | "fallbackToHuman" | "humanHandoffKeywords" | "responseDelay" | "typingIndicator" | "conversationHistory" | "resetContextAfter" | "createdAt" | "updatedAt", ExtArgs["result"]["chatbotConfig"]>
+  export type ChatbotConfigOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "phoneNumberId" | "systemPrompt" | "profileContext" | "model" | "temperature" | "maxTokens" | "enabledTools" | "isActive" | "fallbackToHuman" | "humanHandoffKeywords" | "responseDelay" | "typingIndicator" | "conversationHistory" | "resetContextAfter" | "createdAt" | "updatedAt", ExtArgs["result"]["chatbotConfig"]>
   export type ChatbotConfigInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     phoneNumber?: boolean | PhoneNumberDefaultArgs<ExtArgs>
     conversations?: boolean | ChatbotConfig$conversationsArgs<ExtArgs>
@@ -31962,9 +31980,11 @@ export namespace Prisma {
       id: string
       phoneNumberId: string
       systemPrompt: string
+      profileContext: string | null
       model: string
       temperature: number
       maxTokens: number
+      enabledTools: string[]
       isActive: boolean
       fallbackToHuman: boolean
       humanHandoffKeywords: string[]
@@ -32402,9 +32422,11 @@ export namespace Prisma {
     readonly id: FieldRef<"ChatbotConfig", 'String'>
     readonly phoneNumberId: FieldRef<"ChatbotConfig", 'String'>
     readonly systemPrompt: FieldRef<"ChatbotConfig", 'String'>
+    readonly profileContext: FieldRef<"ChatbotConfig", 'String'>
     readonly model: FieldRef<"ChatbotConfig", 'String'>
     readonly temperature: FieldRef<"ChatbotConfig", 'Float'>
     readonly maxTokens: FieldRef<"ChatbotConfig", 'Int'>
+    readonly enabledTools: FieldRef<"ChatbotConfig", 'String[]'>
     readonly isActive: FieldRef<"ChatbotConfig", 'Boolean'>
     readonly fallbackToHuman: FieldRef<"ChatbotConfig", 'Boolean'>
     readonly humanHandoffKeywords: FieldRef<"ChatbotConfig", 'String[]'>
@@ -36600,9 +36622,11 @@ export namespace Prisma {
     id: 'id',
     phoneNumberId: 'phoneNumberId',
     systemPrompt: 'systemPrompt',
+    profileContext: 'profileContext',
     model: 'model',
     temperature: 'temperature',
     maxTokens: 'maxTokens',
+    enabledTools: 'enabledTools',
     isActive: 'isActive',
     fallbackToHuman: 'fallbackToHuman',
     humanHandoffKeywords: 'humanHandoffKeywords',
@@ -39247,9 +39271,11 @@ export namespace Prisma {
     id?: StringFilter<"ChatbotConfig"> | string
     phoneNumberId?: StringFilter<"ChatbotConfig"> | string
     systemPrompt?: StringFilter<"ChatbotConfig"> | string
+    profileContext?: StringNullableFilter<"ChatbotConfig"> | string | null
     model?: StringFilter<"ChatbotConfig"> | string
     temperature?: FloatFilter<"ChatbotConfig"> | number
     maxTokens?: IntFilter<"ChatbotConfig"> | number
+    enabledTools?: StringNullableListFilter<"ChatbotConfig">
     isActive?: BoolFilter<"ChatbotConfig"> | boolean
     fallbackToHuman?: BoolFilter<"ChatbotConfig"> | boolean
     humanHandoffKeywords?: StringNullableListFilter<"ChatbotConfig">
@@ -39267,9 +39293,11 @@ export namespace Prisma {
     id?: SortOrder
     phoneNumberId?: SortOrder
     systemPrompt?: SortOrder
+    profileContext?: SortOrderInput | SortOrder
     model?: SortOrder
     temperature?: SortOrder
     maxTokens?: SortOrder
+    enabledTools?: SortOrder
     isActive?: SortOrder
     fallbackToHuman?: SortOrder
     humanHandoffKeywords?: SortOrder
@@ -39290,9 +39318,11 @@ export namespace Prisma {
     OR?: ChatbotConfigWhereInput[]
     NOT?: ChatbotConfigWhereInput | ChatbotConfigWhereInput[]
     systemPrompt?: StringFilter<"ChatbotConfig"> | string
+    profileContext?: StringNullableFilter<"ChatbotConfig"> | string | null
     model?: StringFilter<"ChatbotConfig"> | string
     temperature?: FloatFilter<"ChatbotConfig"> | number
     maxTokens?: IntFilter<"ChatbotConfig"> | number
+    enabledTools?: StringNullableListFilter<"ChatbotConfig">
     isActive?: BoolFilter<"ChatbotConfig"> | boolean
     fallbackToHuman?: BoolFilter<"ChatbotConfig"> | boolean
     humanHandoffKeywords?: StringNullableListFilter<"ChatbotConfig">
@@ -39310,9 +39340,11 @@ export namespace Prisma {
     id?: SortOrder
     phoneNumberId?: SortOrder
     systemPrompt?: SortOrder
+    profileContext?: SortOrderInput | SortOrder
     model?: SortOrder
     temperature?: SortOrder
     maxTokens?: SortOrder
+    enabledTools?: SortOrder
     isActive?: SortOrder
     fallbackToHuman?: SortOrder
     humanHandoffKeywords?: SortOrder
@@ -39336,9 +39368,11 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"ChatbotConfig"> | string
     phoneNumberId?: StringWithAggregatesFilter<"ChatbotConfig"> | string
     systemPrompt?: StringWithAggregatesFilter<"ChatbotConfig"> | string
+    profileContext?: StringNullableWithAggregatesFilter<"ChatbotConfig"> | string | null
     model?: StringWithAggregatesFilter<"ChatbotConfig"> | string
     temperature?: FloatWithAggregatesFilter<"ChatbotConfig"> | number
     maxTokens?: IntWithAggregatesFilter<"ChatbotConfig"> | number
+    enabledTools?: StringNullableListFilter<"ChatbotConfig">
     isActive?: BoolWithAggregatesFilter<"ChatbotConfig"> | boolean
     fallbackToHuman?: BoolWithAggregatesFilter<"ChatbotConfig"> | boolean
     humanHandoffKeywords?: StringNullableListFilter<"ChatbotConfig">
@@ -41860,9 +41894,11 @@ export namespace Prisma {
   export type ChatbotConfigCreateInput = {
     id?: string
     systemPrompt: string
+    profileContext?: string | null
     model?: string
     temperature?: number
     maxTokens?: number
+    enabledTools?: ChatbotConfigCreateenabledToolsInput | string[]
     isActive?: boolean
     fallbackToHuman?: boolean
     humanHandoffKeywords?: ChatbotConfigCreatehumanHandoffKeywordsInput | string[]
@@ -41880,9 +41916,11 @@ export namespace Prisma {
     id?: string
     phoneNumberId: string
     systemPrompt: string
+    profileContext?: string | null
     model?: string
     temperature?: number
     maxTokens?: number
+    enabledTools?: ChatbotConfigCreateenabledToolsInput | string[]
     isActive?: boolean
     fallbackToHuman?: boolean
     humanHandoffKeywords?: ChatbotConfigCreatehumanHandoffKeywordsInput | string[]
@@ -41898,9 +41936,11 @@ export namespace Prisma {
   export type ChatbotConfigUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    profileContext?: NullableStringFieldUpdateOperationsInput | string | null
     model?: StringFieldUpdateOperationsInput | string
     temperature?: FloatFieldUpdateOperationsInput | number
     maxTokens?: IntFieldUpdateOperationsInput | number
+    enabledTools?: ChatbotConfigUpdateenabledToolsInput | string[]
     isActive?: BoolFieldUpdateOperationsInput | boolean
     fallbackToHuman?: BoolFieldUpdateOperationsInput | boolean
     humanHandoffKeywords?: ChatbotConfigUpdatehumanHandoffKeywordsInput | string[]
@@ -41918,9 +41958,11 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    profileContext?: NullableStringFieldUpdateOperationsInput | string | null
     model?: StringFieldUpdateOperationsInput | string
     temperature?: FloatFieldUpdateOperationsInput | number
     maxTokens?: IntFieldUpdateOperationsInput | number
+    enabledTools?: ChatbotConfigUpdateenabledToolsInput | string[]
     isActive?: BoolFieldUpdateOperationsInput | boolean
     fallbackToHuman?: BoolFieldUpdateOperationsInput | boolean
     humanHandoffKeywords?: ChatbotConfigUpdatehumanHandoffKeywordsInput | string[]
@@ -41937,9 +41979,11 @@ export namespace Prisma {
     id?: string
     phoneNumberId: string
     systemPrompt: string
+    profileContext?: string | null
     model?: string
     temperature?: number
     maxTokens?: number
+    enabledTools?: ChatbotConfigCreateenabledToolsInput | string[]
     isActive?: boolean
     fallbackToHuman?: boolean
     humanHandoffKeywords?: ChatbotConfigCreatehumanHandoffKeywordsInput | string[]
@@ -41954,9 +41998,11 @@ export namespace Prisma {
   export type ChatbotConfigUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    profileContext?: NullableStringFieldUpdateOperationsInput | string | null
     model?: StringFieldUpdateOperationsInput | string
     temperature?: FloatFieldUpdateOperationsInput | number
     maxTokens?: IntFieldUpdateOperationsInput | number
+    enabledTools?: ChatbotConfigUpdateenabledToolsInput | string[]
     isActive?: BoolFieldUpdateOperationsInput | boolean
     fallbackToHuman?: BoolFieldUpdateOperationsInput | boolean
     humanHandoffKeywords?: ChatbotConfigUpdatehumanHandoffKeywordsInput | string[]
@@ -41972,9 +42018,11 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    profileContext?: NullableStringFieldUpdateOperationsInput | string | null
     model?: StringFieldUpdateOperationsInput | string
     temperature?: FloatFieldUpdateOperationsInput | number
     maxTokens?: IntFieldUpdateOperationsInput | number
+    enabledTools?: ChatbotConfigUpdateenabledToolsInput | string[]
     isActive?: BoolFieldUpdateOperationsInput | boolean
     fallbackToHuman?: BoolFieldUpdateOperationsInput | boolean
     humanHandoffKeywords?: ChatbotConfigUpdatehumanHandoffKeywordsInput | string[]
@@ -44392,9 +44440,11 @@ export namespace Prisma {
     id?: SortOrder
     phoneNumberId?: SortOrder
     systemPrompt?: SortOrder
+    profileContext?: SortOrder
     model?: SortOrder
     temperature?: SortOrder
     maxTokens?: SortOrder
+    enabledTools?: SortOrder
     isActive?: SortOrder
     fallbackToHuman?: SortOrder
     humanHandoffKeywords?: SortOrder
@@ -44418,6 +44468,7 @@ export namespace Prisma {
     id?: SortOrder
     phoneNumberId?: SortOrder
     systemPrompt?: SortOrder
+    profileContext?: SortOrder
     model?: SortOrder
     temperature?: SortOrder
     maxTokens?: SortOrder
@@ -44435,6 +44486,7 @@ export namespace Prisma {
     id?: SortOrder
     phoneNumberId?: SortOrder
     systemPrompt?: SortOrder
+    profileContext?: SortOrder
     model?: SortOrder
     temperature?: SortOrder
     maxTokens?: SortOrder
@@ -46497,6 +46549,10 @@ export namespace Prisma {
     update?: XOR<XOR<OrderUpdateToOneWithWhereWithoutInvoiceInput, OrderUpdateWithoutInvoiceInput>, OrderUncheckedUpdateWithoutInvoiceInput>
   }
 
+  export type ChatbotConfigCreateenabledToolsInput = {
+    set: string[]
+  }
+
   export type ChatbotConfigCreatehumanHandoffKeywordsInput = {
     set: string[]
   }
@@ -46527,6 +46583,11 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type ChatbotConfigUpdateenabledToolsInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type ChatbotConfigUpdatehumanHandoffKeywordsInput = {
@@ -49760,9 +49821,11 @@ export namespace Prisma {
   export type ChatbotConfigCreateWithoutPhoneNumberInput = {
     id?: string
     systemPrompt: string
+    profileContext?: string | null
     model?: string
     temperature?: number
     maxTokens?: number
+    enabledTools?: ChatbotConfigCreateenabledToolsInput | string[]
     isActive?: boolean
     fallbackToHuman?: boolean
     humanHandoffKeywords?: ChatbotConfigCreatehumanHandoffKeywordsInput | string[]
@@ -49778,9 +49841,11 @@ export namespace Prisma {
   export type ChatbotConfigUncheckedCreateWithoutPhoneNumberInput = {
     id?: string
     systemPrompt: string
+    profileContext?: string | null
     model?: string
     temperature?: number
     maxTokens?: number
+    enabledTools?: ChatbotConfigCreateenabledToolsInput | string[]
     isActive?: boolean
     fallbackToHuman?: boolean
     humanHandoffKeywords?: ChatbotConfigCreatehumanHandoffKeywordsInput | string[]
@@ -49881,9 +49946,11 @@ export namespace Prisma {
   export type ChatbotConfigUpdateWithoutPhoneNumberInput = {
     id?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    profileContext?: NullableStringFieldUpdateOperationsInput | string | null
     model?: StringFieldUpdateOperationsInput | string
     temperature?: FloatFieldUpdateOperationsInput | number
     maxTokens?: IntFieldUpdateOperationsInput | number
+    enabledTools?: ChatbotConfigUpdateenabledToolsInput | string[]
     isActive?: BoolFieldUpdateOperationsInput | boolean
     fallbackToHuman?: BoolFieldUpdateOperationsInput | boolean
     humanHandoffKeywords?: ChatbotConfigUpdatehumanHandoffKeywordsInput | string[]
@@ -49899,9 +49966,11 @@ export namespace Prisma {
   export type ChatbotConfigUncheckedUpdateWithoutPhoneNumberInput = {
     id?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    profileContext?: NullableStringFieldUpdateOperationsInput | string | null
     model?: StringFieldUpdateOperationsInput | string
     temperature?: FloatFieldUpdateOperationsInput | number
     maxTokens?: IntFieldUpdateOperationsInput | number
+    enabledTools?: ChatbotConfigUpdateenabledToolsInput | string[]
     isActive?: BoolFieldUpdateOperationsInput | boolean
     fallbackToHuman?: BoolFieldUpdateOperationsInput | boolean
     humanHandoffKeywords?: ChatbotConfigUpdatehumanHandoffKeywordsInput | string[]
@@ -52781,9 +52850,11 @@ export namespace Prisma {
   export type ChatbotConfigCreateWithoutConversationsInput = {
     id?: string
     systemPrompt: string
+    profileContext?: string | null
     model?: string
     temperature?: number
     maxTokens?: number
+    enabledTools?: ChatbotConfigCreateenabledToolsInput | string[]
     isActive?: boolean
     fallbackToHuman?: boolean
     humanHandoffKeywords?: ChatbotConfigCreatehumanHandoffKeywordsInput | string[]
@@ -52800,9 +52871,11 @@ export namespace Prisma {
     id?: string
     phoneNumberId: string
     systemPrompt: string
+    profileContext?: string | null
     model?: string
     temperature?: number
     maxTokens?: number
+    enabledTools?: ChatbotConfigCreateenabledToolsInput | string[]
     isActive?: boolean
     fallbackToHuman?: boolean
     humanHandoffKeywords?: ChatbotConfigCreatehumanHandoffKeywordsInput | string[]
@@ -52864,9 +52937,11 @@ export namespace Prisma {
   export type ChatbotConfigUpdateWithoutConversationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    profileContext?: NullableStringFieldUpdateOperationsInput | string | null
     model?: StringFieldUpdateOperationsInput | string
     temperature?: FloatFieldUpdateOperationsInput | number
     maxTokens?: IntFieldUpdateOperationsInput | number
+    enabledTools?: ChatbotConfigUpdateenabledToolsInput | string[]
     isActive?: BoolFieldUpdateOperationsInput | boolean
     fallbackToHuman?: BoolFieldUpdateOperationsInput | boolean
     humanHandoffKeywords?: ChatbotConfigUpdatehumanHandoffKeywordsInput | string[]
@@ -52883,9 +52958,11 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    profileContext?: NullableStringFieldUpdateOperationsInput | string | null
     model?: StringFieldUpdateOperationsInput | string
     temperature?: FloatFieldUpdateOperationsInput | number
     maxTokens?: IntFieldUpdateOperationsInput | number
+    enabledTools?: ChatbotConfigUpdateenabledToolsInput | string[]
     isActive?: BoolFieldUpdateOperationsInput | boolean
     fallbackToHuman?: BoolFieldUpdateOperationsInput | boolean
     humanHandoffKeywords?: ChatbotConfigUpdatehumanHandoffKeywordsInput | string[]

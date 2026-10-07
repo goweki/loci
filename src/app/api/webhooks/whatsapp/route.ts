@@ -1,10 +1,12 @@
 // app/api/webhooks/whatsapp/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
+import { createHash } from "node:crypto";
 import db from "@/lib/prisma";
-import { processIncomingMessage } from "@/lib/whatsapp/actions";
+import { processIncomingMessage, processStatusUpdate } from "@/lib/whatsapp/actions";
 import { InboundWebhookPayload } from "@/lib/whatsapp/types";
-const WHATSAPP_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
+import { env_ } from "@/lib/whatsapp/types/environment-variables";
+import { isValidMetaWebhookSignature } from "@/lib/whatsapp/webhook-signature";
 
 // Verification
 export async function GET(request: NextRequest) {
@@ -13,16 +15,9 @@ export async function GET(request: NextRequest) {
   const token = searchParams.get("hub.verify_token");
   const challenge = searchParams.get("hub.challenge");
 
-  if (!WHATSAPP_VERIFY_TOKEN) {
-    return NextResponse.json(
-      { error: "Verifivcation TOKEN not configured" },
-      { status: 500 },
-    );
-  }
-
   console.log(`mode-${mode}\n`);
 
-  if (mode === "subscribe" && token === WHATSAPP_VERIFY_TOKEN) {
+  if (mode === "subscribe" && token === env_.verifyToken) {
     return new NextResponse(challenge);
   }
 
@@ -30,39 +25,66 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const rawBody = await request.text();
+  const appSecret = process.env.META_APP_SECRET;
+  const signature = request.headers.get("x-hub-signature-256");
+  if (!appSecret) {
+    return NextResponse.json({ error: "Webhook signature validation is not configured" }, { status: 500 });
+  }
+  if (!isValidMetaWebhookSignature(rawBody, signature, appSecret)) {
+    return NextResponse.json({ error: "Invalid webhook signature" }, { status: 401 });
+  }
+
+  let eventId: string | undefined;
   try {
-    const body = await request.json();
+    const body = JSON.parse(rawBody) as InboundWebhookPayload;
+    const eventKey = createHash("sha256").update(rawBody).digest("hex");
 
-    // Store webhook event
-    await db.webhookEvent.create({
-      data: {
+    const event = await db.webhookEvent.upsert({
+      where: { eventKey },
+      create: {
+        eventKey,
         type: "whatsapp_webhook",
-        payload: body,
+        payload: body as object,
       },
+      update: {},
     });
+    eventId = event.id;
+    if (event.processed) return new NextResponse("OK");
 
-    // Process webhook
     await processWebhookEvent(body);
+    await db.webhookEvent.update({
+      where: { id: event.id },
+      data: { processed: true, processedAt: new Date(), error: null },
+    });
 
     return new NextResponse("OK");
   } catch (error) {
     console.error("Webhook processing error:", error);
+    if (eventId) {
+      await db.webhookEvent.update({
+        where: { id: eventId },
+        data: { error: error instanceof Error ? error.message : "Unknown webhook error" },
+      }).catch((updateError) => console.error("Failed to record webhook failure:", updateError));
+    }
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
 
 async function processWebhookEvent(body: InboundWebhookPayload) {
-  console.log("processing webhook event:", JSON.stringify(body));
-  const entry = body.entry?.[0];
-  const changes = entry?.changes?.[0];
+  for (const entry of body.entry ?? []) {
+    for (const changes of entry.changes ?? []) {
+      if (changes.field !== "messages") continue;
+      const messages = changes.value?.messages ?? [];
+      const contacts = changes.value?.contacts ?? [];
+      const metadata = changes.value?.metadata;
 
-  if (changes?.field === "messages") {
-    const messages = changes.value?.messages || [];
-    const contacts = changes.value?.contacts || [];
-    const metadata = changes.value?.metadata;
-
-    for (const message of messages) {
-      await processIncomingMessage(message, contacts, metadata);
+      for (const message of messages) {
+        if (metadata) await processIncomingMessage(message, contacts, metadata, process.env.META_APP_SECRET!);
+      }
+      for (const status of changes.value?.statuses ?? []) {
+        await processStatusUpdate(status, process.env.META_APP_SECRET!);
+      }
     }
   }
 }

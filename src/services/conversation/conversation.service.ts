@@ -1,9 +1,12 @@
+import "server-only";
 import { requireUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 import {
   MessageDirection,
   MessageStatus,
+  MessageType,
+  PhoneNumberStatus,
   Prisma,
   UserRole,
 } from "@/lib/prisma/generated";
@@ -52,9 +55,14 @@ export class ConversationService {
    * 🧠 DTO mapper
    */
   private toConversationDTO(contact: ContactWithRelations) {
-    const latestMessage = contact.messages[0];
+    const latestMessage = contact.messages.reduce<typeof contact.messages[number] | undefined>(
+      (latest, message) => !latest || message.timestamp > latest.timestamp ? message : latest,
+      undefined,
+    );
 
-    const chatbotConversation = contact.chatbotConversations[0];
+    const chatbotConversation = contact.chatbotConversations.find(
+      (conversation) => conversation.chatbotConfig.phoneNumberId === latestMessage?.phoneNumberId,
+    );
 
     return {
       id: contact.id,
@@ -80,14 +88,23 @@ export class ConversationService {
       unread: contact._count.messages,
 
       lastMessageAt: latestMessage?.timestamp,
+      phoneNumberId: latestMessage?.phoneNumberId,
 
       chatbot: chatbotConversation
         ? {
-            active: chatbotConversation.isActive,
+            active: chatbotConversation.isActive && chatbotConversation.chatbotConfig.isActive,
 
             handedOff: chatbotConversation.handedOffToHuman,
           }
         : null,
+      messages: contact.messages.map((message) => ({
+        id: message.id,
+        phoneNumberId: message.phoneNumberId,
+        content: message.content,
+        direction: message.direction,
+        status: message.status,
+        timestamp: message.timestamp,
+      })),
     };
   }
 
@@ -241,6 +258,79 @@ export class ConversationService {
     return message;
   }
 
+  async sendWhatsAppTextMessage(params: {
+    contactId: string;
+    phoneNumberId: string;
+    text: string;
+  }) {
+    const text = params.text.trim();
+    if (!text || text.length > 4000) throw new Error("Message must contain 1–4000 characters.");
+
+    const [contact, phoneNumber] = await Promise.all([
+      prisma.contact.findFirst({
+        where: this.scope({ id: params.contactId }),
+      }),
+      prisma.phoneNumber.findFirst({
+        where: {
+          id: params.phoneNumberId,
+          status: PhoneNumberStatus.VERIFIED,
+          waba: { userId: this.userId },
+        },
+      }),
+    ]);
+    if (!contact || !phoneNumber) throw new Error("Conversation or WhatsApp number not found.");
+
+    const lastInbound = await prisma.message.findFirst({
+      where: {
+        userId: this.userId,
+        contactId: contact.id,
+        phoneNumberId: phoneNumber.id,
+        direction: MessageDirection.INBOUND,
+      },
+      orderBy: { timestamp: "desc" },
+      select: { timestamp: true },
+    });
+    if (!lastInbound || Date.now() - lastInbound.timestamp.getTime() > 24 * 60 * 60 * 1000) {
+      throw new Error("A free-form reply is unavailable outside the WhatsApp customer service window. Use an approved template.");
+    }
+
+    const { default: whatsapp } = await import("@/lib/whatsapp");
+    const providerResponse = await whatsapp.sendMessage({
+      phoneNumberId: phoneNumber.id,
+      to: contact.phoneNumber,
+      type: MessageType.TEXT,
+      text: { body: text },
+    });
+    if ("error" in providerResponse) throw new Error(providerResponse.error.message);
+
+    const message = await prisma.message.create({
+      data: {
+        userId: this.userId,
+        contactId: contact.id,
+        phoneNumberId: phoneNumber.id,
+        waMessageId: providerResponse.messages[0]?.id,
+        type: MessageType.TEXT,
+        content: { text },
+        direction: MessageDirection.OUTBOUND,
+        status: MessageStatus.SENT,
+        timestamp: new Date(),
+      },
+    });
+    await prisma.contact.update({
+      where: { id: contact.id },
+      data: { lastMessageAt: message.timestamp },
+    });
+
+    await prisma.chatbotConversation.updateMany({
+      where: {
+        contactId: contact.id,
+        chatbotConfig: { phoneNumberId: phoneNumber.id },
+      },
+      data: { handedOffToHuman: true, isActive: false },
+    });
+    return message;
+  }
+
   /**
    * 👁️ Mark conversation as read
    */
@@ -303,6 +393,46 @@ export class ConversationService {
 
       data: {
         handedOffToHuman: true,
+        isActive: false,
+      },
+    });
+  }
+
+  async setAssistantHandoff(contactId: string, phoneNumberId: string, handedOff: boolean) {
+    const contact = await prisma.contact.findFirst({
+      where: this.scope({ id: contactId }),
+      select: { id: true },
+    });
+    if (!contact) throw new Error("Conversation not found");
+
+    const config = await prisma.chatbotConfig.findFirst({
+      where: {
+        phoneNumberId,
+        phoneNumber: { waba: { userId: this.userId } },
+      },
+      select: { id: true, isActive: true },
+    });
+    if (!config) throw new Error("Assistant not found or access denied");
+
+    return prisma.chatbotConversation.upsert({
+      where: {
+        chatbotConfigId_contactId: {
+          chatbotConfigId: config.id,
+          contactId,
+        },
+      },
+      create: {
+        chatbotConfigId: config.id,
+        contactId,
+        context: {},
+        isActive: config.isActive && !handedOff,
+        handedOffToHuman: handedOff,
+      },
+      update: {
+        handedOffToHuman: handedOff,
+        isActive: config.isActive && !handedOff,
+        ...(handedOff ? {} : { context: {}, messageCount: 0 }),
+        lastMessageAt: new Date(),
       },
     });
   }

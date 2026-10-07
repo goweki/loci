@@ -46,3 +46,31 @@ export async function getConversationWithContactAction(
     return { ok: false, error: errorMessage };
   }
 }
+
+export async function setAssistantHandoffAction(
+  contactId: string,
+  phoneNumberId: string,
+  handedOff: boolean,
+) {
+  try {
+    const service = await ConversationService.create();
+    const conversation = await service.setAssistantHandoff(contactId, phoneNumberId, handedOff);
+    return { ok: true as const, data: conversation };
+  } catch (error) {
+    return { ok: false as const, error: getFriendlyErrorMessage(error) };
+  }
+}
+
+export async function sendConversationTextAction(
+  contactId: string,
+  phoneNumberId: string,
+  text: string,
+) {
+  try {
+    const service = await ConversationService.create();
+    const message = await service.sendWhatsAppTextMessage({ contactId, phoneNumberId, text });
+    return { ok: true as const, data: message };
+  } catch (error) {
+    return { ok: false as const, error: getFriendlyErrorMessage(error) };
+  }
+}

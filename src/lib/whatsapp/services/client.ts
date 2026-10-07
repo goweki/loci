@@ -86,13 +86,24 @@ export class WhatsAppClient {
       phoneNumberId: finalPhoneNumberId,
     });
 
+    const {
+      phoneNumberId: _phoneNumberId,
+      type: messageType,
+      recipient_type: recipientType,
+      ...messagePayload
+    } = input;
+    const payload = {
+      ...messagePayload,
+      type: messageType.toLocaleLowerCase(),
+      ...(recipientType ? { recipient_type: recipientType.toLocaleLowerCase() } : {}),
+    };
     const res = await fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${this.env.wabaAccessToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(input),
+      body: JSON.stringify(payload),
     });
 
     const json = await res.json();
