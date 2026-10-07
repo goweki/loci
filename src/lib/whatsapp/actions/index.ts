@@ -2,14 +2,13 @@
 
 "use server";
 
+import { timingSafeEqual } from "node:crypto";
 import prisma from "@/lib/prisma";
 import {
   MessageType,
   MessageDirection,
   MessageStatus,
   Prisma,
-  PhoneNumberStatus,
-  UserRole,
 } from "@/lib/prisma/generated";
 import { InboundMessage, WabaPhoneNumberDetailsResponse } from "../types";
 import { Message } from "../../validations";
@@ -24,8 +23,10 @@ import { getServerSession } from "next-auth";
 import { authOptions, requireUser } from "../../auth";
 import { env_ } from "../types/environment-variables";
 import { UserService } from "@/services/user/user.service";
-import { findContactByPhoneNumber } from "@/actions/contact";
 import { createPhoneNumberAction } from "@/actions/phoneNumber.actions";
+import { AgentRuntimeService } from "@/services/agent/agent-runtime.service";
+import { matchAutoReplyRule } from "@/services/autoReply/match-rule";
+import { shouldHandoffToHuman } from "@/services/agent/agent-helpers";
 
 const BASE_URL = `https://graph.facebook.com/${env_.apiVersion}`;
 
@@ -58,12 +59,14 @@ export async function processIncomingMessage(
     phone_number_id: string;
     display_phone_number: string;
   },
+  webhookSecret: string,
 ): Promise<void> {
+  assertWebhookSecret(webhookSecret);
   try {
-    console.log("Processing incoming message:", message);
+    console.log("Processing WhatsApp message:", message.id);
 
     const fromNumber = message.from;
-    var phoneNumberId = metadata.phone_number_id;
+    const phoneNumberId = metadata.phone_number_id;
 
     if (!phoneNumberId) {
       console.warn(`No phone number id in metadata!`);
@@ -72,56 +75,35 @@ export async function processIncomingMessage(
 
     const phoneNoWithUser = await prisma.phoneNumber.findUnique({
       where: { id: phoneNumberId },
-      include: { waba: { include: { user: { include: { waba: true } } } } },
+      include: { waba: { include: { user: true } } },
     });
-    let user = phoneNoWithUser?.waba?.user;
-
-    if (!user) {
-      console.warn(
-        `No user assigned the phoneNumberId:${phoneNumberId}, assigning it to admin...`,
-      );
-
-      const phoneNumberDetails: WabaPhoneNumberDetailsResponse =
-        await whatsapp.getPhoneNumberDetails(phoneNumberId);
-      user = await prisma.user.findFirstOrThrow({
-        where: { role: UserRole.ADMIN },
-        include: { waba: true },
-      });
-
-      if (!user.waba)
-        throw new Error(
-          `No waba account found to save phone number - ${phoneNumberDetails.verified_name}`,
-        );
-
-      await createPhoneNumberAction({
-        wabaId: user.waba.id,
-        phoneNumber: phoneNumberDetails.display_phone_number,
-        displayName: phoneNumberDetails.verified_name,
-        id: phoneNumberId,
-        status:
-          phoneNumberDetails.code_verification_status as PhoneNumberStatus,
-      });
+    const user = phoneNoWithUser?.waba?.user;
+    if (!phoneNoWithUser || !user) {
+      throw new Error(`WhatsApp number ${phoneNumberId} is not assigned to an account.`);
     }
 
-    if (contacts.length > 0) {
-      for (const contact of contacts) {
-        await findOrCreateContact(
-          user.id,
-          contact.wa_id,
-          contact.profile?.name,
-        );
-      }
-    }
+    const duplicate = await prisma.message.findFirst({
+      where: { waMessageId: message.id, direction: MessageDirection.INBOUND },
+      select: { id: true },
+    });
+    if (duplicate) return;
 
     // Process message content based on type
     const content = await processMessageContent(message);
 
     // Store message in database
-    const contact = await findContactByPhoneNumber(fromNumber);
-    if (!contact) {
-      console.warn(`No contact found with phone number: ${fromNumber}`);
-      return;
-    }
+    const webhookContact = contacts.find(({ wa_id }) => wa_id === fromNumber);
+    const contact = await prisma.contact.upsert({
+      where: { userId_phoneNumber: { userId: user.id, phoneNumber: fromNumber } },
+      create: {
+        userId: user.id,
+        phoneNumber: fromNumber,
+        name: webhookContact?.profile?.name || null,
+      },
+      update: {
+        lastMessageAt: new Date(),
+      },
+    });
 
     await prisma.message.create({
       data: {
@@ -147,7 +129,7 @@ export async function processIncomingMessage(
     await notifyUserOfNewMessage(user.id, contact.id, message);
 
     // Process auto-replies if configured
-    await processAutoReplies(user.id, contact, message);
+    await processAutoReplies(user.id, phoneNumberId, contact, message);
 
     console.log(`Successfully processed message ${message.id}`);
   } catch (error) {
@@ -162,7 +144,9 @@ export async function processIncomingMessage(
  */
 export async function processStatusUpdate(
   statusUpdate: WhatsAppStatusUpdate,
+  webhookSecret: string,
 ): Promise<void> {
+  assertWebhookSecret(webhookSecret);
   try {
     console.log(
       "Processing status update:",
@@ -207,40 +191,16 @@ export async function processStatusUpdate(
   }
 }
 
-/**
- * Find or create contact
- */
-async function findOrCreateContact(
-  userId: string,
-  phoneNumber: string,
-  name?: string,
-) {
-  const contact = await prisma.contact.findFirst({
-    where: {
-      userId,
-      phoneNumber,
-    },
-  });
-
-  if (contact) {
-    // Update name if provided and not already set
-    if (name && !contact.name) {
-      return await prisma.contact.update({
-        where: { id: contact.id },
-        data: { name },
-      });
-    }
-    return contact;
+function assertWebhookSecret(providedSecret: string) {
+  const expectedSecret = process.env.META_APP_SECRET;
+  if (!expectedSecret || !providedSecret) {
+    throw new Error("This processor can only be called by the verified Meta webhook.");
   }
-
-  // Create new contact
-  return await prisma.contact.create({
-    data: {
-      userId,
-      phoneNumber,
-      name: name || null,
-    },
-  });
+  const expected = Buffer.from(expectedSecret);
+  const provided = Buffer.from(providedSecret);
+  if (expected.length !== provided.length || !timingSafeEqual(expected, provided)) {
+    throw new Error("This processor can only be called by the verified Meta webhook.");
+  }
 }
 
 /**
@@ -517,61 +477,147 @@ async function notifyUserOfNewMessage(
  */
 async function processAutoReplies(
   userId: string,
+  phoneNumberId: string,
   contact: any,
   message: InboundMessage,
 ): Promise<void> {
-  try {
-    // Check if user has auto-reply rules configured
-    const autoReplyRules = await prisma.autoReplyRule?.findMany?.({
+  const text = message.type === "text"
+    ? message.text.body
+    : message.type === "interactive"
+      ? message.interactive.button_reply?.title ?? message.interactive.list_reply?.title ?? ""
+      : "";
+  const config = await prisma.chatbotConfig.findUnique({ where: { phoneNumberId } });
+  let conversation = config
+    ? await prisma.chatbotConversation.findUnique({
+        where: {
+          chatbotConfigId_contactId: {
+            chatbotConfigId: config.id,
+            contactId: contact.id,
+          },
+        },
+      })
+    : null;
+
+  if (conversation?.handedOffToHuman) return;
+  if (
+    config?.isActive &&
+    text &&
+    shouldHandoffToHuman(text, config.humanHandoffKeywords)
+  ) {
+    conversation = await prisma.chatbotConversation.upsert({
       where: {
-        createdById: userId,
-        active: true,
+        chatbotConfigId_contactId: {
+          chatbotConfigId: config.id,
+          contactId: contact.id,
+        },
       },
-      orderBy: { priority: "asc" },
+      create: {
+        chatbotConfigId: config.id,
+        contactId: contact.id,
+        context: {},
+        isActive: false,
+        handedOffToHuman: true,
+      },
+      update: { handedOffToHuman: true, isActive: false, lastMessageAt: new Date() },
     });
-
-    if (!autoReplyRules?.length) return;
-
-    // Process rules (implement based on your business logic)
-    for (const rule of autoReplyRules) {
-      if (await shouldTriggerAutoReply(rule, message, contact)) {
-        await triggerAutoReply(rule, contact, message);
-        break; // Only trigger first matching rule
-      }
-    }
-  } catch (error) {
-    console.error("Error processing auto-replies:", error);
+    return;
   }
+
+  const rules = await prisma.autoReplyRule.findMany({
+    where: { phoneNumberId, createdById: userId, isActive: true },
+    orderBy: [{ priority: "asc" }, { createdAt: "asc" }],
+  });
+  const matchingRule = matchAutoReplyRule(rules, {
+    text,
+    messageType: message.type.toLocaleUpperCase(),
+  });
+
+  if (matchingRule) {
+    await sendAssistantText(phoneNumberId, contact, message.id, matchingRule.replyMessage);
+    return;
+  }
+
+  if (!config?.isActive) return;
+
+  conversation = await prisma.chatbotConversation.upsert({
+    where: {
+      chatbotConfigId_contactId: {
+        chatbotConfigId: config.id,
+        contactId: contact.id,
+      },
+    },
+    create: { chatbotConfigId: config.id, contactId: contact.id, context: {} },
+    update: {},
+  });
+  if (conversation.handedOffToHuman || !conversation.isActive) return;
+  if (!text) return;
+
+  const history = await prisma.message.findMany({
+    where: { userId, contactId: contact.id, phoneNumberId },
+    orderBy: { timestamp: "desc" },
+    take: Math.min(Math.max(config.conversationHistory, 1), 30),
+    select: { content: true, direction: true },
+  });
+  const runtime = new AgentRuntimeService();
+  const response = await runtime.respond({
+    ownerId: userId,
+    phoneNumberId,
+    systemPrompt: config.systemPrompt,
+    profileContext: config.profileContext,
+    enabledTools: config.enabledTools,
+    temperature: config.temperature,
+    maxTokens: config.maxTokens,
+    history: history.reverse().map((item) => ({
+      role: item.direction === MessageDirection.INBOUND ? "user" : "assistant",
+      content: extractTextContent(item.content),
+    })),
+  });
+
+  await sendAssistantText(phoneNumberId, contact, message.id, response);
+  await prisma.chatbotConversation.update({
+    where: { id: conversation.id },
+    data: { messageCount: { increment: 2 }, lastMessageAt: new Date() },
+  });
 }
 
-/**
- * Check if auto-reply should be triggered
- */
-async function shouldTriggerAutoReply(
-  rule: any,
-  message: InboundMessage,
-  contact: any,
-): Promise<boolean> {
-  // Implement your auto-reply logic
-  // Examples:
-  // - Keyword matching
-  // - Time-based rules
-  // - First message from new contact
-  // - Business hours
+async function sendAssistantText(
+  phoneNumberId: string,
+  contact: { id: string; phoneNumber: string; userId: string },
+  incomingMessageId: string,
+  text: string,
+) {
+  const body = text.slice(0, 4000);
+  const result = await whatsapp.sendMessage({
+    phoneNumberId,
+    to: contact.phoneNumber,
+    type: MessageType.TEXT,
+    text: { body },
+    context: { message_id: incomingMessageId },
+  });
+  if ("error" in result) throw new Error(result.error.message);
 
-  return false; // Placeholder
+  await prisma.message.create({
+    data: {
+      userId: contact.userId,
+      contactId: contact.id,
+      phoneNumberId,
+      waMessageId: result.messages[0]?.id,
+      type: MessageType.TEXT,
+      content: { text: body },
+      direction: MessageDirection.OUTBOUND,
+      status: MessageStatus.SENT,
+      timestamp: new Date(),
+    },
+  });
 }
 
-/**
- * Trigger auto-reply
- */
-async function triggerAutoReply(
-  rule: any,
-  contact: any,
-  originalMessage: InboundMessage,
-): Promise<void> {
-  // Implement auto-reply sending logic
-  console.log(`Triggering auto-reply for rule ${rule.id}`);
+function extractTextContent(content: Prisma.JsonValue): string {
+  if (typeof content === "string") return content;
+  if (content && typeof content === "object" && !Array.isArray(content)) {
+    if (typeof content.text === "string") return content.text;
+    if (typeof content.caption === "string") return content.caption;
+  }
+  return "";
 }
 
 /**

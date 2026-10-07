@@ -21,7 +21,7 @@ The intended product is agentic-first: the model can select from a small, explic
 
 ### WhatsApp integration UI
 
-`src/components/settings/settings-client/tab-whatsapp/index.tsx` displays WABA connection state, synced phone numbers, and template management. It gates access on an active subscription and renders `WabaEmbeddedSignup` when there is no WABA. It does not yet offer number selection, assistant setup, profile/knowledge setup, or assistant status controls. The “Add Number” button is currently presentation only.
+`src/components/settings/settings-client/tab-whatsapp/index.tsx` displays WABA connection state, synced phone numbers, and template management. It gates access on an active subscription and renders `WabaEmbeddedSignup` when there is no WABA. The assistant setup panel now selects a connected number and saves an editable prompt, reviewed profile/CV text, human handoff keywords, activation state, and catalogue permission. The “Add Number” button is still presentation only.
 
 The schema already maps Meta resources through `WabaAccount`, `PhoneNumber`, and `WabaTemplate`. `PhoneNumber.id` is intentionally used as the Meta phone number ID by the sync service. Keep that stable external identifier and scope all assistant configuration to the locally owned phone number.
 
@@ -29,24 +29,26 @@ The catalogue is represented by `Product`, which is user-owned and contains name
 
 ### Auto-reply UI and actions
 
-`src/components/settings/settings-client/tab-autoReply.tsx` lists rules and displays rule name, trigger, number, priority, and status. The edit/delete buttons are unwired. `src/components/settings/settings-client/forms.tsx` contains a static “New Rule” dialog with hard-coded phone numbers; its inputs are not submitted or validated.
+`src/components/settings/settings-client/tab-autoReply.tsx` lists rules and displays rule name, trigger, number, priority, and status. Create/edit, activate/pause, and delete actions now use real connected numbers and authenticated server actions. Time-based rules are intentionally not exposed until their schedule semantics are defined.
 
 `AutoReplyRule` already stores a phone number, creator, trigger type/value, reply text, priority, and `isActive`. `TriggerType` supports `KEYWORD`, `MESSAGE_TYPE`, `TIME_BASED`, and `DEFAULT`. This is enough for a first deterministic rules feature without adding a model field. Treat `replyMessage` as the literal response for a rule; AI-specific instructions belong on `ChatbotConfig`, not duplicated in each rule. For a rule that needs AI, use a rule action/type only if it can be represented without overloading `replyMessage`; otherwise defer AI-backed matching to the assistant's default path.
 
-The auto-reply server actions and legacy processing code need cleanup before relying on them. Some code references an `active` property that is not present in the `AutoReplyRule` model shown in `schema.prisma`; the webhook's `processAutoReplies` path currently has placeholder matching/sending functions, and its predicate returns `false`. The rule form also does not call these actions. Confirm generated Prisma types against the checked-in schema and consolidate on one authenticated service/action path.
+The auto-reply server actions validate their inputs, derive the creator from the session, and verify number ownership. Matching evaluates specific rules in priority order and uses a default only as fallback. The previous nonexistent `active` field references and placeholder matcher have been removed. A default-rule uniqueness check exists in application logic; concurrent creation still needs a database-level strategy if rule edits become high-volume.
 
 ### Assistant and message schema
 
-The existing schema is close to sufficient:
+The schema uses existing records for the main flow, with two narrowly scoped additions made during implementation:
 
 - `ChatbotConfig` is one-to-one with `PhoneNumber` and stores `systemPrompt`, model settings, active state, human handoff keywords, response delay, and context limits.
 - `ChatbotConversation` is unique per assistant/contact and stores context, message count, active state, and handoff state.
 - `Message`, `Contact`, and `PhoneNumber` provide the inbox data model.
 - `PromptTemplate` stores reusable prompt content per user, but is not currently connected to a WhatsApp assistant workflow.
 - `Product` already provides optional catalogue data, so no new catalogue model is needed for initial read/search access.
+- `ChatbotConfig.profileContext` stores reviewed company/personal/CV text separately from instructions.
+- `ChatbotConfig.enabledTools` stores the allowlisted capabilities for that assistant.
 - `User` currently has basic identity fields only; there is no company profile, CV/profile document, or business knowledge model in this schema.
 
-There is no visible AI provider call in the current source search. `src/actions/chatbot.actions.ts` includes config/conversation helpers and prompt formatting, but config actions shown do not enforce authenticated ownership. Do not expose those persistence functions as unrestricted client-facing actions. Implement provider orchestration in a server-only service and authorize every read/write against the signed-in user and the WABA/phone-number ownership chain. Catalogue tool authorization must use the assistant's resolved owner context; never accept an arbitrary `userId` from model-generated arguments.
+The server-only agent runtime currently uses Anthropic Messages API and offers owner-scoped catalogue search as its first tool. `ANTHROPIC_API_KEY` is optional at app startup but required for AI replies. Chatbot configuration actions verify the signed-in user's WABA ownership. Keep the provider call behind the runtime boundary and never accept an arbitrary `userId` from model-generated tool arguments. A provider-neutral runtime contract, durable tool traces, and alternate provider adapters remain future work.
 
 ## Recommended user experience
 
@@ -68,7 +70,7 @@ Provide a guided setup with these sections:
 - **Response behavior:** model, temperature, max output, response delay, and history/reset policy, bounded by safe server defaults and supported provider configuration.
 - **Test before activation:** a preview/test panel with sample questions using the exact saved prompt/profile context. Activation remains explicit.
 
-Persist the final composed prompt in `ChatbotConfig.systemPrompt` and use the existing behavior fields. Use `PromptTemplate` for reusable starting templates if useful. For the first release, keep profile facts either composed into the saved system prompt or stored in an existing user-owned prompt template/draft as appropriate. If durable, editable profile data or uploaded-file provenance is required, make the smallest justified schema addition only after the profile UX and privacy requirements are settled; do not add marketplace relationships to solve it.
+Persist assistant instructions in `ChatbotConfig.systemPrompt`, reviewed profile/CV text in `ChatbotConfig.profileContext`, and allowed capabilities in `ChatbotConfig.enabledTools`. Use `PromptTemplate` for reusable starting templates if useful. Uploaded-file provenance and ingestion still need a narrowly scoped schema addition if file uploads are implemented; do not add marketplace relationships to solve it.
 
 ### Agent runtime and capability design
 
@@ -170,7 +172,7 @@ Use the existing `Message` and `Contact` models. Add useful filtering/pagination
 
 ## Minimal schema position
 
-Start with no schema change. `ChatbotConfig.systemPrompt` can hold the composed, reviewed prompt; existing behavior settings hold model and conversation behavior; `AutoReplyRule` covers deterministic rules; `PromptTemplate` can provide reusable prompt content; `Product` is already sufficient for initial owner-scoped catalogue search; `Message`/`ChatbotConversation` support the inbox and context. The capability registry can initially be code/config driven. Add persisted per-assistant capability settings or run/tool audit models only when implementation needs durable user controls or operational history that cannot be handled by existing webhook/message records.
+The implementation adds only `ChatbotConfig.profileContext` and `ChatbotConfig.enabledTools`: profile text is distinct from instructions, and capability choices persist per assistant. `AutoReplyRule` covers deterministic rules; `PromptTemplate` can provide reusable prompt content; `Product` is sufficient for initial owner-scoped catalogue search; `Message`/`ChatbotConversation` support the inbox and context. The capability executor is code-defined. Add run/tool audit models only when operational requirements need durable history beyond existing webhook/message records.
 
 Consider a narrowly scoped schema change only if implementation demonstrates a real gap, such as structured reusable business profile fields, uploaded-file metadata/retention, per-assistant capability enablement, agent run/tool audit history, or a distinct rule action that cannot be safely represented in existing fields. Keep ownership explicit and cascade behavior intentional. Do not duplicate catalogue rows into assistant-specific tables unless indexing/snapshot requirements justify it. Avoid coupling the assistant to marketplace order/payment/payout schemas.
 
@@ -204,7 +206,14 @@ Consider a narrowly scoped schema change only if implementation demonstrates a r
 - `src/actions/order.actions.ts`
 - `src/app/[lang]/(mid-pages)/space/[username]/_components/space-utils.tsx`
 - `src/lib/prisma/schema.prisma`
+- `src/lib/prisma/migrations/20261007090000_chatbot_enabled_tools/migration.sql`
 
 ## Protocol and provider references
 
 Keep protocol support behind adapters. MCP is a possible future interoperability layer for exposing selected tools/resources to external agent clients; it is not required for the first-party WhatsApp runtime. Provider-specific function/tool calling should map to the same internal capability contracts and authorization policies. See the [MCP introduction](https://modelcontextprotocol.io/introduction) and [OpenAI function calling guide](https://developers.openai.com/api/docs/guides/function-calling) for examples of these integration surfaces.
+
+## Implementation checkpoint
+
+The current implementation includes per-number assistant setup, editable prompt/profile context, an opt-in catalogue capability, rule CRUD and precedence, owner-scoped product retrieval, signature-checked Meta webhook ingestion, duplicate-message checks, Anthropic tool execution, human handoff state, inbox thread rendering, and manual text replies with a customer-service-window check. The schema migration adds only `profileContext` and `enabledTools` to `ChatbotConfig`.
+
+Before deployment, apply the new migration through the normal release workflow and configure `ANTHROPIC_API_KEY`. The current WhatsApp Cloud API client still uses the single `WHATSAPP_ACCESS_TOKEN` environment value; per-WABA credential lifecycle is not implemented. CV uploads/file parsing, durable outbound retry/outbox processing, provider-neutral runtime adapters, approved-template sends from the inbox, agent evaluations, and live provider verification remain outstanding.

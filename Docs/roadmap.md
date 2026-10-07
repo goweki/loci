@@ -6,8 +6,9 @@ Priorities are ordered by risk and launch dependency. A feature is not complete 
 
 - Rotate/revoke production credentials that have been exposed outside the secret manager; update deployment secrets without committing replacements.
 - Apply and verify the marketplace migration in every target environment before deploying code that uses its models.
+- Apply and verify `20261007090000_chatbot_enabled_tools` before deploying WhatsApp assistant setup.
 - Keep `PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED=false` until Paystack eligibility, legal review, production scheduler, and payout reconciliation are approved.
-- Fix WhatsApp webhook verify-token configuration and validate Meta webhook signatures before enabling its UI.
+- Keep WhatsApp verification-token and request-signature checks covered by regression tests before enabling its UI.
 - Use token-specific permissions for guest order viewing, delivery confirmation, and disputes; reduce callback-token leakage.
 
 **Done when:** no production secret is in source/docs, target database migration status is known, webhook trust checks are tested, and marketplace transfers remain gated.
@@ -35,9 +36,11 @@ Priorities are ordered by risk and launch dependency. A feature is not complete 
 ## P3: Complete Messaging Product
 
 - Enable WhatsApp UI only after webhook verification, sending, templates, and account onboarding pass production checks.
-- Complete auto-reply/chatbot UI and behavior; remove placeholder handlers.
+- Finish per-customer Meta token lifecycle and secret storage; replace the current single environment token where multiple customer WABAs require separate credentials.
+- Complete durable inbound/outbound processing, retry/outbox behavior, assistant provider adapters, approved-template sending, and live inbox refresh.
+- Add CV/document ingestion with user review, provider/tool-call evaluation cases, usage limits, and operational traces with privacy controls.
 - Verify SMS provider configuration, delivery status handling, and failure reporting.
-- Add tests for inbound/outbound message and webhook retry behavior.
+- Add database-backed tests for ownership, webhook replay/concurrency, provider failure, and outbound retry behavior.
 
 **Done when:** setup and messaging workflows have tested success, permission, provider-failure, and retry states.
 

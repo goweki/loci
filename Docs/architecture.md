@@ -17,6 +17,15 @@
 - `src/lib/`: auth, Prisma, providers, validation, and infrastructure helpers.
 - `src/tests/`: Vitest tests.
 
+## Agent Runtime and Capabilities
+
+- Agent orchestration lives in `src/services/agent/`; provider calls stay server-side.
+- Actions authenticate the actor, while services apply tenant/record ownership checks before reading or mutating data.
+- Model tool calls are proposals only. Validate arguments and execute through a registered capability; never expose direct Prisma, arbitrary SQL, or provider credentials to a model.
+- Each capability should have a bounded schema, explicit read/write policy, tenant scope, timeout/result limit, and traceable outcome. State-changing or financial actions require a dedicated workflow and confirmation policy.
+- Keep provider-specific request/response formats behind adapters so application capabilities and authorization survive model changes. External protocols such as MCP can be added as adapters without replacing internal policy checks.
+- Catalogue reads should return minimal owner-scoped product fields. Commerce writes must continue through their existing validated service workflows and are not implicitly enabled by assistant setup.
+
 Preferred request path:
 
 1. Page or client component calls a server action/API route.
@@ -43,7 +52,7 @@ Preferred request path:
 
 ## Configuration and Commands
 
-Use `.env.template` for variable names, never real values. Core names include `DATABASE_URL`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `PAYSTACK_SECRET_KEY`, and Google provider credentials. Marketplace operations also use `MARKETPLACE_DISPUTE_WINDOW_HOURS`, `CRON_SECRET`, and `PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED`.
+Use `.env.template` for variable names, never real values. Core names include `DATABASE_URL`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `PAYSTACK_SECRET_KEY`, and Google provider credentials. WhatsApp assistant generation optionally uses `ANTHROPIC_API_KEY`; without it, rules and message viewing remain available but AI responses cannot be generated. Marketplace operations also use `MARKETPLACE_DISPUTE_WINDOW_HOURS`, `CRON_SECRET`, and `PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED`.
 
 - `npm run dev`: local development server; the script runs Prisma development migration/generation first.
 - `npm run build`: Next.js production build. Check the `postbuild` script and target environment before running because it invokes migration deploy.

@@ -29,10 +29,12 @@ export const contactInclude = Prisma.validator<Prisma.ContactInclude>()({
   },
 
   chatbotConversations: {
-    where: {
-      isActive: true,
+    include: {
+      chatbotConfig: {
+        select: { phoneNumberId: true, isActive: true },
+      },
     },
-    take: 1,
+    take: 10,
   },
 });
 

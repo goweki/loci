@@ -705,10 +705,12 @@ model ChatbotConfig {
   phoneNumberId String @unique
 
   // Core AI Settings
-  systemPrompt String @db.Text
-  model        String @default("claude-sonnet-4-20250514")
-  temperature  Float  @default(0.7)
-  maxTokens    Int    @default(1000)
+  systemPrompt   String   @db.Text
+  profileContext String?  @db.Text
+  model          String   @default("claude-sonnet-4-20250514")
+  temperature    Float    @default(0.7)
+  maxTokens      Int      @default(1000)
+  enabledTools   String[] @default([])
 
   // Behavior Settings
   isActive             Boolean  @default(true)

@@ -1,6 +1,6 @@
 # Current Status
 
-Reviewed: 2026-09-27. Status labels reflect code inspection and the current mocked test suite, not a live-provider or production certification.
+Reviewed: 2026-10-07. Status labels reflect code inspection and the current mocked test suite, not a live-provider or production certification.
 
 | Area                    | Status                          | Current state                                                                                                                                                                                                                                                                                                             |
 | ----------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -11,16 +11,16 @@ Reviewed: 2026-09-27. Status labels reflect code inspection and the current mock
 | Payments                | Partial                         | Subscription checkout is session-bound and server-priced. Marketplace charge webhooks are signed, verified with Paystack, and checked against stored amount/currency/reference. Refunds, chargebacks, fees, and complete reconciliation are not implemented.                                                              |
 | Seller payouts          | Scaffolded, disabled            | Recipient creation, payout records, dispute-window setting, and a protected cron worker exist. `PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED` is false in the provided production configuration. There is a queueing gap when delivery is confirmed before the hold expires; see [Marketplace payments](marketplace-payments.md). |
 | Invoices                | Incomplete                      | `src/actions/invoice.actions.ts` is empty. The invoice service uses a hard-coded 16% tax and needs product/business rules before use.                                                                                                                                                                                     |
-| WhatsApp                | Partial, UI disabled by default | WABA setup, sending, webhook ingestion, templates, and messaging actions exist. The webhook verification route reads `WHATSAPP_VERIFY_TOKEN`, while the environment schema defines `WHATSAPP_WEBHOOK_VERIFY_TOKEN`. The webhook should also have request-signature validation before production use.                      |
+| WhatsApp                | Partial, UI disabled by default | WABA setup, sending, webhook ingestion, templates, and settings UI exist. Webhook POST now checks Meta's app signature, deduplicates identical payloads, and processes message status updates; customer numbers without an owner are rejected. A single environment WhatsApp token is still used, so per-customer token lifecycle is not implemented. |
 | SMS                     | Partial                         | An Africa's Talking send endpoint/service exists. Provider configuration, delivery handling, and automated coverage need verification.                                                                                                                                                                                    |
-| Chatbot/automation      | Partial                         | Rules and chatbot actions/data exist, but UI/processing includes placeholders. Inbound auto-reply behavior and delivery should be verified before promising automation.                                                                                                                                                   |
-| Tests                   | Early                           | `npm run test:ci` currently passes six mocked tests. They do not cover most marketplace state transitions or live Paystack/database behavior.                                                                                                                                                                             |
+| Chatbot/automation      | Partial                         | Per-number assistant configuration, editable profile/system prompt, opt-in owner-scoped catalogue search, deterministic keyword/type/default rules, Anthropic tool execution, human handoff state, conversation display, and manual text send are wired. AI requires `ANTHROPIC_API_KEY`. CV file upload/ingestion, provider abstraction, durable outbound retry/outbox, real-time inbox updates, approved-template manual send, usage limits, and production webhook/live-provider checks remain. |
+| Tests                   | Early                           | Automated tests cover mocked critical paths, rule precedence, owner-scoped catalogue tool calls, and Meta signature validation. They do not cover live WhatsApp/AI providers, database concurrency, or most marketplace transitions.                                                                                                                                                                             |
 
 ## Verified Checks
 
 - Local PostgreSQL migration status was up to date after applying `20260926120000_marketplace_delayed_payouts`.
 - `npx tsc --noEmit --incremental false` passed during the latest implementation work.
-- `npm run test:ci` passed with six tests.
-- Focused ESLint passed for the payout worker, marketplace service, and critical-path tests.
+- `npm run test:ci` passed with ten tests after the WhatsApp assistant implementation.
+- Focused ESLint passed for the changed WhatsApp assistant files.
 
 These checks do not establish live Paystack transfer eligibility, production migration state, or legal approval to hold seller funds.

@@ -1,167 +1,60 @@
 "use server";
 
-import { Prisma, TriggerType, AutoReplyRule } from "@/lib/prisma/generated";
-import prisma from "@/lib/prisma";
+import { TriggerType } from "@/lib/prisma/generated";
 import { AutoReplyService } from "@/services/autoReply/autoreply.service";
+import { z } from "zod";
 
-/**
- * Get all auto-reply rules
- * Optional filters: phoneNumberId, createdById, activeOnly
- */
-export async function getAllAutoReplyRules(): Promise<
-  Prisma.AutoReplyRuleGetPayload<{}>[]
-> {
-  const autorepService = await AutoReplyService.create();
-  return autorepService.getAllAutoReplyRules();
-}
-
-/**
- * Create a new auto-reply rule
- */
-export async function createAutoReplyRule(input: {
-  phoneNumberId: string;
-  createdById: string;
-  name: string;
-  triggerType: TriggerType;
-  triggerValue?: string;
-  replyMessage: string;
-  priority?: number;
-  isActive?: boolean;
-}): Promise<Prisma.AutoReplyRuleGetPayload<{}>> {
-  return prisma.autoReplyRule.create({
-    data: {
-      phoneNumberId: input.phoneNumberId,
-      createdById: input.createdById,
-      name: input.name,
-      triggerType: input.triggerType,
-      triggerValue: input.triggerValue,
-      replyMessage: input.replyMessage,
-      priority: input.priority ?? 0,
-      isActive: input.isActive ?? true,
-      active: true,
-    },
-  });
-}
-
-/**
- * Get all active rules for a phone number (ordered by priority)
- */
-export async function getAutoReplyRulesByPhoneNumber(
-  phoneNumberId: string,
-): Promise<Prisma.AutoReplyRuleGetPayload<{}>[]> {
-  return prisma.autoReplyRule.findMany({
-    where: {
-      phoneNumberId,
-      isActive: true,
-      active: true,
-    },
-    orderBy: {
-      priority: "asc",
-    },
-  });
-}
-
-/**
- * Get a single rule by ID
- */
-export async function getAutoReplyRuleById(
-  ruleId: string,
-): Promise<Prisma.AutoReplyRuleGetPayload<{}> | null> {
-  return prisma.autoReplyRule.findUnique({
-    where: { id: ruleId },
-  });
-}
-
-/**
- * Update an auto-reply rule
- */
-export async function updateAutoReplyRule(
-  ruleId: string,
-  data: Partial<{
-    name: string;
-    triggerType: TriggerType;
-    triggerValue: string | null;
-    replyMessage: string;
-    priority: number;
-    isActive: boolean;
-  }>,
-): Promise<Prisma.AutoReplyRuleGetPayload<{}>> {
-  return prisma.autoReplyRule.update({
-    where: { id: ruleId },
-    data,
-  });
-}
-
-/**
- * Soft-disable a rule (recommended over delete)
- */
-export async function deactivateAutoReplyRule(
-  ruleId: string,
-): Promise<Prisma.AutoReplyRuleGetPayload<{}>> {
-  return prisma.autoReplyRule.update({
-    where: { id: ruleId },
-    data: {
-      active: false,
-      isActive: false,
-    },
-  });
-}
-
-/**
- * Permanently delete a rule
- */
-export async function deleteAutoReplyRule(ruleId: string): Promise<void> {
-  await prisma.autoReplyRule.delete({
-    where: { id: ruleId },
-  });
-}
-
-/**
- * Find the first matching rule for an incoming message
- * (used by message processor / webhook)
- */
-export async function matchAutoReplyRule(input: {
-  phoneNumberId: string;
-  messageText?: string;
-  messageType?: string;
-}): Promise<AutoReplyRule | null> {
-  const rules = await prisma.autoReplyRule.findMany({
-    where: {
-      phoneNumberId: input.phoneNumberId,
-      isActive: true,
-      active: true,
-    },
-    orderBy: { priority: "asc" },
-  });
-
-  for (const rule of rules) {
-    switch (rule.triggerType) {
-      case TriggerType.DEFAULT:
-        return rule;
-
-      case TriggerType.KEYWORD:
-        if (
-          input.messageText &&
-          rule.triggerValue &&
-          input.messageText
-            .toLowerCase()
-            .includes(rule.triggerValue.toLowerCase())
-        ) {
-          return rule;
-        }
-        break;
-
-      case TriggerType.MESSAGE_TYPE:
-        if (rule.triggerValue === input.messageType) {
-          return rule;
-        }
-        break;
-
-      case TriggerType.TIME_BASED:
-        // Implement time logic if needed
-        break;
-    }
+const ruleSchema = z.object({
+  phoneNumberId: z.string().min(1),
+  name: z.string().trim().min(1).max(100),
+  triggerType: z.nativeEnum(TriggerType),
+  triggerValue: z.string().trim().max(200).optional().nullable(),
+  replyMessage: z.string().trim().min(1).max(4000),
+  priority: z.number().int().min(0).max(1000).default(100),
+  isActive: z.boolean().default(true),
+}).superRefine((rule, context) => {
+  if ((rule.triggerType === TriggerType.KEYWORD || rule.triggerType === TriggerType.MESSAGE_TYPE) && !rule.triggerValue) {
+    context.addIssue({ code: "custom", path: ["triggerValue"], message: "A trigger value is required." });
   }
+  if (rule.triggerType === TriggerType.TIME_BASED) {
+    context.addIssue({ code: "custom", path: ["triggerType"], message: "Time-based rules are not available yet." });
+  }
+});
 
-  return null;
+export async function getAllAutoReplyRules(phoneNumberId?: string) {
+  const service = await AutoReplyService.create();
+  return service.getAllAutoReplyRules(phoneNumberId);
+}
+
+export async function createAutoReplyRule(input: unknown) {
+  const data = ruleSchema.parse(input);
+  const service = await AutoReplyService.create();
+  return service.createAutoReplyRule({
+    ...data,
+    triggerValue: data.triggerValue || null,
+  });
+}
+
+export async function updateAutoReplyRule(ruleId: string, input: unknown) {
+  const data = ruleSchema.partial().parse(input);
+  const service = await AutoReplyService.create();
+  return service.updateAutoReplyRule(ruleId, {
+    ...(data.name !== undefined ? { name: data.name } : {}),
+    ...(data.triggerType !== undefined ? { triggerType: data.triggerType } : {}),
+    ...(data.triggerValue !== undefined ? { triggerValue: data.triggerValue || null } : {}),
+    ...(data.replyMessage !== undefined ? { replyMessage: data.replyMessage } : {}),
+    ...(data.priority !== undefined ? { priority: data.priority } : {}),
+    ...(data.isActive !== undefined ? { isActive: data.isActive } : {}),
+  });
+}
+
+export async function setAutoReplyRuleActive(ruleId: string, isActive: boolean) {
+  const service = await AutoReplyService.create();
+  return service.updateAutoReplyRule(ruleId, { isActive });
+}
+
+export async function deleteAutoReplyRule(ruleId: string) {
+  const service = await AutoReplyService.create();
+  await service.deleteAutoReplyRule(ruleId);
+  return { ok: true };
 }
