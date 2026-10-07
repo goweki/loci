@@ -85,7 +85,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
                 </h3>
                 <p className="text-sm text-muted-foreground max-w-md mx-auto">
                   <Link href={`/${language}/settings?tab=subscription`}>
-                    Select A Subscription
+                    Select a Subscription
                   </Link>
                 </p>
               </div>
