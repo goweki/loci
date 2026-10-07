@@ -6,6 +6,7 @@ Reviewed: 2026-09-27. These pages describe the current repository state and the 
 - [Architecture](architecture.md): runtime, routes, services, data ownership, and configuration.
 - [Roadmap](roadmap.md): prioritized steps and completion criteria.
 - [Marketplace payments](marketplace-payments.md): buyer checkout, payment verification, delivery holds, and seller payouts.
+- [WhatsApp assistant flow](whatsapp-assistant-flow.md): post-Meta setup, assistant prompts, auto-reply rules, inbound processing, and inbox scope.
 
 ## Important
 
