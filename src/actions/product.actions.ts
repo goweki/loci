@@ -63,6 +63,31 @@ export async function getUserProducts(): Promise<
   }
 }
 
+export async function adjustProductStockAction(
+  productId: string,
+  direction: "ADD" | "REMOVE",
+  quantity: number,
+  requestId: string,
+): Promise<ActionResult<{ productId: string; name: string; stockQty: number }>> {
+  try {
+    if (!productId || !/^[0-9a-f-]{36}$/i.test(requestId) || !Number.isSafeInteger(quantity) || quantity < 1 || quantity > 100000) {
+      throw new Error("Choose a product and enter a whole-number quantity from 1 to 100,000.");
+    }
+    const service = await ProductService.create();
+    const product = await service.updateStock(
+      productId,
+      direction === "ADD" ? quantity : -quantity,
+      requestId,
+    );
+    if (!product) throw new Error("Product not found or access denied.");
+    revalidatePath("/dashboard/products");
+    revalidatePath("/dashboard/inventory");
+    return { ok: true, data: { productId, name: product.name, stockQty: product.stockQty } };
+  } catch (error) {
+    return { ok: false, error: getFriendlyErrorMessage(error) };
+  }
+}
+
 export async function getProductById(
   productId: string,
 ): Promise<ActionResult<ProductWithRelations>> {

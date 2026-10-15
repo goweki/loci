@@ -14,11 +14,15 @@ The usual request path is UI/API â†’ authenticated action or verified webhook â†
 
 `Product.userId` is the merchant owner. `WabaAccount` is linked to its owner; assistant configuration is attached to a locally owned `PhoneNumber`. Contacts, messages, rules, and conversations must be accessed through that number's ownership. Marketplace orders and payments remain separate from WhatsApp assistant capabilities.
 
-Inventory currently stores quantity in `Product.stockQty`. `ProductService.updateStock` applies a signed quantity change and rejects a result below zero. There is no QR scanning or inventory movement/audit model yet. See [QR inventory](qr-inventory.md) before adding that flow.
+Inventory quantity is stored in `Product.stockQty`. Dashboard QR adjustments use owner-scoped atomic updates and create an `InventoryAdjustment` audit record with an idempotency key. Sales and QR adjustments must preserve stock invariants under concurrent updates. See [QR inventory](qr-inventory.md).
+
+Outbound WhatsApp sends reserve a `MessageQuota` for the user's active subscription billing period before calling Meta. This enforces `Plan.maxMessagesPerMonth` across assistant replies, manual replies, and scheduled template campaigns.
 
 ## Configuration
 
-Use `.env.template` for names. Relevant variables include `DATABASE_URL`, auth/Google credentials, `NEXT_PUBLIC_ENABLE_WHATSAPP_UI`, `WHATSAPP_ACCESS_TOKEN`, WhatsApp webhook verification configuration, `META_APP_SECRET`, `ANTHROPIC_API_KEY`, Paystack variables, `CRON_SECRET`, and `PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED`. AI replies require the Anthropic key; WhatsApp sending currently uses the single global access token.
+Use `.env.template` for names. Relevant variables include `DATABASE_URL`, auth/Google credentials, `NEXT_PUBLIC_ENABLE_WHATSAPP_UI`, `WHATSAPP_ACCESS_TOKEN` (legacy fallback and other integration helpers), `WHATSAPP_TOKEN_ENCRYPTION_KEY` (32-byte base64 or 64-character hex key for encrypting connected WABA tokens), WhatsApp webhook verification configuration, `META_APP_SECRET`, `ANTHROPIC_API_KEY`, Paystack variables, `CRON_SECRET`, and `PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED`. AI replies require the Anthropic key. Conversation replies and notification campaigns prefer the encrypted token stored for the connected WABA.
+
+The deployment scheduler must POST to `/api/cron/whatsapp-campaigns` to dispatch due customer notification campaigns and `/api/cron/whatsapp-webhooks` to retry failed webhook processing. Both require `Authorization: Bearer <CRON_SECRET>`. No scheduler is provisioned by the application itself.
 
 Never commit `.env` or paste secrets into documentation, logs, or test fixtures.
 

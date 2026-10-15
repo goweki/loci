@@ -295,12 +295,15 @@ export class ConversationService {
     }
 
     const { default: whatsapp } = await import("@/lib/whatsapp");
+    const { getWhatsAppTokenForPhoneNumber } = await import("@/lib/whatsapp/credentials");
+    const { reserveWhatsAppMessage } = await import("@/services/whatsapp/message-quota.service");
+    await reserveWhatsAppMessage(this.userId);
     const providerResponse = await whatsapp.sendMessage({
       phoneNumberId: phoneNumber.id,
       to: contact.phoneNumber,
       type: MessageType.TEXT,
       text: { body: text },
-    });
+    }, await getWhatsAppTokenForPhoneNumber(phoneNumber.id));
     if ("error" in providerResponse) throw new Error(providerResponse.error.message);
 
     const message = await prisma.message.create({
@@ -516,6 +519,9 @@ export class ConversationService {
     }
 
     if (typeof content === "object" && !Array.isArray(content)) {
+      if (typeof content.templateName === "string") {
+        return `Template: ${content.templateName}`;
+      }
       return (
         (content as any).text ||
         (content as any).body ||

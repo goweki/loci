@@ -59,6 +59,9 @@ export default async function ProductsPage({
         >
           New Product
         </Link>
+        <Link href={`/${lang}/dashboard/inventory`} className={buttonVariants({ variant: "outline" })}>
+          Scan Inventory QR
+        </Link>
       </div>
 
       <ProductStats products={products} />

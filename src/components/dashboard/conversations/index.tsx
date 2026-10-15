@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { Search, User, Check, CheckCheck, Clock, PlusIcon, Send } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -47,6 +47,13 @@ export function ConversationsComponent({
   );
   const [isPending, startTransition] = useTransition();
   const [draft, setDraft] = useState("");
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "visible") router.refresh();
+    }, 15000);
+    return () => window.clearInterval(timer);
+  }, [router]);
 
   const conversations = useMemo(() => {
     if (!search.trim()) {
@@ -105,9 +112,10 @@ export function ConversationsComponent({
   function messageText(content: unknown) {
     if (typeof content === "string") return content;
     if (content && typeof content === "object") {
-      const value = content as { text?: unknown; caption?: unknown; filename?: unknown };
+      const value = content as { text?: unknown; caption?: unknown; filename?: unknown; templateName?: unknown };
       if (typeof value.text === "string") return value.text;
       if (typeof value.caption === "string") return value.caption;
+      if (typeof value.templateName === "string") return `Template: ${value.templateName}`;
       if (typeof value.filename === "string") return `Document: ${value.filename}`;
     }
     return "Media message";

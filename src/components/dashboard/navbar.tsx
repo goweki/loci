@@ -108,6 +108,12 @@ export default function DashboardNavbar({
             icon: FilePenIcon,
           },
           {
+            title: "Customer notifications",
+            href: `/${language}/dashboard/whatsapp-notifications`,
+            description: "Schedule approved WhatsApp templates",
+            icon: FileBoxIcon,
+          },
+          {
             title: t.contacts,
             href: `/${language}/dashboard/contacts`,
             description: "Manage Drivers",

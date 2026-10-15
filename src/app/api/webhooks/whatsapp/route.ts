@@ -3,10 +3,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import db from "@/lib/prisma";
-import { processIncomingMessage, processStatusUpdate } from "@/lib/whatsapp/actions";
 import { InboundWebhookPayload } from "@/lib/whatsapp/types";
-import { env_ } from "@/lib/whatsapp/types/environment-variables";
 import { isValidMetaWebhookSignature } from "@/lib/whatsapp/webhook-signature";
+import { processWhatsAppWebhookPayload } from "@/services/whatsapp/webhook-processing.service";
 
 // Verification
 export async function GET(request: NextRequest) {
@@ -17,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   console.log(`mode-${mode}\n`);
 
-  if (mode === "subscribe" && token === env_.verifyToken) {
+  if (mode === "subscribe" && token === process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN) {
     return new NextResponse(challenge);
   }
 
@@ -52,10 +51,20 @@ export async function POST(request: NextRequest) {
     eventId = event.id;
     if (event.processed) return new NextResponse("OK");
 
-    await processWebhookEvent(body);
+    const claimed = await db.webhookEvent.updateMany({
+      where: {
+        id: event.id,
+        processed: false,
+        OR: [{ processingAt: null }, { processingAt: { lt: new Date(Date.now() - 10 * 60_000) } }],
+      },
+      data: { processingAt: new Date() },
+    });
+    if (!claimed.count) return new NextResponse("OK");
+
+    await processWhatsAppWebhookPayload(body);
     await db.webhookEvent.update({
       where: { id: event.id },
-      data: { processed: true, processedAt: new Date(), error: null },
+      data: { processed: true, processedAt: new Date(), error: null, nextRetry: null, processingAt: null },
     });
 
     return new NextResponse("OK");
@@ -64,27 +73,14 @@ export async function POST(request: NextRequest) {
     if (eventId) {
       await db.webhookEvent.update({
         where: { id: eventId },
-        data: { error: error instanceof Error ? error.message : "Unknown webhook error" },
+        data: {
+          error: error instanceof Error ? error.message.slice(0, 1000) : "Unknown webhook error",
+          retryCount: { increment: 1 },
+          nextRetry: new Date(Date.now() + 60_000),
+          processingAt: null,
+        },
       }).catch((updateError) => console.error("Failed to record webhook failure:", updateError));
     }
     return new NextResponse("Internal Server Error", { status: 500 });
-  }
-}
-
-async function processWebhookEvent(body: InboundWebhookPayload) {
-  for (const entry of body.entry ?? []) {
-    for (const changes of entry.changes ?? []) {
-      if (changes.field !== "messages") continue;
-      const messages = changes.value?.messages ?? [];
-      const contacts = changes.value?.contacts ?? [];
-      const metadata = changes.value?.metadata;
-
-      for (const message of messages) {
-        if (metadata) await processIncomingMessage(message, contacts, metadata, process.env.META_APP_SECRET!);
-      }
-      for (const status of changes.value?.statuses ?? []) {
-        await processStatusUpdate(status, process.env.META_APP_SECRET!);
-      }
-    }
   }
 }

@@ -211,27 +211,55 @@ export class ProductService {
   /**
    * Stock Adjustment
    */
-  async updateStock(productId: string, quantityChange: number) {
-    const product = await this.getProductById(productId);
+  async updateStock(productId: string, quantityChange: number, idempotencyKey: string) {
+    if (!Number.isInteger(quantityChange) || quantityChange === 0) {
+      throw new Error("Stock adjustment must be a non-zero whole number");
+    }
+    if (!idempotencyKey || idempotencyKey.length > 100) throw new Error("A valid adjustment request ID is required.");
 
-    if (!product) {
-      throw new Error("Product not found");
+    const prior = await prisma.inventoryAdjustment.findUnique({ where: { idempotencyKey } });
+    if (prior) {
+      if (prior.productId !== productId || prior.actorId !== this.userId || prior.quantityChange !== quantityChange) {
+        throw new Error("This adjustment request ID was already used for a different change.");
+      }
+      return this.getProductById(productId);
     }
 
-    const nextQty = product.stockQty + quantityChange;
-
-    if (nextQty < 0) {
-      throw new Error("Insufficient stock");
+    try {
+      await prisma.$transaction(async (tx) => {
+        const where: Prisma.ProductWhereInput = this.scope({
+          id: productId,
+          ...(quantityChange < 0 ? { stockQty: { gte: Math.abs(quantityChange) } } : {}),
+        });
+        const updated = await tx.product.updateManyAndReturn({
+          where,
+          data: { stockQty: { increment: quantityChange } },
+          select: { stockQty: true },
+        });
+        if (!updated.length) {
+          const product = await this.getProductById(productId);
+          if (!product) throw new Error("Product not found or access denied");
+          throw new Error("Insufficient stock");
+        }
+        await tx.inventoryAdjustment.create({
+          data: {
+            productId,
+            actorId: this.userId,
+            quantityChange,
+            stockAfter: updated[0].stockQty,
+            source: "QR_SCAN",
+            idempotencyKey,
+          },
+        });
+      });
+    } catch (error) {
+      const duplicate = await prisma.inventoryAdjustment.findUnique({ where: { idempotencyKey } });
+      if (duplicate?.productId === productId && duplicate.actorId === this.userId && duplicate.quantityChange === quantityChange) {
+        return this.getProductById(productId);
+      }
+      throw error;
     }
-
-    return prisma.product.update({
-      where: {
-        id: productId,
-      },
-      data: {
-        stockQty: nextQty,
-      },
-    });
+    return this.getProductById(productId);
   }
 
   /**

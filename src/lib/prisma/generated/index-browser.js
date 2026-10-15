@@ -200,6 +200,8 @@ exports.Prisma.WabaAccountScalarFieldEnum = {
   currency: 'currency',
   timezoneId: 'timezoneId',
   messageTemplateNamespace: 'messageTemplateNamespace',
+  accessTokenEncrypted: 'accessTokenEncrypted',
+  tokenUpdatedAt: 'tokenUpdatedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -214,6 +216,33 @@ exports.Prisma.WabaTemplateScalarFieldEnum = {
   rejectedReason: 'rejectedReason',
   wabaId: 'wabaId',
   createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.WhatsAppCampaignScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  phoneNumberId: 'phoneNumberId',
+  templateId: 'templateId',
+  name: 'name',
+  language: 'language',
+  bodyParameters: 'bodyParameters',
+  status: 'status',
+  scheduledAt: 'scheduledAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.WhatsAppCampaignRecipientScalarFieldEnum = {
+  id: 'id',
+  campaignId: 'campaignId',
+  contactId: 'contactId',
+  status: 'status',
+  providerMessageId: 'providerMessageId',
+  error: 'error',
+  sentAt: 'sentAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -268,6 +297,9 @@ exports.Prisma.ContactScalarFieldEnum = {
   phoneNumber: 'phoneNumber',
   name: 'name',
   avatar: 'avatar',
+  whatsappOptInAt: 'whatsappOptInAt',
+  whatsappOptInSource: 'whatsappOptInSource',
+  whatsappOptOutAt: 'whatsappOptOutAt',
   lastMessageAt: 'lastMessageAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -281,6 +313,7 @@ exports.Prisma.MessageScalarFieldEnum = {
   phoneNumberId: 'phoneNumberId',
   waMessageId: 'waMessageId',
   astMessageId: 'astMessageId',
+  replyToWaMessageId: 'replyToWaMessageId',
   type: 'type',
   content: 'content',
   direction: 'direction',
@@ -324,6 +357,9 @@ exports.Prisma.WebhookEventScalarFieldEnum = {
   processed: 'processed',
   processedAt: 'processedAt',
   error: 'error',
+  retryCount: 'retryCount',
+  nextRetry: 'nextRetry',
+  processingAt: 'processingAt',
   createdAt: 'createdAt'
 };
 
@@ -340,6 +376,17 @@ exports.Prisma.ProductScalarFieldEnum = {
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.InventoryAdjustmentScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  actorId: 'actorId',
+  quantityChange: 'quantityChange',
+  stockAfter: 'stockAfter',
+  source: 'source',
+  idempotencyKey: 'idempotencyKey',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.OrderScalarFieldEnum = {
@@ -447,6 +494,41 @@ exports.Prisma.ChatbotConfigScalarFieldEnum = {
   conversationHistory: 'conversationHistory',
   resetContextAfter: 'resetContextAfter',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AgentRunScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  phoneNumberId: 'phoneNumberId',
+  contactId: 'contactId',
+  provider: 'provider',
+  model: 'model',
+  status: 'status',
+  isPreview: 'isPreview',
+  durationMs: 'durationMs',
+  errorCode: 'errorCode',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.AgentToolCallScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  capability: 'capability',
+  capabilityVersion: 'capabilityVersion',
+  inputSummary: 'inputSummary',
+  outputSummary: 'outputSummary',
+  succeeded: 'succeeded',
+  durationMs: 'durationMs',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.MessageQuotaScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  periodStart: 'periodStart',
+  periodEnd: 'periodEnd',
+  used: 'used',
   updatedAt: 'updatedAt'
 };
 
@@ -609,6 +691,22 @@ exports.TemplateLanguage = exports.$Enums.TemplateLanguage = {
   sw_KE: 'sw_KE'
 };
 
+exports.WhatsAppCampaignStatus = exports.$Enums.WhatsAppCampaignStatus = {
+  SCHEDULED: 'SCHEDULED',
+  PROCESSING: 'PROCESSING',
+  SENT: 'SENT',
+  PARTIAL: 'PARTIAL',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED'
+};
+
+exports.WhatsAppCampaignRecipientStatus = exports.$Enums.WhatsAppCampaignRecipientStatus = {
+  PENDING: 'PENDING',
+  SENDING: 'SENDING',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
+};
+
 exports.PhoneNumberStatus = exports.$Enums.PhoneNumberStatus = {
   NOT_CLAIMED: 'NOT_CLAIMED',
   NOT_VERIFIED: 'NOT_VERIFIED',
@@ -645,6 +743,11 @@ exports.TriggerType = exports.$Enums.TriggerType = {
   MESSAGE_TYPE: 'MESSAGE_TYPE',
   TIME_BASED: 'TIME_BASED',
   DEFAULT: 'DEFAULT'
+};
+
+exports.InventoryAdjustmentSource = exports.$Enums.InventoryAdjustmentSource = {
+  QR_SCAN: 'QR_SCAN',
+  MANUAL: 'MANUAL'
 };
 
 exports.OrderStatus = exports.$Enums.OrderStatus = {
@@ -702,6 +805,11 @@ exports.InvoiceStatus = exports.$Enums.InvoiceStatus = {
   CANCELLED: 'CANCELLED'
 };
 
+exports.AgentRunStatus = exports.$Enums.AgentRunStatus = {
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED'
+};
+
 exports.ContactStatus = exports.$Enums.ContactStatus = {
   PENDING: 'PENDING',
   IN_PROGRESS: 'IN_PROGRESS',
@@ -717,6 +825,8 @@ exports.Prisma.ModelName = {
   SubscriptionPayment: 'SubscriptionPayment',
   WabaAccount: 'WabaAccount',
   WabaTemplate: 'WabaTemplate',
+  WhatsAppCampaign: 'WhatsAppCampaign',
+  WhatsAppCampaignRecipient: 'WhatsAppCampaignRecipient',
   Payment: 'Payment',
   Feature: 'Feature',
   PlanFeature: 'PlanFeature',
@@ -727,6 +837,7 @@ exports.Prisma.ModelName = {
   AutoReplyRule: 'AutoReplyRule',
   WebhookEvent: 'WebhookEvent',
   Product: 'Product',
+  InventoryAdjustment: 'InventoryAdjustment',
   Order: 'Order',
   OrderItem: 'OrderItem',
   OrderPayout: 'OrderPayout',
@@ -734,6 +845,9 @@ exports.Prisma.ModelName = {
   LedgerEntry: 'LedgerEntry',
   Invoice: 'Invoice',
   ChatbotConfig: 'ChatbotConfig',
+  AgentRun: 'AgentRun',
+  AgentToolCall: 'AgentToolCall',
+  MessageQuota: 'MessageQuota',
   ChatbotConversation: 'ChatbotConversation',
   PromptTemplate: 'PromptTemplate',
   ContactUs: 'ContactUs'

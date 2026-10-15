@@ -1,6 +1,6 @@
-# QR inventory workflow (planned)
+# QR inventory workflow
 
-This is the next inventory feature brief, not an implemented capability. Its purpose is to let an authenticated owner scan a product QR code to add or remove stock quickly, while keeping the product catalogue accurate for the AI assistant and customer engagement.
+The dashboard now supports locally generated product QR labels and camera-based QR scanning for stock adjustments. Manual product-ID entry is available when camera access is unavailable. This is owner-facing inventory tooling that helps keep catalogue answers accurate for the AI assistant.
 
 ## Owner workflow
 
@@ -21,9 +21,9 @@ Generate printable/displayable QR codes from the product UI and support existing
 
 ## Data and implementation fit
 
-`Product.stockQty` already holds the current quantity. `ProductService.updateStock(productId, quantityChange)` already applies a signed adjustment and prevents negative stock; route the new authenticated server action through the owner-scoped service rather than updating Prisma directly in the client.
+`Product.stockQty` holds the current quantity. The authenticated action calls `ProductService.updateStock(productId, quantityChange, requestId)`, which performs a tenant-scoped atomic increment/decrement, rejects a decrement below zero, and creates an `InventoryAdjustment` in the same transaction. Repeated submissions with the same request ID do not apply a second adjustment. QR payloads contain only the opaque product ID; the server checks ownership.
 
-Current schema has no inventory movement history. For a first minimal release, retain stock on `Product` and record adjustment metadata only if needed for operational review. If auditability is required, add a narrowly scoped `InventoryAdjustment` model with product/owner, signed quantity delta, resulting quantity, reason/source (`QR_SCAN`), actor, timestamp, and optional idempotency key. Decide this before shipping so duplicate scans/retries cannot double-adjust unnoticed. Use a transaction or conditional atomic update to protect concurrent scans and sales.
+`InventoryAdjustment` records actor, signed quantity delta, resulting stock, source, request ID, and timestamp. The adjustment and stock update are transactional.
 
 ## Interaction with commerce and assistant
 
@@ -35,6 +35,8 @@ The assistant's catalogue search reads current `stockQty`, so successful adjustm
 - Scanning alone does not alter stock; Add/Remove and quantity are confirmed.
 - Invalid QR data, unauthorized products, invalid quantities, and insufficient stock produce safe errors.
 - Concurrent scan and checkout operations cannot create negative or lost stock updates.
-- Repeated submission is protected against accidental duplicate adjustment, or the UI clearly prevents/requires confirmation for re-submission.
+- Repeated submission with the same request ID is protected against duplicate adjustment.
 - The resulting balance appears in product/inventory UI and is available to the catalogue search tool.
 - Camera denial, unsupported camera, and manual fallback are handled accessibly.
+
+QR generation and scanning require no network service. Camera access requires a supported browser and secure context (HTTPS, or localhost). Product labels encode internal IDs; treat labels as account inventory identifiers and do not publish them as customer-facing product links.

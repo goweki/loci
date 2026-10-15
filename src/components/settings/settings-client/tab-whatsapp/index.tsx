@@ -7,8 +7,8 @@ import {
 } from "@/components/ui/card";
 import { Building2Icon, Phone } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 import WabaEmbeddedSignup from "@/components/ui/waba-embedded-signup";
+import { Button } from "@/components/ui/button";
 import {
   PhoneNumber,
   SubscriptionStatus,
@@ -113,7 +113,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
                   {subCheck.subscription?.plan &&
                     subCheck.subscription.plan.maxPhoneNumbers >
                       waba.phoneNumbers.length && (
-                      <Button size="sm">Add Number</Button>
+                      <WabaEmbeddedSignup label="Add WhatsApp number" />
                     )}
                 </div>
 
@@ -164,6 +164,17 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
         </CardContent>
       </Card>
       {waba ? <AssistantConfig /> : null}
+      {waba ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Customer notifications</CardTitle>
+            <CardDescription>Schedule approved WhatsApp templates for customers who have opted in.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild variant="outline"><Link href={`/${language}/dashboard/whatsapp-notifications`}>Manage notifications</Link></Button>
+          </CardContent>
+        </Card>
+      ) : null}
       {waba ? (
         <Card>
           <CardHeader>

@@ -4,10 +4,17 @@ vi.mock("server-only", () => ({}));
 
 const mocks = vi.hoisted(() => ({
   findMany: vi.fn(),
+  agentRunCreate: vi.fn(),
+  agentRunUpdate: vi.fn(),
+  agentToolCallCreate: vi.fn(),
 }));
 
 vi.mock("@/lib/prisma", () => ({
-  default: { product: { findMany: mocks.findMany } },
+  default: {
+    product: { findMany: mocks.findMany },
+    agentRun: { create: mocks.agentRunCreate, update: mocks.agentRunUpdate },
+    agentToolCall: { create: mocks.agentToolCallCreate },
+  },
 }));
 
 import { matchAutoReplyRule } from "@/services/autoReply/match-rule";
@@ -36,6 +43,9 @@ function rule(overrides: Partial<AutoReplyRule>): AutoReplyRule {
 describe("WhatsApp assistant capabilities", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.agentRunCreate.mockResolvedValue({ id: "agent-run-1" });
+    mocks.agentRunUpdate.mockResolvedValue({});
+    mocks.agentToolCallCreate.mockResolvedValue({});
   });
 
   it("matches specific rules before the default regardless of default priority", () => {
@@ -94,6 +104,12 @@ describe("WhatsApp assistant capabilities", () => {
       where: expect.objectContaining({ userId: "owner-1", isActive: true }),
       select: expect.objectContaining({ name: true, price: true, stockQty: true }),
       take: 5,
+    }));
+    expect(mocks.agentRunCreate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ userId: "owner-1", phoneNumberId: "phone-1", model: "claude-sonnet-4-20250514" }),
+    }));
+    expect(mocks.agentToolCallCreate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ capability: "search_catalogue", succeeded: true, inputSummary: { queryLength: 10 }, outputSummary: { resultCount: 1 } }),
     }));
     vi.unstubAllGlobals();
     vi.unstubAllEnvs();

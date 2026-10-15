@@ -27,6 +27,8 @@ import { createPhoneNumberAction } from "@/actions/phoneNumber.actions";
 import { AgentRuntimeService } from "@/services/agent/agent-runtime.service";
 import { matchAutoReplyRule } from "@/services/autoReply/match-rule";
 import { shouldHandoffToHuman } from "@/services/agent/agent-helpers";
+import { getWhatsAppTokenForPhoneNumber } from "@/lib/whatsapp/credentials";
+import { reserveWhatsAppMessage } from "@/services/whatsapp/message-quota.service";
 
 const BASE_URL = `https://graph.facebook.com/${env_.apiVersion}`;
 
@@ -84,9 +86,19 @@ export async function processIncomingMessage(
 
     const duplicate = await prisma.message.findFirst({
       where: { waMessageId: message.id, direction: MessageDirection.INBOUND },
-      select: { id: true },
+      select: { id: true, userId: true, contactId: true, phoneNumberId: true },
     });
-    if (duplicate) return;
+    if (duplicate) {
+      const priorReply = await prisma.message.findFirst({
+        where: { replyToWaMessageId: message.id, direction: MessageDirection.OUTBOUND },
+        select: { id: true },
+      });
+      if (!priorReply) {
+        const retryContact = await prisma.contact.findFirst({ where: { id: duplicate.contactId, userId: duplicate.userId } });
+        if (retryContact) await processAutoReplies(duplicate.userId, duplicate.phoneNumberId, retryContact, message);
+      }
+      return;
+    }
 
     // Process message content based on type
     const content = await processMessageContent(message);
@@ -125,8 +137,21 @@ export async function processIncomingMessage(
       data: { lastMessageAt: new Date() },
     });
 
-    // Trigger real-time updates (WebSocket, SSE, etc.)
+    // The dashboard refreshes conversations on a short polling interval.
     await notifyUserOfNewMessage(user.id, contact.id, message);
+
+    const inboundText = message.type === "text" ? message.text.body.trim() : "";
+    if (/^(stop|stop all|unsubscribe|cancel|end|quit)$/i.test(inboundText)) {
+      await prisma.contact.update({ where: { id: contact.id }, data: { whatsappOptOutAt: new Date() } });
+      await sendAssistantText(phoneNumberId, contact, message.id, "You are opted out of WhatsApp notifications. Reply START if you want to opt in again.");
+      return;
+    }
+
+    if (/^start$/i.test(inboundText) && contact.whatsappOptOutAt) {
+      await prisma.contact.update({ where: { id: contact.id }, data: { whatsappOptOutAt: null, whatsappOptInAt: new Date(), whatsappOptInSource: "Customer replied START on WhatsApp" } });
+      await sendAssistantText(phoneNumberId, contact, message.id, "You are opted in to WhatsApp messages again.");
+      return;
+    }
 
     // Process auto-replies if configured
     await processAutoReplies(user.id, phoneNumberId, contact, message);
@@ -136,6 +161,7 @@ export async function processIncomingMessage(
     console.error("Error processing incoming message:", error);
     // Store failed message for retry
     await storeFailedMessage(message, error);
+    throw error;
   }
 }
 
@@ -163,8 +189,7 @@ export async function processStatusUpdate(
     });
 
     if (!message) {
-      console.warn(`Message not found for status update: ${statusUpdate.id}`);
-      return;
+      throw new Error(`Outbound message not found for status update: ${statusUpdate.id}`);
     }
 
     // Update message status
@@ -178,6 +203,12 @@ export async function processStatusUpdate(
         updatedAt: new Date(),
       },
     });
+    if (statusUpdate.status === "failed") {
+      await prisma.whatsAppCampaignRecipient.updateMany({
+        where: { providerMessageId: statusUpdate.id },
+        data: { status: "FAILED", error: statusUpdate.errors?.map((item) => item.message).join("; ").slice(0, 500) || "Meta reported delivery failure." },
+      });
+    }
 
     // Handle failed messages
     if (statusUpdate.status === "failed" && statusUpdate.errors) {
@@ -188,6 +219,7 @@ export async function processStatusUpdate(
     console.log(`Updated message ${message.id} status to ${newStatus}`);
   } catch (error) {
     console.error("Error processing status update:", error);
+    throw error;
   }
 }
 
@@ -449,27 +481,11 @@ function mapWhatsAppStatusToMessageStatus(
  * Notify user of new message (WebSocket, SSE, etc.)
  */
 async function notifyUserOfNewMessage(
-  userId: string,
-  contactId: string,
-  message: InboundMessage,
+  _userId: string,
+  _contactId: string,
+  _message: InboundMessage,
 ): Promise<void> {
-  // Implement real-time notification logic
-  // Examples:
-  // - WebSocket broadcast
-  // - Server-Sent Events
-  // - Push notifications
-  // - Email notifications
-
-  console.log(
-    `Notifying user ${userId} of new message from contact ${contactId}`,
-  );
-
-  // Placeholder for actual implementation
-  // await websocketManager.sendToUser(userId, {
-  //   type: 'new_message',
-  //   contactId,
-  //   messageId: message.id
-  // })
+  // The authenticated inbox refreshes from the database on a 15-second interval.
 }
 
 /**
@@ -562,6 +578,7 @@ async function processAutoReplies(
   const response = await runtime.respond({
     ownerId: userId,
     phoneNumberId,
+    contactId: contact.id,
     systemPrompt: config.systemPrompt,
     profileContext: config.profileContext,
     enabledTools: config.enabledTools,
@@ -587,27 +604,33 @@ async function sendAssistantText(
   text: string,
 ) {
   const body = text.slice(0, 4000);
+  const existingReply = await prisma.message.findUnique({ where: { replyToWaMessageId: incomingMessageId }, select: { id: true } });
+  if (existingReply) return;
+  await reserveWhatsAppMessage(contact.userId);
+  const outbound = await prisma.message.create({
+    data: {
+      userId: contact.userId,
+      contactId: contact.id,
+      phoneNumberId,
+      replyToWaMessageId: incomingMessageId,
+      type: MessageType.TEXT,
+      content: { text: body },
+      direction: MessageDirection.OUTBOUND,
+      status: MessageStatus.FAILED,
+      timestamp: new Date(),
+    },
+  });
   const result = await whatsapp.sendMessage({
     phoneNumberId,
     to: contact.phoneNumber,
     type: MessageType.TEXT,
     text: { body },
     context: { message_id: incomingMessageId },
-  });
+  }, await getWhatsAppTokenForPhoneNumber(phoneNumberId));
   if ("error" in result) throw new Error(result.error.message);
-
-  await prisma.message.create({
-    data: {
-      userId: contact.userId,
-      contactId: contact.id,
-      phoneNumberId,
-      waMessageId: result.messages[0]?.id,
-      type: MessageType.TEXT,
-      content: { text: body },
-      direction: MessageDirection.OUTBOUND,
-      status: MessageStatus.SENT,
-      timestamp: new Date(),
-    },
+  await prisma.message.update({
+    where: { id: outbound.id },
+    data: { waMessageId: result.messages?.[0]?.id, status: MessageStatus.SENT },
   });
 }
 

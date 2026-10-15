@@ -10,7 +10,7 @@ The existing products/catalogue can enrich an assistant's answers. Future invent
 
 The WhatsApp tab is gated by `NEXT_PUBLIC_ENABLE_WHATSAPP_UI=true` and by account subscription/WABA state. Meta signup and asset synchronization provide a WABA and phone numbers. The UI includes connected asset/template state and assistant configuration for a selected owned number.
 
-`ChatbotConfig` stores the system prompt, manually entered profile/company/CV context, activation and handoff settings, model parameters, and enabled tools. Profile text is pasted manually. The **Generate prompt draft** button creates a fixed generic prompt in the browser; it does not use the entered profile to generate tailored instructions. There is no CV upload or document parsing. The current runtime calls Anthropic using `ANTHROPIC_API_KEY` and a fixed model. Without the key, AI-generated replies are unavailable.
+`ChatbotConfig` stores the system prompt, manually entered profile/company/CV context, activation and handoff settings, model parameters, and enabled tools. The **Generate prompt draft from profile** button builds an editable draft that includes owner-pasted profile information. Owners can test the current unsaved draft and optional catalogue capability against the configured Anthropic runtime without sending a WhatsApp message. There is no CV upload or document parsing. The runtime uses `ANTHROPIC_API_KEY` and a fixed model. Without the key, AI-generated replies and preview are unavailable.
 
 If enabled, the assistant has a read-only catalogue search capability over the owner's active products. It returns a bounded minimal product projection. It cannot create orders, accept payment, alter stock, issue refunds, or initiate payouts. The assistant is an initial bounded tool-using implementation, not a generalized provider-independent agent platform.
 
@@ -20,16 +20,22 @@ If enabled, the assistant has a read-only catalogue search capability over the o
 
 Meta webhook POST requests are signature-checked. The inbound processor resolves the Meta number to a locally owned phone number, persists contacts/messages, handles status callbacks, checks handoff and rules, and then may invoke the assistant. Duplicate event/message checks exist. Processing is synchronous and has no durable retry/outbox worker.
 
-The inbox shows conversation history and supports manual text replies within the WhatsApp customer-service window. Human handoff pauses assistant responses until resumed. Inbox updates are not real-time. The WhatsApp client currently relies on one global `WHATSAPP_ACCESS_TOKEN`; per-WABA credential storage and lifecycle are not implemented. Media/attachments are not interpreted by the assistant. Although template management and a template-send API helper exist, a complete owner-facing, policy-aware customer-notification workflow (audience, consent, template selection/variables, scheduling, delivery tracking) is not implemented.
+The inbox shows conversation history and supports manual text replies within the WhatsApp customer-service window. Human handoff pauses assistant responses until resumed. The inbox refreshes from the server every 15 seconds while visible. A connected WABA token is stored encrypted with AES-256-GCM and used for inbox replies and scheduled campaigns; the legacy global token remains a fallback for other integration helpers. Media/attachments are not interpreted by the assistant.
 
-## Core features that are incomplete
+Owners can schedule approved WhatsApp templates to selected contacts with recorded opt-in consent. The UI records the consent source, handles customer `STOP`/`START` messages, validates WABA/template/recipient ownership, supports body-text variables, stores recipient outcomes, and updates delivery failures from Meta status callbacks. `/api/cron/whatsapp-campaigns` must be scheduled externally to send due campaigns. Dynamic header/button variables and unsupported media template headers are rejected. Consent must be genuine and externally obtained; the app's record is not itself proof of consent.
 
-- **Meta asset onboarding:** connecting and syncing a WABA/number is present, but the visible **Add Number** control is not wired to an action. Per-business token storage, refresh, rotation, and revocation are also absent; sending uses one global token.
-- **Assistant setup:** owners can edit and save a prompt/profile and activate the assistant. The draft generator is generic rather than profile-aware, and there is no test chat/preview that exercises the saved runtime before activation.
-- **Customer notifications:** there is no complete campaign/notification flow for sending approved templates to customers outside the active service conversation, including consent/audience controls, scheduling, and results. The webhook's `notifyUserOfNewMessage` function is only a console placeholder, so operators do not receive a push/email/realtime alert for incoming messages.
-- **Operational inbox:** messages are persisted and displayed, but updates are not real-time, processing has no durable retry/outbox, and there is no media understanding.
-- **Agentic foundation:** catalogue search is the only tool. Provider adapters, tool/run history, evaluation, and usage controls are future work. No order/payment/inventory mutation tools exist.
-- **Inventory QR:** QR scanning to identify products and add/remove stock is planned in [QR inventory](qr-inventory.md), not implemented.
+Assistant runs and catalogue-tool calls now create privacy-conscious audit rows (`AgentRun`, `AgentToolCall`): they record provider/model, outcome, duration, capability version, and bounded metadata such as query length/result count, not the prompt, customer message, or raw tool result. WhatsApp sends reserve against the active plan's per-billing-period message cap in an atomic database counter. The owner-facing UI for reviewing traces, model-spend budgets, and evaluations is not yet implemented.
+
+## Remaining implementation and operational gaps
+
+- **Meta credentials:** connected WABA tokens are encrypted and used for conversational replies/campaigns, but expiry tracking, refresh/rotation, and revocation UI are not complete. Other legacy integration helpers may still require the global token.
+- **Number onboarding limits:** Meta signup syncs numbers and enforces plan count/ownership. Supporting multiple distinct WABAs per user is not implemented because the current schema is one WABA per user.
+- **Campaign operations:** delivery is scheduled through an external cron caller. There is no in-app scheduler provisioning, audience segmentation, per-campaign retry control, or full delivery analytics. Uncertain send outcomes are marked failed for reconciliation rather than blindly retried.
+- **Webhook recovery:** failed webhook events are stored and retried by `/api/cron/whatsapp-webhooks`, with a bounded attempt count and idempotent inbound/outbound guards. Failed events still need operator monitoring; some provider/model failures after inbound persistence may leave the inbound visible without an automated reply.
+- **Agent runtime:** catalogue search is the only model tool. The bounded runtime, privacy-conscious run/tool audit records, and per-plan outbound message cap are implemented, but provider choice remains Anthropic-specific; model-spend budgets and evaluations are not complete. No order/payment/inventory mutation tools exist.
+- **Assistant knowledge:** file/CV upload and parsing are absent; owners paste reviewed text. Media understanding and voice transcription are absent.
+- **Meta verification:** production app permissions, embedded signup behavior, token validity, webhook subscriptions, templates, rate limits, and live delivery must be verified with the actual Meta app and WABA.
+- **QR inventory:** product labels and confirmed add/remove stock scanning are implemented. Camera support depends on browser/HTTPS; imported external label formats and warehouse-level stock locations are not supported.
 
 ## Current data and code
 
@@ -45,4 +51,4 @@ Assistant context/tool fields were added to `ChatbotConfig` by migration `202610
 
 ## Known follow-up
 
-Per-account Meta credential lifecycle, customer notification workflows, asynchronous/retryable message processing, profile-aware prompt authoring and preview, document ingestion with review, runtime/tool traces and usage controls, inbox refresh, and production/live-provider verification remain future work. Keep capabilities narrow, owner-scoped, and explicitly authorized as new agentic flows are added.
+Token lifecycle, broader agent observability/provider support, document ingestion, operational monitoring, and live-provider verification remain future work. Keep capabilities narrow, owner-scoped, and explicitly authorized as new agentic flows are added.

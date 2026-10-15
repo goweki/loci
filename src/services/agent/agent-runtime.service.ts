@@ -13,6 +13,8 @@ type AgentMessage = { role: "user" | "assistant"; content: string };
 type RuntimeInput = {
   ownerId: string;
   phoneNumberId: string;
+  contactId?: string;
+  isPreview?: boolean;
   systemPrompt: string;
   profileContext: string | null;
   enabledTools: string[];
@@ -128,6 +130,36 @@ export class AgentRuntimeService {
   constructor(private readonly provider: AgentProviderAdapter = new AnthropicMessagesAdapter()) {}
 
   async respond(input: RuntimeInput): Promise<string> {
+    const startedAt = Date.now();
+    const run = await prisma.agentRun.create({
+      data: {
+        userId: input.ownerId,
+        phoneNumberId: input.phoneNumberId,
+        contactId: input.contactId,
+        provider: "anthropic",
+        model: "claude-sonnet-4-20250514",
+        status: "FAILED",
+        isPreview: input.isPreview ?? false,
+      },
+      select: { id: true },
+    });
+    try {
+      const response = await this.runAgent(input, run.id);
+      await prisma.agentRun.update({
+        where: { id: run.id },
+        data: { status: "SUCCEEDED", durationMs: Date.now() - startedAt },
+      });
+      return response;
+    } catch (error) {
+      await prisma.agentRun.update({
+        where: { id: run.id },
+        data: { status: "FAILED", durationMs: Date.now() - startedAt, errorCode: "agent_run_failed" },
+      });
+      throw error;
+    }
+  }
+
+  private async runAgent(input: RuntimeInput, runId: string): Promise<string> {
     const enabledTools = input.enabledTools.includes("search_catalogue")
       ? [CATALOGUE_TOOL]
       : [];
@@ -169,6 +201,17 @@ export class AgentRuntimeService {
       const toolResults = [];
       for (const call of toolCalls) {
         if (call.name !== "search_catalogue" || toolsUsed >= 3) {
+          await prisma.agentToolCall.create({
+            data: {
+              runId,
+              capability: typeof call.name === "string" ? call.name.slice(0, 100) : "unknown",
+              capabilityVersion: "unregistered",
+              inputSummary: { rejected: true },
+              outputSummary: { reason: "not_enabled_or_tool_limit" },
+              succeeded: false,
+              durationMs: 0,
+            },
+          });
           toolResults.push({
             type: "tool_result",
             tool_use_id: call.id,
@@ -178,14 +221,35 @@ export class AgentRuntimeService {
           continue;
         }
         toolsUsed += 1;
+        const toolStartedAt = Date.now();
+        let products: Awaited<ReturnType<typeof searchCatalogue>> | null = null;
         try {
-          const products = await searchCatalogue(input.ownerId, call.input);
+          products = await searchCatalogue(input.ownerId, call.input);
+        } catch {
+          // The model receives a safe failure; the audit stores only non-content metadata.
+        }
+        await prisma.agentToolCall.create({
+          data: {
+            runId,
+            capability: "search_catalogue",
+            capabilityVersion: "1.0.0",
+            inputSummary: {
+              queryLength: call.input && typeof call.input === "object" && "query" in call.input && typeof call.input.query === "string"
+                ? call.input.query.length
+                : null,
+            },
+            outputSummary: products ? { resultCount: products.length } : undefined,
+            succeeded: products !== null,
+            durationMs: Date.now() - toolStartedAt,
+          },
+        });
+        if (products) {
           toolResults.push({
             type: "tool_result",
             tool_use_id: call.id,
             content: JSON.stringify(products),
           });
-        } catch {
+        } else {
           toolResults.push({
             type: "tool_result",
             tool_use_id: call.id,

@@ -3,6 +3,7 @@
 import { requireUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+import { AgentRuntimeService } from "@/services/agent/agent-runtime.service";
 
 const chatbotConfigSchema = z.object({
   phoneNumberId: z.string().min(1),
@@ -82,4 +83,33 @@ export async function toggleChatbotStatus(phoneNumberId: string, isActive: boole
     where: { phoneNumberId },
     data: { isActive },
   });
+}
+
+const previewSchema = z.object({
+  phoneNumberId: z.string().min(1),
+  systemPrompt: z.string().trim().min(20).max(12000),
+  profileContext: z.string().max(10000).nullable().optional(),
+  enabledTools: z.array(z.enum(["search_catalogue"])).default([]),
+  temperature: z.number().min(0).max(1).default(0.4),
+  maxTokens: z.number().int().min(64).max(800).default(400),
+  question: z.string().trim().min(1).max(1000),
+});
+
+export async function previewChatbotResponse(input: unknown) {
+  const user = await requireUser();
+  const data = previewSchema.parse(input);
+  await requireOwnedPhoneNumber(data.phoneNumberId, user.id);
+
+  const answer = await new AgentRuntimeService().respond({
+    ownerId: user.id,
+    phoneNumberId: data.phoneNumberId,
+    isPreview: true,
+    systemPrompt: data.systemPrompt,
+    profileContext: data.profileContext ?? null,
+    enabledTools: data.enabledTools,
+    temperature: data.temperature,
+    maxTokens: data.maxTokens,
+    history: [{ role: "user", content: data.question }],
+  });
+  return { answer };
 }

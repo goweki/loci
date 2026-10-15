@@ -22,7 +22,6 @@ interface WabaDetails {
 export default function WabaEmbeddedSignup({ label }: { label?: string }) {
   const [sdkReady, setSdkReady] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isLinked, setIsLinked] = useState(false);
 
   const wabaDetailsRef = useRef<WabaDetails | null>(null);
   const router = useRouter();
@@ -33,9 +32,15 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
 
     const handleMessage = (event: MessageEvent) => {
       // Basic origin check
+      let origin = "";
+      try {
+        origin = new URL(event.origin).hostname;
+      } catch {
+        return;
+      }
       if (
-        !event.origin.includes("facebook.com") &&
-        !event.origin.includes("whatsapp.com")
+        origin !== "facebook.com" && !origin.endsWith(".facebook.com") &&
+        origin !== "whatsapp.com" && !origin.endsWith(".whatsapp.com")
       ) {
         return;
       }
@@ -49,7 +54,6 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
           const code = params.get("code");
 
           if (code) {
-            console.log("Captured Auth Code from postMessage:", code);
             wabaDetailsRef.current = {
               ...wabaDetailsRef.current,
               code,
@@ -163,7 +167,6 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
 
           if (res.ok) {
             toast.success("WhatsApp account connected and saved!");
-            setIsLinked(true);
             router.refresh();
           } else {
             toast.error(res.error || "Failed to process linkage");
@@ -203,15 +206,9 @@ export default function WabaEmbeddedSignup({ label }: { label?: string }) {
 
   return (
     <div>
-      {isLinked ? (
-        <p className="text-green-600 font-medium">
-          ✓ WhatsApp Successfully Linked
-        </p>
-      ) : (
-        <Button onClick={handleLogin} disabled={!sdkReady || loading}>
-          {loading ? <Loader /> : label || "Integrate new Whatsapp Chatbot"}
-        </Button>
-      )}
+      <Button onClick={handleLogin} disabled={!sdkReady || loading}>
+        {loading ? <Loader /> : label || "Integrate new Whatsapp Chatbot"}
+      </Button>
     </div>
   );
 }
