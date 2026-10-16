@@ -47,6 +47,15 @@ export default function SubscriptionInfo({
             Messages/month
           </span>
         </div>
+        <div className="flex items-center gap-2 text-sm">
+          <CheckCircle2Icon className="w-4 h-4 text-green-500" />
+          <span>
+            {subscription.plan.maxTemplates >= 999
+              ? "Unlimited"
+              : subscription.plan.maxTemplates}{" "}
+            WhatsApp templates
+          </span>
+        </div>
       </div>
 
       {/* <div className="flex gap-2 pt-2">

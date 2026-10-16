@@ -159,6 +159,7 @@ exports.Prisma.PlanScalarFieldEnum = {
   monthlyPrice: 'monthlyPrice',
   maxPhoneNumbers: 'maxPhoneNumbers',
   maxMessagesPerMonth: 'maxMessagesPerMonth',
+  maxTemplates: 'maxTemplates',
   active: 'active',
   popular: 'popular',
   createdAt: 'createdAt',
@@ -216,6 +217,20 @@ exports.Prisma.WabaTemplateScalarFieldEnum = {
   rejectedReason: 'rejectedReason',
   wabaId: 'wabaId',
   createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TemplateLibraryEntryScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  name: 'name',
+  description: 'description',
+  category: 'category',
+  language: 'language',
+  components: 'components',
+  isDefault: 'isDefault',
+  isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -825,6 +840,7 @@ exports.Prisma.ModelName = {
   SubscriptionPayment: 'SubscriptionPayment',
   WabaAccount: 'WabaAccount',
   WabaTemplate: 'WabaTemplate',
+  TemplateLibraryEntry: 'TemplateLibraryEntry',
   WhatsAppCampaign: 'WhatsAppCampaign',
   WhatsAppCampaignRecipient: 'WhatsAppCampaignRecipient',
   Payment: 'Payment',

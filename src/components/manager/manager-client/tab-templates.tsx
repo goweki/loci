@@ -1,109 +1,128 @@
 "use client";
 
 import { useCallback, useEffect, useState, useTransition } from "react";
-import { CheckCircleIcon, ClockIcon, EditIcon, EyeIcon, PlusIcon, RefreshCwIcon, SearchIcon, Trash2Icon, XCircleIcon } from "lucide-react";
-import { Prisma, TemplateApprovalStatus, TemplateCategory, TemplateLanguage, WabaTemplate } from "@/lib/prisma/generated";
-import { Button } from "@/components/ui/button";
+import { EditIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import toast from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TabsContent } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import Loader from "@/components/ui/loaders";
-import TemplateForm from "@/components/settings/settings-client/tab-whatsapp/waba-templates/form";
-import { deleteWabaTemplateAction, findWabaTemplatesAction, synchronizeMeta, updateWabaTemplateAction } from "./actions";
-import toast from "react-hot-toast";
+import { TemplateCategory, TemplateLanguage, TemplateLibraryEntry } from "@/lib/prisma/generated";
+import {
+  createTemplateLibraryEntryAction,
+  deleteTemplateLibraryEntryAction,
+  getTemplateLibraryForManagerAction,
+  updateTemplateLibraryEntryAction,
+} from "@/actions/template-library.actions";
 import { ConfirmActionDialog } from "./confirm-action-dialog";
+import Loader from "@/components/ui/loaders";
 
-type DialogState = { kind: "create" } | { kind: "view" | "edit" | "delete"; template: WabaTemplate } | null;
-
-const statusIcon = {
-  APPROVED: <CheckCircleIcon className="mr-1 h-3 w-3" />,
-  PENDING: <ClockIcon className="mr-1 h-3 w-3" />,
-  REJECTED: <XCircleIcon className="mr-1 h-3 w-3" />,
-  DISABLED: <ClockIcon className="mr-1 h-3 w-3" />,
+type EntryDraft = {
+  key: string;
+  name: string;
+  description: string;
+  category: TemplateCategory;
+  language: TemplateLanguage;
+  components: string;
+  isDefault: boolean;
+  isActive: boolean;
 };
 
+const emptyDraft: EntryDraft = {
+  key: "",
+  name: "",
+  description: "",
+  category: TemplateCategory.UTILITY,
+  language: TemplateLanguage.en_US,
+  components: JSON.stringify([{ type: "BODY", text: "Hello {{1}}" }], null, 2),
+  isDefault: false,
+  isActive: true,
+};
+
+function toDraft(entry?: TemplateLibraryEntry): EntryDraft {
+  return entry ? {
+    key: entry.key,
+    name: entry.name,
+    description: entry.description ?? "",
+    category: entry.category,
+    language: entry.language,
+    components: JSON.stringify(entry.components, null, 2),
+    isDefault: entry.isDefault,
+    isActive: entry.isActive,
+  } : emptyDraft;
+}
+
 export default function TabTemplates() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [templates, setTemplates] = useState<WabaTemplate[] | null>(null);
-  const [dialog, setDialog] = useState<DialogState>(null);
+  const [entries, setEntries] = useState<TemplateLibraryEntry[] | null>(null);
+  const [editing, setEditing] = useState<TemplateLibraryEntry | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState<TemplateLibraryEntry | null>(null);
+  const [draft, setDraft] = useState<EntryDraft>(emptyDraft);
   const [isPending, startTransition] = useTransition();
-  const [syncing, setSyncing] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
-      setTemplates(await findWabaTemplatesAction());
+      setEntries(await getTemplateLibraryForManagerAction());
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unable to load templates.");
-      setTemplates([]);
+      toast.error(error instanceof Error ? error.message : "Unable to load the template library.");
+      setEntries([]);
     }
   }, []);
 
   useEffect(() => { void refresh(); }, [refresh]);
 
-  const filtered = (templates ?? []).filter((template) =>
-    `${template.name} ${template.category} ${template.language} ${template.status}`.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const openCreate = () => {
+    setEditing(null);
+    setDraft(emptyDraft);
+    setDialogOpen(true);
+  };
 
-  const saveEdit = (event: React.FormEvent<HTMLFormElement>) => {
+  const openEdit = (entry: TemplateLibraryEntry) => {
+    setEditing(entry);
+    setDraft(toDraft(entry));
+    setDialogOpen(true);
+  };
+
+  const save = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!dialog || dialog.kind !== "edit") return;
-    const form = new FormData(event.currentTarget);
-    let components: Prisma.InputJsonValue;
+    let components: unknown;
     try {
-      components = JSON.parse(String(form.get("components") ?? "[]"));
+      components = JSON.parse(draft.components);
     } catch {
-      toast.error("Components must be valid JSON.");
+      toast.error("Template components must be valid JSON.");
       return;
     }
-    const data = {
-      name: String(form.get("name") ?? "").trim(),
-      category: String(form.get("category")) as TemplateCategory,
-      language: String(form.get("language")) as TemplateLanguage,
-      components,
-    };
+    const input = { ...draft, components };
     startTransition(async () => {
       try {
-        await updateWabaTemplateAction(dialog.template.id, data);
-        toast.success("Local template record updated.");
-        setDialog(null);
+        if (editing) await updateTemplateLibraryEntryAction(editing.id, input);
+        else await createTemplateLibraryEntryAction(input);
+        toast.success(editing ? "Library template updated." : "Library template created.");
+        setDialogOpen(false);
         await refresh();
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Unable to update template.");
+        toast.error(error instanceof Error ? error.message : "Unable to save the library template.");
       }
     });
   };
 
-  const removeTemplate = () => {
-    if (!dialog || dialog.kind !== "delete") return;
-    const template = dialog.template;
+  const remove = () => {
+    if (!deleting) return;
     startTransition(async () => {
       try {
-        await deleteWabaTemplateAction(template.id);
-        toast.success(`Template “${template.name}” deleted.`);
-        setDialog(null);
+        await deleteTemplateLibraryEntryAction(deleting.id);
+        toast.success("Library template deleted.");
+        setDeleting(null);
         await refresh();
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Unable to delete template.");
+        toast.error(error instanceof Error ? error.message : "Unable to delete the library template.");
       }
     });
-  };
-
-  const syncTemplates = async () => {
-    setSyncing(true);
-    try {
-      await synchronizeMeta();
-      toast.success("WhatsApp templates synchronized.");
-      await refresh();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unable to synchronize templates.");
-    } finally {
-      setSyncing(false);
-    }
   };
 
   return (
@@ -111,28 +130,27 @@ export default function TabTemplates() {
       <Card>
         <CardHeader>
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-            <div><CardTitle>Message Templates</CardTitle><CardDescription>Manage WhatsApp templates and sync their status with Meta Cloud API.</CardDescription></div>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="outline" onClick={syncTemplates} disabled={syncing}><RefreshCwIcon className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />Sync from Meta</Button>
-              <Button onClick={() => setDialog({ kind: "create" })}><PlusIcon className="h-4 w-4" />New Template</Button>
+            <div>
+              <CardTitle>Template creation library</CardTitle>
+              <CardDescription>Curate reusable WhatsApp template JSON for businesses. Mark entries as defaults for restricted plans; plans with customization enabled can edit components for an individual submission.</CardDescription>
             </div>
+            <Button onClick={openCreate}><PlusIcon className="h-4 w-4" />Add library template</Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="relative mb-4"><SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input placeholder="Search templates..." value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} className="pl-10" /></div>
-          {templates === null ? <Loader /> : templates.length === 0 ? <p className="rounded-md border p-8 text-center text-sm text-muted-foreground">No templates yet. Create a template to submit it to WhatsApp for review.</p> : filtered.length === 0 ? <p className="rounded-md border p-8 text-center text-sm text-muted-foreground">No templates match your search.</p> : (
+          {entries === null ? <Loader /> : entries.length === 0 ? (
+            <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">The library is empty. Add a template blueprint to make it available in Settings.</div>
+          ) : (
             <div className="overflow-x-auto rounded-md border">
               <table className="w-full">
-                <thead><tr className="border-b bg-muted/50 text-left text-sm"><th className="px-4 py-3">Template name</th><th className="px-4 py-3">Category</th><th className="px-4 py-3">Language</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Last updated</th><th className="px-4 py-3 text-right">Actions</th></tr></thead>
-                <tbody>{filtered.map((template) => <tr key={template.id} className="border-b last:border-0 hover:bg-muted/30">
-                  <td className="px-4 py-3 text-sm font-medium">{template.name}</td><td className="px-4 py-3"><Badge variant="outline">{template.category}</Badge></td><td className="px-4 py-3 text-sm">{template.language}</td>
-                  <td className="px-4 py-3"><Badge variant={template.status === TemplateApprovalStatus.APPROVED ? "default" : template.status === TemplateApprovalStatus.REJECTED ? "destructive" : "secondary"}>{statusIcon[template.status]}{template.status}</Badge></td>
-                  <td className="px-4 py-3 text-sm">{template.updatedAt.toLocaleDateString()}</td>
-                  <td className="px-4 py-3"><div className="flex justify-end gap-1">
-                    <Button variant="ghost" size="icon" aria-label={`View ${template.name}`} title="View" onClick={() => setDialog({ kind: "view", template })}><EyeIcon /></Button>
-                    <Button variant="ghost" size="icon" aria-label={`Edit ${template.name}`} title="Edit local record" onClick={() => setDialog({ kind: "edit", template })}><EditIcon /></Button>
-                    <Button variant="ghost" size="icon" aria-label={`Delete ${template.name}`} title="Delete" onClick={() => setDialog({ kind: "delete", template })}><Trash2Icon /></Button>
-                  </div></td>
+                <thead><tr className="border-b bg-muted/50 text-left text-sm"><th className="px-4 py-3">Name</th><th className="px-4 py-3">Key</th><th className="px-4 py-3">Category</th><th className="px-4 py-3">Availability</th><th className="px-4 py-3">Status</th><th className="px-4 py-3 text-right">Actions</th></tr></thead>
+                <tbody>{entries.map((entry) => <tr key={entry.id} className="border-b last:border-0">
+                  <td className="px-4 py-3"><p className="font-medium">{entry.name}</p>{entry.description && <p className="text-xs text-muted-foreground">{entry.description}</p>}</td>
+                  <td className="px-4 py-3 font-mono text-xs">{entry.key}</td>
+                  <td className="px-4 py-3"><Badge variant="outline">{entry.category}</Badge></td>
+                  <td className="px-4 py-3"><Badge variant={entry.isDefault ? "secondary" : "outline"}>{entry.isDefault ? "Default plans" : "Customization plans"}</Badge></td>
+                  <td className="px-4 py-3"><Badge variant={entry.isActive ? "default" : "secondary"}>{entry.isActive ? "Active" : "Archived"}</Badge></td>
+                  <td className="px-4 py-3"><div className="flex justify-end gap-1"><Button variant="ghost" size="icon" aria-label={`Edit ${entry.name}`} onClick={() => openEdit(entry)}><EditIcon /></Button><Button variant="ghost" size="icon" aria-label={`Delete ${entry.name}`} onClick={() => setDeleting(entry)}><Trash2Icon /></Button></div></td>
                 </tr>)}</tbody>
               </table>
             </div>
@@ -140,46 +158,27 @@ export default function TabTemplates() {
         </CardContent>
       </Card>
 
-      <Dialog open={dialog?.kind === "create"} onOpenChange={(open) => !open && setDialog(null)}>
-        <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
-          <DialogHeader><DialogTitle>Create WhatsApp template</DialogTitle><DialogDescription>Build and submit a template for Meta approval.</DialogDescription></DialogHeader>
-          <TemplateForm onCreated={() => { setDialog(null); void refresh(); }} />
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+          <DialogHeader><DialogTitle>{editing ? "Edit library template" : "Add library template"}</DialogTitle><DialogDescription>Use Meta template component JSON. Users get a copy of this blueprint when they create a template.</DialogDescription></DialogHeader>
+          <form onSubmit={save} className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2"><Label htmlFor="library-key">Template key</Label><Input id="library-key" value={draft.key} onChange={(event) => setDraft({ ...draft, key: event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "_") })} placeholder="appointment_reminder" required maxLength={128} /></div>
+              <div className="space-y-2"><Label htmlFor="library-name">Display name</Label><Input id="library-name" value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} required maxLength={120} /></div>
+            </div>
+            <div className="space-y-2"><Label htmlFor="library-description">Description</Label><Input id="library-description" value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} maxLength={500} /></div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2"><Label>Category</Label><Select value={draft.category} onValueChange={(category) => setDraft({ ...draft, category: category as TemplateCategory })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{Object.values(TemplateCategory).map((category) => <SelectItem key={category} value={category}>{category}</SelectItem>)}</SelectContent></Select></div>
+              <div className="space-y-2"><Label>Language</Label><Select value={draft.language} onValueChange={(language) => setDraft({ ...draft, language: language as TemplateLanguage })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{Object.values(TemplateLanguage).map((language) => <SelectItem key={language} value={language}>{language}</SelectItem>)}</SelectContent></Select></div>
+            </div>
+            <div className="space-y-2"><Label htmlFor="library-components">Components JSON</Label><Textarea id="library-components" value={draft.components} onChange={(event) => setDraft({ ...draft, components: event.target.value })} rows={14} className="font-mono text-xs" required /><p className="text-xs text-muted-foreground">For variable text, use Meta placeholders such as {'{{1}}'} and provide matching examples in the BODY component.</p></div>
+            <div className="flex flex-wrap gap-5 text-sm"><label className="flex items-center gap-2"><input type="checkbox" checked={draft.isDefault} onChange={(event) => setDraft({ ...draft, isDefault: event.target.checked })} />Available on default plans</label><label className="flex items-center gap-2"><input type="checkbox" checked={draft.isActive} onChange={(event) => setDraft({ ...draft, isActive: event.target.checked })} />Available to users</label></div>
+            <DialogFooter><Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button><Button type="submit" disabled={isPending}>{isPending ? "Saving…" : editing ? "Save changes" : "Create blueprint"}</Button></DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={dialog?.kind === "view"} onOpenChange={(open) => !open && setDialog(null)}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto">
-          {dialog?.kind === "view" && <><DialogHeader><DialogTitle>{dialog.template.name}</DialogTitle><DialogDescription>WhatsApp template details</DialogDescription></DialogHeader>
-            <div className="grid grid-cols-2 gap-4 text-sm"><div><Label>Category</Label><p className="mt-1">{dialog.template.category}</p></div><div><Label>Language</Label><p className="mt-1">{dialog.template.language}</p></div><div><Label>Status</Label><p className="mt-1">{dialog.template.status}</p></div><div><Label>Updated</Label><p className="mt-1">{dialog.template.updatedAt.toLocaleString()}</p></div></div>
-            {dialog.template.rejectedReason && <div><Label>Meta feedback</Label><p className="mt-1 text-sm text-destructive">{dialog.template.rejectedReason}</p></div>}
-            <div><Label>Components</Label><pre className="mt-1 max-h-72 overflow-auto rounded-md bg-muted p-3 text-xs">{JSON.stringify(dialog.template.components, null, 2)}</pre></div>
-          </>}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={dialog?.kind === "edit"} onOpenChange={(open) => !open && setDialog(null)}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
-          {dialog?.kind === "edit" && <><DialogHeader><DialogTitle>Edit local template record</DialogTitle><DialogDescription>Meta does not support editing a submitted template in place. These changes update Loci’s local record only; create a new template to change what WhatsApp sends.</DialogDescription></DialogHeader>
-            <form onSubmit={saveEdit} className="space-y-4">
-              <div className="space-y-2"><Label htmlFor="template-name">Name</Label><Input id="template-name" name="name" defaultValue={dialog.template.name} required maxLength={512} /></div>
-              <div className="grid grid-cols-2 gap-4"><div className="space-y-2"><Label>Category</Label><Select name="category" defaultValue={dialog.template.category}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{Object.values(TemplateCategory).map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent></Select></div>
-                <div className="space-y-2"><Label>Language</Label><Select name="language" defaultValue={dialog.template.language}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{Object.values(TemplateLanguage).map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent></Select></div></div>
-              <div className="space-y-2"><Label htmlFor="template-components">Components (JSON)</Label><Textarea id="template-components" name="components" defaultValue={JSON.stringify(dialog.template.components, null, 2)} rows={10} className="font-mono text-xs" required /></div>
-              <DialogFooter><Button type="button" variant="outline" onClick={() => setDialog(null)}>Cancel</Button><Button type="submit" disabled={isPending}>{isPending ? "Saving…" : "Save local changes"}</Button></DialogFooter>
-            </form>
-          </>}
-        </DialogContent>
-      </Dialog>
-
-      <ConfirmActionDialog
-        open={dialog?.kind === "delete"}
-        onOpenChange={(open) => !open && setDialog(null)}
-        title="Delete template?"
-        description={dialog?.kind === "delete" ? `This will remove “${dialog.template.name}” from Loci. WhatsApp templates are not deleted from Meta, and templates used by scheduled campaigns cannot be removed.` : ""}
-        confirmLabel="Delete template"
-        pending={isPending}
-        onConfirm={removeTemplate}
-      />
+      <ConfirmActionDialog open={Boolean(deleting)} onOpenChange={(open) => !open && setDeleting(null)} title="Delete library template?" description={deleting ? `“${deleting.name}” will no longer be available for new submissions. Templates already created by users are not affected.` : ""} confirmLabel="Delete blueprint" pending={isPending} onConfirm={remove} />
     </TabsContent>
   );
 }

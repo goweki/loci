@@ -49,6 +49,11 @@ export type WabaAccount = $Result.DefaultSelection<Prisma.$WabaAccountPayload>
  */
 export type WabaTemplate = $Result.DefaultSelection<Prisma.$WabaTemplatePayload>
 /**
+ * Model TemplateLibraryEntry
+ * Admin-curated templates users can instantiate for their own WABA.
+ */
+export type TemplateLibraryEntry = $Result.DefaultSelection<Prisma.$TemplateLibraryEntryPayload>
+/**
  * Model WhatsAppCampaign
  * 
  */
@@ -818,6 +823,16 @@ export class PrismaClient<
   get wabaTemplate(): Prisma.WabaTemplateDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.templateLibraryEntry`: Exposes CRUD operations for the **TemplateLibraryEntry** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TemplateLibraryEntries
+    * const templateLibraryEntries = await prisma.templateLibraryEntry.findMany()
+    * ```
+    */
+  get templateLibraryEntry(): Prisma.TemplateLibraryEntryDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.whatsAppCampaign`: Exposes CRUD operations for the **WhatsAppCampaign** model.
     * Example usage:
     * ```ts
@@ -1530,6 +1545,7 @@ export namespace Prisma {
     SubscriptionPayment: 'SubscriptionPayment',
     WabaAccount: 'WabaAccount',
     WabaTemplate: 'WabaTemplate',
+    TemplateLibraryEntry: 'TemplateLibraryEntry',
     WhatsAppCampaign: 'WhatsAppCampaign',
     WhatsAppCampaignRecipient: 'WhatsAppCampaignRecipient',
     Payment: 'Payment',
@@ -1571,7 +1587,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "token" | "plan" | "subscription" | "subscriptionPayment" | "wabaAccount" | "wabaTemplate" | "whatsAppCampaign" | "whatsAppCampaignRecipient" | "payment" | "feature" | "planFeature" | "phoneNumber" | "contact" | "message" | "messageUnprocessed" | "autoReplyRule" | "webhookEvent" | "product" | "inventoryAdjustment" | "order" | "orderItem" | "orderPayout" | "ledgerTransaction" | "ledgerEntry" | "invoice" | "chatbotConfig" | "agentRun" | "agentToolCall" | "messageQuota" | "chatbotConversation" | "promptTemplate" | "contactUs"
+      modelProps: "user" | "token" | "plan" | "subscription" | "subscriptionPayment" | "wabaAccount" | "wabaTemplate" | "templateLibraryEntry" | "whatsAppCampaign" | "whatsAppCampaignRecipient" | "payment" | "feature" | "planFeature" | "phoneNumber" | "contact" | "message" | "messageUnprocessed" | "autoReplyRule" | "webhookEvent" | "product" | "inventoryAdjustment" | "order" | "orderItem" | "orderPayout" | "ledgerTransaction" | "ledgerEntry" | "invoice" | "chatbotConfig" | "agentRun" | "agentToolCall" | "messageQuota" | "chatbotConversation" | "promptTemplate" | "contactUs"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2090,6 +2106,80 @@ export namespace Prisma {
           count: {
             args: Prisma.WabaTemplateCountArgs<ExtArgs>
             result: $Utils.Optional<WabaTemplateCountAggregateOutputType> | number
+          }
+        }
+      }
+      TemplateLibraryEntry: {
+        payload: Prisma.$TemplateLibraryEntryPayload<ExtArgs>
+        fields: Prisma.TemplateLibraryEntryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TemplateLibraryEntryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateLibraryEntryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TemplateLibraryEntryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateLibraryEntryPayload>
+          }
+          findFirst: {
+            args: Prisma.TemplateLibraryEntryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateLibraryEntryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TemplateLibraryEntryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateLibraryEntryPayload>
+          }
+          findMany: {
+            args: Prisma.TemplateLibraryEntryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateLibraryEntryPayload>[]
+          }
+          create: {
+            args: Prisma.TemplateLibraryEntryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateLibraryEntryPayload>
+          }
+          createMany: {
+            args: Prisma.TemplateLibraryEntryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TemplateLibraryEntryCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateLibraryEntryPayload>[]
+          }
+          delete: {
+            args: Prisma.TemplateLibraryEntryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateLibraryEntryPayload>
+          }
+          update: {
+            args: Prisma.TemplateLibraryEntryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateLibraryEntryPayload>
+          }
+          deleteMany: {
+            args: Prisma.TemplateLibraryEntryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TemplateLibraryEntryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TemplateLibraryEntryUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateLibraryEntryPayload>[]
+          }
+          upsert: {
+            args: Prisma.TemplateLibraryEntryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateLibraryEntryPayload>
+          }
+          aggregate: {
+            args: Prisma.TemplateLibraryEntryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTemplateLibraryEntry>
+          }
+          groupBy: {
+            args: Prisma.TemplateLibraryEntryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TemplateLibraryEntryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TemplateLibraryEntryCountArgs<ExtArgs>
+            result: $Utils.Optional<TemplateLibraryEntryCountAggregateOutputType> | number
           }
         }
       }
@@ -4147,6 +4237,7 @@ export namespace Prisma {
     subscriptionPayment?: SubscriptionPaymentOmit
     wabaAccount?: WabaAccountOmit
     wabaTemplate?: WabaTemplateOmit
+    templateLibraryEntry?: TemplateLibraryEntryOmit
     whatsAppCampaign?: WhatsAppCampaignOmit
     whatsAppCampaignRecipient?: WhatsAppCampaignRecipientOmit
     payment?: PaymentOmit
@@ -7706,12 +7797,14 @@ export namespace Prisma {
     monthlyPrice: number | null
     maxPhoneNumbers: number | null
     maxMessagesPerMonth: number | null
+    maxTemplates: number | null
   }
 
   export type PlanSumAggregateOutputType = {
     monthlyPrice: number | null
     maxPhoneNumbers: number | null
     maxMessagesPerMonth: number | null
+    maxTemplates: number | null
   }
 
   export type PlanMinAggregateOutputType = {
@@ -7721,6 +7814,7 @@ export namespace Prisma {
     monthlyPrice: number | null
     maxPhoneNumbers: number | null
     maxMessagesPerMonth: number | null
+    maxTemplates: number | null
     active: boolean | null
     popular: boolean | null
     createdAt: Date | null
@@ -7734,6 +7828,7 @@ export namespace Prisma {
     monthlyPrice: number | null
     maxPhoneNumbers: number | null
     maxMessagesPerMonth: number | null
+    maxTemplates: number | null
     active: boolean | null
     popular: boolean | null
     createdAt: Date | null
@@ -7747,6 +7842,7 @@ export namespace Prisma {
     monthlyPrice: number
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
+    maxTemplates: number
     active: number
     popular: number
     createdAt: number
@@ -7759,12 +7855,14 @@ export namespace Prisma {
     monthlyPrice?: true
     maxPhoneNumbers?: true
     maxMessagesPerMonth?: true
+    maxTemplates?: true
   }
 
   export type PlanSumAggregateInputType = {
     monthlyPrice?: true
     maxPhoneNumbers?: true
     maxMessagesPerMonth?: true
+    maxTemplates?: true
   }
 
   export type PlanMinAggregateInputType = {
@@ -7774,6 +7872,7 @@ export namespace Prisma {
     monthlyPrice?: true
     maxPhoneNumbers?: true
     maxMessagesPerMonth?: true
+    maxTemplates?: true
     active?: true
     popular?: true
     createdAt?: true
@@ -7787,6 +7886,7 @@ export namespace Prisma {
     monthlyPrice?: true
     maxPhoneNumbers?: true
     maxMessagesPerMonth?: true
+    maxTemplates?: true
     active?: true
     popular?: true
     createdAt?: true
@@ -7800,6 +7900,7 @@ export namespace Prisma {
     monthlyPrice?: true
     maxPhoneNumbers?: true
     maxMessagesPerMonth?: true
+    maxTemplates?: true
     active?: true
     popular?: true
     createdAt?: true
@@ -7900,6 +8001,7 @@ export namespace Prisma {
     monthlyPrice: number
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
+    maxTemplates: number
     active: boolean
     popular: boolean
     createdAt: Date
@@ -7932,6 +8034,7 @@ export namespace Prisma {
     monthlyPrice?: boolean
     maxPhoneNumbers?: boolean
     maxMessagesPerMonth?: boolean
+    maxTemplates?: boolean
     active?: boolean
     popular?: boolean
     createdAt?: boolean
@@ -7948,6 +8051,7 @@ export namespace Prisma {
     monthlyPrice?: boolean
     maxPhoneNumbers?: boolean
     maxMessagesPerMonth?: boolean
+    maxTemplates?: boolean
     active?: boolean
     popular?: boolean
     createdAt?: boolean
@@ -7961,6 +8065,7 @@ export namespace Prisma {
     monthlyPrice?: boolean
     maxPhoneNumbers?: boolean
     maxMessagesPerMonth?: boolean
+    maxTemplates?: boolean
     active?: boolean
     popular?: boolean
     createdAt?: boolean
@@ -7974,13 +8079,14 @@ export namespace Prisma {
     monthlyPrice?: boolean
     maxPhoneNumbers?: boolean
     maxMessagesPerMonth?: boolean
+    maxTemplates?: boolean
     active?: boolean
     popular?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PlanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "monthlyPrice" | "maxPhoneNumbers" | "maxMessagesPerMonth" | "active" | "popular" | "createdAt" | "updatedAt", ExtArgs["result"]["plan"]>
+  export type PlanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "monthlyPrice" | "maxPhoneNumbers" | "maxMessagesPerMonth" | "maxTemplates" | "active" | "popular" | "createdAt" | "updatedAt", ExtArgs["result"]["plan"]>
   export type PlanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     subscriptions?: boolean | Plan$subscriptionsArgs<ExtArgs>
     planFeatures?: boolean | Plan$planFeaturesArgs<ExtArgs>
@@ -8002,6 +8108,7 @@ export namespace Prisma {
       monthlyPrice: number
       maxPhoneNumbers: number
       maxMessagesPerMonth: number
+      maxTemplates: number
       active: boolean
       popular: boolean
       createdAt: Date
@@ -8437,6 +8544,7 @@ export namespace Prisma {
     readonly monthlyPrice: FieldRef<"Plan", 'Int'>
     readonly maxPhoneNumbers: FieldRef<"Plan", 'Int'>
     readonly maxMessagesPerMonth: FieldRef<"Plan", 'Int'>
+    readonly maxTemplates: FieldRef<"Plan", 'Int'>
     readonly active: FieldRef<"Plan", 'Boolean'>
     readonly popular: FieldRef<"Plan", 'Boolean'>
     readonly createdAt: FieldRef<"Plan", 'DateTime'>
@@ -13650,6 +13758,1080 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: WabaTemplateInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TemplateLibraryEntry
+   */
+
+  export type AggregateTemplateLibraryEntry = {
+    _count: TemplateLibraryEntryCountAggregateOutputType | null
+    _min: TemplateLibraryEntryMinAggregateOutputType | null
+    _max: TemplateLibraryEntryMaxAggregateOutputType | null
+  }
+
+  export type TemplateLibraryEntryMinAggregateOutputType = {
+    id: string | null
+    key: string | null
+    name: string | null
+    description: string | null
+    category: $Enums.TemplateCategory | null
+    language: $Enums.TemplateLanguage | null
+    isDefault: boolean | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TemplateLibraryEntryMaxAggregateOutputType = {
+    id: string | null
+    key: string | null
+    name: string | null
+    description: string | null
+    category: $Enums.TemplateCategory | null
+    language: $Enums.TemplateLanguage | null
+    isDefault: boolean | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TemplateLibraryEntryCountAggregateOutputType = {
+    id: number
+    key: number
+    name: number
+    description: number
+    category: number
+    language: number
+    components: number
+    isDefault: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type TemplateLibraryEntryMinAggregateInputType = {
+    id?: true
+    key?: true
+    name?: true
+    description?: true
+    category?: true
+    language?: true
+    isDefault?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TemplateLibraryEntryMaxAggregateInputType = {
+    id?: true
+    key?: true
+    name?: true
+    description?: true
+    category?: true
+    language?: true
+    isDefault?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TemplateLibraryEntryCountAggregateInputType = {
+    id?: true
+    key?: true
+    name?: true
+    description?: true
+    category?: true
+    language?: true
+    components?: true
+    isDefault?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type TemplateLibraryEntryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TemplateLibraryEntry to aggregate.
+     */
+    where?: TemplateLibraryEntryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TemplateLibraryEntries to fetch.
+     */
+    orderBy?: TemplateLibraryEntryOrderByWithRelationInput | TemplateLibraryEntryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TemplateLibraryEntryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TemplateLibraryEntries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TemplateLibraryEntries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TemplateLibraryEntries
+    **/
+    _count?: true | TemplateLibraryEntryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TemplateLibraryEntryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TemplateLibraryEntryMaxAggregateInputType
+  }
+
+  export type GetTemplateLibraryEntryAggregateType<T extends TemplateLibraryEntryAggregateArgs> = {
+        [P in keyof T & keyof AggregateTemplateLibraryEntry]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTemplateLibraryEntry[P]>
+      : GetScalarType<T[P], AggregateTemplateLibraryEntry[P]>
+  }
+
+
+
+
+  export type TemplateLibraryEntryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TemplateLibraryEntryWhereInput
+    orderBy?: TemplateLibraryEntryOrderByWithAggregationInput | TemplateLibraryEntryOrderByWithAggregationInput[]
+    by: TemplateLibraryEntryScalarFieldEnum[] | TemplateLibraryEntryScalarFieldEnum
+    having?: TemplateLibraryEntryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TemplateLibraryEntryCountAggregateInputType | true
+    _min?: TemplateLibraryEntryMinAggregateInputType
+    _max?: TemplateLibraryEntryMaxAggregateInputType
+  }
+
+  export type TemplateLibraryEntryGroupByOutputType = {
+    id: string
+    key: string
+    name: string
+    description: string | null
+    category: $Enums.TemplateCategory
+    language: $Enums.TemplateLanguage
+    components: JsonValue
+    isDefault: boolean
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: TemplateLibraryEntryCountAggregateOutputType | null
+    _min: TemplateLibraryEntryMinAggregateOutputType | null
+    _max: TemplateLibraryEntryMaxAggregateOutputType | null
+  }
+
+  type GetTemplateLibraryEntryGroupByPayload<T extends TemplateLibraryEntryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TemplateLibraryEntryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TemplateLibraryEntryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TemplateLibraryEntryGroupByOutputType[P]>
+            : GetScalarType<T[P], TemplateLibraryEntryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TemplateLibraryEntrySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    key?: boolean
+    name?: boolean
+    description?: boolean
+    category?: boolean
+    language?: boolean
+    components?: boolean
+    isDefault?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["templateLibraryEntry"]>
+
+  export type TemplateLibraryEntrySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    key?: boolean
+    name?: boolean
+    description?: boolean
+    category?: boolean
+    language?: boolean
+    components?: boolean
+    isDefault?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["templateLibraryEntry"]>
+
+  export type TemplateLibraryEntrySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    key?: boolean
+    name?: boolean
+    description?: boolean
+    category?: boolean
+    language?: boolean
+    components?: boolean
+    isDefault?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["templateLibraryEntry"]>
+
+  export type TemplateLibraryEntrySelectScalar = {
+    id?: boolean
+    key?: boolean
+    name?: boolean
+    description?: boolean
+    category?: boolean
+    language?: boolean
+    components?: boolean
+    isDefault?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type TemplateLibraryEntryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "key" | "name" | "description" | "category" | "language" | "components" | "isDefault" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["templateLibraryEntry"]>
+
+  export type $TemplateLibraryEntryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TemplateLibraryEntry"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      key: string
+      name: string
+      description: string | null
+      category: $Enums.TemplateCategory
+      language: $Enums.TemplateLanguage
+      components: Prisma.JsonValue
+      isDefault: boolean
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["templateLibraryEntry"]>
+    composites: {}
+  }
+
+  type TemplateLibraryEntryGetPayload<S extends boolean | null | undefined | TemplateLibraryEntryDefaultArgs> = $Result.GetResult<Prisma.$TemplateLibraryEntryPayload, S>
+
+  type TemplateLibraryEntryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TemplateLibraryEntryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TemplateLibraryEntryCountAggregateInputType | true
+    }
+
+  export interface TemplateLibraryEntryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TemplateLibraryEntry'], meta: { name: 'TemplateLibraryEntry' } }
+    /**
+     * Find zero or one TemplateLibraryEntry that matches the filter.
+     * @param {TemplateLibraryEntryFindUniqueArgs} args - Arguments to find a TemplateLibraryEntry
+     * @example
+     * // Get one TemplateLibraryEntry
+     * const templateLibraryEntry = await prisma.templateLibraryEntry.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TemplateLibraryEntryFindUniqueArgs>(args: SelectSubset<T, TemplateLibraryEntryFindUniqueArgs<ExtArgs>>): Prisma__TemplateLibraryEntryClient<$Result.GetResult<Prisma.$TemplateLibraryEntryPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TemplateLibraryEntry that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TemplateLibraryEntryFindUniqueOrThrowArgs} args - Arguments to find a TemplateLibraryEntry
+     * @example
+     * // Get one TemplateLibraryEntry
+     * const templateLibraryEntry = await prisma.templateLibraryEntry.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TemplateLibraryEntryFindUniqueOrThrowArgs>(args: SelectSubset<T, TemplateLibraryEntryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TemplateLibraryEntryClient<$Result.GetResult<Prisma.$TemplateLibraryEntryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TemplateLibraryEntry that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateLibraryEntryFindFirstArgs} args - Arguments to find a TemplateLibraryEntry
+     * @example
+     * // Get one TemplateLibraryEntry
+     * const templateLibraryEntry = await prisma.templateLibraryEntry.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TemplateLibraryEntryFindFirstArgs>(args?: SelectSubset<T, TemplateLibraryEntryFindFirstArgs<ExtArgs>>): Prisma__TemplateLibraryEntryClient<$Result.GetResult<Prisma.$TemplateLibraryEntryPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TemplateLibraryEntry that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateLibraryEntryFindFirstOrThrowArgs} args - Arguments to find a TemplateLibraryEntry
+     * @example
+     * // Get one TemplateLibraryEntry
+     * const templateLibraryEntry = await prisma.templateLibraryEntry.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TemplateLibraryEntryFindFirstOrThrowArgs>(args?: SelectSubset<T, TemplateLibraryEntryFindFirstOrThrowArgs<ExtArgs>>): Prisma__TemplateLibraryEntryClient<$Result.GetResult<Prisma.$TemplateLibraryEntryPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TemplateLibraryEntries that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateLibraryEntryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TemplateLibraryEntries
+     * const templateLibraryEntries = await prisma.templateLibraryEntry.findMany()
+     * 
+     * // Get first 10 TemplateLibraryEntries
+     * const templateLibraryEntries = await prisma.templateLibraryEntry.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const templateLibraryEntryWithIdOnly = await prisma.templateLibraryEntry.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TemplateLibraryEntryFindManyArgs>(args?: SelectSubset<T, TemplateLibraryEntryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TemplateLibraryEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TemplateLibraryEntry.
+     * @param {TemplateLibraryEntryCreateArgs} args - Arguments to create a TemplateLibraryEntry.
+     * @example
+     * // Create one TemplateLibraryEntry
+     * const TemplateLibraryEntry = await prisma.templateLibraryEntry.create({
+     *   data: {
+     *     // ... data to create a TemplateLibraryEntry
+     *   }
+     * })
+     * 
+     */
+    create<T extends TemplateLibraryEntryCreateArgs>(args: SelectSubset<T, TemplateLibraryEntryCreateArgs<ExtArgs>>): Prisma__TemplateLibraryEntryClient<$Result.GetResult<Prisma.$TemplateLibraryEntryPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TemplateLibraryEntries.
+     * @param {TemplateLibraryEntryCreateManyArgs} args - Arguments to create many TemplateLibraryEntries.
+     * @example
+     * // Create many TemplateLibraryEntries
+     * const templateLibraryEntry = await prisma.templateLibraryEntry.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TemplateLibraryEntryCreateManyArgs>(args?: SelectSubset<T, TemplateLibraryEntryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TemplateLibraryEntries and returns the data saved in the database.
+     * @param {TemplateLibraryEntryCreateManyAndReturnArgs} args - Arguments to create many TemplateLibraryEntries.
+     * @example
+     * // Create many TemplateLibraryEntries
+     * const templateLibraryEntry = await prisma.templateLibraryEntry.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TemplateLibraryEntries and only return the `id`
+     * const templateLibraryEntryWithIdOnly = await prisma.templateLibraryEntry.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TemplateLibraryEntryCreateManyAndReturnArgs>(args?: SelectSubset<T, TemplateLibraryEntryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TemplateLibraryEntryPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TemplateLibraryEntry.
+     * @param {TemplateLibraryEntryDeleteArgs} args - Arguments to delete one TemplateLibraryEntry.
+     * @example
+     * // Delete one TemplateLibraryEntry
+     * const TemplateLibraryEntry = await prisma.templateLibraryEntry.delete({
+     *   where: {
+     *     // ... filter to delete one TemplateLibraryEntry
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TemplateLibraryEntryDeleteArgs>(args: SelectSubset<T, TemplateLibraryEntryDeleteArgs<ExtArgs>>): Prisma__TemplateLibraryEntryClient<$Result.GetResult<Prisma.$TemplateLibraryEntryPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TemplateLibraryEntry.
+     * @param {TemplateLibraryEntryUpdateArgs} args - Arguments to update one TemplateLibraryEntry.
+     * @example
+     * // Update one TemplateLibraryEntry
+     * const templateLibraryEntry = await prisma.templateLibraryEntry.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TemplateLibraryEntryUpdateArgs>(args: SelectSubset<T, TemplateLibraryEntryUpdateArgs<ExtArgs>>): Prisma__TemplateLibraryEntryClient<$Result.GetResult<Prisma.$TemplateLibraryEntryPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TemplateLibraryEntries.
+     * @param {TemplateLibraryEntryDeleteManyArgs} args - Arguments to filter TemplateLibraryEntries to delete.
+     * @example
+     * // Delete a few TemplateLibraryEntries
+     * const { count } = await prisma.templateLibraryEntry.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TemplateLibraryEntryDeleteManyArgs>(args?: SelectSubset<T, TemplateLibraryEntryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TemplateLibraryEntries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateLibraryEntryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TemplateLibraryEntries
+     * const templateLibraryEntry = await prisma.templateLibraryEntry.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TemplateLibraryEntryUpdateManyArgs>(args: SelectSubset<T, TemplateLibraryEntryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TemplateLibraryEntries and returns the data updated in the database.
+     * @param {TemplateLibraryEntryUpdateManyAndReturnArgs} args - Arguments to update many TemplateLibraryEntries.
+     * @example
+     * // Update many TemplateLibraryEntries
+     * const templateLibraryEntry = await prisma.templateLibraryEntry.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TemplateLibraryEntries and only return the `id`
+     * const templateLibraryEntryWithIdOnly = await prisma.templateLibraryEntry.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TemplateLibraryEntryUpdateManyAndReturnArgs>(args: SelectSubset<T, TemplateLibraryEntryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TemplateLibraryEntryPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TemplateLibraryEntry.
+     * @param {TemplateLibraryEntryUpsertArgs} args - Arguments to update or create a TemplateLibraryEntry.
+     * @example
+     * // Update or create a TemplateLibraryEntry
+     * const templateLibraryEntry = await prisma.templateLibraryEntry.upsert({
+     *   create: {
+     *     // ... data to create a TemplateLibraryEntry
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TemplateLibraryEntry we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TemplateLibraryEntryUpsertArgs>(args: SelectSubset<T, TemplateLibraryEntryUpsertArgs<ExtArgs>>): Prisma__TemplateLibraryEntryClient<$Result.GetResult<Prisma.$TemplateLibraryEntryPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TemplateLibraryEntries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateLibraryEntryCountArgs} args - Arguments to filter TemplateLibraryEntries to count.
+     * @example
+     * // Count the number of TemplateLibraryEntries
+     * const count = await prisma.templateLibraryEntry.count({
+     *   where: {
+     *     // ... the filter for the TemplateLibraryEntries we want to count
+     *   }
+     * })
+    **/
+    count<T extends TemplateLibraryEntryCountArgs>(
+      args?: Subset<T, TemplateLibraryEntryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TemplateLibraryEntryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TemplateLibraryEntry.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateLibraryEntryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TemplateLibraryEntryAggregateArgs>(args: Subset<T, TemplateLibraryEntryAggregateArgs>): Prisma.PrismaPromise<GetTemplateLibraryEntryAggregateType<T>>
+
+    /**
+     * Group by TemplateLibraryEntry.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateLibraryEntryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TemplateLibraryEntryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TemplateLibraryEntryGroupByArgs['orderBy'] }
+        : { orderBy?: TemplateLibraryEntryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TemplateLibraryEntryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTemplateLibraryEntryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TemplateLibraryEntry model
+   */
+  readonly fields: TemplateLibraryEntryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TemplateLibraryEntry.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TemplateLibraryEntryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TemplateLibraryEntry model
+   */
+  interface TemplateLibraryEntryFieldRefs {
+    readonly id: FieldRef<"TemplateLibraryEntry", 'String'>
+    readonly key: FieldRef<"TemplateLibraryEntry", 'String'>
+    readonly name: FieldRef<"TemplateLibraryEntry", 'String'>
+    readonly description: FieldRef<"TemplateLibraryEntry", 'String'>
+    readonly category: FieldRef<"TemplateLibraryEntry", 'TemplateCategory'>
+    readonly language: FieldRef<"TemplateLibraryEntry", 'TemplateLanguage'>
+    readonly components: FieldRef<"TemplateLibraryEntry", 'Json'>
+    readonly isDefault: FieldRef<"TemplateLibraryEntry", 'Boolean'>
+    readonly isActive: FieldRef<"TemplateLibraryEntry", 'Boolean'>
+    readonly createdAt: FieldRef<"TemplateLibraryEntry", 'DateTime'>
+    readonly updatedAt: FieldRef<"TemplateLibraryEntry", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TemplateLibraryEntry findUnique
+   */
+  export type TemplateLibraryEntryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateLibraryEntry
+     */
+    select?: TemplateLibraryEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateLibraryEntry
+     */
+    omit?: TemplateLibraryEntryOmit<ExtArgs> | null
+    /**
+     * Filter, which TemplateLibraryEntry to fetch.
+     */
+    where: TemplateLibraryEntryWhereUniqueInput
+  }
+
+  /**
+   * TemplateLibraryEntry findUniqueOrThrow
+   */
+  export type TemplateLibraryEntryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateLibraryEntry
+     */
+    select?: TemplateLibraryEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateLibraryEntry
+     */
+    omit?: TemplateLibraryEntryOmit<ExtArgs> | null
+    /**
+     * Filter, which TemplateLibraryEntry to fetch.
+     */
+    where: TemplateLibraryEntryWhereUniqueInput
+  }
+
+  /**
+   * TemplateLibraryEntry findFirst
+   */
+  export type TemplateLibraryEntryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateLibraryEntry
+     */
+    select?: TemplateLibraryEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateLibraryEntry
+     */
+    omit?: TemplateLibraryEntryOmit<ExtArgs> | null
+    /**
+     * Filter, which TemplateLibraryEntry to fetch.
+     */
+    where?: TemplateLibraryEntryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TemplateLibraryEntries to fetch.
+     */
+    orderBy?: TemplateLibraryEntryOrderByWithRelationInput | TemplateLibraryEntryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TemplateLibraryEntries.
+     */
+    cursor?: TemplateLibraryEntryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TemplateLibraryEntries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TemplateLibraryEntries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TemplateLibraryEntries.
+     */
+    distinct?: TemplateLibraryEntryScalarFieldEnum | TemplateLibraryEntryScalarFieldEnum[]
+  }
+
+  /**
+   * TemplateLibraryEntry findFirstOrThrow
+   */
+  export type TemplateLibraryEntryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateLibraryEntry
+     */
+    select?: TemplateLibraryEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateLibraryEntry
+     */
+    omit?: TemplateLibraryEntryOmit<ExtArgs> | null
+    /**
+     * Filter, which TemplateLibraryEntry to fetch.
+     */
+    where?: TemplateLibraryEntryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TemplateLibraryEntries to fetch.
+     */
+    orderBy?: TemplateLibraryEntryOrderByWithRelationInput | TemplateLibraryEntryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TemplateLibraryEntries.
+     */
+    cursor?: TemplateLibraryEntryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TemplateLibraryEntries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TemplateLibraryEntries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TemplateLibraryEntries.
+     */
+    distinct?: TemplateLibraryEntryScalarFieldEnum | TemplateLibraryEntryScalarFieldEnum[]
+  }
+
+  /**
+   * TemplateLibraryEntry findMany
+   */
+  export type TemplateLibraryEntryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateLibraryEntry
+     */
+    select?: TemplateLibraryEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateLibraryEntry
+     */
+    omit?: TemplateLibraryEntryOmit<ExtArgs> | null
+    /**
+     * Filter, which TemplateLibraryEntries to fetch.
+     */
+    where?: TemplateLibraryEntryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TemplateLibraryEntries to fetch.
+     */
+    orderBy?: TemplateLibraryEntryOrderByWithRelationInput | TemplateLibraryEntryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TemplateLibraryEntries.
+     */
+    cursor?: TemplateLibraryEntryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TemplateLibraryEntries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TemplateLibraryEntries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TemplateLibraryEntries.
+     */
+    distinct?: TemplateLibraryEntryScalarFieldEnum | TemplateLibraryEntryScalarFieldEnum[]
+  }
+
+  /**
+   * TemplateLibraryEntry create
+   */
+  export type TemplateLibraryEntryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateLibraryEntry
+     */
+    select?: TemplateLibraryEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateLibraryEntry
+     */
+    omit?: TemplateLibraryEntryOmit<ExtArgs> | null
+    /**
+     * The data needed to create a TemplateLibraryEntry.
+     */
+    data: XOR<TemplateLibraryEntryCreateInput, TemplateLibraryEntryUncheckedCreateInput>
+  }
+
+  /**
+   * TemplateLibraryEntry createMany
+   */
+  export type TemplateLibraryEntryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TemplateLibraryEntries.
+     */
+    data: TemplateLibraryEntryCreateManyInput | TemplateLibraryEntryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TemplateLibraryEntry createManyAndReturn
+   */
+  export type TemplateLibraryEntryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateLibraryEntry
+     */
+    select?: TemplateLibraryEntrySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateLibraryEntry
+     */
+    omit?: TemplateLibraryEntryOmit<ExtArgs> | null
+    /**
+     * The data used to create many TemplateLibraryEntries.
+     */
+    data: TemplateLibraryEntryCreateManyInput | TemplateLibraryEntryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TemplateLibraryEntry update
+   */
+  export type TemplateLibraryEntryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateLibraryEntry
+     */
+    select?: TemplateLibraryEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateLibraryEntry
+     */
+    omit?: TemplateLibraryEntryOmit<ExtArgs> | null
+    /**
+     * The data needed to update a TemplateLibraryEntry.
+     */
+    data: XOR<TemplateLibraryEntryUpdateInput, TemplateLibraryEntryUncheckedUpdateInput>
+    /**
+     * Choose, which TemplateLibraryEntry to update.
+     */
+    where: TemplateLibraryEntryWhereUniqueInput
+  }
+
+  /**
+   * TemplateLibraryEntry updateMany
+   */
+  export type TemplateLibraryEntryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TemplateLibraryEntries.
+     */
+    data: XOR<TemplateLibraryEntryUpdateManyMutationInput, TemplateLibraryEntryUncheckedUpdateManyInput>
+    /**
+     * Filter which TemplateLibraryEntries to update
+     */
+    where?: TemplateLibraryEntryWhereInput
+    /**
+     * Limit how many TemplateLibraryEntries to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TemplateLibraryEntry updateManyAndReturn
+   */
+  export type TemplateLibraryEntryUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateLibraryEntry
+     */
+    select?: TemplateLibraryEntrySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateLibraryEntry
+     */
+    omit?: TemplateLibraryEntryOmit<ExtArgs> | null
+    /**
+     * The data used to update TemplateLibraryEntries.
+     */
+    data: XOR<TemplateLibraryEntryUpdateManyMutationInput, TemplateLibraryEntryUncheckedUpdateManyInput>
+    /**
+     * Filter which TemplateLibraryEntries to update
+     */
+    where?: TemplateLibraryEntryWhereInput
+    /**
+     * Limit how many TemplateLibraryEntries to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TemplateLibraryEntry upsert
+   */
+  export type TemplateLibraryEntryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateLibraryEntry
+     */
+    select?: TemplateLibraryEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateLibraryEntry
+     */
+    omit?: TemplateLibraryEntryOmit<ExtArgs> | null
+    /**
+     * The filter to search for the TemplateLibraryEntry to update in case it exists.
+     */
+    where: TemplateLibraryEntryWhereUniqueInput
+    /**
+     * In case the TemplateLibraryEntry found by the `where` argument doesn't exist, create a new TemplateLibraryEntry with this data.
+     */
+    create: XOR<TemplateLibraryEntryCreateInput, TemplateLibraryEntryUncheckedCreateInput>
+    /**
+     * In case the TemplateLibraryEntry was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TemplateLibraryEntryUpdateInput, TemplateLibraryEntryUncheckedUpdateInput>
+  }
+
+  /**
+   * TemplateLibraryEntry delete
+   */
+  export type TemplateLibraryEntryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateLibraryEntry
+     */
+    select?: TemplateLibraryEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateLibraryEntry
+     */
+    omit?: TemplateLibraryEntryOmit<ExtArgs> | null
+    /**
+     * Filter which TemplateLibraryEntry to delete.
+     */
+    where: TemplateLibraryEntryWhereUniqueInput
+  }
+
+  /**
+   * TemplateLibraryEntry deleteMany
+   */
+  export type TemplateLibraryEntryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TemplateLibraryEntries to delete
+     */
+    where?: TemplateLibraryEntryWhereInput
+    /**
+     * Limit how many TemplateLibraryEntries to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TemplateLibraryEntry without action
+   */
+  export type TemplateLibraryEntryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateLibraryEntry
+     */
+    select?: TemplateLibraryEntrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateLibraryEntry
+     */
+    omit?: TemplateLibraryEntryOmit<ExtArgs> | null
   }
 
 
@@ -44449,6 +45631,7 @@ export namespace Prisma {
     monthlyPrice: 'monthlyPrice',
     maxPhoneNumbers: 'maxPhoneNumbers',
     maxMessagesPerMonth: 'maxMessagesPerMonth',
+    maxTemplates: 'maxTemplates',
     active: 'active',
     popular: 'popular',
     createdAt: 'createdAt',
@@ -44523,6 +45706,23 @@ export namespace Prisma {
   };
 
   export type WabaTemplateScalarFieldEnum = (typeof WabaTemplateScalarFieldEnum)[keyof typeof WabaTemplateScalarFieldEnum]
+
+
+  export const TemplateLibraryEntryScalarFieldEnum: {
+    id: 'id',
+    key: 'key',
+    name: 'name',
+    description: 'description',
+    category: 'category',
+    language: 'language',
+    components: 'components',
+    isDefault: 'isDefault',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type TemplateLibraryEntryScalarFieldEnum = (typeof TemplateLibraryEntryScalarFieldEnum)[keyof typeof TemplateLibraryEntryScalarFieldEnum]
 
 
   export const WhatsAppCampaignScalarFieldEnum: {
@@ -45794,6 +46994,7 @@ export namespace Prisma {
     monthlyPrice?: IntFilter<"Plan"> | number
     maxPhoneNumbers?: IntFilter<"Plan"> | number
     maxMessagesPerMonth?: IntFilter<"Plan"> | number
+    maxTemplates?: IntFilter<"Plan"> | number
     active?: BoolFilter<"Plan"> | boolean
     popular?: BoolFilter<"Plan"> | boolean
     createdAt?: DateTimeFilter<"Plan"> | Date | string
@@ -45809,6 +47010,7 @@ export namespace Prisma {
     monthlyPrice?: SortOrder
     maxPhoneNumbers?: SortOrder
     maxMessagesPerMonth?: SortOrder
+    maxTemplates?: SortOrder
     active?: SortOrder
     popular?: SortOrder
     createdAt?: SortOrder
@@ -45827,6 +47029,7 @@ export namespace Prisma {
     monthlyPrice?: IntFilter<"Plan"> | number
     maxPhoneNumbers?: IntFilter<"Plan"> | number
     maxMessagesPerMonth?: IntFilter<"Plan"> | number
+    maxTemplates?: IntFilter<"Plan"> | number
     active?: BoolFilter<"Plan"> | boolean
     popular?: BoolFilter<"Plan"> | boolean
     createdAt?: DateTimeFilter<"Plan"> | Date | string
@@ -45842,6 +47045,7 @@ export namespace Prisma {
     monthlyPrice?: SortOrder
     maxPhoneNumbers?: SortOrder
     maxMessagesPerMonth?: SortOrder
+    maxTemplates?: SortOrder
     active?: SortOrder
     popular?: SortOrder
     createdAt?: SortOrder
@@ -45863,6 +47067,7 @@ export namespace Prisma {
     monthlyPrice?: IntWithAggregatesFilter<"Plan"> | number
     maxPhoneNumbers?: IntWithAggregatesFilter<"Plan"> | number
     maxMessagesPerMonth?: IntWithAggregatesFilter<"Plan"> | number
+    maxTemplates?: IntWithAggregatesFilter<"Plan"> | number
     active?: BoolWithAggregatesFilter<"Plan"> | boolean
     popular?: BoolWithAggregatesFilter<"Plan"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Plan"> | Date | string
@@ -46223,6 +47428,88 @@ export namespace Prisma {
     createdById?: StringNullableWithAggregatesFilter<"WabaTemplate"> | string | null
     createdAt?: DateTimeNullableWithAggregatesFilter<"WabaTemplate"> | Date | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"WabaTemplate"> | Date | string
+  }
+
+  export type TemplateLibraryEntryWhereInput = {
+    AND?: TemplateLibraryEntryWhereInput | TemplateLibraryEntryWhereInput[]
+    OR?: TemplateLibraryEntryWhereInput[]
+    NOT?: TemplateLibraryEntryWhereInput | TemplateLibraryEntryWhereInput[]
+    id?: StringFilter<"TemplateLibraryEntry"> | string
+    key?: StringFilter<"TemplateLibraryEntry"> | string
+    name?: StringFilter<"TemplateLibraryEntry"> | string
+    description?: StringNullableFilter<"TemplateLibraryEntry"> | string | null
+    category?: EnumTemplateCategoryFilter<"TemplateLibraryEntry"> | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFilter<"TemplateLibraryEntry"> | $Enums.TemplateLanguage
+    components?: JsonFilter<"TemplateLibraryEntry">
+    isDefault?: BoolFilter<"TemplateLibraryEntry"> | boolean
+    isActive?: BoolFilter<"TemplateLibraryEntry"> | boolean
+    createdAt?: DateTimeFilter<"TemplateLibraryEntry"> | Date | string
+    updatedAt?: DateTimeFilter<"TemplateLibraryEntry"> | Date | string
+  }
+
+  export type TemplateLibraryEntryOrderByWithRelationInput = {
+    id?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    category?: SortOrder
+    language?: SortOrder
+    components?: SortOrder
+    isDefault?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TemplateLibraryEntryWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    key?: string
+    AND?: TemplateLibraryEntryWhereInput | TemplateLibraryEntryWhereInput[]
+    OR?: TemplateLibraryEntryWhereInput[]
+    NOT?: TemplateLibraryEntryWhereInput | TemplateLibraryEntryWhereInput[]
+    name?: StringFilter<"TemplateLibraryEntry"> | string
+    description?: StringNullableFilter<"TemplateLibraryEntry"> | string | null
+    category?: EnumTemplateCategoryFilter<"TemplateLibraryEntry"> | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFilter<"TemplateLibraryEntry"> | $Enums.TemplateLanguage
+    components?: JsonFilter<"TemplateLibraryEntry">
+    isDefault?: BoolFilter<"TemplateLibraryEntry"> | boolean
+    isActive?: BoolFilter<"TemplateLibraryEntry"> | boolean
+    createdAt?: DateTimeFilter<"TemplateLibraryEntry"> | Date | string
+    updatedAt?: DateTimeFilter<"TemplateLibraryEntry"> | Date | string
+  }, "id" | "key">
+
+  export type TemplateLibraryEntryOrderByWithAggregationInput = {
+    id?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    category?: SortOrder
+    language?: SortOrder
+    components?: SortOrder
+    isDefault?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: TemplateLibraryEntryCountOrderByAggregateInput
+    _max?: TemplateLibraryEntryMaxOrderByAggregateInput
+    _min?: TemplateLibraryEntryMinOrderByAggregateInput
+  }
+
+  export type TemplateLibraryEntryScalarWhereWithAggregatesInput = {
+    AND?: TemplateLibraryEntryScalarWhereWithAggregatesInput | TemplateLibraryEntryScalarWhereWithAggregatesInput[]
+    OR?: TemplateLibraryEntryScalarWhereWithAggregatesInput[]
+    NOT?: TemplateLibraryEntryScalarWhereWithAggregatesInput | TemplateLibraryEntryScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TemplateLibraryEntry"> | string
+    key?: StringWithAggregatesFilter<"TemplateLibraryEntry"> | string
+    name?: StringWithAggregatesFilter<"TemplateLibraryEntry"> | string
+    description?: StringNullableWithAggregatesFilter<"TemplateLibraryEntry"> | string | null
+    category?: EnumTemplateCategoryWithAggregatesFilter<"TemplateLibraryEntry"> | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageWithAggregatesFilter<"TemplateLibraryEntry"> | $Enums.TemplateLanguage
+    components?: JsonWithAggregatesFilter<"TemplateLibraryEntry">
+    isDefault?: BoolWithAggregatesFilter<"TemplateLibraryEntry"> | boolean
+    isActive?: BoolWithAggregatesFilter<"TemplateLibraryEntry"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"TemplateLibraryEntry"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"TemplateLibraryEntry"> | Date | string
   }
 
   export type WhatsAppCampaignWhereInput = {
@@ -48803,6 +50090,7 @@ export namespace Prisma {
     monthlyPrice: number
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
+    maxTemplates?: number
     active?: boolean
     popular?: boolean
     createdAt?: Date | string
@@ -48818,6 +50106,7 @@ export namespace Prisma {
     monthlyPrice: number
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
+    maxTemplates?: number
     active?: boolean
     popular?: boolean
     createdAt?: Date | string
@@ -48833,6 +50122,7 @@ export namespace Prisma {
     monthlyPrice?: IntFieldUpdateOperationsInput | number
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
+    maxTemplates?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     popular?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -48848,6 +50138,7 @@ export namespace Prisma {
     monthlyPrice?: IntFieldUpdateOperationsInput | number
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
+    maxTemplates?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     popular?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -48863,6 +50154,7 @@ export namespace Prisma {
     monthlyPrice: number
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
+    maxTemplates?: number
     active?: boolean
     popular?: boolean
     createdAt?: Date | string
@@ -48876,6 +50168,7 @@ export namespace Prisma {
     monthlyPrice?: IntFieldUpdateOperationsInput | number
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
+    maxTemplates?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     popular?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -48889,6 +50182,7 @@ export namespace Prisma {
     monthlyPrice?: IntFieldUpdateOperationsInput | number
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
+    maxTemplates?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     popular?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -49287,6 +50581,104 @@ export namespace Prisma {
     wabaId?: StringFieldUpdateOperationsInput | string
     createdById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TemplateLibraryEntryCreateInput = {
+    id?: string
+    key: string
+    name: string
+    description?: string | null
+    category: $Enums.TemplateCategory
+    language?: $Enums.TemplateLanguage
+    components: JsonNullValueInput | InputJsonValue
+    isDefault?: boolean
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TemplateLibraryEntryUncheckedCreateInput = {
+    id?: string
+    key: string
+    name: string
+    description?: string | null
+    category: $Enums.TemplateCategory
+    language?: $Enums.TemplateLanguage
+    components: JsonNullValueInput | InputJsonValue
+    isDefault?: boolean
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TemplateLibraryEntryUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumTemplateCategoryFieldUpdateOperationsInput | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFieldUpdateOperationsInput | $Enums.TemplateLanguage
+    components?: JsonNullValueInput | InputJsonValue
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TemplateLibraryEntryUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumTemplateCategoryFieldUpdateOperationsInput | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFieldUpdateOperationsInput | $Enums.TemplateLanguage
+    components?: JsonNullValueInput | InputJsonValue
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TemplateLibraryEntryCreateManyInput = {
+    id?: string
+    key: string
+    name: string
+    description?: string | null
+    category: $Enums.TemplateCategory
+    language?: $Enums.TemplateLanguage
+    components: JsonNullValueInput | InputJsonValue
+    isDefault?: boolean
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TemplateLibraryEntryUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumTemplateCategoryFieldUpdateOperationsInput | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFieldUpdateOperationsInput | $Enums.TemplateLanguage
+    components?: JsonNullValueInput | InputJsonValue
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TemplateLibraryEntryUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumTemplateCategoryFieldUpdateOperationsInput | $Enums.TemplateCategory
+    language?: EnumTemplateLanguageFieldUpdateOperationsInput | $Enums.TemplateLanguage
+    components?: JsonNullValueInput | InputJsonValue
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -52326,6 +53718,7 @@ export namespace Prisma {
     monthlyPrice?: SortOrder
     maxPhoneNumbers?: SortOrder
     maxMessagesPerMonth?: SortOrder
+    maxTemplates?: SortOrder
     active?: SortOrder
     popular?: SortOrder
     createdAt?: SortOrder
@@ -52336,6 +53729,7 @@ export namespace Prisma {
     monthlyPrice?: SortOrder
     maxPhoneNumbers?: SortOrder
     maxMessagesPerMonth?: SortOrder
+    maxTemplates?: SortOrder
   }
 
   export type PlanMaxOrderByAggregateInput = {
@@ -52345,6 +53739,7 @@ export namespace Prisma {
     monthlyPrice?: SortOrder
     maxPhoneNumbers?: SortOrder
     maxMessagesPerMonth?: SortOrder
+    maxTemplates?: SortOrder
     active?: SortOrder
     popular?: SortOrder
     createdAt?: SortOrder
@@ -52358,6 +53753,7 @@ export namespace Prisma {
     monthlyPrice?: SortOrder
     maxPhoneNumbers?: SortOrder
     maxMessagesPerMonth?: SortOrder
+    maxTemplates?: SortOrder
     active?: SortOrder
     popular?: SortOrder
     createdAt?: SortOrder
@@ -52368,6 +53764,7 @@ export namespace Prisma {
     monthlyPrice?: SortOrder
     maxPhoneNumbers?: SortOrder
     maxMessagesPerMonth?: SortOrder
+    maxTemplates?: SortOrder
   }
 
   export type EnumPlanNameWithAggregatesFilter<$PrismaModel = never> = {
@@ -52839,6 +54236,46 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedJsonFilter<$PrismaModel>
     _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type TemplateLibraryEntryCountOrderByAggregateInput = {
+    id?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
+    language?: SortOrder
+    components?: SortOrder
+    isDefault?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TemplateLibraryEntryMaxOrderByAggregateInput = {
+    id?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
+    language?: SortOrder
+    isDefault?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TemplateLibraryEntryMinOrderByAggregateInput = {
+    id?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
+    language?: SortOrder
+    isDefault?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type StringNullableListFilter<$PrismaModel = never> = {
@@ -59688,6 +61125,7 @@ export namespace Prisma {
     monthlyPrice: number
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
+    maxTemplates?: number
     active?: boolean
     popular?: boolean
     createdAt?: Date | string
@@ -59702,6 +61140,7 @@ export namespace Prisma {
     monthlyPrice: number
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
+    maxTemplates?: number
     active?: boolean
     popular?: boolean
     createdAt?: Date | string
@@ -59845,6 +61284,7 @@ export namespace Prisma {
     monthlyPrice?: IntFieldUpdateOperationsInput | number
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
+    maxTemplates?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     popular?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -59859,6 +61299,7 @@ export namespace Prisma {
     monthlyPrice?: IntFieldUpdateOperationsInput | number
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
+    maxTemplates?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     popular?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -61275,6 +62716,7 @@ export namespace Prisma {
     monthlyPrice: number
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
+    maxTemplates?: number
     active?: boolean
     popular?: boolean
     createdAt?: Date | string
@@ -61289,6 +62731,7 @@ export namespace Prisma {
     monthlyPrice: number
     maxPhoneNumbers: number
     maxMessagesPerMonth: number
+    maxTemplates?: number
     active?: boolean
     popular?: boolean
     createdAt?: Date | string
@@ -61348,6 +62791,7 @@ export namespace Prisma {
     monthlyPrice?: IntFieldUpdateOperationsInput | number
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
+    maxTemplates?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     popular?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -61362,6 +62806,7 @@ export namespace Prisma {
     monthlyPrice?: IntFieldUpdateOperationsInput | number
     maxPhoneNumbers?: IntFieldUpdateOperationsInput | number
     maxMessagesPerMonth?: IntFieldUpdateOperationsInput | number
+    maxTemplates?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     popular?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

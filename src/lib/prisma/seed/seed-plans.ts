@@ -19,6 +19,7 @@ interface PlanSeedData {
   monthlyPrice: number;
   maxPhoneNumbers: number;
   maxMessagesPerMonth: number;
+  maxTemplates: number;
   popular: boolean;
   features: PlanFeatureItem[];
 }
@@ -64,6 +65,11 @@ const featuresData: FeatureSeedData[] = [
   {
     name: "WhatsApp Templates",
     description: "Access to WhatsApp templates",
+    useMetric: "BOOLEAN",
+  },
+  {
+    name: "Custom WhatsApp Templates",
+    description: "Customize curated template components before submission",
     useMetric: "BOOLEAN",
   },
   {
@@ -118,6 +124,7 @@ const plansData: PlanSeedData[] = [
     monthlyPrice: 2499,
     maxPhoneNumbers: 1,
     maxMessagesPerMonth: 1000,
+    maxTemplates: 3,
     popular: false,
 
     features: [
@@ -129,6 +136,7 @@ const plansData: PlanSeedData[] = [
 
       { name: "Payment Links", enabled: true },
       { name: "WhatsApp Templates", enabled: true },
+      { name: "Custom WhatsApp Templates", enabled: false },
       { name: "Bulk Messaging", enabled: false },
 
       { name: "Automation", enabled: false },
@@ -148,6 +156,7 @@ const plansData: PlanSeedData[] = [
     monthlyPrice: 9999,
     maxPhoneNumbers: 5,
     maxMessagesPerMonth: 10000,
+    maxTemplates: 10,
     popular: true,
 
     features: [
@@ -159,6 +168,7 @@ const plansData: PlanSeedData[] = [
 
       { name: "Payment Links", enabled: true },
       { name: "WhatsApp Templates", enabled: true },
+      { name: "Custom WhatsApp Templates", enabled: true },
       { name: "Bulk Messaging", enabled: true },
 
       { name: "Automation", enabled: true },
@@ -178,6 +188,7 @@ const plansData: PlanSeedData[] = [
     monthlyPrice: 49999,
     maxPhoneNumbers: 999,
     maxMessagesPerMonth: 100000,
+    maxTemplates: 999,
     popular: false,
 
     features: [
@@ -189,6 +200,7 @@ const plansData: PlanSeedData[] = [
 
       { name: "Payment Links", enabled: true },
       { name: "WhatsApp Templates", enabled: true },
+      { name: "Custom WhatsApp Templates", enabled: true },
       { name: "Bulk Messaging", enabled: true },
 
       { name: "Automation", enabled: true },
@@ -227,6 +239,7 @@ export async function seedPlans(prisma: PrismaClient) {
         popular: plan.popular,
         maxPhoneNumbers: plan.maxPhoneNumbers,
         maxMessagesPerMonth: plan.maxMessagesPerMonth,
+        maxTemplates: plan.maxTemplates,
         active: true,
       },
       create: {
@@ -236,6 +249,7 @@ export async function seedPlans(prisma: PrismaClient) {
         popular: plan.popular,
         maxPhoneNumbers: plan.maxPhoneNumbers,
         maxMessagesPerMonth: plan.maxMessagesPerMonth,
+        maxTemplates: plan.maxTemplates,
         active: true,
       },
     });

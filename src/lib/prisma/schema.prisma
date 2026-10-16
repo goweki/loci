@@ -171,6 +171,7 @@ model Plan {
   monthlyPrice        Int
   maxPhoneNumbers     Int
   maxMessagesPerMonth Int
+  maxTemplates        Int            @default(3)
   active              Boolean        @default(true)
   popular             Boolean        @default(false)
   subscriptions       Subscription[]
@@ -279,6 +280,24 @@ model WabaTemplate {
   @@index([status])
   @@index([category])
   @@map("waba_templates")
+}
+
+/// Admin-curated templates users can instantiate for their own WABA.
+model TemplateLibraryEntry {
+  id          String           @id @default(cuid())
+  key         String           @unique
+  name        String
+  description String?
+  category    TemplateCategory
+  language    TemplateLanguage @default(en_US)
+  components  Json
+  isDefault   Boolean          @default(false)
+  isActive    Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([isActive, isDefault])
+  @@map("template_library_entries")
 }
 
 enum WhatsAppCampaignStatus {
