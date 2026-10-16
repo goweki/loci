@@ -7,12 +7,12 @@ import { Suspense } from "react";
 
 const translations = {
   en: {
-    title: "Loci Manager",
+    title: "System Manager",
     subtitle:
       "Synchronize WhatsApp business accounts, message templates, and configure the platform",
   },
   sw: {
-    title: "Meneja wa Loci",
+    title: "Usimamizi wa mfumo",
     subtitle:
       "Sawazisha akaunti za biashara za WhatsApp, templeti za ujumbe, na sanidi jukwaa",
   },

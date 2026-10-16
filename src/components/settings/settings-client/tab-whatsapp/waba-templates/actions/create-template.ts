@@ -14,6 +14,8 @@ import {
   WabaTemplateCreateResponse,
 } from "@/lib/whatsapp/types/waba-template";
 import z from "zod";
+import { requireUser } from "@/lib/auth";
+import { UserRole } from "@/lib/prisma/generated";
 
 type Component = z.infer<typeof componentSchema>;
 type ButtonsComponent = z.infer<typeof buttonsComponentSchema>;
@@ -29,10 +31,19 @@ export async function createTemplate(
     wabaId?: string;
   },
 ) {
+  const actor = await requireUser();
   const wabaId_ = data.wabaId || process.env.WABA_ID;
   if (!wabaId_) {
     throw new Error("missing wabaId and process.env.WABA_ID");
   }
+  const account = await prisma.wabaAccount.findFirst({
+    where: {
+      id: wabaId_,
+      ...(actor.role === UserRole.ADMIN ? {} : { userId: actor.id }),
+    },
+    select: { id: true },
+  });
+  if (!account) throw new Error("WhatsApp Business account not found or access denied.");
   const res: WabaTemplateCreateResponse = await whatsapp.createTemplate(data);
 
   const { id, status, category } = res;
@@ -46,7 +57,7 @@ export async function createTemplate(
       language: data.language || TemplateLanguage.en_US,
       components: data.components,
       wabaId: wabaId_,
-      createdById: data.createdById,
+      createdById: actor.id,
     },
   });
 }

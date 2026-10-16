@@ -47,7 +47,7 @@ type FormData = AuthFormData | NonAuthFormData;
 
 /* --------------------- Form Component --------------------- */
 
-const WabaTemplateForm = () => {
+const WabaTemplateForm = ({ onCreated }: { onCreated?: () => void } = {}) => {
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState<Partial<FormData>>({
@@ -130,22 +130,14 @@ const WabaTemplateForm = () => {
   const handleSubmit = async () => {
     try {
       const validated = templateBuilderSchema.parse(formData);
-      console.log("Validated builder:", JSON.stringify(validated, null, 2));
-
       const template = builderToTemplate(validated);
-      console.log("Converted template:", JSON.stringify(template, null, 2));
-
-      // Check the components array specifically
-      console.log(
-        "Template components:",
-        JSON.stringify(template.components, null, 2)
-      );
 
       const augmented = { ...template, createdById: userId };
       const newTemplate: WabaTemplate = await createTemplate(augmented);
       toast.success(`Template created: ${newTemplate.name}`);
+      onCreated?.();
     } catch (err) {
-      // ...
+      toast.error(err instanceof Error ? err.message : "Unable to create template.");
     }
   };
 
