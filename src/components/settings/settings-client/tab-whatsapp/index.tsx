@@ -164,7 +164,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
         </CardContent>
       </Card>
       {waba ? <AssistantConfig /> : null}
-      {waba ? (
+      {/* {waba ? (
         <Card>
           <CardHeader>
             <CardTitle>Customer notifications</CardTitle>
@@ -174,7 +174,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
             <Button asChild variant="outline"><Link href={`/${language}/dashboard/whatsapp-notifications`}>Manage notifications</Link></Button>
           </CardContent>
         </Card>
-      ) : null}
+      ) : null} */}
       <TemplatesClient wabaAccount={waba} />
     </>
   );
