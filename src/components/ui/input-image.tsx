@@ -5,6 +5,7 @@ import { ImagePlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { resizeImageFile } from "@/lib/utils/reactImageHandlers";
+import Image from "next/image";
 
 interface ImageInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   name?: string;
@@ -118,7 +119,7 @@ export const ImageInput = React.forwardRef<HTMLInputElement, ImageInputProps>(
         {previewUrl ? (
           <div className="relative rounded-lg border bg-muted/30 p-2">
             <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-background">
-              <img
+              <Image
                 src={previewUrl}
                 alt="Preview"
                 className="h-full w-full object-cover"
