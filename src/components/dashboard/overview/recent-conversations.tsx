@@ -9,7 +9,16 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
-import { MessageCircle } from "lucide-react";
+import { ArrowRightIcon, MessageCircle } from "lucide-react";
+import { BASE_URL } from "@/lib/utils/getUrl";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Language } from "@/lib/i18n";
+
+const dict = {
+  en: { allConversations: "All Conversations" },
+  sw: { allConversations: "Mazungumzo yote" },
+};
 
 interface Conversation {
   id: string;
@@ -21,16 +30,27 @@ interface Conversation {
 }
 
 interface RecentConversationsProps {
+  lng: Language;
   conversations: Conversation[];
 }
 
 export function RecentConversations({
+  lng,
   conversations,
 }: RecentConversationsProps) {
+  const t = dict[lng];
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Conversations</CardTitle>
+        <CardTitle className="space-x-4">
+          <span>Recent Conversations</span>
+          <Button asChild variant="link" size="sm" className="shrink-0 gap-1">
+            <Link href={`${BASE_URL}/en/dashboard/conversations`}>
+              {t.allConversations}
+              <ArrowRightIcon className="h-4 w-4" />
+            </Link>
+          </Button>
+        </CardTitle>
 
         <CardDescription>Latest customer interactions</CardDescription>
       </CardHeader>
