@@ -27,7 +27,7 @@ export default function TabProfile({ user }: { user: UserWithRelations }) {
         <ProfileForm />
       </Card>
 
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Notification Preferences</CardTitle>
           <CardDescription>
@@ -87,7 +87,7 @@ export default function TabProfile({ user }: { user: UserWithRelations }) {
             <Button>Save Preferences</Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </>
   );
 
