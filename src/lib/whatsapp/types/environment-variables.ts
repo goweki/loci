@@ -20,6 +20,7 @@ export const EnvSchema = z.object({
   WHATSAPP_WEBHOOK_VERIFY_TOKEN: z.string().min(4),
   META_APP_SECRET: z.string().min(4),
   WHATSAPP_PHONE_NUMBER_ID: z.string().min(4),
+  ANTHROPIC_API_KEY: z.string().min(1).optional(),
   META_BUSINESS_ID: z.string().min(4),
   META_API_VERSION: z.string().min(4),
   WABA_ID: z.string().min(4),

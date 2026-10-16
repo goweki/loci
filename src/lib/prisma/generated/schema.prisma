@@ -45,17 +45,21 @@ model User {
 
   waba WabaAccount?
 
-  contacts        Contact[]
-  messages        Message[]
-  subscriptions   Subscription[]
-  tokens          Token[]
-  autoreplyRules  AutoReplyRule[]
-  wabaTemplates   WabaTemplate[]
-  promptTemplates PromptTemplate[]
-  products        Product[]
-  orders          Order[]
-  invoices        Invoice[]
-  payouts         OrderPayout[]
+  contacts             Contact[]
+  messages             Message[]
+  subscriptions        Subscription[]
+  tokens               Token[]
+  autoreplyRules       AutoReplyRule[]
+  wabaTemplates        WabaTemplate[]
+  promptTemplates      PromptTemplate[]
+  products             Product[]
+  orders               Order[]
+  invoices             Invoice[]
+  payouts              OrderPayout[]
+  whatsappCampaigns    WhatsAppCampaign[]
+  inventoryAdjustments InventoryAdjustment[]
+  agentRuns            AgentRun[]
+  messageQuotas        MessageQuota[]
 
   paystackRecipientCode     String?
   paystackRecipientCurrency Currency?
@@ -240,6 +244,8 @@ model WabaAccount {
   currency                 String?
   timezoneId               String?
   messageTemplateNamespace String?
+  accessTokenEncrypted     String?   @db.Text
+  tokenUpdatedAt           DateTime?
 
   phoneNumbers PhoneNumber[]
   templates    WabaTemplate[]
@@ -265,13 +271,73 @@ model WabaTemplate {
   createdById String?
   createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
-  createdAt DateTime? @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime?          @default(now())
+  updatedAt DateTime           @updatedAt
+  campaigns WhatsAppCampaign[]
 
   @@unique([name, wabaId])
   @@index([status])
   @@index([category])
   @@map("waba_templates")
+}
+
+enum WhatsAppCampaignStatus {
+  SCHEDULED
+  PROCESSING
+  SENT
+  PARTIAL
+  FAILED
+  CANCELLED
+}
+
+enum WhatsAppCampaignRecipientStatus {
+  PENDING
+  SENDING
+  SENT
+  FAILED
+}
+
+model WhatsAppCampaign {
+  id             String                 @id @default(cuid())
+  userId         String
+  phoneNumberId  String
+  templateId     String
+  name           String
+  language       String                 @default("en_US")
+  bodyParameters String[]               @default([])
+  status         WhatsAppCampaignStatus @default(SCHEDULED)
+  scheduledAt    DateTime
+  completedAt    DateTime?
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  user        User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phoneNumber PhoneNumber                 @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+  template    WabaTemplate                @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  recipients  WhatsAppCampaignRecipient[]
+
+  @@index([status, scheduledAt])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("whatsapp_campaigns")
+}
+
+model WhatsAppCampaignRecipient {
+  id                String                          @id @default(cuid())
+  campaignId        String
+  contactId         String
+  status            WhatsAppCampaignRecipientStatus @default(PENDING)
+  providerMessageId String?                         @unique
+  error             String?
+  sentAt            DateTime?
+  createdAt         DateTime                        @default(now())
+  updatedAt         DateTime                        @updatedAt
+
+  campaign WhatsAppCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contact  Contact          @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, contactId])
+  @@index([campaignId, status])
+  @@map("whatsapp_campaign_recipients")
 }
 
 enum TemplateLanguage {
@@ -364,8 +430,10 @@ model PhoneNumber {
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
 
-  messages       Message[]
-  autoReplyRules AutoReplyRule[]
+  messages          Message[]
+  autoReplyRules    AutoReplyRule[]
+  whatsappCampaigns WhatsAppCampaign[]
+  agentRuns         AgentRun[]
 
   wabaId String?
   waba   WabaAccount? @relation(fields: [wabaId], references: [id], onDelete: Restrict)
@@ -379,18 +447,23 @@ model Contact {
   id          String @id @default(cuid())
   phoneNumber String
 
-  name          String?
-  avatar        String?
-  lastMessageAt DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  name                String?
+  avatar              String?
+  whatsappOptInAt     DateTime?
+  whatsappOptInSource String?
+  whatsappOptOutAt    DateTime?
+  lastMessageAt       DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  messages             Message[]
-  chatbotConversations ChatbotConversation[]
-  orders               Order[]
+  messages                   Message[]
+  chatbotConversations       ChatbotConversation[]
+  orders                     Order[]
+  whatsappCampaignRecipients WhatsAppCampaignRecipient[]
+  agentRuns                  AgentRun[]
 
   @@unique([userId, phoneNumber])
   @@index([userId, lastMessageAt(sort: Desc)])
@@ -398,24 +471,25 @@ model Contact {
 }
 
 model Message {
-  id            String           @id @default(cuid())
-  userId        String
-  contactId     String
-  phoneNumberId String
-  waMessageId   String?
-  astMessageId  String?
-  type          MessageType      @default(TEXT)
-  content       Json
-  direction     MessageDirection
-  status        MessageStatus    @default(SENT)
-  timestamp     DateTime
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  contact       Contact          @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  phoneNumber   PhoneNumber      @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  order         Order?           @relation(fields: [orderId], references: [id])
-  orderId       String?
+  id                 String           @id @default(cuid())
+  userId             String
+  contactId          String
+  phoneNumberId      String
+  waMessageId        String?
+  astMessageId       String?
+  replyToWaMessageId String?          @unique
+  type               MessageType      @default(TEXT)
+  content            Json
+  direction          MessageDirection
+  status             MessageStatus    @default(SENT)
+  timestamp          DateTime
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  contact            Contact          @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  phoneNumber        PhoneNumber      @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order              Order?           @relation(fields: [orderId], references: [id])
+  orderId            String?
 
   @@index([contactId, timestamp(sort: Desc)])
   @@index([userId, direction, status])
@@ -456,15 +530,19 @@ model AutoReplyRule {
 }
 
 model WebhookEvent {
-  id          String    @id @default(cuid())
-  eventKey    String?   @unique
-  type        String
-  payload     Json
-  processed   Boolean   @default(false)
-  processedAt DateTime?
-  error       String?
-  createdAt   DateTime  @default(now())
+  id           String    @id @default(cuid())
+  eventKey     String?   @unique
+  type         String
+  payload      Json
+  processed    Boolean   @default(false)
+  processedAt  DateTime?
+  error        String?
+  retryCount   Int       @default(0)
+  nextRetry    DateTime?
+  processingAt DateTime?
+  createdAt    DateTime  @default(now())
 
+  @@index([processed, nextRetry])
   @@map("webhook_events")
 }
 
@@ -530,9 +608,32 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  orderItems OrderItem[]
+  orderItems           OrderItem[]
+  inventoryAdjustments InventoryAdjustment[]
 
   @@map("products")
+}
+
+enum InventoryAdjustmentSource {
+  QR_SCAN
+  MANUAL
+}
+
+model InventoryAdjustment {
+  id             String                    @id @default(cuid())
+  productId      String
+  actorId        String
+  quantityChange Int
+  stockAfter     Int
+  source         InventoryAdjustmentSource @default(MANUAL)
+  idempotencyKey String                    @unique
+  createdAt      DateTime                  @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  actor   User    @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([productId, createdAt(sort: Desc)])
+  @@map("inventory_adjustments")
 }
 
 model Order {
@@ -705,10 +806,12 @@ model ChatbotConfig {
   phoneNumberId String @unique
 
   // Core AI Settings
-  systemPrompt String @db.Text
-  model        String @default("claude-sonnet-4-20250514")
-  temperature  Float  @default(0.7)
-  maxTokens    Int    @default(1000)
+  systemPrompt   String   @db.Text
+  profileContext String?  @db.Text
+  model          String   @default("claude-sonnet-4-20250514")
+  temperature    Float    @default(0.7)
+  maxTokens      Int      @default(1000)
+  enabledTools   String[] @default([])
 
   // Behavior Settings
   isActive             Boolean  @default(true)
@@ -730,6 +833,66 @@ model ChatbotConfig {
   conversations ChatbotConversation[]
 
   @@map("chatbot_configs")
+}
+
+enum AgentRunStatus {
+  SUCCEEDED
+  FAILED
+}
+
+model AgentRun {
+  id            String         @id @default(cuid())
+  userId        String
+  phoneNumberId String
+  contactId     String?
+  provider      String
+  model         String
+  status        AgentRunStatus
+  isPreview     Boolean        @default(false)
+  durationMs    Int?
+  errorCode     String?
+  createdAt     DateTime       @default(now())
+
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phoneNumber PhoneNumber     @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+  contact     Contact?        @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  toolCalls   AgentToolCall[]
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([phoneNumberId, status, createdAt(sort: Desc)])
+  @@map("agent_runs")
+}
+
+model AgentToolCall {
+  id                String   @id @default(cuid())
+  runId             String
+  capability        String
+  capabilityVersion String
+  inputSummary      Json
+  outputSummary     Json?
+  succeeded         Boolean
+  durationMs        Int
+  createdAt         DateTime @default(now())
+
+  run AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, createdAt])
+  @@map("agent_tool_calls")
+}
+
+model MessageQuota {
+  id          String   @id @default(cuid())
+  userId      String
+  periodStart DateTime
+  periodEnd   DateTime
+  used        Int      @default(0)
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, periodStart])
+  @@index([periodEnd])
+  @@map("message_quotas")
 }
 
 model ChatbotConversation {

@@ -73,7 +73,7 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   // 2. SEND MESSAGE
   // ---------------------------------------------------------------------
-  async sendMessage(input: Message): Promise<WhatsappSendResponse> {
+  async sendMessage(input: Message, accessToken?: string): Promise<WhatsappSendResponse> {
     const { phoneNumberId, to, type } = input;
 
     const finalPhoneNumberId = phoneNumberId ?? this.env.phoneNumberId;
@@ -86,13 +86,24 @@ export class WhatsAppClient {
       phoneNumberId: finalPhoneNumberId,
     });
 
+    const {
+      phoneNumberId: _phoneNumberId,
+      type: messageType,
+      recipient_type: recipientType,
+      ...messagePayload
+    } = input;
+    const payload = {
+      ...messagePayload,
+      type: messageType.toLocaleLowerCase(),
+      ...(recipientType ? { recipient_type: recipientType.toLocaleLowerCase() } : {}),
+    };
     const res = await fetch(url, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${this.env.wabaAccessToken}`,
+        Authorization: `Bearer ${accessToken ?? this.env.wabaAccessToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(input),
+      body: JSON.stringify(payload),
     });
 
     const json = await res.json();
@@ -107,8 +118,13 @@ export class WhatsAppClient {
     return json;
   }
 
-  async sendTemplate(input: Message): Promise<WhatsappSendResponse> {
-    const { phoneNumberId, ...payload } = input;
+  async sendTemplate(input: Message, accessToken?: string): Promise<WhatsappSendResponse> {
+    const { phoneNumberId, type, recipient_type, ...messagePayload } = input;
+    const payload = {
+      ...messagePayload,
+      type: type.toLocaleLowerCase(),
+      ...(recipient_type ? { recipient_type: recipient_type.toLocaleLowerCase() } : {}),
+    };
 
     const finalPhoneNumberId = phoneNumberId ?? this.env.phoneNumberId;
 
@@ -118,7 +134,7 @@ export class WhatsAppClient {
       const response = await fetch(url, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${this.env.wabaAccessToken}`,
+          Authorization: `Bearer ${accessToken ?? this.env.wabaAccessToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -130,10 +146,8 @@ export class WhatsAppClient {
         throw new Error(`WhatsApp API error: ${JSON.stringify(data)}`);
       }
 
-      console.log("Message sent:", data);
       return data;
     } catch (error) {
-      console.error("Failed to send WhatsApp message:", error);
       throw error; // re-throw for upstream handling
     }
   }

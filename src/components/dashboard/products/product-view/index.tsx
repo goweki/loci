@@ -7,6 +7,7 @@ import ProductInformation from "./product-information";
 import PurchaseCard from "./purchase-card";
 import InventoryStats from "./inventory-stats";
 import ProductMetadata from "./product-metadata";
+import { ProductQrCode } from "../product-qr-code";
 
 interface ProductViewProps {
   product: ProductWithRelations;
@@ -37,6 +38,8 @@ export default function ProductView({
         {merchantInfo ? (
           <>
             <InventoryStats product={product} inventoryValue={inventoryValue} />
+
+            <ProductQrCode productId={product.id} productName={product.name} />
 
             <ProductMetadata product={product} />
           </>

@@ -7,8 +7,8 @@ import {
 } from "@/components/ui/card";
 import { Building2Icon, Phone } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 import WabaEmbeddedSignup from "@/components/ui/waba-embedded-signup";
+import { Button } from "@/components/ui/button";
 import {
   PhoneNumber,
   SubscriptionStatus,
@@ -24,6 +24,7 @@ import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import Loader from "@/components/ui/loaders";
 import { SubscriptionStatusCheck } from "@/types";
+import { AssistantConfig } from "./assistant-config";
 
 interface Waba extends WabaAccount {
   phoneNumbers: PhoneNumber[];
@@ -63,7 +64,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
     }
   }, []);
 
-  return isLoading ? (
+  return isLoading || !subCheck ? (
     <Loader />
   ) : (
     <>
@@ -75,7 +76,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {subCheck?.status !== SubscriptionStatus.ACTIVE ? (
+          {subCheck.status !== SubscriptionStatus.ACTIVE ? (
             <div className="text-center py-12 space-y-4">
               <Building2Icon className="w-16 h-16 mx-auto text-muted-foreground" />
               <div className="space-y-2">
@@ -84,7 +85,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
                 </h3>
                 <p className="text-sm text-muted-foreground max-w-md mx-auto">
                   <Link href={`/${language}/settings?tab=subscription`}>
-                    Select A Subscription
+                    Select a Subscription
                   </Link>
                 </p>
               </div>
@@ -112,7 +113,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
                   {subCheck.subscription?.plan &&
                     subCheck.subscription.plan.maxPhoneNumbers >
                       waba.phoneNumbers.length && (
-                      <Button size="sm">Add Number</Button>
+                      <WabaEmbeddedSignup label="Add WhatsApp number" />
                     )}
                 </div>
 
@@ -162,6 +163,18 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
           )}
         </CardContent>
       </Card>
+      {waba ? <AssistantConfig /> : null}
+      {waba ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Customer notifications</CardTitle>
+            <CardDescription>Schedule approved WhatsApp templates for customers who have opted in.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild variant="outline"><Link href={`/${language}/dashboard/whatsapp-notifications`}>Manage notifications</Link></Button>
+          </CardContent>
+        </Card>
+      ) : null}
       {waba ? (
         <Card>
           <CardHeader>

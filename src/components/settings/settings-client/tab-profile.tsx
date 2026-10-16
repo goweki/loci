@@ -119,7 +119,7 @@ export default function TabProfile({ user }: { user: UserWithRelations }) {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
-            <Input id="name" defaultValue={user.name || ""} />
+            <Input disabled id="name" defaultValue={user.name || ""} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -129,6 +129,7 @@ export default function TabProfile({ user }: { user: UserWithRelations }) {
                 type="email"
                 defaultValue={user.email || ""}
                 className="flex-1"
+                disabled
               />
               {user.emailVerified && (
                 <CheckCircle2Icon className="w-5 h-5 text-green-500 mt-2" />
@@ -143,6 +144,7 @@ export default function TabProfile({ user }: { user: UserWithRelations }) {
                 type="tel"
                 defaultValue={user.tel || ""}
                 className="flex-1"
+                disabled
               />
               {user.telVerified && (
                 <CheckCircle2Icon className="w-5 h-5 text-green-500 mt-2" />
@@ -160,10 +162,10 @@ export default function TabProfile({ user }: { user: UserWithRelations }) {
           Member since {new Date(user.createdAt).toLocaleDateString()}
         </div>
 
-        <div className="flex justify-end gap-2">
+        {/* <div className="flex justify-end gap-2">
           <Button variant="outline">Cancel</Button>
           <Button>Save </Button>
-        </div>
+        </div> */}
       </CardContent>
     );
   }

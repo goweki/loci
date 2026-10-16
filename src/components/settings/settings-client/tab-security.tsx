@@ -53,7 +53,7 @@ export function TabSecurity() {
 
   return (
     <>
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Set New Password</CardTitle>
           <CardDescription>
@@ -63,7 +63,7 @@ export function TabSecurity() {
         <CardContent className="space-y-6">
           <RequestPasswordReset />
         </CardContent>
-      </Card>
+      </Card> */}
 
       <Card>
         <CardHeader>
