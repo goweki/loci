@@ -116,11 +116,60 @@ export function TemplatesClient({
 
   return (
     <div className="space-y-6">
+      {wabaAccount && data && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Message Templates</CardTitle>
+            <CardDescription>
+              Templates are available for customer notifications after Meta
+              approves them.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {data.templates.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                You have not submitted any templates yet.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {data.templates.map((template) => (
+                  <div
+                    key={template.id}
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <MessageSquareText className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{template.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {template.category} · {template.language}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge
+                      variant={
+                        template.status === "APPROVED"
+                          ? "default"
+                          : template.status === "REJECTED"
+                            ? "destructive"
+                            : "secondary"
+                      }
+                    >
+                      {template.status}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
-              <CardTitle>WhatsApp templates</CardTitle>
+              <CardTitle>Template library</CardTitle>
               <CardDescription>
                 Start with a curated template and submit it to Meta for
                 approval.
@@ -149,7 +198,7 @@ export function TemplatesClient({
             </div>
           ) : !wabaAccount ? (
             <p className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
-              Connect a WhatsApp Business account before submitting a template.
+              No Whatsapp Business account linked
             </p>
           ) : data === null ? (
             <Loader />
@@ -157,8 +206,7 @@ export function TemplatesClient({
             <>
               {!data.hasActiveSubscription && (
                 <p className="rounded-md border border-amber-500/30 bg-amber-500/5 p-4 text-sm">
-                  An active subscription is required to submit WhatsApp
-                  templates.
+                  An active subscription is required.
                 </p>
               )}
               {atLimit && (
@@ -209,55 +257,6 @@ export function TemplatesClient({
           )}
         </CardContent>
       </Card>
-
-      {wabaAccount && data && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Your submitted templates</CardTitle>
-            <CardDescription>
-              Templates are available for customer notifications after Meta
-              approves them.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {data.templates.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                You have not submitted any templates yet.
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {data.templates.map((template) => (
-                  <div
-                    key={template.id}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3"
-                  >
-                    <div className="flex items-center gap-3">
-                      <MessageSquareText className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium">{template.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {template.category} · {template.language}
-                        </p>
-                      </div>
-                    </div>
-                    <Badge
-                      variant={
-                        template.status === "APPROVED"
-                          ? "default"
-                          : template.status === "REJECTED"
-                            ? "destructive"
-                            : "secondary"
-                      }
-                    >
-                      {template.status}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">

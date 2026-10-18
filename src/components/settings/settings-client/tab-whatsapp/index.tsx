@@ -175,7 +175,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
           </CardContent>
         </Card>
       ) : null} */}
-      <TemplatesClient wabaAccount={waba} />
+      {waba && <TemplatesClient wabaAccount={waba} />}
     </>
   );
 }
