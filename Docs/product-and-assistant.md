@@ -2,13 +2,19 @@
 
 ## Product focus
 
-Loci helps businesses **supercharge engagements**, especially with customers. Its core direction is connecting a business's WhatsApp Business assets, configuring an AI assistant, and managing customer conversations. The product should be useful without requiring a merchant storefront, checkout, or payment workflow. Customer notifications are a product goal, but a complete business-initiated notification workflow is not implemented yet.
+Loci helps businesses **supercharge engagements**, especially with customers. Its core direction is connecting a business's WhatsApp Business assets, configuring an AI assistant, and managing customer conversations. The product should be useful without requiring a merchant storefront, checkout, or payment workflow. A consent-based WhatsApp template campaign workflow is implemented; richer scheduling and campaign operations remain incomplete.
 
-The existing products/catalogue can enrich an assistant's answers. Future inventory tools can help owners keep that catalogue accurate. Marketplace payments are a separate, optional direction (see [Optional payments](optional-payments.md)).
+The existing products/catalogue can enrich an assistant's answers. Product QR labels and confirmed stock adjustments help owners keep catalogue availability current. Marketplace payments are a separate, optional direction (see [Optional payments](optional-payments.md)).
 
-## Current WhatsApp setup
+## Current WhatsApp setup and templates
 
-The WhatsApp tab is gated by `NEXT_PUBLIC_ENABLE_WHATSAPP_UI=true` and by account subscription/WABA state. Meta signup and asset synchronization provide a WABA and phone numbers. The UI includes connected asset/template state and assistant configuration for a selected owned number.
+The WhatsApp tab is gated by `NEXT_PUBLIC_ENABLE_WHATSAPP_UI=true` and account subscription/WABA state. An active subscription is required to connect a business through Meta Embedded Signup. The server exchanges the signup code, verifies the exact WABA and selected phone number, checks tenant ownership and phone-number plan limits, subscribes the app to that WABA, and stores the WABA credential encrypted. Credentials are not passed to client components. Meta phone verification and Cloud API registration are separate states; when the phone is not `CONNECTED`, settings offers a registration dialog for the six-digit WhatsApp two-step verification PIN. The current schema supports one WABA per user.
+
+The settings template library combines three built-in templates (OTP verification, order update, and appointment reminder) with active admin-managed library entries. These curated entries are reusable starting points and are not saved as user-authored blueprints. Users with an active subscription can submit available templates to Meta, subject to the plan's `maxTemplates` cap. A plan with the `Custom WhatsApp Templates` feature can customize components before submission; the template still counts toward that cap. Admins manage curated database entries in the manager route. Template submission status is pending until Meta review; `message_template_status_update` webhook events update the locally stored status when that field is subscribed in Meta.
+
+Authentication/OTP templates use Meta-generated body text: their BODY component must not include custom `text` or body examples. The default OTP uses a copy-code button and expiration footer. Utility and marketing templates use their regular text/header/footer components.
+
+The UI includes connected asset/template state and assistant configuration for a selected owned number. Embedded Signup, webhook subscriptions, app permissions and production review still require setup and verification in Meta's Developer Dashboard; successful local code paths do not prove production provider configuration.
 
 `ChatbotConfig` stores the system prompt, manually entered profile/company/CV context, activation and handoff settings, model parameters, and enabled tools. The **Generate prompt draft from profile** button builds an editable draft that includes owner-pasted profile information. Owners can test the current unsaved draft and optional catalogue capability against the configured Anthropic runtime without sending a WhatsApp message. There is no CV upload or document parsing. The runtime uses `ANTHROPIC_API_KEY` and a fixed model. Without the key, AI-generated replies and preview are unavailable.
 
@@ -16,9 +22,9 @@ If enabled, the assistant has a read-only catalogue search capability over the o
 
 ## Rules and message handling
 
-`AutoReplyRule` supports keyword, message-type, and default rules, each tied to a phone number. Active specific matches take precedence over the default; a match sends its literal response. If there is no match, an active assistant can answer. If neither path applies, the message remains for a human. Time-based rules are not exposed.
+`AutoReplyRule` supports keyword, message-type, and default rules, each tied to a phone number. Opt-out and human handoff checks take precedence. Active specific matches take precedence over the default; matching rules are considered by ascending priority, then creation time, and a match sends its literal response without invoking AI. If no rule matches, an active assistant conversation can answer; otherwise the message remains for a human. `STOP` opts a contact out, sends an opt-out confirmation, and suppresses later automated replies; `START` clears the opt-out and sends a confirmation. Time-based rules are not exposed.
 
-Meta webhook POST requests are signature-checked. The inbound processor resolves the Meta number to a locally owned phone number, persists contacts/messages, handles status callbacks, checks handoff and rules, and then may invoke the assistant. Duplicate event/message checks exist. Processing is synchronous and has no durable retry/outbox worker.
+Meta webhook POST requests are signature-checked. The inbound processor resolves the Meta number to a locally owned phone number, persists contacts/messages, handles status callbacks, checks opt-out/handoff and rules, and then may invoke the assistant. Duplicate event/message checks exist. Initial processing is synchronous; failed webhook events are persisted and retried by `/api/cron/whatsapp-webhooks` up to five times. Schedule that route externally and monitor exhausted failures.
 
 The inbox shows conversation history and supports manual text replies within the WhatsApp customer-service window. Human handoff pauses assistant responses until resumed. The inbox refreshes from the server every 15 seconds while visible. A connected WABA token is stored encrypted with AES-256-GCM and used for inbox replies and scheduled campaigns; the legacy global token remains a fallback for other integration helpers. Media/attachments are not interpreted by the assistant.
 
@@ -28,8 +34,8 @@ Assistant runs and catalogue-tool calls now create privacy-conscious audit rows 
 
 ## Remaining implementation and operational gaps
 
-- **Meta credentials:** connected WABA tokens are encrypted and used for conversational replies/campaigns, but expiry tracking, refresh/rotation, and revocation UI are not complete. Other legacy integration helpers may still require the global token.
-- **Number onboarding limits:** Meta signup syncs numbers and enforces plan count/ownership. Supporting multiple distinct WABAs per user is not implemented because the current schema is one WABA per user.
+- **Meta credentials:** connected WABA tokens are encrypted and used for conversational replies/campaigns. Token type, returned expiry metadata, and update time are stored, but automatic refresh/rotation and revocation UI are not complete. Other legacy integration helpers may still require the global token.
+- **Number onboarding limits:** Meta signup verifies the selected number belongs to the selected WABA and enforces plan count/ownership before saving that number. It does not import every number on the WABA. Supporting multiple distinct WABAs per user is not implemented because the current schema is one WABA per user.
 - **Campaign operations:** delivery is scheduled through an external cron caller. There is no in-app scheduler provisioning, audience segmentation, per-campaign retry control, or full delivery analytics. Uncertain send outcomes are marked failed for reconciliation rather than blindly retried.
 - **Webhook recovery:** failed webhook events are stored and retried by `/api/cron/whatsapp-webhooks`, with a bounded attempt count and idempotent inbound/outbound guards. Failed events still need operator monitoring; some provider/model failures after inbound persistence may leave the inbound visible without an automated reply.
 - **Agent runtime:** catalogue search is the only model tool. The bounded runtime, privacy-conscious run/tool audit records, and per-plan outbound message cap are implemented, but provider choice remains Anthropic-specific; model-spend budgets and evaluations are not complete. No order/payment/inventory mutation tools exist.

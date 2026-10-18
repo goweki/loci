@@ -12,5 +12,7 @@ These documents describe current code unless a section is explicitly marked as p
 ## Deployment notes
 
 - Configure `WHATSAPP_TOKEN_ENCRYPTION_KEY` before connecting WABAs. Schedule both WhatsApp cron routes with `CRON_SECRET` for notification delivery and failed webhook recovery.
-- Apply the committed migrations for encrypted WABA credentials, consent-based WhatsApp campaigns, audited inventory adjustments, webhook retries, outbound idempotency, agent-run traces, and message quotas through the normal release process.
+- Apply all committed migrations through the normal release process, including WhatsApp onboarding metadata (`20261019100000_whatsapp_onboarding_metadata`), encrypted WABA credentials, template library, consent-based campaigns, audited inventory adjustments, webhook retries, outbound idempotency, agent-run traces, and message quotas.
 - Marketplace transfers remain gated by `PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED`; keep them disabled until payout readiness is reviewed.
+
+The onboarding migration and application code do not configure Meta's Developer Dashboard. Production Embedded Signup, permissions, webhook subscriptions, and message delivery still require verification against the actual Meta app and WABA; see [Product and assistant](product-and-assistant.md).
