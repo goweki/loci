@@ -142,7 +142,7 @@ export function ConversationsComponent({
   }
 
   return (
-    <div className="flex h-[calc(100dvh-8.5rem)] min-h-0 w-full min-w-0 overflow-hidden pt-2 md:h-[calc(100vh-12rem)] md:pt-6">
+    <div className="flex max-h-[calc(100dvh-4rem)] w-full overflow-hidden pt-2 md:max-h-[calc(100vh-6rem)] md:pt-6 h-full">
       {/* Sidebar */}
       <Card
         className={cn(
