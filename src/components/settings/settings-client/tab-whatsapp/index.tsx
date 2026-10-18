@@ -92,6 +92,18 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
             </div>
           ) : waba ? (
             <>
+              {!waba.accessTokenEncrypted && (
+                <div className="flex flex-col gap-3 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-medium">Reconnect WhatsApp</h3>
+                    <p className="text-sm text-muted-foreground">
+                      This account has no saved WhatsApp access token. Reconnect
+                      it to create templates and use WhatsApp features.
+                    </p>
+                  </div>
+                  <WabaEmbeddedSignup label="Reconnect account" />
+                </div>
+              )}
               <div className="flex items-center gap-4 p-4 border rounded-lg">
                 <Building2Icon className="w-10 h-10 text-green-600" />
                 <div className="flex-1">
