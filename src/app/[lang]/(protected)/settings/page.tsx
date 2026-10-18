@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { isValidLanguage } from "@/lib/i18n";
 import { getUserByIdAction } from "@/actions/user.actions";
 import { userInclude } from "@/services/user/user.dto";
+import prisma from "@/lib/prisma";
 
 const translations = {
   en: {
@@ -36,7 +37,13 @@ export default async function SettingsPage({
 
   const t = translations[lang];
 
-  const resUser = await getUserByIdAction(session.user.id, userInclude);
+  const [resUser, wabaCredential] = await Promise.all([
+    getUserByIdAction(session.user.id, userInclude),
+    prisma.wabaAccount.findFirst({
+      where: { userId: session.user.id },
+      select: { accessTokenEncrypted: true },
+    }),
+  ]);
 
   if (!resUser.ok) {
     return;
@@ -49,7 +56,10 @@ export default async function SettingsPage({
       <PageTitle title={t.title} subtitle={t.subtitle} />
 
       <Suspense fallback={<TemplatesSkeleton />}>
-        <SettingsClient user={user} />
+        <SettingsClient
+          user={user}
+          hasWhatsAppCredential={Boolean(wabaCredential?.accessTokenEncrypted)}
+        />
       </Suspense>
     </div>
   ) : (

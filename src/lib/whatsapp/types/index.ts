@@ -41,10 +41,12 @@ export interface WabaPhoneNumberListResponse {
 }
 
 export interface WabaPhoneNumberDetailsResponse {
+  id?: string;
   verified_name: string;
   display_phone_number: string;
   quality_rating?: string;
   code_verification_status?: string;
+  status?: string;
 }
 
 // ------------------------------

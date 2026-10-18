@@ -202,7 +202,10 @@ exports.Prisma.WabaAccountScalarFieldEnum = {
   timezoneId: 'timezoneId',
   messageTemplateNamespace: 'messageTemplateNamespace',
   accessTokenEncrypted: 'accessTokenEncrypted',
+  accessTokenType: 'accessTokenType',
+  accessTokenExpiresAt: 'accessTokenExpiresAt',
   tokenUpdatedAt: 'tokenUpdatedAt',
+  businessId: 'businessId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -302,6 +305,7 @@ exports.Prisma.PhoneNumberScalarFieldEnum = {
   preVerificationCode: 'preVerificationCode',
   status: 'status',
   verifiedAt: 'verifiedAt',
+  whatsappRegistrationStatus: 'whatsappRegistrationStatus',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   wabaId: 'wabaId'
@@ -690,7 +694,14 @@ exports.TemplateApprovalStatus = exports.$Enums.TemplateApprovalStatus = {
   APPROVED: 'APPROVED',
   PENDING: 'PENDING',
   REJECTED: 'REJECTED',
-  DISABLED: 'DISABLED'
+  DISABLED: 'DISABLED',
+  PAUSED: 'PAUSED',
+  IN_APPEAL: 'IN_APPEAL',
+  PENDING_DELETION: 'PENDING_DELETION',
+  DELETED: 'DELETED',
+  LIMIT_EXCEEDED: 'LIMIT_EXCEEDED',
+  ARCHIVED: 'ARCHIVED',
+  FLAGGED: 'FLAGGED'
 };
 
 exports.TemplateCategory = exports.$Enums.TemplateCategory = {

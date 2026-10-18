@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Prisma, TemplateLibraryEntry } from "@/lib/prisma/generated";
+import { TemplateLibraryEntry } from "@/lib/prisma/generated";
 import { DEFAULT_TEMPLATE_LIBRARY } from "@/lib/whatsapp/template-library/default-templates";
 import {
   createTemplateFromLibraryAction,
@@ -31,9 +31,7 @@ import {
 } from "@/actions/template-library.actions";
 import Loader from "@/components/ui/loaders";
 
-type WabaWithAssets = Prisma.WabaAccountGetPayload<{
-  include: { templates: true; phoneNumbers: true };
-}> | null;
+type WabaWithAssets = { id: string } | null;
 type LibraryData = Awaited<ReturnType<typeof getTemplateLibraryForUserAction>>;
 type TemplateChoice = {
   id: string;

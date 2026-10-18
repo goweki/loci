@@ -246,7 +246,10 @@ model WabaAccount {
   timezoneId               String?
   messageTemplateNamespace String?
   accessTokenEncrypted     String?   @db.Text
+  accessTokenType          String?
+  accessTokenExpiresAt     DateTime?
   tokenUpdatedAt           DateTime?
+  businessId               String?
 
   phoneNumbers PhoneNumber[]
   templates    WabaTemplate[]
@@ -377,6 +380,13 @@ enum TemplateApprovalStatus {
   PENDING
   REJECTED
   DISABLED
+  PAUSED
+  IN_APPEAL
+  PENDING_DELETION
+  DELETED
+  LIMIT_EXCEEDED
+  ARCHIVED
+  FLAGGED
 }
 
 enum NotificationChannel {
@@ -444,10 +454,11 @@ model PhoneNumber {
   preVerificationId   String?
   preVerificationCode String?
 
-  status     PhoneNumberStatus @default(NOT_CLAIMED)
-  verifiedAt DateTime?
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
+  status                     PhoneNumberStatus @default(NOT_CLAIMED)
+  verifiedAt                 DateTime?
+  whatsappRegistrationStatus String?
+  createdAt                  DateTime          @default(now())
+  updatedAt                  DateTime          @updatedAt
 
   messages          Message[]
   autoReplyRules    AutoReplyRule[]

@@ -377,7 +377,14 @@ export const TemplateApprovalStatus: {
   APPROVED: 'APPROVED',
   PENDING: 'PENDING',
   REJECTED: 'REJECTED',
-  DISABLED: 'DISABLED'
+  DISABLED: 'DISABLED',
+  PAUSED: 'PAUSED',
+  IN_APPEAL: 'IN_APPEAL',
+  PENDING_DELETION: 'PENDING_DELETION',
+  DELETED: 'DELETED',
+  LIMIT_EXCEEDED: 'LIMIT_EXCEEDED',
+  ARCHIVED: 'ARCHIVED',
+  FLAGGED: 'FLAGGED'
 };
 
 export type TemplateApprovalStatus = (typeof TemplateApprovalStatus)[keyof typeof TemplateApprovalStatus]
@@ -11368,7 +11375,10 @@ export namespace Prisma {
     timezoneId: string | null
     messageTemplateNamespace: string | null
     accessTokenEncrypted: string | null
+    accessTokenType: string | null
+    accessTokenExpiresAt: Date | null
     tokenUpdatedAt: Date | null
+    businessId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -11382,7 +11392,10 @@ export namespace Prisma {
     timezoneId: string | null
     messageTemplateNamespace: string | null
     accessTokenEncrypted: string | null
+    accessTokenType: string | null
+    accessTokenExpiresAt: Date | null
     tokenUpdatedAt: Date | null
+    businessId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -11396,7 +11409,10 @@ export namespace Prisma {
     timezoneId: number
     messageTemplateNamespace: number
     accessTokenEncrypted: number
+    accessTokenType: number
+    accessTokenExpiresAt: number
     tokenUpdatedAt: number
+    businessId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -11412,7 +11428,10 @@ export namespace Prisma {
     timezoneId?: true
     messageTemplateNamespace?: true
     accessTokenEncrypted?: true
+    accessTokenType?: true
+    accessTokenExpiresAt?: true
     tokenUpdatedAt?: true
+    businessId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -11426,7 +11445,10 @@ export namespace Prisma {
     timezoneId?: true
     messageTemplateNamespace?: true
     accessTokenEncrypted?: true
+    accessTokenType?: true
+    accessTokenExpiresAt?: true
     tokenUpdatedAt?: true
+    businessId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -11440,7 +11462,10 @@ export namespace Prisma {
     timezoneId?: true
     messageTemplateNamespace?: true
     accessTokenEncrypted?: true
+    accessTokenType?: true
+    accessTokenExpiresAt?: true
     tokenUpdatedAt?: true
+    businessId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -11527,7 +11552,10 @@ export namespace Prisma {
     timezoneId: string | null
     messageTemplateNamespace: string | null
     accessTokenEncrypted: string | null
+    accessTokenType: string | null
+    accessTokenExpiresAt: Date | null
     tokenUpdatedAt: Date | null
+    businessId: string | null
     createdAt: Date
     updatedAt: Date
     _count: WabaAccountCountAggregateOutputType | null
@@ -11558,7 +11586,10 @@ export namespace Prisma {
     timezoneId?: boolean
     messageTemplateNamespace?: boolean
     accessTokenEncrypted?: boolean
+    accessTokenType?: boolean
+    accessTokenExpiresAt?: boolean
     tokenUpdatedAt?: boolean
+    businessId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | WabaAccount$userArgs<ExtArgs>
@@ -11576,7 +11607,10 @@ export namespace Prisma {
     timezoneId?: boolean
     messageTemplateNamespace?: boolean
     accessTokenEncrypted?: boolean
+    accessTokenType?: boolean
+    accessTokenExpiresAt?: boolean
     tokenUpdatedAt?: boolean
+    businessId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | WabaAccount$userArgs<ExtArgs>
@@ -11591,7 +11625,10 @@ export namespace Prisma {
     timezoneId?: boolean
     messageTemplateNamespace?: boolean
     accessTokenEncrypted?: boolean
+    accessTokenType?: boolean
+    accessTokenExpiresAt?: boolean
     tokenUpdatedAt?: boolean
+    businessId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | WabaAccount$userArgs<ExtArgs>
@@ -11606,12 +11643,15 @@ export namespace Prisma {
     timezoneId?: boolean
     messageTemplateNamespace?: boolean
     accessTokenEncrypted?: boolean
+    accessTokenType?: boolean
+    accessTokenExpiresAt?: boolean
     tokenUpdatedAt?: boolean
+    businessId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type WabaAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "userId" | "ownership" | "currency" | "timezoneId" | "messageTemplateNamespace" | "accessTokenEncrypted" | "tokenUpdatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["wabaAccount"]>
+  export type WabaAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "userId" | "ownership" | "currency" | "timezoneId" | "messageTemplateNamespace" | "accessTokenEncrypted" | "accessTokenType" | "accessTokenExpiresAt" | "tokenUpdatedAt" | "businessId" | "createdAt" | "updatedAt", ExtArgs["result"]["wabaAccount"]>
   export type WabaAccountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | WabaAccount$userArgs<ExtArgs>
     phoneNumbers?: boolean | WabaAccount$phoneNumbersArgs<ExtArgs>
@@ -11641,7 +11681,10 @@ export namespace Prisma {
       timezoneId: string | null
       messageTemplateNamespace: string | null
       accessTokenEncrypted: string | null
+      accessTokenType: string | null
+      accessTokenExpiresAt: Date | null
       tokenUpdatedAt: Date | null
+      businessId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["wabaAccount"]>
@@ -12078,7 +12121,10 @@ export namespace Prisma {
     readonly timezoneId: FieldRef<"WabaAccount", 'String'>
     readonly messageTemplateNamespace: FieldRef<"WabaAccount", 'String'>
     readonly accessTokenEncrypted: FieldRef<"WabaAccount", 'String'>
+    readonly accessTokenType: FieldRef<"WabaAccount", 'String'>
+    readonly accessTokenExpiresAt: FieldRef<"WabaAccount", 'DateTime'>
     readonly tokenUpdatedAt: FieldRef<"WabaAccount", 'DateTime'>
+    readonly businessId: FieldRef<"WabaAccount", 'String'>
     readonly createdAt: FieldRef<"WabaAccount", 'DateTime'>
     readonly updatedAt: FieldRef<"WabaAccount", 'DateTime'>
   }
@@ -20549,6 +20595,7 @@ export namespace Prisma {
     preVerificationCode: string | null
     status: $Enums.PhoneNumberStatus | null
     verifiedAt: Date | null
+    whatsappRegistrationStatus: string | null
     createdAt: Date | null
     updatedAt: Date | null
     wabaId: string | null
@@ -20562,6 +20609,7 @@ export namespace Prisma {
     preVerificationCode: string | null
     status: $Enums.PhoneNumberStatus | null
     verifiedAt: Date | null
+    whatsappRegistrationStatus: string | null
     createdAt: Date | null
     updatedAt: Date | null
     wabaId: string | null
@@ -20575,6 +20623,7 @@ export namespace Prisma {
     preVerificationCode: number
     status: number
     verifiedAt: number
+    whatsappRegistrationStatus: number
     createdAt: number
     updatedAt: number
     wabaId: number
@@ -20590,6 +20639,7 @@ export namespace Prisma {
     preVerificationCode?: true
     status?: true
     verifiedAt?: true
+    whatsappRegistrationStatus?: true
     createdAt?: true
     updatedAt?: true
     wabaId?: true
@@ -20603,6 +20653,7 @@ export namespace Prisma {
     preVerificationCode?: true
     status?: true
     verifiedAt?: true
+    whatsappRegistrationStatus?: true
     createdAt?: true
     updatedAt?: true
     wabaId?: true
@@ -20616,6 +20667,7 @@ export namespace Prisma {
     preVerificationCode?: true
     status?: true
     verifiedAt?: true
+    whatsappRegistrationStatus?: true
     createdAt?: true
     updatedAt?: true
     wabaId?: true
@@ -20702,6 +20754,7 @@ export namespace Prisma {
     preVerificationCode: string | null
     status: $Enums.PhoneNumberStatus
     verifiedAt: Date | null
+    whatsappRegistrationStatus: string | null
     createdAt: Date
     updatedAt: Date
     wabaId: string | null
@@ -20732,6 +20785,7 @@ export namespace Prisma {
     preVerificationCode?: boolean
     status?: boolean
     verifiedAt?: boolean
+    whatsappRegistrationStatus?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     wabaId?: boolean
@@ -20752,6 +20806,7 @@ export namespace Prisma {
     preVerificationCode?: boolean
     status?: boolean
     verifiedAt?: boolean
+    whatsappRegistrationStatus?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     wabaId?: boolean
@@ -20766,6 +20821,7 @@ export namespace Prisma {
     preVerificationCode?: boolean
     status?: boolean
     verifiedAt?: boolean
+    whatsappRegistrationStatus?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     wabaId?: boolean
@@ -20780,12 +20836,13 @@ export namespace Prisma {
     preVerificationCode?: boolean
     status?: boolean
     verifiedAt?: boolean
+    whatsappRegistrationStatus?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     wabaId?: boolean
   }
 
-  export type PhoneNumberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "phoneNumber" | "displayName" | "preVerificationId" | "preVerificationCode" | "status" | "verifiedAt" | "createdAt" | "updatedAt" | "wabaId", ExtArgs["result"]["phoneNumber"]>
+  export type PhoneNumberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "phoneNumber" | "displayName" | "preVerificationId" | "preVerificationCode" | "status" | "verifiedAt" | "whatsappRegistrationStatus" | "createdAt" | "updatedAt" | "wabaId", ExtArgs["result"]["phoneNumber"]>
   export type PhoneNumberInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     messages?: boolean | PhoneNumber$messagesArgs<ExtArgs>
     autoReplyRules?: boolean | PhoneNumber$autoReplyRulesArgs<ExtArgs>
@@ -20820,6 +20877,7 @@ export namespace Prisma {
       preVerificationCode: string | null
       status: $Enums.PhoneNumberStatus
       verifiedAt: Date | null
+      whatsappRegistrationStatus: string | null
       createdAt: Date
       updatedAt: Date
       wabaId: string | null
@@ -21259,6 +21317,7 @@ export namespace Prisma {
     readonly preVerificationCode: FieldRef<"PhoneNumber", 'String'>
     readonly status: FieldRef<"PhoneNumber", 'PhoneNumberStatus'>
     readonly verifiedAt: FieldRef<"PhoneNumber", 'DateTime'>
+    readonly whatsappRegistrationStatus: FieldRef<"PhoneNumber", 'String'>
     readonly createdAt: FieldRef<"PhoneNumber", 'DateTime'>
     readonly updatedAt: FieldRef<"PhoneNumber", 'DateTime'>
     readonly wabaId: FieldRef<"PhoneNumber", 'String'>
@@ -45683,7 +45742,10 @@ export namespace Prisma {
     timezoneId: 'timezoneId',
     messageTemplateNamespace: 'messageTemplateNamespace',
     accessTokenEncrypted: 'accessTokenEncrypted',
+    accessTokenType: 'accessTokenType',
+    accessTokenExpiresAt: 'accessTokenExpiresAt',
     tokenUpdatedAt: 'tokenUpdatedAt',
+    businessId: 'businessId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -45807,6 +45869,7 @@ export namespace Prisma {
     preVerificationCode: 'preVerificationCode',
     status: 'status',
     verifiedAt: 'verifiedAt',
+    whatsappRegistrationStatus: 'whatsappRegistrationStatus',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     wabaId: 'wabaId'
@@ -47259,7 +47322,10 @@ export namespace Prisma {
     timezoneId?: StringNullableFilter<"WabaAccount"> | string | null
     messageTemplateNamespace?: StringNullableFilter<"WabaAccount"> | string | null
     accessTokenEncrypted?: StringNullableFilter<"WabaAccount"> | string | null
+    accessTokenType?: StringNullableFilter<"WabaAccount"> | string | null
+    accessTokenExpiresAt?: DateTimeNullableFilter<"WabaAccount"> | Date | string | null
     tokenUpdatedAt?: DateTimeNullableFilter<"WabaAccount"> | Date | string | null
+    businessId?: StringNullableFilter<"WabaAccount"> | string | null
     createdAt?: DateTimeFilter<"WabaAccount"> | Date | string
     updatedAt?: DateTimeFilter<"WabaAccount"> | Date | string
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -47276,7 +47342,10 @@ export namespace Prisma {
     timezoneId?: SortOrderInput | SortOrder
     messageTemplateNamespace?: SortOrderInput | SortOrder
     accessTokenEncrypted?: SortOrderInput | SortOrder
+    accessTokenType?: SortOrderInput | SortOrder
+    accessTokenExpiresAt?: SortOrderInput | SortOrder
     tokenUpdatedAt?: SortOrderInput | SortOrder
+    businessId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -47296,7 +47365,10 @@ export namespace Prisma {
     timezoneId?: StringNullableFilter<"WabaAccount"> | string | null
     messageTemplateNamespace?: StringNullableFilter<"WabaAccount"> | string | null
     accessTokenEncrypted?: StringNullableFilter<"WabaAccount"> | string | null
+    accessTokenType?: StringNullableFilter<"WabaAccount"> | string | null
+    accessTokenExpiresAt?: DateTimeNullableFilter<"WabaAccount"> | Date | string | null
     tokenUpdatedAt?: DateTimeNullableFilter<"WabaAccount"> | Date | string | null
+    businessId?: StringNullableFilter<"WabaAccount"> | string | null
     createdAt?: DateTimeFilter<"WabaAccount"> | Date | string
     updatedAt?: DateTimeFilter<"WabaAccount"> | Date | string
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -47313,7 +47385,10 @@ export namespace Prisma {
     timezoneId?: SortOrderInput | SortOrder
     messageTemplateNamespace?: SortOrderInput | SortOrder
     accessTokenEncrypted?: SortOrderInput | SortOrder
+    accessTokenType?: SortOrderInput | SortOrder
+    accessTokenExpiresAt?: SortOrderInput | SortOrder
     tokenUpdatedAt?: SortOrderInput | SortOrder
+    businessId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: WabaAccountCountOrderByAggregateInput
@@ -47333,7 +47408,10 @@ export namespace Prisma {
     timezoneId?: StringNullableWithAggregatesFilter<"WabaAccount"> | string | null
     messageTemplateNamespace?: StringNullableWithAggregatesFilter<"WabaAccount"> | string | null
     accessTokenEncrypted?: StringNullableWithAggregatesFilter<"WabaAccount"> | string | null
+    accessTokenType?: StringNullableWithAggregatesFilter<"WabaAccount"> | string | null
+    accessTokenExpiresAt?: DateTimeNullableWithAggregatesFilter<"WabaAccount"> | Date | string | null
     tokenUpdatedAt?: DateTimeNullableWithAggregatesFilter<"WabaAccount"> | Date | string | null
+    businessId?: StringNullableWithAggregatesFilter<"WabaAccount"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"WabaAccount"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"WabaAccount"> | Date | string
   }
@@ -47914,6 +47992,7 @@ export namespace Prisma {
     preVerificationCode?: StringNullableFilter<"PhoneNumber"> | string | null
     status?: EnumPhoneNumberStatusFilter<"PhoneNumber"> | $Enums.PhoneNumberStatus
     verifiedAt?: DateTimeNullableFilter<"PhoneNumber"> | Date | string | null
+    whatsappRegistrationStatus?: StringNullableFilter<"PhoneNumber"> | string | null
     createdAt?: DateTimeFilter<"PhoneNumber"> | Date | string
     updatedAt?: DateTimeFilter<"PhoneNumber"> | Date | string
     wabaId?: StringNullableFilter<"PhoneNumber"> | string | null
@@ -47933,6 +48012,7 @@ export namespace Prisma {
     preVerificationCode?: SortOrderInput | SortOrder
     status?: SortOrder
     verifiedAt?: SortOrderInput | SortOrder
+    whatsappRegistrationStatus?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     wabaId?: SortOrderInput | SortOrder
@@ -47955,6 +48035,7 @@ export namespace Prisma {
     preVerificationCode?: StringNullableFilter<"PhoneNumber"> | string | null
     status?: EnumPhoneNumberStatusFilter<"PhoneNumber"> | $Enums.PhoneNumberStatus
     verifiedAt?: DateTimeNullableFilter<"PhoneNumber"> | Date | string | null
+    whatsappRegistrationStatus?: StringNullableFilter<"PhoneNumber"> | string | null
     createdAt?: DateTimeFilter<"PhoneNumber"> | Date | string
     updatedAt?: DateTimeFilter<"PhoneNumber"> | Date | string
     wabaId?: StringNullableFilter<"PhoneNumber"> | string | null
@@ -47974,6 +48055,7 @@ export namespace Prisma {
     preVerificationCode?: SortOrderInput | SortOrder
     status?: SortOrder
     verifiedAt?: SortOrderInput | SortOrder
+    whatsappRegistrationStatus?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     wabaId?: SortOrderInput | SortOrder
@@ -47993,6 +48075,7 @@ export namespace Prisma {
     preVerificationCode?: StringNullableWithAggregatesFilter<"PhoneNumber"> | string | null
     status?: EnumPhoneNumberStatusWithAggregatesFilter<"PhoneNumber"> | $Enums.PhoneNumberStatus
     verifiedAt?: DateTimeNullableWithAggregatesFilter<"PhoneNumber"> | Date | string | null
+    whatsappRegistrationStatus?: StringNullableWithAggregatesFilter<"PhoneNumber"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"PhoneNumber"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"PhoneNumber"> | Date | string
     wabaId?: StringNullableWithAggregatesFilter<"PhoneNumber"> | string | null
@@ -50387,7 +50470,10 @@ export namespace Prisma {
     timezoneId?: string | null
     messageTemplateNamespace?: string | null
     accessTokenEncrypted?: string | null
+    accessTokenType?: string | null
+    accessTokenExpiresAt?: Date | string | null
     tokenUpdatedAt?: Date | string | null
+    businessId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user?: UserCreateNestedOneWithoutWabaInput
@@ -50404,7 +50490,10 @@ export namespace Prisma {
     timezoneId?: string | null
     messageTemplateNamespace?: string | null
     accessTokenEncrypted?: string | null
+    accessTokenType?: string | null
+    accessTokenExpiresAt?: Date | string | null
     tokenUpdatedAt?: Date | string | null
+    businessId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     phoneNumbers?: PhoneNumberUncheckedCreateNestedManyWithoutWabaInput
@@ -50419,7 +50508,10 @@ export namespace Prisma {
     timezoneId?: NullableStringFieldUpdateOperationsInput | string | null
     messageTemplateNamespace?: NullableStringFieldUpdateOperationsInput | string | null
     accessTokenEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenType?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tokenUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    businessId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutWabaNestedInput
@@ -50436,7 +50528,10 @@ export namespace Prisma {
     timezoneId?: NullableStringFieldUpdateOperationsInput | string | null
     messageTemplateNamespace?: NullableStringFieldUpdateOperationsInput | string | null
     accessTokenEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenType?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tokenUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    businessId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phoneNumbers?: PhoneNumberUncheckedUpdateManyWithoutWabaNestedInput
@@ -50452,7 +50547,10 @@ export namespace Prisma {
     timezoneId?: string | null
     messageTemplateNamespace?: string | null
     accessTokenEncrypted?: string | null
+    accessTokenType?: string | null
+    accessTokenExpiresAt?: Date | string | null
     tokenUpdatedAt?: Date | string | null
+    businessId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -50465,7 +50563,10 @@ export namespace Prisma {
     timezoneId?: NullableStringFieldUpdateOperationsInput | string | null
     messageTemplateNamespace?: NullableStringFieldUpdateOperationsInput | string | null
     accessTokenEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenType?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tokenUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    businessId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -50479,7 +50580,10 @@ export namespace Prisma {
     timezoneId?: NullableStringFieldUpdateOperationsInput | string | null
     messageTemplateNamespace?: NullableStringFieldUpdateOperationsInput | string | null
     accessTokenEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenType?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tokenUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    businessId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -51103,6 +51207,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     messages?: MessageCreateNestedManyWithoutPhoneNumberInput
@@ -51121,6 +51226,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     wabaId?: string | null
@@ -51139,6 +51245,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUpdateManyWithoutPhoneNumberNestedInput
@@ -51157,6 +51264,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51175,6 +51283,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     wabaId?: string | null
@@ -51188,6 +51297,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -51200,6 +51310,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54045,7 +54156,10 @@ export namespace Prisma {
     timezoneId?: SortOrder
     messageTemplateNamespace?: SortOrder
     accessTokenEncrypted?: SortOrder
+    accessTokenType?: SortOrder
+    accessTokenExpiresAt?: SortOrder
     tokenUpdatedAt?: SortOrder
+    businessId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -54059,7 +54173,10 @@ export namespace Prisma {
     timezoneId?: SortOrder
     messageTemplateNamespace?: SortOrder
     accessTokenEncrypted?: SortOrder
+    accessTokenType?: SortOrder
+    accessTokenExpiresAt?: SortOrder
     tokenUpdatedAt?: SortOrder
+    businessId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -54073,7 +54190,10 @@ export namespace Prisma {
     timezoneId?: SortOrder
     messageTemplateNamespace?: SortOrder
     accessTokenEncrypted?: SortOrder
+    accessTokenType?: SortOrder
+    accessTokenExpiresAt?: SortOrder
     tokenUpdatedAt?: SortOrder
+    businessId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -54655,6 +54775,7 @@ export namespace Prisma {
     preVerificationCode?: SortOrder
     status?: SortOrder
     verifiedAt?: SortOrder
+    whatsappRegistrationStatus?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     wabaId?: SortOrder
@@ -54668,6 +54789,7 @@ export namespace Prisma {
     preVerificationCode?: SortOrder
     status?: SortOrder
     verifiedAt?: SortOrder
+    whatsappRegistrationStatus?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     wabaId?: SortOrder
@@ -54681,6 +54803,7 @@ export namespace Prisma {
     preVerificationCode?: SortOrder
     status?: SortOrder
     verifiedAt?: SortOrder
+    whatsappRegistrationStatus?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     wabaId?: SortOrder
@@ -59609,7 +59732,10 @@ export namespace Prisma {
     timezoneId?: string | null
     messageTemplateNamespace?: string | null
     accessTokenEncrypted?: string | null
+    accessTokenType?: string | null
+    accessTokenExpiresAt?: Date | string | null
     tokenUpdatedAt?: Date | string | null
+    businessId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     phoneNumbers?: PhoneNumberCreateNestedManyWithoutWabaInput
@@ -59624,7 +59750,10 @@ export namespace Prisma {
     timezoneId?: string | null
     messageTemplateNamespace?: string | null
     accessTokenEncrypted?: string | null
+    accessTokenType?: string | null
+    accessTokenExpiresAt?: Date | string | null
     tokenUpdatedAt?: Date | string | null
+    businessId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     phoneNumbers?: PhoneNumberUncheckedCreateNestedManyWithoutWabaInput
@@ -60255,7 +60384,10 @@ export namespace Prisma {
     timezoneId?: NullableStringFieldUpdateOperationsInput | string | null
     messageTemplateNamespace?: NullableStringFieldUpdateOperationsInput | string | null
     accessTokenEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenType?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tokenUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    businessId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phoneNumbers?: PhoneNumberUpdateManyWithoutWabaNestedInput
@@ -60270,7 +60402,10 @@ export namespace Prisma {
     timezoneId?: NullableStringFieldUpdateOperationsInput | string | null
     messageTemplateNamespace?: NullableStringFieldUpdateOperationsInput | string | null
     accessTokenEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenType?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tokenUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    businessId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phoneNumbers?: PhoneNumberUncheckedUpdateManyWithoutWabaNestedInput
@@ -61492,6 +61627,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     messages?: MessageCreateNestedManyWithoutPhoneNumberInput
@@ -61509,6 +61645,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     messages?: MessageUncheckedCreateNestedManyWithoutPhoneNumberInput
@@ -61672,6 +61809,7 @@ export namespace Prisma {
     preVerificationCode?: StringNullableFilter<"PhoneNumber"> | string | null
     status?: EnumPhoneNumberStatusFilter<"PhoneNumber"> | $Enums.PhoneNumberStatus
     verifiedAt?: DateTimeNullableFilter<"PhoneNumber"> | Date | string | null
+    whatsappRegistrationStatus?: StringNullableFilter<"PhoneNumber"> | string | null
     createdAt?: DateTimeFilter<"PhoneNumber"> | Date | string
     updatedAt?: DateTimeFilter<"PhoneNumber"> | Date | string
     wabaId?: StringNullableFilter<"PhoneNumber"> | string | null
@@ -61701,7 +61839,10 @@ export namespace Prisma {
     timezoneId?: string | null
     messageTemplateNamespace?: string | null
     accessTokenEncrypted?: string | null
+    accessTokenType?: string | null
+    accessTokenExpiresAt?: Date | string | null
     tokenUpdatedAt?: Date | string | null
+    businessId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user?: UserCreateNestedOneWithoutWabaInput
@@ -61717,7 +61858,10 @@ export namespace Prisma {
     timezoneId?: string | null
     messageTemplateNamespace?: string | null
     accessTokenEncrypted?: string | null
+    accessTokenType?: string | null
+    accessTokenExpiresAt?: Date | string | null
     tokenUpdatedAt?: Date | string | null
+    businessId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     phoneNumbers?: PhoneNumberUncheckedCreateNestedManyWithoutWabaInput
@@ -61860,7 +62004,10 @@ export namespace Prisma {
     timezoneId?: NullableStringFieldUpdateOperationsInput | string | null
     messageTemplateNamespace?: NullableStringFieldUpdateOperationsInput | string | null
     accessTokenEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenType?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tokenUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    businessId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutWabaNestedInput
@@ -61876,7 +62023,10 @@ export namespace Prisma {
     timezoneId?: NullableStringFieldUpdateOperationsInput | string | null
     messageTemplateNamespace?: NullableStringFieldUpdateOperationsInput | string | null
     accessTokenEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenType?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tokenUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    businessId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phoneNumbers?: PhoneNumberUncheckedUpdateManyWithoutWabaNestedInput
@@ -62058,6 +62208,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     messages?: MessageCreateNestedManyWithoutPhoneNumberInput
@@ -62075,6 +62226,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     wabaId?: string | null
@@ -62252,6 +62404,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUpdateManyWithoutPhoneNumberNestedInput
@@ -62269,6 +62422,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62980,7 +63134,10 @@ export namespace Prisma {
     timezoneId?: string | null
     messageTemplateNamespace?: string | null
     accessTokenEncrypted?: string | null
+    accessTokenType?: string | null
+    accessTokenExpiresAt?: Date | string | null
     tokenUpdatedAt?: Date | string | null
+    businessId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user?: UserCreateNestedOneWithoutWabaInput
@@ -62996,7 +63153,10 @@ export namespace Prisma {
     timezoneId?: string | null
     messageTemplateNamespace?: string | null
     accessTokenEncrypted?: string | null
+    accessTokenType?: string | null
+    accessTokenExpiresAt?: Date | string | null
     tokenUpdatedAt?: Date | string | null
+    businessId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     templates?: WabaTemplateUncheckedCreateNestedManyWithoutWabaInput
@@ -63135,7 +63295,10 @@ export namespace Prisma {
     timezoneId?: NullableStringFieldUpdateOperationsInput | string | null
     messageTemplateNamespace?: NullableStringFieldUpdateOperationsInput | string | null
     accessTokenEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenType?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tokenUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    businessId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutWabaNestedInput
@@ -63151,7 +63314,10 @@ export namespace Prisma {
     timezoneId?: NullableStringFieldUpdateOperationsInput | string | null
     messageTemplateNamespace?: NullableStringFieldUpdateOperationsInput | string | null
     accessTokenEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenType?: NullableStringFieldUpdateOperationsInput | string | null
+    accessTokenExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tokenUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    businessId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     templates?: WabaTemplateUncheckedUpdateManyWithoutWabaNestedInput
@@ -63721,6 +63887,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     autoReplyRules?: AutoReplyRuleCreateNestedManyWithoutPhoneNumberInput
@@ -63738,6 +63905,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     wabaId?: string | null
@@ -63954,6 +64122,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     autoReplyRules?: AutoReplyRuleUpdateManyWithoutPhoneNumberNestedInput
@@ -63971,6 +64140,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -64136,6 +64306,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     messages?: MessageCreateNestedManyWithoutPhoneNumberInput
@@ -64153,6 +64324,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     wabaId?: string | null
@@ -64259,6 +64431,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUpdateManyWithoutPhoneNumberNestedInput
@@ -64276,6 +64449,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66510,6 +66684,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     messages?: MessageCreateNestedManyWithoutPhoneNumberInput
@@ -66527,6 +66702,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     wabaId?: string | null
@@ -66594,6 +66770,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUpdateManyWithoutPhoneNumberNestedInput
@@ -66611,6 +66788,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66717,6 +66895,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     messages?: MessageCreateNestedManyWithoutPhoneNumberInput
@@ -66734,6 +66913,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     wabaId?: string | null
@@ -66919,6 +67099,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUpdateManyWithoutPhoneNumberNestedInput
@@ -66936,6 +67117,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     wabaId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -68591,6 +68773,7 @@ export namespace Prisma {
     preVerificationCode?: string | null
     status?: $Enums.PhoneNumberStatus
     verifiedAt?: Date | string | null
+    whatsappRegistrationStatus?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -68616,6 +68799,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUpdateManyWithoutPhoneNumberNestedInput
@@ -68633,6 +68817,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUncheckedUpdateManyWithoutPhoneNumberNestedInput
@@ -68650,6 +68835,7 @@ export namespace Prisma {
     preVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPhoneNumberStatusFieldUpdateOperationsInput | $Enums.PhoneNumberStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    whatsappRegistrationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
