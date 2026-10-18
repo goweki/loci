@@ -402,7 +402,12 @@ export class WhatsAppClient {
         Authorization: `Bearer ${this.env.wabaAccessToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(template),
+      body: JSON.stringify({
+        name: template.name,
+        language: template.language,
+        category: template.category,
+        components: template.components,
+      }),
     });
 
     const json = await _res.json();

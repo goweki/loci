@@ -12,9 +12,7 @@ export const DEFAULT_TEMPLATE_LIBRARY = [
     components: [
       {
         type: "BODY",
-        text: "{{1}} is your verification code. For your security, do not share this code.",
         add_security_recommendation: true,
-        example: { body_text: [["123456"]] },
       },
       { type: "FOOTER", code_expiration_minutes: 10 },
       {
