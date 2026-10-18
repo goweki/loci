@@ -497,6 +497,9 @@ async function processAutoReplies(
   contact: any,
   message: InboundMessage,
 ): Promise<void> {
+  // Opt-out is a hard stop for both configured replies and AI responses.
+  if (contact.whatsappOptOutAt) return;
+
   const text = message.type === "text"
     ? message.text.body
     : message.type === "interactive"
@@ -539,6 +542,8 @@ async function processAutoReplies(
     return;
   }
 
+  // Exact configured replies take precedence; the AI is the fallback only
+  // when no active rule matches. Rule ordering is priority, then creation.
   const rules = await prisma.autoReplyRule.findMany({
     where: { phoneNumberId, createdById: userId, isActive: true },
     orderBy: [{ priority: "asc" }, { createdAt: "asc" }],
