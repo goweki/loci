@@ -26,7 +26,28 @@ CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
 CREATE TYPE "PaymentMethod" AS ENUM ('PAYSTACK', 'MPESA', 'CARD', 'BANK');
 
 -- CreateEnum
+CREATE TYPE "FulfillmentStatus" AS ENUM ('UNFULFILLED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'DISPUTED', 'CANCELLED');
+
+-- CreateEnum
+CREATE TYPE "PayoutStatus" AS ENUM ('NOT_DUE', 'QUEUED', 'PENDING', 'PAID', 'FAILED', 'REVERSED', 'ON_HOLD');
+
+-- CreateEnum
+CREATE TYPE "LedgerTransactionType" AS ENUM ('PAYMENT_RECEIVED', 'PAYOUT_SENT', 'REFUND_ISSUED', 'PAYOUT_REVERSED');
+
+-- CreateEnum
+CREATE TYPE "LedgerAccount" AS ENUM ('PAYMENT_CLEARING', 'SELLER_PAYABLE', 'PLATFORM_REVENUE', 'REFUND_CLEARING');
+
+-- CreateEnum
+CREATE TYPE "LedgerSide" AS ENUM ('DEBIT', 'CREDIT');
+
+-- CreateEnum
 CREATE TYPE "WabaOwnership" AS ENUM ('OWNED', 'SHARED');
+
+-- CreateEnum
+CREATE TYPE "WhatsAppCampaignStatus" AS ENUM ('SCHEDULED', 'PROCESSING', 'SENT', 'PARTIAL', 'FAILED', 'CANCELLED');
+
+-- CreateEnum
+CREATE TYPE "WhatsAppCampaignRecipientStatus" AS ENUM ('PENDING', 'SENDING', 'SENT', 'FAILED');
 
 -- CreateEnum
 CREATE TYPE "TemplateLanguage" AS ENUM ('en_US', 'en_GB', 'fr_FR', 'sw_KE');
@@ -35,7 +56,7 @@ CREATE TYPE "TemplateLanguage" AS ENUM ('en_US', 'en_GB', 'fr_FR', 'sw_KE');
 CREATE TYPE "TemplateCategory" AS ENUM ('AUTHENTICATION', 'UTILITY', 'MARKETING');
 
 -- CreateEnum
-CREATE TYPE "TemplateApprovalStatus" AS ENUM ('APPROVED', 'PENDING', 'REJECTED', 'DISABLED');
+CREATE TYPE "TemplateApprovalStatus" AS ENUM ('APPROVED', 'PENDING', 'REJECTED', 'DISABLED', 'PAUSED', 'IN_APPEAL', 'PENDING_DELETION', 'DELETED', 'LIMIT_EXCEEDED', 'ARCHIVED', 'FLAGGED');
 
 -- CreateEnum
 CREATE TYPE "NotificationChannel" AS ENUM ('EMAIL', 'WHATSAPP', 'SMS');
@@ -59,10 +80,16 @@ CREATE TYPE "MessageDirection" AS ENUM ('INBOUND', 'OUTBOUND');
 CREATE TYPE "MessageStatus" AS ENUM ('SENT', 'DELIVERED', 'READ', 'FAILED');
 
 -- CreateEnum
+CREATE TYPE "InventoryAdjustmentSource" AS ENUM ('QR_SCAN', 'MANUAL');
+
+-- CreateEnum
 CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'SENT', 'PARTIALLY_PAID', 'PAID', 'CANCELLED');
 
 -- CreateEnum
 CREATE TYPE "InvoiceStatus" AS ENUM ('DRAFT', 'PENDING', 'PARTIALLY_PAID', 'PAID', 'OVERDUE', 'CANCELLED');
+
+-- CreateEnum
+CREATE TYPE "AgentRunStatus" AS ENUM ('SUCCEEDED', 'FAILED');
 
 -- CreateEnum
 CREATE TYPE "ContactStatus" AS ENUM ('PENDING', 'IN_PROGRESS', 'RESOLVED', 'SPAM');
@@ -83,6 +110,8 @@ CREATE TABLE "users" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "preferredCommunicationChannel" "CommunicationChannel" NOT NULL DEFAULT 'WHATSAPP',
+    "paystackRecipientCode" TEXT,
+    "paystackRecipientCurrency" "Currency",
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -111,6 +140,7 @@ CREATE TABLE "plans" (
     "monthlyPrice" INTEGER NOT NULL,
     "maxPhoneNumbers" INTEGER NOT NULL,
     "maxMessagesPerMonth" INTEGER NOT NULL,
+    "maxTemplates" INTEGER NOT NULL DEFAULT 3,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "popular" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -161,6 +191,11 @@ CREATE TABLE "waba_accounts" (
     "currency" TEXT,
     "timezoneId" TEXT,
     "messageTemplateNamespace" TEXT,
+    "accessTokenEncrypted" TEXT,
+    "accessTokenType" TEXT,
+    "accessTokenExpiresAt" TIMESTAMP(3),
+    "tokenUpdatedAt" TIMESTAMP(3),
+    "businessId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -185,6 +220,56 @@ CREATE TABLE "waba_templates" (
 );
 
 -- CreateTable
+CREATE TABLE "template_library_entries" (
+    "id" TEXT NOT NULL,
+    "key" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "category" "TemplateCategory" NOT NULL,
+    "language" "TemplateLanguage" NOT NULL DEFAULT 'en_US',
+    "components" JSONB NOT NULL,
+    "isDefault" BOOLEAN NOT NULL DEFAULT false,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "template_library_entries_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "whatsapp_campaigns" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "phoneNumberId" TEXT NOT NULL,
+    "templateId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "language" TEXT NOT NULL DEFAULT 'en_US',
+    "bodyParameters" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "status" "WhatsAppCampaignStatus" NOT NULL DEFAULT 'SCHEDULED',
+    "scheduledAt" TIMESTAMP(3) NOT NULL,
+    "completedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "whatsapp_campaigns_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "whatsapp_campaign_recipients" (
+    "id" TEXT NOT NULL,
+    "campaignId" TEXT NOT NULL,
+    "contactId" TEXT NOT NULL,
+    "status" "WhatsAppCampaignRecipientStatus" NOT NULL DEFAULT 'PENDING',
+    "providerMessageId" TEXT,
+    "error" TEXT,
+    "sentAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "whatsapp_campaign_recipients_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "payments" (
     "id" TEXT NOT NULL,
     "transactionId" TEXT NOT NULL,
@@ -194,6 +279,7 @@ CREATE TABLE "payments" (
     "currency" "Currency" NOT NULL DEFAULT 'KES',
     "status" "PaymentStatus" NOT NULL DEFAULT 'PENDING',
     "paidAt" TIMESTAMP(3),
+    "metadata" JSONB,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -233,6 +319,7 @@ CREATE TABLE "phone_numbers" (
     "preVerificationCode" TEXT,
     "status" "PhoneNumberStatus" NOT NULL DEFAULT 'NOT_CLAIMED',
     "verifiedAt" TIMESTAMP(3),
+    "whatsappRegistrationStatus" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "wabaId" TEXT,
@@ -246,6 +333,9 @@ CREATE TABLE "contacts" (
     "phoneNumber" TEXT NOT NULL,
     "name" TEXT,
     "avatar" TEXT,
+    "whatsappOptInAt" TIMESTAMP(3),
+    "whatsappOptInSource" TEXT,
+    "whatsappOptOutAt" TIMESTAMP(3),
     "lastMessageAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -262,6 +352,7 @@ CREATE TABLE "messages" (
     "phoneNumberId" TEXT NOT NULL,
     "waMessageId" TEXT,
     "astMessageId" TEXT,
+    "replyToWaMessageId" TEXT,
     "type" "MessageType" NOT NULL DEFAULT 'TEXT',
     "content" JSONB NOT NULL,
     "direction" "MessageDirection" NOT NULL,
@@ -308,9 +399,15 @@ CREATE TABLE "autoreply_rules" (
 -- CreateTable
 CREATE TABLE "webhook_events" (
     "id" TEXT NOT NULL,
+    "eventKey" TEXT,
     "type" TEXT NOT NULL,
     "payload" JSONB NOT NULL,
     "processed" BOOLEAN NOT NULL DEFAULT false,
+    "processedAt" TIMESTAMP(3),
+    "error" TEXT,
+    "retryCount" INTEGER NOT NULL DEFAULT 0,
+    "nextRetry" TIMESTAMP(3),
+    "processingAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "webhook_events_pkey" PRIMARY KEY ("id")
@@ -335,14 +432,39 @@ CREATE TABLE "products" (
 );
 
 -- CreateTable
+CREATE TABLE "inventory_adjustments" (
+    "id" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
+    "actorId" TEXT NOT NULL,
+    "quantityChange" INTEGER NOT NULL,
+    "stockAfter" INTEGER NOT NULL,
+    "source" "InventoryAdjustmentSource" NOT NULL DEFAULT 'MANUAL',
+    "idempotencyKey" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "inventory_adjustments_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "orders" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "contactId" TEXT,
     "status" "OrderStatus" NOT NULL DEFAULT 'PENDING',
+    "fulfillmentStatus" "FulfillmentStatus" NOT NULL DEFAULT 'UNFULFILLED',
     "currency" "Currency" NOT NULL DEFAULT 'KES',
     "notes" TEXT,
     "paymentLink" TEXT,
+    "buyerName" TEXT,
+    "buyerEmail" TEXT,
+    "buyerPhone" TEXT,
+    "deliveryTokenHash" TEXT,
+    "deliveryTokenExpiresAt" TIMESTAMP(3),
+    "deliveryConfirmedAt" TIMESTAMP(3),
+    "disputeOpenedAt" TIMESTAMP(3),
+    "disputeReason" TEXT,
+    "platformFee" DECIMAL(10,2) NOT NULL DEFAULT 0,
+    "payoutStatus" "PayoutStatus" NOT NULL DEFAULT 'NOT_DUE',
     "total" DECIMAL(10,2) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -361,6 +483,50 @@ CREATE TABLE "order_items" (
     "total" DECIMAL(10,2) NOT NULL,
 
     CONSTRAINT "order_items_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "order_payouts" (
+    "id" TEXT NOT NULL,
+    "orderId" TEXT NOT NULL,
+    "merchantId" TEXT NOT NULL,
+    "amount" DECIMAL(10,2) NOT NULL,
+    "currency" "Currency" NOT NULL,
+    "recipientCode" TEXT NOT NULL,
+    "reference" TEXT NOT NULL,
+    "transferCode" TEXT,
+    "status" "PayoutStatus" NOT NULL DEFAULT 'NOT_DUE',
+    "requestedAt" TIMESTAMP(3),
+    "paidAt" TIMESTAMP(3),
+    "lastError" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "order_payouts_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ledger_transactions" (
+    "id" TEXT NOT NULL,
+    "eventKey" TEXT NOT NULL,
+    "type" "LedgerTransactionType" NOT NULL,
+    "orderId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "ledger_transactions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ledger_entries" (
+    "id" TEXT NOT NULL,
+    "transactionId" TEXT NOT NULL,
+    "account" "LedgerAccount" NOT NULL,
+    "side" "LedgerSide" NOT NULL,
+    "amount" DECIMAL(10,2) NOT NULL,
+    "currency" "Currency" NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "ledger_entries_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -390,9 +556,11 @@ CREATE TABLE "chatbot_configs" (
     "id" TEXT NOT NULL,
     "phoneNumberId" TEXT NOT NULL,
     "systemPrompt" TEXT NOT NULL,
+    "profileContext" TEXT,
     "model" TEXT NOT NULL DEFAULT 'claude-sonnet-4-20250514',
     "temperature" DOUBLE PRECISION NOT NULL DEFAULT 0.7,
     "maxTokens" INTEGER NOT NULL DEFAULT 1000,
+    "enabledTools" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "fallbackToHuman" BOOLEAN NOT NULL DEFAULT true,
     "humanHandoffKeywords" TEXT[],
@@ -404,6 +572,50 @@ CREATE TABLE "chatbot_configs" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "chatbot_configs_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "agent_runs" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "phoneNumberId" TEXT NOT NULL,
+    "contactId" TEXT,
+    "provider" TEXT NOT NULL,
+    "model" TEXT NOT NULL,
+    "status" "AgentRunStatus" NOT NULL,
+    "isPreview" BOOLEAN NOT NULL DEFAULT false,
+    "durationMs" INTEGER,
+    "errorCode" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "agent_runs_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "agent_tool_calls" (
+    "id" TEXT NOT NULL,
+    "runId" TEXT NOT NULL,
+    "capability" TEXT NOT NULL,
+    "capabilityVersion" TEXT NOT NULL,
+    "inputSummary" JSONB NOT NULL,
+    "outputSummary" JSONB,
+    "succeeded" BOOLEAN NOT NULL,
+    "durationMs" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "agent_tool_calls_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "message_quotas" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "periodStart" TIMESTAMP(3) NOT NULL,
+    "periodEnd" TIMESTAMP(3) NOT NULL,
+    "used" INTEGER NOT NULL DEFAULT 0,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "message_quotas_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -493,6 +705,27 @@ CREATE INDEX "waba_templates_category_idx" ON "waba_templates"("category");
 CREATE UNIQUE INDEX "waba_templates_name_wabaId_key" ON "waba_templates"("name", "wabaId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "template_library_entries_key_key" ON "template_library_entries"("key");
+
+-- CreateIndex
+CREATE INDEX "template_library_entries_isActive_isDefault_idx" ON "template_library_entries"("isActive", "isDefault");
+
+-- CreateIndex
+CREATE INDEX "whatsapp_campaigns_status_scheduledAt_idx" ON "whatsapp_campaigns"("status", "scheduledAt");
+
+-- CreateIndex
+CREATE INDEX "whatsapp_campaigns_userId_createdAt_idx" ON "whatsapp_campaigns"("userId", "createdAt" DESC);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "whatsapp_campaign_recipients_providerMessageId_key" ON "whatsapp_campaign_recipients"("providerMessageId");
+
+-- CreateIndex
+CREATE INDEX "whatsapp_campaign_recipients_campaignId_status_idx" ON "whatsapp_campaign_recipients"("campaignId", "status");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "whatsapp_campaign_recipients_campaignId_contactId_key" ON "whatsapp_campaign_recipients"("campaignId", "contactId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "payments_transactionId_key" ON "payments"("transactionId");
 
 -- CreateIndex
@@ -508,6 +741,9 @@ CREATE INDEX "contacts_userId_lastMessageAt_idx" ON "contacts"("userId", "lastMe
 CREATE UNIQUE INDEX "contacts_userId_phoneNumber_key" ON "contacts"("userId", "phoneNumber");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "messages_replyToWaMessageId_key" ON "messages"("replyToWaMessageId");
+
+-- CreateIndex
 CREATE INDEX "messages_contactId_timestamp_idx" ON "messages"("contactId", "timestamp" DESC);
 
 -- CreateIndex
@@ -517,10 +753,43 @@ CREATE INDEX "messages_userId_direction_status_idx" ON "messages"("userId", "dir
 CREATE INDEX "messages_contactId_direction_status_idx" ON "messages"("contactId", "direction", "status");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "webhook_events_eventKey_key" ON "webhook_events"("eventKey");
+
+-- CreateIndex
+CREATE INDEX "webhook_events_processed_nextRetry_idx" ON "webhook_events"("processed", "nextRetry");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "inventory_adjustments_idempotencyKey_key" ON "inventory_adjustments"("idempotencyKey");
+
+-- CreateIndex
+CREATE INDEX "inventory_adjustments_productId_createdAt_idx" ON "inventory_adjustments"("productId", "createdAt" DESC);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "orders_deliveryTokenHash_key" ON "orders"("deliveryTokenHash");
+
+-- CreateIndex
 CREATE INDEX "order_items_orderId_idx" ON "order_items"("orderId");
 
 -- CreateIndex
 CREATE INDEX "order_items_productId_idx" ON "order_items"("productId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "order_payouts_orderId_key" ON "order_payouts"("orderId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "order_payouts_reference_key" ON "order_payouts"("reference");
+
+-- CreateIndex
+CREATE INDEX "order_payouts_status_createdAt_idx" ON "order_payouts"("status", "createdAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ledger_transactions_eventKey_key" ON "ledger_transactions"("eventKey");
+
+-- CreateIndex
+CREATE INDEX "ledger_transactions_orderId_createdAt_idx" ON "ledger_transactions"("orderId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "ledger_entries_transactionId_idx" ON "ledger_entries"("transactionId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "invoices_orderId_key" ON "invoices"("orderId");
@@ -539,6 +808,21 @@ CREATE INDEX "invoices_dueDate_idx" ON "invoices"("dueDate");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "chatbot_configs_phoneNumberId_key" ON "chatbot_configs"("phoneNumberId");
+
+-- CreateIndex
+CREATE INDEX "agent_runs_userId_createdAt_idx" ON "agent_runs"("userId", "createdAt" DESC);
+
+-- CreateIndex
+CREATE INDEX "agent_runs_phoneNumberId_status_createdAt_idx" ON "agent_runs"("phoneNumberId", "status", "createdAt" DESC);
+
+-- CreateIndex
+CREATE INDEX "agent_tool_calls_runId_createdAt_idx" ON "agent_tool_calls"("runId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "message_quotas_periodEnd_idx" ON "message_quotas"("periodEnd");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "message_quotas_userId_periodStart_key" ON "message_quotas"("userId", "periodStart");
 
 -- CreateIndex
 CREATE INDEX "chatbot_conversations_isActive_idx" ON "chatbot_conversations"("isActive");
@@ -577,6 +861,21 @@ ALTER TABLE "waba_templates" ADD CONSTRAINT "waba_templates_wabaId_fkey" FOREIGN
 ALTER TABLE "waba_templates" ADD CONSTRAINT "waba_templates_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "whatsapp_campaigns" ADD CONSTRAINT "whatsapp_campaigns_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "whatsapp_campaigns" ADD CONSTRAINT "whatsapp_campaigns_phoneNumberId_fkey" FOREIGN KEY ("phoneNumberId") REFERENCES "phone_numbers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "whatsapp_campaigns" ADD CONSTRAINT "whatsapp_campaigns_templateId_fkey" FOREIGN KEY ("templateId") REFERENCES "waba_templates"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "whatsapp_campaign_recipients" ADD CONSTRAINT "whatsapp_campaign_recipients_campaignId_fkey" FOREIGN KEY ("campaignId") REFERENCES "whatsapp_campaigns"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "whatsapp_campaign_recipients" ADD CONSTRAINT "whatsapp_campaign_recipients_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "contacts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "payments" ADD CONSTRAINT "payments_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -613,6 +912,12 @@ ALTER TABLE "autoreply_rules" ADD CONSTRAINT "autoreply_rules_createdById_fkey" 
 ALTER TABLE "products" ADD CONSTRAINT "products_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "inventory_adjustments" ADD CONSTRAINT "inventory_adjustments_productId_fkey" FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "inventory_adjustments" ADD CONSTRAINT "inventory_adjustments_actorId_fkey" FOREIGN KEY ("actorId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "orders" ADD CONSTRAINT "orders_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -625,6 +930,18 @@ ALTER TABLE "order_items" ADD CONSTRAINT "order_items_orderId_fkey" FOREIGN KEY 
 ALTER TABLE "order_items" ADD CONSTRAINT "order_items_productId_fkey" FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "order_payouts" ADD CONSTRAINT "order_payouts_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "order_payouts" ADD CONSTRAINT "order_payouts_merchantId_fkey" FOREIGN KEY ("merchantId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ledger_transactions" ADD CONSTRAINT "ledger_transactions_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ledger_entries" ADD CONSTRAINT "ledger_entries_transactionId_fkey" FOREIGN KEY ("transactionId") REFERENCES "ledger_transactions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "invoices" ADD CONSTRAINT "invoices_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -632,6 +949,21 @@ ALTER TABLE "invoices" ADD CONSTRAINT "invoices_orderId_fkey" FOREIGN KEY ("orde
 
 -- AddForeignKey
 ALTER TABLE "chatbot_configs" ADD CONSTRAINT "chatbot_configs_phoneNumberId_fkey" FOREIGN KEY ("phoneNumberId") REFERENCES "phone_numbers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "agent_runs" ADD CONSTRAINT "agent_runs_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "agent_runs" ADD CONSTRAINT "agent_runs_phoneNumberId_fkey" FOREIGN KEY ("phoneNumberId") REFERENCES "phone_numbers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "agent_runs" ADD CONSTRAINT "agent_runs_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "contacts"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "agent_tool_calls" ADD CONSTRAINT "agent_tool_calls_runId_fkey" FOREIGN KEY ("runId") REFERENCES "agent_runs"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "message_quotas" ADD CONSTRAINT "message_quotas_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "chatbot_conversations" ADD CONSTRAINT "chatbot_conversations_chatbotConfigId_fkey" FOREIGN KEY ("chatbotConfigId") REFERENCES "chatbot_configs"("id") ON DELETE CASCADE ON UPDATE CASCADE;
