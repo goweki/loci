@@ -73,7 +73,10 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   // 2. SEND MESSAGE
   // ---------------------------------------------------------------------
-  async sendMessage(input: Message, accessToken?: string): Promise<WhatsappSendResponse> {
+  async sendMessage(
+    input: Message,
+    accessToken?: string,
+  ): Promise<WhatsappSendResponse> {
     const { phoneNumberId, to, type } = input;
 
     const finalPhoneNumberId = phoneNumberId ?? this.env.phoneNumberId;
@@ -95,7 +98,9 @@ export class WhatsAppClient {
     const payload = {
       ...messagePayload,
       type: messageType.toLocaleLowerCase(),
-      ...(recipientType ? { recipient_type: recipientType.toLocaleLowerCase() } : {}),
+      ...(recipientType
+        ? { recipient_type: recipientType.toLocaleLowerCase() }
+        : {}),
     };
     const res = await fetch(url, {
       method: "POST",
@@ -118,12 +123,17 @@ export class WhatsAppClient {
     return json;
   }
 
-  async sendTemplate(input: Message, accessToken?: string): Promise<WhatsappSendResponse> {
+  async sendTemplate(
+    input: Message,
+    accessToken?: string,
+  ): Promise<WhatsappSendResponse> {
     const { phoneNumberId, type, recipient_type, ...messagePayload } = input;
     const payload = {
       ...messagePayload,
       type: type.toLocaleLowerCase(),
-      ...(recipient_type ? { recipient_type: recipient_type.toLocaleLowerCase() } : {}),
+      ...(recipient_type
+        ? { recipient_type: recipient_type.toLocaleLowerCase() }
+        : {}),
     };
 
     const finalPhoneNumberId = phoneNumberId ?? this.env.phoneNumberId;
@@ -244,7 +254,7 @@ export class WhatsAppClient {
     }
   > {
     const token = accessToken ?? this.env.wabaAccessToken;
-    const url = `${this.baseUrl}/${phoneNumberId}?fields=display_phone_number,verified_name`;
+    const url = `${this.baseUrl}/${phoneNumberId}?fields=id,display_phone_number,verified_name,code_verification_status,status`;
 
     this.logger.info("Fetching phone number details", { phoneNumberId });
 
@@ -315,6 +325,28 @@ export class WhatsAppClient {
     return json;
   }
 
+  async registerPhoneNumber(
+    phoneNumberId: string,
+    pin: string,
+    accessToken: string,
+  ): Promise<{ success: boolean }> {
+    const url = `${this.baseUrl}/${phoneNumberId}/register`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ messaging_product: "whatsapp", pin }),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      this.logger.error("WhatsApp API Error (registerPhoneNumber)", json);
+      throw normalizeWhatsAppError(res.status, json);
+    }
+    return json;
+  }
+
   // ---------------------------------------------------------------------
   // 5. TEMPLATE MANAGEMENT
   // ---------------------------------------------------------------------
@@ -370,7 +402,12 @@ export class WhatsAppClient {
         Authorization: `Bearer ${this.env.wabaAccessToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(template),
+      body: JSON.stringify({
+        name: template.name,
+        language: template.language,
+        category: template.category,
+        components: template.components,
+      }),
     });
 
     const json = await _res.json();
@@ -475,14 +512,17 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   // 7. WEBHOOK SUBSCRIPTION MANAGEMENT
   // ---------------------------------------------------------------------
-  async subscribeApp(): Promise<WabaSubscribedAppsResponse> {
-    const url = `${this.baseUrl}/${this.env.fbAppId}/subscribed_apps`;
+  async subscribeApp(
+    wabaId: string,
+    accessToken: string,
+  ): Promise<WabaSubscribedAppsResponse> {
+    const url = `${this.baseUrl}/${wabaId}/subscribed_apps`;
 
     this.logger.info("Subscribing app to WABA");
 
     const res = await fetch(url, {
       method: "POST",
-      headers: { Authorization: `Bearer ${this.env.wabaAccessToken}` },
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
 
     const json = await res.json();
@@ -495,14 +535,17 @@ export class WhatsAppClient {
     return json;
   }
 
-  async unsubscribeApp(): Promise<WabaSubscribedAppsResponse> {
-    const url = `${this.baseUrl}/${this.env.fbAppId}/subscribed_apps`;
+  async unsubscribeApp(
+    wabaId: string,
+    accessToken: string,
+  ): Promise<WabaSubscribedAppsResponse> {
+    const url = `${this.baseUrl}/${wabaId}/subscribed_apps`;
 
     this.logger.info("Unsubscribing app from WABA");
 
     const res = await fetch(url, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${this.env.wabaAccessToken}` },
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
 
     const json = await res.json();
@@ -515,12 +558,17 @@ export class WhatsAppClient {
     return json;
   }
 
-  async getSubscribedApps(): Promise<WabaSubscribedAppsResponse> {
-    const url = `${this.baseUrl}/${this.env.fbAppId}/subscribed_apps?access_token=${this.env.wabaAccessToken}`;
+  async getSubscribedApps(
+    wabaId: string,
+    accessToken: string,
+  ): Promise<WabaSubscribedAppsResponse> {
+    const url = `${this.baseUrl}/${wabaId}/subscribed_apps`;
 
     this.logger.info("Fetching subscribed apps");
 
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
     const json = await res.json();
 
     if (!res.ok) {
@@ -698,7 +746,13 @@ export class WhatsAppClient {
     );
   }
 
-  async getTokenUsingWabaAuthCode(code: string): Promise<ActionResult<string>> {
+  async getTokenUsingWabaAuthCode(code: string): Promise<
+    ActionResult<{
+      accessToken: string;
+      tokenType?: string;
+      expiresIn?: number;
+    }>
+  > {
     try {
       const url = new URL(`${this.baseUrl}/oauth/access_token`);
       url.searchParams.append("client_id", this.env.fbAppId);
@@ -729,9 +783,20 @@ export class WhatsAppClient {
         };
       }
 
+      if (typeof json.access_token !== "string" || !json.access_token) {
+        throw new Error("Meta did not return an access token.");
+      }
       return {
         ok: true,
-        data: json.access_token,
+        data: {
+          accessToken: json.access_token,
+          ...(typeof json.token_type === "string"
+            ? { tokenType: json.token_type }
+            : {}),
+          ...(typeof json.expires_in === "number"
+            ? { expiresIn: json.expires_in }
+            : {}),
+        },
       };
     } catch (error: any) {
       this.logger.error("Error exchanging WABA auth code:", error);

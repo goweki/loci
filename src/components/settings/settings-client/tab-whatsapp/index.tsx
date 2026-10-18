@@ -9,12 +9,8 @@ import { Building2Icon, Phone } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import WabaEmbeddedSignup from "@/components/ui/waba-embedded-signup";
 import { Button } from "@/components/ui/button";
-import {
-  PhoneNumber,
-  SubscriptionStatus,
-  WabaAccount,
-  WabaTemplate,
-} from "@/lib/prisma/generated";
+import { SubscriptionStatus } from "@/lib/prisma/generated";
+import { UserWithRelations } from "@/services/user/user.dto";
 import { getStatusBadge } from "../utilities";
 import { TemplatesClient } from "./waba-templates";
 import { getUserSubscription } from "@/actions/subscription.actions";
@@ -26,12 +22,15 @@ import Loader from "@/components/ui/loaders";
 import { SubscriptionStatusCheck } from "@/types";
 import { AssistantConfig } from "./assistant-config";
 
-interface Waba extends WabaAccount {
-  phoneNumbers: PhoneNumber[];
-  templates: WabaTemplate[];
-}
+type Waba = NonNullable<UserWithRelations["waba"]>;
 
-export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
+export default function TabWhatsApp({
+  waba,
+  hasWhatsAppCredential,
+}: {
+  waba: Waba | null;
+  hasWhatsAppCredential: boolean;
+}) {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [subCheck, setSubCheck] = useState<SubscriptionStatusCheck | undefined>(
     undefined,
@@ -92,6 +91,18 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
             </div>
           ) : waba ? (
             <>
+              {!hasWhatsAppCredential && (
+                <div className="flex flex-col gap-3 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-medium">Reconnect WhatsApp</h3>
+                    <p className="text-sm text-muted-foreground">
+                      This account has no saved WhatsApp access token. Reconnect
+                      it to create templates and use WhatsApp features.
+                    </p>
+                  </div>
+                  <WabaEmbeddedSignup label="Reconnect account" />
+                </div>
+              )}
               <div className="flex items-center gap-4 p-4 border rounded-lg">
                 <Building2Icon className="w-10 h-10 text-green-600" />
                 <div className="flex-1">
@@ -135,7 +146,15 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
                             </p>
                           </div>
                         </div>
-                        {getStatusBadge(phone.status)}
+                        <div className="flex items-center gap-2">
+                          {getStatusBadge(phone.status)}
+                          {phone.whatsappRegistrationStatus !== "CONNECTED" && (
+                            <WabaEmbeddedSignup
+                              phoneNumberId={phone.id}
+                              label="Finish registration"
+                            />
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -164,7 +183,7 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
         </CardContent>
       </Card>
       {waba ? <AssistantConfig /> : null}
-      {waba ? (
+      {/* {waba ? (
         <Card>
           <CardHeader>
             <CardTitle>Customer notifications</CardTitle>
@@ -174,18 +193,8 @@ export default function TabWhatsApp({ waba }: { waba: Waba | null }) {
             <Button asChild variant="outline"><Link href={`/${language}/dashboard/whatsapp-notifications`}>Manage notifications</Link></Button>
           </CardContent>
         </Card>
-      ) : null}
-      {waba ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Whatsapp Templates</CardTitle>
-            <CardDescription>Manage your WhatsApp Templates</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <TemplatesClient wabaAccount={waba} />
-          </CardContent>
-        </Card>
-      ) : null}
+      ) : null} */}
+      {waba && <TemplatesClient wabaAccount={waba} />}
     </>
   );
 }

@@ -60,6 +60,7 @@ const translations = {
     features: {
       phoneNumbers: "Phone Numbers",
       messages: "Messages per Month",
+      templates: "WhatsApp templates",
       basicTemplates: "Message Templates",
       emailSupport: "Email Support",
       analytics: "Advanced Analytics",
@@ -105,6 +106,7 @@ const translations = {
     features: {
       phoneNumbers: "Namba za Simu",
       messages: "Ujumbe Kwa Mwezi",
+      templates: "Violezo vya WhatsApp",
       basicTemplates: "Violezo vya Ujumbe",
       emailSupport: "Msaada wa Barua Pepe",
       analytics: "Takwimu za Hali ya Juu",
@@ -280,7 +282,11 @@ export default function PricingComponent(props: { pageTitle?: boolean }) {
 
               <CardContent className="flex-grow">
                 <ul className="space-y-3 w-fit m-auto">
-                  {plan.planFeatures.map((feature, index) => (
+                  <li className="flex items-start">
+                    <span className="mr-3 mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary/10"><Check className="h-3 w-3 text-primary" /></span>
+                    <span><span className="font-semibold">{plan.maxTemplates >= 999 ? t.unlimited : plan.maxTemplates}</span> {t.features.templates}</span>
+                  </li>
+                  {plan.planFeatures.filter(({ feature }) => feature.name !== "WhatsApp Templates").map((feature, index) => (
                     <li key={index} className="flex items-start">
                       <span
                         className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mr-3 mt-0.5 ${

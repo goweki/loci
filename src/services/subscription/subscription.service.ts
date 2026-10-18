@@ -88,19 +88,31 @@ export class SubscriptionService {
       return { hasAccess: true, status: SubscriptionStatus.INCOMPLETE };
     }
 
+    const subscriptionDto = {
+      ...subscription,
+      payments: subscription.payments.map((payment) => ({
+        ...payment,
+        amount: payment.amount.toNumber(),
+      })),
+    };
+
     const now = new Date();
     const isWithinPeriod = now <= subscription.currentPeriodEnd;
 
     // Evaluate active status conditionally based on state & timeline
     if (subscription.status === SubscriptionStatus.ACTIVE && isWithinPeriod) {
-      return { hasAccess: true, status: "ACTIVE", subscription };
+      return {
+        hasAccess: true,
+        status: "ACTIVE",
+        subscription: subscriptionDto,
+      };
     }
 
     if (subscription.status === SubscriptionStatus.CANCELED && isWithinPeriod) {
       return {
         hasAccess: true,
         status: SubscriptionStatus.CANCELED,
-        subscription,
+        subscription: subscriptionDto,
       };
     }
 
@@ -112,7 +124,11 @@ export class SubscriptionService {
       });
     }
 
-    return { hasAccess: false, status: "EXPIRED", subscription };
+    return {
+      hasAccess: false,
+      status: "EXPIRED",
+      subscription: subscriptionDto,
+    };
   }
 
   /**

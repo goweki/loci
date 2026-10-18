@@ -88,6 +88,18 @@ export const bodyComponentSchema = z.object({
     .optional(),
 });
 
+// Authentication templates use Meta's generated OTP copy. Unlike regular
+// templates, their BODY component cannot include custom text or examples.
+export const authenticationBodyComponentSchema = z.object({
+  type: z.literal("BODY"),
+  add_security_recommendation: z.boolean().optional(),
+});
+
+export const authenticationFooterComponentSchema = z.object({
+  type: z.literal("FOOTER"),
+  code_expiration_minutes: z.number().min(1).max(90).optional(),
+});
+
 export const footerComponentSchema = z.object({
   type: z.literal("FOOTER"),
   text: z.string().max(60).optional(),
@@ -97,6 +109,11 @@ export const footerComponentSchema = z.object({
 export const buttonsComponentSchema = z.object({
   type: z.literal("BUTTONS"),
   buttons: z.array(buttonSchema).max(10),
+});
+
+export const authenticationButtonsComponentSchema = z.object({
+  type: z.literal("BUTTONS"),
+  buttons: z.tuple([otpButtonSchema]),
 });
 
 export const componentSchema = z.union([
@@ -120,9 +137,9 @@ export const authenticationTemplateSchema = z.object({
     .default(TemplateApprovalStatus.PENDING),
   components: z.array(
     z.union([
-      bodyComponentSchema,
-      footerComponentSchema,
-      buttonsComponentSchema,
+      authenticationBodyComponentSchema,
+      authenticationFooterComponentSchema,
+      authenticationButtonsComponentSchema,
     ])
   ),
 });
@@ -152,12 +169,10 @@ export const authTemplateBuilderSchema = z.object({
   language: z.enum(TemplateLanguage).default(TemplateLanguage.en_US),
   category: z.literal(TemplateCategory.AUTHENTICATION),
   body: z.object({
-    text: z.string().min(1),
     addSecurityRecommendation: z.boolean().optional(),
   }),
   footer: z
     .object({
-      text: z.string().optional(),
       codeExpirationMinutes: z.number().min(1).max(90).optional(),
     })
     .optional(),
@@ -269,7 +284,6 @@ export function builderToTemplate(builder: TemplateBuilder): Template {
     const components: any[] = [
       {
         type: "BODY",
-        text: builder.body.text,
         ...(builder.body.addSecurityRecommendation && {
           add_security_recommendation: true,
         }),
@@ -279,7 +293,6 @@ export function builderToTemplate(builder: TemplateBuilder): Template {
     if (builder.footer) {
       components.push({
         type: "FOOTER",
-        ...builder.footer,
         ...(builder.footer.codeExpirationMinutes && {
           code_expiration_minutes: builder.footer.codeExpirationMinutes,
         }),

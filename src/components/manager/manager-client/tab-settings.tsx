@@ -17,9 +17,11 @@ import { useSession } from "next-auth/react";
 import { getUserByIdAction } from "@/actions/user.actions";
 import { userInclude, type UserWithRelations } from "@/services/user/user.dto";
 
-export default function TabSettings() {
+export default function TabSync() {
   const [user, setUser] = useState<UserWithRelations>();
   const [loading, setLoading] = useState<"waba">();
+  const [syncResults, setSyncResults] =
+    useState<Record<string, string | string[] | number>>();
 
   const { data: session } = useSession();
 
@@ -32,7 +34,9 @@ export default function TabSettings() {
   }, [session?.user]);
 
   const syncWithMeta = useCallback(async () => {
-    await synchronizeMeta();
+    setSyncResults(undefined);
+    const res = await synchronizeMeta();
+    if (res) setSyncResults(res);
     setLoading((prev) => {
       if (prev === "waba") return undefined;
     });
@@ -44,7 +48,7 @@ export default function TabSettings() {
   }, [getUser]);
 
   return (
-    <TabsContent value="settings" className="space-y-4">
+    <TabsContent value="sync" className="space-y-4">
       {user ? (
         <Card>
           <CardHeader className="hidden"></CardHeader>
@@ -71,6 +75,36 @@ export default function TabSettings() {
                 {loading == "waba" && <Loader size={4} />}
               </Button>
             </div>
+            {syncResults && (
+              <div className="mt-6 rounded-lg border p-4 space-y-3 bg-primary/10">
+                <h4 className="font-medium text-sm text-foreground">
+                  Sync Results
+                </h4>
+                <div className="space-y-2 text-xs">
+                  {Object.entries(syncResults).map(([key, value]) => (
+                    <div
+                      key={key}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 py-1 border-b border-border/50 last:border-0"
+                    >
+                      <span className="font-semibold text-muted-foreground capitalize">
+                        {key.replace(/([A-Z])/g, " $1")}:
+                      </span>
+                      <span className="font-mono text-foreground">
+                        {Array.isArray(value) ? (
+                          <ul className="list-disc list-inside space-y-0.5">
+                            {value.map((item, idx) => (
+                              <li key={idx}>{item}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          String(value)
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       ) : (

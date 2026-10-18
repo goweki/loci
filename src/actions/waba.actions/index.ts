@@ -2,215 +2,338 @@
 
 import { requireUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { PhoneNumberStatus, SubscriptionStatus, WabaOwnership } from "@/lib/prisma/generated";
+import {
+  PhoneNumberStatus,
+  SubscriptionStatus,
+  WabaOwnership,
+} from "@/lib/prisma/generated";
 import whatsapp from "@/lib/whatsapp";
+import {
+  decryptWhatsAppToken,
+  encryptWhatsAppToken,
+} from "@/lib/whatsapp/credentials";
+import { env_ } from "@/lib/whatsapp/types/environment-variables";
 import { ActionResult } from "@/types";
-import { encryptWhatsAppToken } from "@/lib/whatsapp/credentials";
 
 interface ConnectWabaParams {
   code: string;
-  waba_id?: string;
+  waba_id: string;
   phone_number_id?: string;
   business_id?: string;
+}
+
+export interface ConnectedWabaResult {
+  wabaId: string;
+  phoneNumberId: string;
+  registrationRequired: boolean;
 }
 
 export async function connectWhatsAppAction({
   code,
   waba_id,
   phone_number_id,
-}: ConnectWabaParams): Promise<ActionResult<string>> {
+  business_id,
+}: ConnectWabaParams): Promise<ActionResult<ConnectedWabaResult>> {
   const actor = await requireUser();
 
   try {
-    if (!code) {
-      return { ok: false, error: "Missing authorization code" };
+    if (!code?.trim())
+      throw new Error("Meta did not return an authorization code.");
+    if (!/^\d{5,32}$/.test(waba_id))
+      throw new Error("Meta returned an invalid WhatsApp Business Account ID.");
+    if (phone_number_id && !/^\d{5,32}$/.test(phone_number_id)) {
+      throw new Error("Meta returned an invalid phone number ID.");
     }
-
-    // 1. Exchange OAuth code via WhatsAppClient
-    const resTokenData = await whatsapp.getTokenUsingWabaAuthCode(code);
-    if (!resTokenData.ok) {
-      throw new Error(resTokenData.error);
+    if (business_id && !/^\d{5,32}$/.test(business_id)) {
+      throw new Error("Meta returned an invalid business portfolio ID.");
     }
-    const access_token = resTokenData.data;
-
-    if (!access_token) {
-      return {
-        ok: false,
-        error: "Failed to obtain access token from authorization code",
-      };
-    }
-    const encryptedAccessToken = encryptWhatsAppToken(access_token);
 
     const subscription = await prisma.subscription.findFirst({
-      where: { userId: actor.id, status: SubscriptionStatus.ACTIVE, currentPeriodEnd: { gt: new Date() } },
+      where: {
+        userId: actor.id,
+        status: SubscriptionStatus.ACTIVE,
+        currentPeriodEnd: { gt: new Date() },
+      },
       include: { plan: { select: { maxPhoneNumbers: true } } },
       orderBy: { currentPeriodEnd: "desc" },
     });
-    if (!subscription) return { ok: false, error: "An active subscription is required to connect WhatsApp." };
-
-    // --- FALLBACK RESOLUTION FOR CASE A (Missing IDs) ---
-    let targetWabaId = waba_id;
-    let targetPhoneNumberId = phone_number_id;
-
-    // 2. Fetch WABA ID via Meta /debug_token if missing
-    if (!targetWabaId) {
-      try {
-        const appAccessToken = `${process.env.NEXT_PUBLIC_META_APP_ID}|${process.env.META_APP_SECRET}`;
-        const debugRes = await fetch(
-          `https://graph.facebook.com/v22.0/debug_token?input_token=${access_token}&access_token=${appAccessToken}`,
-        );
-        const debugData = await debugRes.json();
-
-        const scopes = debugData?.data?.granular_scopes || [];
-        const whatsappScope = scopes.find(
-          (s: any) => s.scope === "whatsapp_business_management",
-        );
-
-        targetWabaId = whatsappScope?.target_ids?.[0];
-      } catch (err) {
-        console.warn("Could not resolve WABA ID from debug_token:", err);
-      }
-    }
-
-    if (!targetWabaId) {
-      return {
-        ok: false,
-        error: "Could not locate WhatsApp Business Account ID from Meta",
-      };
-    }
-
-    // 3. Fetch Phone Number ID via WABA endpoint if missing
-    let remotePhoneNumbers: Array<{ id: string }> = [];
-    try {
-      const phoneListRes = await fetch(
-        `https://graph.facebook.com/v22.0/${targetWabaId}/phone_numbers?fields=id&limit=100`,
-        { headers: { Authorization: `Bearer ${access_token}` }, signal: AbortSignal.timeout(10000) },
+    if (!subscription) {
+      throw new Error(
+        "An active subscription is required to connect WhatsApp.",
       );
-      const phoneListData = await phoneListRes.json();
-      if (!phoneListRes.ok) throw new Error(phoneListData?.error?.message || "Unable to read WhatsApp phone numbers from Meta.");
-      remotePhoneNumbers = Array.isArray(phoneListData?.data) ? phoneListData.data : [];
-      targetPhoneNumberId ||= remotePhoneNumbers[0]?.id;
-    } catch (err) {
-      if (targetPhoneNumberId) remotePhoneNumbers = [{ id: targetPhoneNumberId }];
-      else throw err;
     }
 
-    const existingWaba = await prisma.wabaAccount.findUnique({ where: { id: targetWabaId }, select: { userId: true } });
+    const exchanged = await whatsapp.getTokenUsingWabaAuthCode(code);
+    if (!exchanged.ok) throw new Error(exchanged.error);
+    const { accessToken, tokenType, expiresIn } = exchanged.data;
+    const encryptedAccessToken = encryptWhatsAppToken(accessToken);
+
+    // These calls verify that the exchanged credential can access the exact
+    // WABA and selected phone number from this signup session.
+    const [wabaMeta, phoneNumbers] = await Promise.all([
+      whatsapp.getWaba(waba_id, accessToken),
+      getWabaPhoneNumbers(waba_id, accessToken),
+    ]);
+    if (wabaMeta.id !== waba_id) {
+      throw new Error(
+        "The selected WhatsApp Business Account could not be verified.",
+      );
+    }
+
+    const phoneNumberId =
+      phone_number_id ??
+      (phoneNumbers.length === 1 ? phoneNumbers[0].id : undefined);
+    if (!phoneNumberId) {
+      throw new Error(
+        "Select a phone number in Meta Embedded Signup and try again.",
+      );
+    }
+    if (!phoneNumbers.some((phone) => phone.id === phoneNumberId)) {
+      throw new Error(
+        "The selected phone number does not belong to this WhatsApp Business Account.",
+      );
+    }
+
+    const [phoneData, existingWaba, otherAccount, existingPhone] =
+      await Promise.all([
+        whatsapp.getPhoneNumberDetails(phoneNumberId, accessToken),
+        prisma.wabaAccount.findUnique({
+          where: { id: waba_id },
+          select: { userId: true },
+        }),
+        prisma.wabaAccount.findFirst({
+          where: { userId: actor.id, id: { not: waba_id } },
+          select: { id: true },
+        }),
+        prisma.phoneNumber.findUnique({
+          where: { id: phoneNumberId },
+          select: { id: true, waba: { select: { userId: true } } },
+        }),
+      ]);
+    if (phoneData.id && phoneData.id !== phoneNumberId) {
+      throw new Error("Meta returned details for a different phone number.");
+    }
     if (existingWaba?.userId && existingWaba.userId !== actor.id) {
-      return { ok: false, error: "This WhatsApp Business Account is already connected to another account." };
+      throw new Error(
+        "This WhatsApp Business Account is connected to another account.",
+      );
     }
-    const existingCount = await prisma.phoneNumber.count({ where: { waba: { userId: actor.id } } });
-    const newPhoneIds = remotePhoneNumbers.filter((item) => item.id).map((item) => item.id);
-    const alreadyOwned = await prisma.phoneNumber.count({ where: { id: { in: newPhoneIds }, waba: { userId: actor.id } } });
-    if (existingCount + newPhoneIds.length - alreadyOwned > subscription.plan.maxPhoneNumbers) {
-      return { ok: false, error: `Your plan allows ${subscription.plan.maxPhoneNumbers} WhatsApp number(s).` };
+    if (otherAccount) {
+      throw new Error(
+        "This account already has a different WhatsApp Business Account connected.",
+      );
     }
-
-    const otherAccount = await prisma.wabaAccount.findFirst({ where: { userId: actor.id, id: { not: targetWabaId } }, select: { id: true } });
-    if (otherAccount) return { ok: false, error: "This account already has a different WhatsApp Business Account connected." };
-    // --- END FALLBACK RESOLUTION ---
-
-    // 4. Fetch WABA Metadata via WhatsAppClient
-    let wabaMeta = {
-      name: "Unknown WhatsApp Account",
-      currency: "USD",
-      timezone_id: "1",
-      message_template_namespace: null as string | null,
-    };
-
-    try {
-      const data = await whatsapp.getWaba(targetWabaId, access_token);
-      wabaMeta = {
-        name: data.name || wabaMeta.name,
-        currency: data.currency || wabaMeta.currency,
-        timezone_id: data.timezone_id || wabaMeta.timezone_id,
-        message_template_namespace: data.message_template_namespace || null,
-      };
-    } catch (err) {
-      console.warn(
-        "Could not fetch WABA metadata, proceeding with defaults:",
-        err,
+    if (existingPhone?.waba?.userId && existingPhone.waba.userId !== actor.id) {
+      throw new Error("This phone number is connected to another account.");
+    }
+    const phoneNumber = phoneData.display_phone_number || phoneNumberId;
+    const existingPhoneNumber = await prisma.phoneNumber.findUnique({
+      where: { phoneNumber },
+      select: { id: true, waba: { select: { userId: true } } },
+    });
+    if (
+      existingPhoneNumber?.waba?.userId &&
+      existingPhoneNumber.waba.userId !== actor.id
+    ) {
+      throw new Error("This phone number is connected to another account.");
+    }
+    const currentPhoneCount = await prisma.phoneNumber.count({
+      where: { waba: { userId: actor.id } },
+    });
+    const alreadyOwnedPhone =
+      existingPhone?.waba?.userId === actor.id ||
+      existingPhoneNumber?.waba?.userId === actor.id;
+    if (
+      !alreadyOwnedPhone &&
+      currentPhoneCount >= subscription.plan.maxPhoneNumbers
+    ) {
+      throw new Error(
+        `Your plan allows ${subscription.plan.maxPhoneNumbers} WhatsApp number(s).`,
       );
     }
 
-    // 5. Persist WABA Account in Prisma DB
+    // Ensure webhook delivery is enabled before reporting onboarding success.
+    await whatsapp.subscribeApp(waba_id, accessToken);
+
+    const now = new Date();
     const wabaAccount = await prisma.wabaAccount.upsert({
-      where: { id: targetWabaId },
+      where: { id: waba_id },
       update: {
         userId: actor.id,
         name: wabaMeta.name,
         currency: wabaMeta.currency,
         timezoneId: wabaMeta.timezone_id,
         messageTemplateNamespace: wabaMeta.message_template_namespace,
+        businessId: business_id,
         accessTokenEncrypted: encryptedAccessToken,
-        tokenUpdatedAt: new Date(),
+        accessTokenType: tokenType ?? null,
+        accessTokenExpiresAt:
+          typeof expiresIn === "number"
+            ? new Date(now.getTime() + expiresIn * 1000)
+            : null,
+        tokenUpdatedAt: now,
       },
       create: {
-        id: targetWabaId,
+        id: waba_id,
         userId: actor.id,
         name: wabaMeta.name,
         ownership: WabaOwnership.SHARED,
         currency: wabaMeta.currency,
         timezoneId: wabaMeta.timezone_id,
         messageTemplateNamespace: wabaMeta.message_template_namespace,
+        businessId: business_id,
         accessTokenEncrypted: encryptedAccessToken,
-        tokenUpdatedAt: new Date(),
+        accessTokenType: tokenType ?? null,
+        accessTokenExpiresAt:
+          typeof expiresIn === "number"
+            ? new Date(now.getTime() + expiresIn * 1000)
+            : null,
+        tokenUpdatedAt: now,
       },
     });
 
-    // 6. Fetch and Store Phone Number details via WhatsAppClient
-    let syncedPhoneCount = 0;
-    for (const remotePhone of remotePhoneNumbers) {
-      try {
-        const phoneData = await whatsapp.getPhoneNumberDetails(
-          remotePhone.id,
-          access_token,
-        );
-        const phoneNumberStr =
-          phoneData.display_phone_number || remotePhone.id;
+    const verified = phoneData.code_verification_status === "VERIFIED";
+    await prisma.phoneNumber.upsert({
+      where: { phoneNumber },
+      update: {
+        id: phoneNumberId,
+        displayName: phoneData.verified_name || null,
+        status: verified
+          ? PhoneNumberStatus.VERIFIED
+          : PhoneNumberStatus.NOT_VERIFIED,
+        verifiedAt: verified ? now : null,
+        whatsappRegistrationStatus: phoneData.status ?? null,
+        wabaId: wabaAccount.id,
+      },
+      create: {
+        id: phoneNumberId,
+        phoneNumber,
+        displayName: phoneData.verified_name || null,
+        status: verified
+          ? PhoneNumberStatus.VERIFIED
+          : PhoneNumberStatus.NOT_VERIFIED,
+        verifiedAt: verified ? now : null,
+        whatsappRegistrationStatus: phoneData.status ?? null,
+        wabaId: wabaAccount.id,
+      },
+    });
 
-        const existingPhone = await prisma.phoneNumber.findUnique({ where: { phoneNumber: phoneNumberStr }, select: { id: true, waba: { select: { userId: true } } } });
-        if (existingPhone?.waba?.userId && existingPhone.waba.userId !== actor.id) {
-          throw new Error("A phone number returned by Meta belongs to another Loci account.");
-        }
-
-        await prisma.phoneNumber.upsert({
-          where: { phoneNumber: phoneNumberStr },
-          update: {
-            id: remotePhone.id,
-            displayName: phoneData.verified_name || null,
-            status: PhoneNumberStatus.VERIFIED,
-            verifiedAt: new Date(),
-            wabaId: wabaAccount.id,
-          },
-          create: {
-            id: remotePhone.id,
-            phoneNumber: phoneNumberStr,
-            displayName: phoneData.verified_name || null,
-            status: PhoneNumberStatus.VERIFIED,
-            verifiedAt: new Date(),
-            wabaId: wabaAccount.id,
-          },
-        });
-        syncedPhoneCount += 1;
-      } catch (err) {
-        if (err instanceof Error && err.message.includes("belongs to another")) throw err;
-        console.warn(
-          `Could not fetch phone number details for ${remotePhone.id}, skipping phone save:`,
-          err,
-        );
-      }
-    }
-    if (syncedPhoneCount === 0) {
-      throw new Error("Meta connected the business account, but no phone numbers could be synced. Retry the connection.");
-    }
-
-    return { ok: true, data: wabaAccount.id };
-  } catch (error: any) {
-    console.error("WhatsApp Action Error:", error);
+    return {
+      ok: true,
+      data: {
+        wabaId: wabaAccount.id,
+        phoneNumberId,
+        registrationRequired: phoneData.status !== "CONNECTED",
+      },
+    };
+  } catch (error) {
+    console.error("WhatsApp connection error:", error);
     return {
       ok: false,
-      error: error.message || "Failed to link WhatsApp account",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to link WhatsApp account.",
     };
   }
+}
+
+export async function registerWhatsAppPhoneNumberAction(
+  phoneNumberId: string,
+  pin: string,
+): Promise<ActionResult<void>> {
+  const actor = await requireUser();
+  if (!/^\d{5,32}$/.test(phoneNumberId)) {
+    return { ok: false, error: "Invalid WhatsApp phone number." };
+  }
+  if (!/^\d{6}$/.test(pin)) {
+    return {
+      ok: false,
+      error: "Enter the six-digit WhatsApp registration PIN.",
+    };
+  }
+
+  try {
+    const phone = await prisma.phoneNumber.findFirst({
+      where: { id: phoneNumberId, waba: { userId: actor.id } },
+      select: {
+        id: true,
+        waba: { select: { id: true, accessTokenEncrypted: true } },
+      },
+    });
+    if (!phone?.waba?.accessTokenEncrypted) {
+      throw new Error(
+        "Reconnect your WhatsApp Business account before registering this number.",
+      );
+    }
+
+    const accessToken = decryptWhatsAppToken(phone.waba.accessTokenEncrypted);
+    const result = await whatsapp.registerPhoneNumber(
+      phone.id,
+      pin,
+      accessToken,
+    );
+    if (!result.success)
+      throw new Error("Meta did not confirm phone number registration.");
+
+    await prisma.phoneNumber.update({
+      where: { id: phone.id },
+      data: { whatsappRegistrationStatus: "CONNECTED" },
+    });
+    return { ok: true, data: undefined };
+  } catch (error) {
+    return {
+      ok: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Could not register the WhatsApp phone number.",
+    };
+  }
+}
+
+async function getWabaPhoneNumbers(wabaId: string, accessToken: string) {
+  const allPhones: Array<{ id: string }> = [];
+  let nextUrl: string | undefined =
+    `https://graph.facebook.com/${env_.apiVersion}/${wabaId}/phone_numbers?fields=id&limit=100`;
+
+  while (nextUrl) {
+    const pageResponse: Response = await fetch(nextUrl, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      signal: AbortSignal.timeout(10000),
+    });
+    const pageData: {
+      data?: Array<{ id?: unknown }>;
+      paging?: { next?: unknown };
+      error?: { message?: string };
+    } = await pageResponse.json();
+    if (!pageResponse.ok) {
+      throw new Error(
+        pageData.error?.message || "Unable to verify WhatsApp phone numbers.",
+      );
+    }
+    if (Array.isArray(pageData.data)) {
+      for (const phone of pageData.data) {
+        if (typeof phone?.id === "string") allPhones.push({ id: phone.id });
+      }
+    }
+    nextUrl =
+      typeof pageData.paging?.next === "string"
+        ? pageData.paging.next
+        : undefined;
+    if (nextUrl) {
+      const pagingUrl = new URL(nextUrl);
+      if (
+        pagingUrl.protocol !== "https:" ||
+        pagingUrl.hostname !== "graph.facebook.com"
+      ) {
+        throw new Error("Meta returned an invalid phone-number paging URL.");
+      }
+    }
+    if (allPhones.length > 500)
+      throw new Error(
+        "This WhatsApp Business Account has too many phone numbers to sync.",
+      );
+  }
+  return allPhones;
 }

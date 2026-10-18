@@ -11,7 +11,35 @@ export const userInclude = Prisma.validator<Prisma.UserInclude>()({
   contacts: true,
   messages: true,
   subscriptions: { include: { plan: true } },
-  waba: { include: { phoneNumbers: true, templates: true } },
+  waba: {
+    select: {
+      id: true,
+      name: true,
+      userId: true,
+      ownership: true,
+      currency: true,
+      timezoneId: true,
+      messageTemplateNamespace: true,
+      businessId: true,
+      tokenUpdatedAt: true,
+      createdAt: true,
+      updatedAt: true,
+      phoneNumbers: {
+        select: {
+          id: true,
+          phoneNumber: true,
+          displayName: true,
+          status: true,
+          verifiedAt: true,
+          createdAt: true,
+          updatedAt: true,
+          wabaId: true,
+          whatsappRegistrationStatus: true,
+        },
+      },
+      templates: true,
+    },
+  },
   autoreplyRules: true,
   _count: {
     select: {

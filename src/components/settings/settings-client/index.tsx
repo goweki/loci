@@ -21,7 +21,13 @@ import { UserWithRelations } from "@/services/user/user.dto";
 
 const isWhatsAppEnabled = process.env.NEXT_PUBLIC_ENABLE_WHATSAPP_UI === "true";
 
-export default function SettingsClient({ user }: { user: UserWithRelations }) {
+export default function SettingsClient({
+  user,
+  hasWhatsAppCredential,
+}: {
+  user: UserWithRelations;
+  hasWhatsAppCredential: boolean;
+}) {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
 
@@ -87,7 +93,10 @@ export default function SettingsClient({ user }: { user: UserWithRelations }) {
       {/* WhatsApp / Chatbots Tab */}
       <TabsContent value="chatbots" className="space-y-6">
         {isWhatsAppEnabled ? (
-          <TabWhatsApp waba={user.waba} />
+          <TabWhatsApp
+            waba={user.waba}
+            hasWhatsAppCredential={hasWhatsAppCredential}
+          />
         ) : (
           /* Under Development Placeholder */
           <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">

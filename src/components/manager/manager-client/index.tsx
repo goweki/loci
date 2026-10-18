@@ -22,7 +22,7 @@ import {
 import TabTemplates from "./tab-templates";
 import TabPhoneNumbers from "./tab-phoneNumbers";
 import TabAutoreplyRules from "./tab-autoReply";
-import TabSettings from "./tab-settings";
+import TabSync from "./tab-settings";
 import { useSearchParams } from "next/navigation";
 
 export default function ManagerComponent() {
@@ -46,9 +46,9 @@ export default function ManagerComponent() {
           <MessageSquare className="w-4 h-4" />
           <span className="hidden sm:inline">Auto Reply</span>
         </TabsTrigger>
-        <TabsTrigger value="settings" className="flex items-center gap-2">
+        <TabsTrigger value="sync" className="flex items-center gap-2">
           <Settings className="w-4 h-4" />
-          <span className="hidden sm:inline">Settings</span>
+          <span className="hidden sm:inline">Sync from Cloud</span>
         </TabsTrigger>
       </TabsList>
 
@@ -61,35 +61,7 @@ export default function ManagerComponent() {
       {/* Auto Reply Tab */}
       <TabAutoreplyRules />
 
-      {/* Contacts Tab */}
-      {/* <TabsContent value="contacts" className="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Contacts</CardTitle>
-            <CardDescription>
-              View and manage your WhatsApp contacts
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="mb-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                <Input placeholder="Search contacts..." className="pl-10" />
-              </div>
-            </div>
-            <Alert>
-              <Users className="h-4 w-4" />
-              <AlertDescription>
-                Contacts are automatically created when you send or receive
-                messages.
-              </AlertDescription>
-            </Alert>
-          </CardContent>
-        </Card>
-      </TabsContent> */}
-
-      {/* Settings Tab */}
-      <TabSettings />
+      <TabSync />
     </Tabs>
   );
 }

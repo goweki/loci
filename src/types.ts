@@ -11,13 +11,30 @@ export type ActionResult<T = void> =
 // SUBSCRIPTION type
 // ============================================
 
+type SubscriptionWithNumberPaymentAmounts = Omit<
+  Prisma.SubscriptionGetPayload<{
+    include: {
+      plan: true;
+      payments: true;
+    };
+  }>,
+  "payments"
+> & {
+  payments: Array<
+    Omit<
+      Prisma.SubscriptionGetPayload<{
+        include: {
+          plan: true;
+          payments: true;
+        };
+      }>["payments"][number],
+      "amount"
+    > & { amount: number }
+  >;
+};
+
 export interface SubscriptionStatusCheck {
   hasAccess: boolean;
   status: SubscriptionStatus;
-  subscription?: Prisma.SubscriptionGetPayload<{
-    include: {
-      plan: true;
-      payments: true; // Note: Use SubscriptionPayment if using the separated model
-    };
-  }>;
+  subscription?: SubscriptionWithNumberPaymentAmounts;
 }

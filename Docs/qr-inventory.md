@@ -15,9 +15,9 @@ A scan must never silently mutate inventory. Require an explicit adjustment dire
 
 ## QR identity and safety
 
-Prefer encoding an opaque, stable product identifier or an application URL containing an opaque identifier. Do not encode price, stock quantity, owner ID, or other mutable/trusted fields in the QR payload. Treat all scanned text as untrusted; the server resolves the identifier under the authenticated owner's scope. A QR code is an identifier, not authorization.
+Product QR labels currently encode the opaque product ID. Do not encode price, stock quantity, owner ID, or other mutable/trusted fields in the QR payload. Treat all scanned text as untrusted; the UI resolves it against the owner's product list and the server repeats the ownership check for adjustments. A QR code is an identifier, not authorization. SKU is optional and is not used by the current QR workflow.
 
-Generate printable/displayable QR codes from the product UI and support existing labels only if their payload format can be safely mapped. SKU exists in the schema but is optional and current product-create inputs do not expose it consistently; decide whether QR resolves by product ID or formalize SKU before implementation. Avoid relying on mutable product names.
+Product pages generate printable/displayable QR codes locally, and the inventory scanner accepts the product ID manually when camera access is unavailable. Existing labels are supported only when their payload exactly matches a product ID. Avoid relying on mutable product names.
 
 ## Data and implementation fit
 

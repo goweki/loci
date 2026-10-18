@@ -9,6 +9,7 @@ import {
   Clock,
   PlusIcon,
   Send,
+  ArrowLeft,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -44,6 +45,7 @@ export function ConversationsComponent({
   const dialog = searchParams.get("dialog");
 
   const [search, setSearch] = useState("");
+  const [mobileView, setMobileView] = useState<"list" | "chat">("list");
 
   const [selectedConversationId, setSelectedConversationId] = useState<
     string | null
@@ -140,9 +142,14 @@ export function ConversationsComponent({
   }
 
   return (
-    <div className="flex h-[calc(100vh-12rem)] overflow-hidden pt-6">
+    <div className="flex max-h-[calc(100dvh-4rem)] w-full overflow-hidden pt-2 md:max-h-[calc(100vh-6rem)] md:pt-6 h-full">
       {/* Sidebar */}
-      <Card className="flex w-96 flex-col">
+      <Card
+        className={cn(
+          "min-h-0 w-full min-w-0 flex-col overflow-hidden md:flex md:w-80 md:shrink-0 lg:w-96",
+          mobileView === "list" ? "flex" : "hidden",
+        )}
+      >
         {/* Header */}
         <div className="border-b p-4">
           <div className="mb-4">
@@ -152,7 +159,10 @@ export function ConversationsComponent({
               Manage your WhatsApp conversations
             </p>
           </div>
-          <Button className="mb-4" onClick={() => setNewDialogOpen(true)}>
+          <Button
+            className="mb-4 w-full sm:w-auto"
+            onClick={() => setNewDialogOpen(true)}
+          >
             <PlusIcon /> New Message
           </Button>
           <NewMessageDialog open={newDialogOpen} setOpen={setNewDialogOpen} />
@@ -176,7 +186,10 @@ export function ConversationsComponent({
               <button
                 key={conversation.id}
                 type="button"
-                onClick={() => setSelectedConversationId(conversation.id)}
+                onClick={() => {
+                  setSelectedConversationId(conversation.id);
+                  setMobileView("chat");
+                }}
                 className={cn(
                   "w-full border-b p-4 text-left transition-colors hover:bg-accent/50",
                   selectedConversationId === conversation.id && "bg-accent/30",
@@ -228,20 +241,39 @@ export function ConversationsComponent({
       </Card>
 
       {/* Chat Area */}
-      <div className="flex flex-1 items-center justify-center bg-background">
+      <div
+        className={cn(
+          "min-h-0 min-w-0 flex-1 items-center justify-center overflow-hidden bg-background",
+          mobileView === "chat" ? "flex" : "hidden md:flex",
+        )}
+      >
         {selectedConversation ? (
-          <div className="flex h-full w-full flex-col">
-            <div className="flex items-center justify-between border-b px-5 py-3">
-              <div>
-                <h2 className="font-semibold">{selectedConversation.name}</h2>
-                <p className="text-sm text-muted-foreground">
-                  {selectedConversation.phone}
-                </p>
+          <div className="flex h-full min-h-0 w-full min-w-0 flex-col">
+            <div className="flex flex-col gap-3 border-b px-3 py-3 sm:flex-row sm:items-center sm:justify-between md:px-5">
+              <div className="flex min-w-0 items-center gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="shrink-0 md:hidden"
+                  aria-label="Back to conversations"
+                  onClick={() => setMobileView("list")}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <div className="min-w-0">
+                  <h2 className="truncate font-semibold">
+                    {selectedConversation.name}
+                  </h2>
+                  <p className="truncate text-sm text-muted-foreground">
+                    {selectedConversation.phone}
+                  </p>
+                </div>
               </div>
               {selectedConversation.chatbot &&
                 selectedConversation.phoneNumberId && (
-                  <div className="flex items-center gap-3">
-                    <p className="text-xs text-muted-foreground">
+                  <div className="flex min-w-0 items-center justify-between gap-2 sm:justify-end">
+                    <p className="truncate text-xs text-muted-foreground">
                       {selectedConversation.chatbot.handedOff
                         ? "Human takeover"
                         : selectedConversation.chatbot.active
@@ -279,7 +311,7 @@ export function ConversationsComponent({
                   </div>
                 )}
             </div>
-            <div className="flex-1 space-y-3 overflow-y-auto p-5">
+            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3 sm:p-5">
               {selectedConversation.messages
                 .filter(
                   (message) =>
@@ -293,7 +325,7 @@ export function ConversationsComponent({
                     className={`flex ${message.direction === "OUTBOUND" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[80%] rounded-2xl px-4 py-2 ${message.direction === "OUTBOUND" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+                      className={`max-w-[90%] break-words rounded-2xl px-4 py-2 sm:max-w-[80%] ${message.direction === "OUTBOUND" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
                     >
                       <p className="whitespace-pre-wrap text-sm">
                         {messageText(message.content)}
@@ -314,13 +346,14 @@ export function ConversationsComponent({
             </div>
             <form
               onSubmit={onSend}
-              className="flex items-end gap-2 border-t p-4"
+              className="flex items-end gap-2 border-t p-3 sm:p-4"
             >
               <Textarea
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 rows={2}
                 maxLength={4000}
+                className="min-w-0"
                 placeholder="Reply in WhatsApp…"
                 disabled={isPending || !selectedConversation.phoneNumberId}
               />
@@ -340,6 +373,15 @@ export function ConversationsComponent({
           </div>
         ) : (
           <div className="text-center">
+            <Button
+              type="button"
+              variant="ghost"
+              className="mb-3 md:hidden"
+              onClick={() => setMobileView("list")}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              All conversations
+            </Button>
             <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-muted">
               <User className="h-12 w-12 text-muted-foreground" />
             </div>

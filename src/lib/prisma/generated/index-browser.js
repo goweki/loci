@@ -159,6 +159,7 @@ exports.Prisma.PlanScalarFieldEnum = {
   monthlyPrice: 'monthlyPrice',
   maxPhoneNumbers: 'maxPhoneNumbers',
   maxMessagesPerMonth: 'maxMessagesPerMonth',
+  maxTemplates: 'maxTemplates',
   active: 'active',
   popular: 'popular',
   createdAt: 'createdAt',
@@ -201,7 +202,10 @@ exports.Prisma.WabaAccountScalarFieldEnum = {
   timezoneId: 'timezoneId',
   messageTemplateNamespace: 'messageTemplateNamespace',
   accessTokenEncrypted: 'accessTokenEncrypted',
+  accessTokenType: 'accessTokenType',
+  accessTokenExpiresAt: 'accessTokenExpiresAt',
   tokenUpdatedAt: 'tokenUpdatedAt',
+  businessId: 'businessId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -216,6 +220,20 @@ exports.Prisma.WabaTemplateScalarFieldEnum = {
   rejectedReason: 'rejectedReason',
   wabaId: 'wabaId',
   createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TemplateLibraryEntryScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  name: 'name',
+  description: 'description',
+  category: 'category',
+  language: 'language',
+  components: 'components',
+  isDefault: 'isDefault',
+  isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -287,6 +305,7 @@ exports.Prisma.PhoneNumberScalarFieldEnum = {
   preVerificationCode: 'preVerificationCode',
   status: 'status',
   verifiedAt: 'verifiedAt',
+  whatsappRegistrationStatus: 'whatsappRegistrationStatus',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   wabaId: 'wabaId'
@@ -675,7 +694,14 @@ exports.TemplateApprovalStatus = exports.$Enums.TemplateApprovalStatus = {
   APPROVED: 'APPROVED',
   PENDING: 'PENDING',
   REJECTED: 'REJECTED',
-  DISABLED: 'DISABLED'
+  DISABLED: 'DISABLED',
+  PAUSED: 'PAUSED',
+  IN_APPEAL: 'IN_APPEAL',
+  PENDING_DELETION: 'PENDING_DELETION',
+  DELETED: 'DELETED',
+  LIMIT_EXCEEDED: 'LIMIT_EXCEEDED',
+  ARCHIVED: 'ARCHIVED',
+  FLAGGED: 'FLAGGED'
 };
 
 exports.TemplateCategory = exports.$Enums.TemplateCategory = {
@@ -825,6 +851,7 @@ exports.Prisma.ModelName = {
   SubscriptionPayment: 'SubscriptionPayment',
   WabaAccount: 'WabaAccount',
   WabaTemplate: 'WabaTemplate',
+  TemplateLibraryEntry: 'TemplateLibraryEntry',
   WhatsAppCampaign: 'WhatsAppCampaign',
   WhatsAppCampaignRecipient: 'WhatsAppCampaignRecipient',
   Payment: 'Payment',

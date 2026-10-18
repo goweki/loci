@@ -124,7 +124,7 @@ export const InboundWebhookPayloadSchema = z.object({
         z.object({
           field: z.string(),
           value: z.object({
-            messaging_product: z.literal("whatsapp"),
+            messaging_product: z.literal("whatsapp").optional(),
 
             messages: z.array(InboundMessageSchema).optional(),
             statuses: z.array(z.any()).optional(),
@@ -132,10 +132,15 @@ export const InboundWebhookPayloadSchema = z.object({
             contacts: z.array(z.any()).optional(),
             metadata: z.any().optional(),
             errors: z.array(z.any()).optional(),
+            event: z.string().optional(),
+            message_template_id: z.string().optional(),
+            message_template_name: z.string().optional(),
+            message_template_language: z.string().optional(),
+            reason: z.string().optional(),
           }),
-        })
+        }),
       ),
-    })
+    }),
   ),
 });
 
