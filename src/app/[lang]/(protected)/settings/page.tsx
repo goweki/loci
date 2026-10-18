@@ -57,6 +57,7 @@ export default async function SettingsPage({
   ]);
 
   if (!resUser.ok) {
+    console.error(resUser.error);
     return;
   }
 
