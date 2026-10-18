@@ -15,6 +15,7 @@ import {
 import { SubscriptionService } from "@/services/subscription/subscription.service";
 import { submitWabaTemplate } from "@/services/waba/template.service";
 import { z } from "zod";
+import { DEFAULT_TEMPLATE_LIBRARY } from "@/lib/whatsapp/template-library/default-templates";
 
 const componentsSchema = z.array(componentSchema).min(1);
 
@@ -99,7 +100,8 @@ export async function getTemplateLibraryForUserAction() {
 export async function createTemplateFromLibraryAction(input: unknown) {
   const actor = await requireUser();
   const requestSchema = z.object({
-    libraryEntryId: z.string().min(1),
+    libraryEntryId: z.string().min(1).optional(),
+    staticTemplateKey: z.string().min(1).optional(),
     name: z
       .string()
       .trim()
@@ -109,6 +111,9 @@ export async function createTemplateFromLibraryAction(input: unknown) {
     components: componentsSchema.optional(),
   });
   const request = requestSchema.parse(input);
+  if (Boolean(request.libraryEntryId) === Boolean(request.staticTemplateKey)) {
+    throw new Error("Choose exactly one template library entry.");
+  }
   const [{ subscription, plan, canCustomize }, waba] = await Promise.all([
     getPlanAccess(actor.id),
     prisma.wabaAccount.findFirst({
@@ -126,13 +131,22 @@ export async function createTemplateFromLibraryAction(input: unknown) {
       "Connect a WhatsApp Business account before creating templates.",
     );
 
-  const entry = await prisma.templateLibraryEntry.findFirst({
-    where: {
-      id: request.libraryEntryId,
-      isActive: true,
-      ...(canCustomize ? {} : { isDefault: true }),
-    },
-  });
+  const staticEntry = request.staticTemplateKey
+    ? DEFAULT_TEMPLATE_LIBRARY.find(
+        (template) => template.key === request.staticTemplateKey,
+      )
+    : undefined;
+  const entry = staticEntry
+    ? staticEntry
+    : request.libraryEntryId
+      ? await prisma.templateLibraryEntry.findFirst({
+          where: {
+            id: request.libraryEntryId,
+            isActive: true,
+            ...(canCustomize ? {} : { isDefault: true }),
+          },
+        })
+      : null;
   if (!entry) throw new Error("This template is not available on your plan.");
 
   const count = await prisma.wabaTemplate.count({ where: { wabaId: waba.id } });

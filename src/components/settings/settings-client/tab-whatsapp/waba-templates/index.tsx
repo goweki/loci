@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Prisma, TemplateLibraryEntry } from "@/lib/prisma/generated";
+import { DEFAULT_TEMPLATE_LIBRARY } from "@/lib/whatsapp/template-library/default-templates";
 import {
   createTemplateFromLibraryAction,
   getTemplateLibraryForUserAction,
@@ -34,6 +35,16 @@ type WabaWithAssets = Prisma.WabaAccountGetPayload<{
   include: { templates: true; phoneNumbers: true };
 }> | null;
 type LibraryData = Awaited<ReturnType<typeof getTemplateLibraryForUserAction>>;
+type TemplateChoice = {
+  id: string;
+  key: string;
+  name: string;
+  description: string | null;
+  category: TemplateLibraryEntry["category"];
+  language: TemplateLibraryEntry["language"];
+  components: TemplateLibraryEntry["components"];
+  staticTemplateKey?: string;
+};
 
 export function TemplatesClient({
   wabaAccount,
@@ -41,7 +52,7 @@ export function TemplatesClient({
   wabaAccount: WabaWithAssets;
 }) {
   const [data, setData] = useState<LibraryData | null>(null);
-  const [selected, setSelected] = useState<TemplateLibraryEntry | null>(null);
+  const [selected, setSelected] = useState<TemplateChoice | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [templateName, setTemplateName] = useState("");
   const [componentsJson, setComponentsJson] = useState("");
@@ -52,7 +63,6 @@ export function TemplatesClient({
     setLoadError(null);
     try {
       const library = await getTemplateLibraryForUserAction();
-      console.log(library);
       setData(library);
     } catch (error) {
       const message =
@@ -68,7 +78,7 @@ export function TemplatesClient({
     void refresh();
   }, [refresh]);
 
-  const openCreate = (entry: TemplateLibraryEntry) => {
+  const openCreate = (entry: TemplateChoice) => {
     const usedNames = new Set(
       data?.templates.map((template) => template.name) ?? [],
     );
@@ -96,7 +106,9 @@ export function TemplatesClient({
     startTransition(async () => {
       try {
         await createTemplateFromLibraryAction({
-          libraryEntryId: selected.id,
+          ...(selected.staticTemplateKey
+            ? { staticTemplateKey: selected.staticTemplateKey }
+            : { libraryEntryId: selected.id }),
           name: templateName.trim(),
           ...(data?.canCustomize ? { components } : {}),
         });
@@ -113,6 +125,14 @@ export function TemplatesClient({
   };
 
   const atLimit = Boolean(data && data.currentCount >= data.maxTemplates);
+  const entries: TemplateChoice[] = [
+    ...DEFAULT_TEMPLATE_LIBRARY.map((entry) => ({
+      ...entry,
+      id: `static:${entry.key}`,
+      staticTemplateKey: entry.key,
+    })),
+    ...(data?.entries ?? []),
+  ];
 
   return (
     <div className="space-y-6">
@@ -122,13 +142,13 @@ export function TemplatesClient({
             <CardTitle>Message Templates</CardTitle>
             <CardDescription>
               Templates are available for customer notifications after Meta
-              approves them.
+              approval.
             </CardDescription>
           </CardHeader>
           <CardContent>
             {data.templates.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                You have not submitted any templates yet.
+                You have no active templates
               </p>
             ) : (
               <div className="space-y-2">
@@ -215,13 +235,13 @@ export function TemplatesClient({
                   or remove a template before creating another.
                 </p>
               )}
-              {data.entries.length === 0 ? (
+              {entries.length === 0 ? (
                 <p className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
                   No templates are available for your plan yet.
                 </p>
               ) : (
                 <div className="grid gap-3 md:grid-cols-2">
-                  {data.entries.map((entry) => (
+                  {entries.map((entry) => (
                     <div
                       key={entry.id}
                       className="flex flex-col justify-between gap-4 rounded-lg border p-4"
