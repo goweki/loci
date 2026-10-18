@@ -73,7 +73,10 @@ export class WhatsAppClient {
   // ---------------------------------------------------------------------
   // 2. SEND MESSAGE
   // ---------------------------------------------------------------------
-  async sendMessage(input: Message, accessToken?: string): Promise<WhatsappSendResponse> {
+  async sendMessage(
+    input: Message,
+    accessToken?: string,
+  ): Promise<WhatsappSendResponse> {
     const { phoneNumberId, to, type } = input;
 
     const finalPhoneNumberId = phoneNumberId ?? this.env.phoneNumberId;
@@ -95,7 +98,9 @@ export class WhatsAppClient {
     const payload = {
       ...messagePayload,
       type: messageType.toLocaleLowerCase(),
-      ...(recipientType ? { recipient_type: recipientType.toLocaleLowerCase() } : {}),
+      ...(recipientType
+        ? { recipient_type: recipientType.toLocaleLowerCase() }
+        : {}),
     };
     const res = await fetch(url, {
       method: "POST",
@@ -118,12 +123,17 @@ export class WhatsAppClient {
     return json;
   }
 
-  async sendTemplate(input: Message, accessToken?: string): Promise<WhatsappSendResponse> {
+  async sendTemplate(
+    input: Message,
+    accessToken?: string,
+  ): Promise<WhatsappSendResponse> {
     const { phoneNumberId, type, recipient_type, ...messagePayload } = input;
     const payload = {
       ...messagePayload,
       type: type.toLocaleLowerCase(),
-      ...(recipient_type ? { recipient_type: recipient_type.toLocaleLowerCase() } : {}),
+      ...(recipient_type
+        ? { recipient_type: recipient_type.toLocaleLowerCase() }
+        : {}),
     };
 
     const finalPhoneNumberId = phoneNumberId ?? this.env.phoneNumberId;
