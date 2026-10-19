@@ -6,7 +6,7 @@ const attempts = new Map();
 export function rateLimit(
   request: NextRequest,
   maxAttempts: number = 5,
-  windowMs: number = 5 * 60 * 1000, // 5 minutes
+  windowMs: number = 1 * 60 * 1000, // 1 minute
 ) {
   // const ip = request.ip || request.headers.get("x-forwarded-for") || "unknown";
   const ip =
