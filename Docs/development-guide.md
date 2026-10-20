@@ -20,7 +20,7 @@ Outbound WhatsApp sends reserve a `MessageQuota` for the user's active subscript
 
 ## Configuration
 
-Use `.env.template` for names and do not copy values into docs. Relevant variables include `DATABASE_URL`, auth/Google credentials, `NEXT_PUBLIC_ENABLE_WHATSAPP_UI`, `NEXT_PUBLIC_META_APP_ID`, `NEXT_PUBLIC_WABA_EMBEDDED_CONFIG_ID`, `META_APP_SECRET`, `META_API_VERSION`, `META_BUSINESS_ID`, `WABA_ID`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WEBHOOK_VERIFY_TOKEN`, and `WHATSAPP_ACCESS_TOKEN`. The global WhatsApp token is still required by current environment validation and serves as a legacy fallback/integration credential; connected-account messaging prefers the per-WABA token encrypted with `WHATSAPP_TOKEN_ENCRYPTION_KEY` (32-byte base64 or 64-character hex). AI replies require `ANTHROPIC_API_KEY`. Paystack variables, `CRON_SECRET`, and `PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED` are also used by the optional payment and scheduled job paths.
+Use `.env.template` for names and do not copy values into docs. Relevant variables include `DATABASE_URL`, auth/Google credentials, `NEXT_PUBLIC_ENABLE_WHATSAPP_UI`, `NEXT_PUBLIC_META_APP_ID`, `NEXT_PUBLIC_WABA_EMBEDDED_CONFIG_ID`, `META_APP_SECRET`, `META_API_VERSION`, `META_BUSINESS_ID`, `WABA_ID`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WEBHOOK_VERIFY_TOKEN`, and `WHATSAPP_ACCESS_TOKEN`. The global WhatsApp token is still required by current environment validation and serves as a legacy fallback/integration credential; connected-account messaging prefers the per-WABA token encrypted with `WHATSAPP_TOKEN_ENCRYPTION_KEY` (32-byte base64 or 64-character hex). AI replies use Meta Model API (`MODEL_API_KEY`, or the accepted `META_AI_API_KEY` alias; default model `muse-wonder-1.0`) with `ANTHROPIC_API_KEY` as fallback; keep both server-side. Paystack variables, `CRON_SECRET`, and `PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED` are also used by the optional payment and scheduled job paths.
 
 The deployment scheduler must POST to `/api/cron/whatsapp-campaigns` to dispatch due customer notification campaigns and `/api/cron/whatsapp-webhooks` to retry failed webhook events (up to five attempts). Both require `Authorization: Bearer <CRON_SECRET>`. No scheduler is provisioned by the application itself. Meta webhook configuration is external: configure the callback/verify token and subscribe to `messages` and `message_template_status_update` to receive message and template-status events.
 
@@ -35,6 +35,6 @@ If a provider key is exposed, revoke or replace it. Rotating `WHATSAPP_TOKEN_ENC
 - `npm run lint:check`: lint check if configured in the current package scripts.
 - `npx prisma migrate status`: inspect migration state for the configured database.
 - `npx prisma migrate deploy`: apply committed migrations to the configured database.
-- `npm run build`: inspect `postbuild`; build may invoke migration deployment.
+- `npm run build`: build the Next.js app; the current `package.json` does not define a `postbuild` migration hook.
 
 Confirm the database target before migrations or build commands that can change it. Local migration state does not imply deployment state.

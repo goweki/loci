@@ -12,6 +12,7 @@ import { removePlus } from "@/lib/utils/telHandlers";
 import { findOrCreateContact } from "@/actions/contact";
 import { createMessage, getMessagesByUserId } from "@/actions/message.actions";
 import { ensureDefaultPhoneNumberExists } from "@/actions/phoneNumber.actions";
+import { reserveWhatsAppMessage } from "@/services/whatsapp/message-quota.service";
 
 const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
   try {
@@ -29,6 +30,7 @@ const postTemplateMessage: AuthenticatedHandler = async (request, apiKey) => {
     const userId = apiKey.user.id;
 
     await authorizeMessageSend(userId, message);
+    await reserveWhatsAppMessage(userId);
 
     console.log("New Message for sending...", message);
 

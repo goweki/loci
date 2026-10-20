@@ -35,8 +35,9 @@ export const authOptions: NextAuthOptions = {
 
         const user = await UserService.getUserByKey(credentials.username);
 
-        if (user.status === UserStatus.SUSPENDED)
-          throw new Error("Account suspended");
+        if (!user) throw new Error("Invalid credentials");
+        if (user.status !== UserStatus.ACTIVE)
+          throw new Error("Account is not active");
 
         // auth password
         let isPasswordValid = false;
@@ -236,8 +237,12 @@ export const authOptions: NextAuthOptions = {
           // if exists already
           const existingUser = await prisma.user.findUnique({
             where: { email },
-            select: { id: true },
+            select: { id: true, status: true },
           });
+
+          if (existingUser && existingUser.status !== UserStatus.ACTIVE) {
+            return "/sign-in?error=AccountUnavailable";
+          }
 
           if (flow === "signin" && !existingUser) {
             console.warn(

@@ -21,16 +21,7 @@ import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import { SubscriptionService } from "@/services/subscription/subscription.service";
 import { ActionResult, SubscriptionStatusCheck } from "@/types";
 import { generateRandom } from "@/lib/utils/authHandlers";
-
-function getPeriodEndDate(startDate: Date, interval: PlanInterval): Date {
-  const endDate = new Date(startDate);
-  if (interval === PlanInterval.MONTHLY) {
-    endDate.setMonth(endDate.getMonth() + 1);
-  } else {
-    endDate.setFullYear(endDate.getFullYear() + 1);
-  }
-  return endDate;
-}
+import { getPeriodEndDate } from "@/lib/utils/subscription-dates";
 
 export async function createSubscriptionAction({
   planName,

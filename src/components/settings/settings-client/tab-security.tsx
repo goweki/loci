@@ -208,7 +208,7 @@ export function TabSecurity() {
 
       setIsGenerating(true);
       try {
-        const rawKey = await generateUserApiKey(session?.user.id, newKeyName);
+        const rawKey = await generateUserApiKey(newKeyName);
         setRevealedKey(rawKey);
         toast.success("API Key generated successfully");
       } catch (err) {

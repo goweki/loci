@@ -8,6 +8,7 @@ import {
   WabaOwnership,
 } from "@/lib/prisma/generated";
 import whatsapp from "@/lib/whatsapp";
+import { WhatsAppClient } from "@/lib/whatsapp/services/client";
 import {
   decryptWhatsAppToken,
   encryptWhatsAppToken,
@@ -288,6 +289,35 @@ export async function registerWhatsAppPhoneNumberAction(
         error instanceof Error
           ? error.message
           : "Could not register the WhatsApp phone number.",
+    };
+  }
+}
+
+export async function deleteWhatsAppPhoneNumberAction(phoneNumberId: string): Promise<ActionResult<void>> {
+  const actor = await requireUser();
+  if (!/^\d{5,32}$/.test(phoneNumberId)) {
+    return { ok: false, error: "Invalid WhatsApp phone number." };
+  }
+  try {
+    const phone = await prisma.phoneNumber.findFirst({
+      where: { id: phoneNumberId, waba: { userId: actor.id } },
+      select: { id: true, waba: { select: { id: true, accessTokenEncrypted: true } } },
+    });
+    if (!phone?.waba?.accessTokenEncrypted) {
+      throw new Error("Reconnect your WhatsApp Business account before removing this number.");
+    }
+    const client = new WhatsAppClient({
+      ...env_,
+      wabaId: phone.waba.id,
+      wabaAccessToken: decryptWhatsAppToken(phone.waba.accessTokenEncrypted),
+    });
+    await client.deregisterPhoneNumber(phone.id);
+    await prisma.phoneNumber.delete({ where: { id: phone.id } });
+    return { ok: true, data: undefined };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Could not remove the WhatsApp number.",
     };
   }
 }

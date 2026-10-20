@@ -16,6 +16,9 @@ import { SubscriptionService } from "@/services/subscription/subscription.servic
 import { submitWabaTemplate } from "@/services/waba/template.service";
 import { z } from "zod";
 import { DEFAULT_TEMPLATE_LIBRARY } from "@/lib/whatsapp/template-library/default-templates";
+import { WhatsAppClient } from "@/lib/whatsapp/services/client";
+import { decryptWhatsAppToken } from "@/lib/whatsapp/credentials";
+import { env_ } from "@/lib/whatsapp/types/environment-variables";
 
 const componentsSchema = z.array(componentSchema).min(1);
 
@@ -181,6 +184,40 @@ export async function createTemplateFromLibraryAction(input: unknown) {
     template: validated,
     userId: actor.id,
     wabaId: waba.id,
+  });
+}
+
+export async function deleteWabaTemplateAction(templateId: string) {
+  const actor = await requireUser();
+  const id = z.string().min(1).parse(templateId);
+  const template = await prisma.wabaTemplate.findFirst({
+    where: { id, waba: { userId: actor.id } },
+    include: { waba: { select: { id: true, accessTokenEncrypted: true } } },
+  });
+  if (!template) throw new Error("Template not found or access denied.");
+  if (!template.waba.accessTokenEncrypted) {
+    throw new Error("Reconnect your WhatsApp Business account before deleting templates.");
+  }
+
+  const client = new WhatsAppClient({
+    ...env_,
+    wabaId: template.waba.id,
+    wabaAccessToken: decryptWhatsAppToken(template.waba.accessTokenEncrypted),
+  });
+  await client.deleteTemplate(template.name, template.id);
+  return prisma.$transaction(async (tx) => {
+    await tx.whatsAppCampaign.updateMany({
+      where: {
+        templateId: template.id,
+        status: { in: ["SCHEDULED", "PROCESSING"] },
+      },
+      data: {
+        status: "CANCELLED",
+        completedAt: new Date(),
+        templateId: null,
+      },
+    });
+    return tx.wabaTemplate.delete({ where: { id: template.id } });
   });
 }
 

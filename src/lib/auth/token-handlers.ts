@@ -3,7 +3,7 @@ import "server-only";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { TokenType } from "../prisma/generated";
+import { TokenType, UserStatus } from "../prisma/generated";
 import { UserService } from "@/services/user/user.service";
 import { hashSha256 } from "../utils/authHandlers";
 
@@ -65,6 +65,7 @@ export async function createApiKey(options: {
   return {
     id: apiKey.id,
     apiKey: rawKey,
+    expiresAt: apiKey.expiresAt,
   };
 }
 
@@ -92,6 +93,10 @@ export async function validateToken(
 
   if (!apiKey_inDb.isActive) {
     return NextResponse.json({ error: "API key revoked" }, { status: 401 });
+  }
+
+  if (apiKey_inDb.user.status !== UserStatus.ACTIVE) {
+    return NextResponse.json({ error: "User account is not active" }, { status: 403 });
   }
 
   if (apiKey_inDb.expiresAt && apiKey_inDb.expiresAt < new Date()) {

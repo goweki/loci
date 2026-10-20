@@ -65,7 +65,7 @@ describe("WhatsApp assistant capabilities", () => {
   });
 
   it("executes catalogue search only for the assistant owner and returns minimal catalogue facts", async () => {
-    vi.stubEnv("ANTHROPIC_API_KEY", "test-key");
+    vi.stubEnv("MODEL_API_KEY", "test-meta-key");
     mocks.findMany.mockResolvedValue([{
       id: "product-1",
       name: "Blue shirt",
@@ -106,10 +106,48 @@ describe("WhatsApp assistant capabilities", () => {
       take: 5,
     }));
     expect(mocks.agentRunCreate).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({ userId: "owner-1", phoneNumberId: "phone-1", model: "claude-sonnet-4-20250514" }),
+      data: expect.objectContaining({ userId: "owner-1", phoneNumberId: "phone-1", provider: "meta", model: "muse-wonder-1.0" }),
     }));
     expect(mocks.agentToolCallCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ capability: "search_catalogue", succeeded: true, inputSummary: { queryLength: 10 }, outputSummary: { resultCount: 1 } }),
+    }));
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  it("falls back to Anthropic on a retryable Meta Model API failure and audits the actual provider", async () => {
+    vi.stubEnv("MODEL_API_KEY", "test-meta-key");
+    vi.stubEnv("ANTHROPIC_API_KEY", "test-anthropic-key");
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ error: { message: "rate limited" } }), { status: 429 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        content: [{ type: "text", text: "I can help with that." }],
+        stop_reason: "end_turn",
+      }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await new AgentRuntimeService().respond({
+      ownerId: "owner-1",
+      phoneNumberId: "phone-1",
+      systemPrompt: "Be helpful.",
+      profileContext: null,
+      enabledTools: [],
+      temperature: 0.4,
+      maxTokens: 300,
+      history: [{ role: "user", content: "Hello" }],
+    });
+
+    expect(response).toBe("I can help with that.");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[0][0]).toBe("https://api.meta.ai/v1/messages");
+    expect(fetchMock.mock.calls[1][0]).toBe("https://api.anthropic.com/v1/messages");
+    expect(mocks.agentRunUpdate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        status: "SUCCEEDED",
+        provider: "anthropic",
+        model: "claude-sonnet-4-20250514",
+        errorCode: "rate_limited",
+      }),
     }));
     vi.unstubAllGlobals();
     vi.unstubAllEnvs();

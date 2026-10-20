@@ -42,6 +42,13 @@ export async function processDueWhatsAppCampaigns() {
       include: { template: true, phoneNumber: true, recipients: { where: { status: WhatsAppCampaignRecipientStatus.PENDING }, take: RECIPIENT_BATCH_SIZE, include: { contact: true } } },
     });
     if (!campaign || campaign.status !== WhatsAppCampaignStatus.PROCESSING) continue;
+    if (!campaign.template) {
+      await prisma.whatsAppCampaign.update({
+        where: { id: campaign.id },
+        data: { status: WhatsAppCampaignStatus.CANCELLED, completedAt: now },
+      });
+      continue;
+    }
     summary.campaigns += 1;
 
     for (const recipient of campaign.recipients) {
