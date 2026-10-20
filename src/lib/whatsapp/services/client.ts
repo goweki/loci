@@ -420,8 +420,13 @@ export class WhatsAppClient {
     return json;
   }
 
-  async deleteTemplate(name: string): Promise<WabaTemplateDeleteResponse> {
-    const url = `${this.baseUrl}/${this.env.fbAppId}/message_templates?name=${name}`;
+  async deleteTemplate(
+    name: string,
+    templateId?: string,
+  ): Promise<WabaTemplateDeleteResponse> {
+    const params = new URLSearchParams({ name });
+    if (templateId) params.set("hsm_id", templateId);
+    const url = `${this.baseUrl}/${this.env.wabaId}/message_templates?${params}`;
 
     this.logger.info(`Deleting template - ${name}`);
 
@@ -441,6 +446,25 @@ export class WhatsAppClient {
     }
 
     return json;
+  }
+
+  async deregisterPhoneNumber(phoneNumberId: string): Promise<{ success: boolean }> {
+    const url = `${this.baseUrl}/${phoneNumberId}/deregister`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${this.env.wabaAccessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+      signal: AbortSignal.timeout(15000),
+    });
+    const json = (await res.json()) as { success?: boolean };
+    if (!res.ok || json.success !== true) {
+      this.logger.error("WhatsApp API Error (deregisterPhoneNumber)", json);
+      throw normalizeWhatsAppError(res.status, json);
+    }
+    return { success: true };
   }
 
   // ---------------------------------------------------------------------

@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   });
 
   // check against limit
-  if (phoneNumbers.length > maxPhoneNumbers) {
+  if (phoneNumbers.length >= maxPhoneNumbers) {
     return NextResponse.json(
       {
         error: "Message limit exceeded for your current plan.",

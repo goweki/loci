@@ -2,7 +2,7 @@
 
 Loci is a Next.js application for small businesses managing customer conversations and commerce. The current codebase includes authenticated dashboard areas for contacts, conversations, products and subscriptions, public merchant storefronts, and an in-progress Paystack marketplace checkout and delayed-payout flow.
 
-The app is under active development. WhatsApp/SMS automation, invoices, full order management, refunds, and marketplace payouts are not all production-ready. See [Docs/current-status.md](Docs/current-status.md) for the implementation snapshot and [Docs/roadmap.md](Docs/roadmap.md) for the next work.
+The app is under active development. WhatsApp onboarding and messaging still need provider-backed staging verification; marketplace payouts remain gated. See [Docs/README.md](Docs/README.md) for current product documentation and [Docs/launch-readiness-plan.md](Docs/launch-readiness-plan.md) for the critical customer journey gaps and proposed test plan.
 
 ## Requirements
 
@@ -59,10 +59,10 @@ The app is under active development. WhatsApp/SMS automation, invoices, full ord
 ## Safety Notes
 
 - Never commit `.env`, production database URLs, API keys, or provider secrets.
-- The marketplace migration must be applied to each deployment database before deploying code that uses its schema.
+- Apply every committed Prisma migration to each deployment database before deploying code that uses its schema.
 - Keep `PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED=false` until Paystack confirms the funds-hold/disbursement model, legal review is complete, and the scheduled worker is operational.
 - Paystack transfers do not constitute an escrow service. Do not market this flow as escrow without explicit approval and qualified legal guidance.
 
 ## Documentation
 
-Start at [Docs/README.md](Docs/README.md). It links the current status, architecture, roadmap, and marketplace payment guide.
+Start at [Docs/README.md](Docs/README.md) for product behavior, development guidance, optional marketplace payments, and launch readiness.

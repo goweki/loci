@@ -192,6 +192,31 @@ describe("merchant launch critical path", () => {
     );
   });
 
+  it("rejects credential sign-in for an inactive account", async () => {
+    const { authOptions } = await import("@/lib/auth/auth-options");
+    const provider = authOptions.providers.find(
+      (entry) => "id" in entry && entry.id === "credentials",
+    );
+    const authorize = (
+      provider as unknown as {
+        authorize: (credentials: { username: string; password: string }, request: never) => Promise<unknown>;
+      }
+    ).authorize;
+    mocks.getUserByKey.mockResolvedValue({
+      id: "user-1",
+      email: "merchant@example.com",
+      name: "Test Merchant",
+      image: null,
+      password: "stored-hash",
+      status: "SUSPENDED",
+      role: "USER",
+    });
+
+    await expect(authorize({ username: "merchant@example.com", password: "correct-password" }, undefined as never))
+      .rejects.toThrow("Account is not active");
+    expect(mocks.bcryptCompare).not.toHaveBeenCalled();
+  });
+
   it("creates a product and exposes it through the public store and product lookup", async () => {
     const { createProductAction, getPublicProductById } =
       await import("@/actions/product.actions");

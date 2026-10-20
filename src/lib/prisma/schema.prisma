@@ -323,7 +323,7 @@ model WhatsAppCampaign {
   id             String                 @id @default(cuid())
   userId         String
   phoneNumberId  String
-  templateId     String
+  templateId     String?
   name           String
   language       String                 @default("en_US")
   bodyParameters String[]               @default([])
@@ -335,7 +335,7 @@ model WhatsAppCampaign {
 
   user        User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
   phoneNumber PhoneNumber                 @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
-  template    WabaTemplate                @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  template    WabaTemplate?               @relation(fields: [templateId], references: [id], onDelete: SetNull)
   recipients  WhatsAppCampaignRecipient[]
 
   @@index([status, scheduledAt])

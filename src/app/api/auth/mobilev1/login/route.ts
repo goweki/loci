@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 import { bcryptCompare } from "@/lib/utils/authHandlers";
-import { addToDate } from "@/lib/utils/dateHandlers";
 import { UserService } from "@/services/user/user.service";
-import { generateUserApiKey } from "@/actions/api-key.actions";
+import { createApiKey } from "@/lib/auth/token-handlers";
+import { UserStatus } from "@/lib/prisma/generated";
 
 const LoginSchema = z.object({
   username: z.string().min(6),
@@ -40,6 +40,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (user.status !== UserStatus.ACTIVE) {
+      return NextResponse.json({ error: "User account is not active" }, { status: 403 });
+    }
+
     if (!user.password) {
       return NextResponse.json(
         {
@@ -60,13 +64,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const apiKeyString = await generateUserApiKey(user.id, "mobile-login");
+    const { apiKey: apiKeyString, expiresAt } = await createApiKey({
+      userId: user.id,
+      description: "mobile-login",
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    });
 
     return NextResponse.json({
       success: true,
       data: {
         apiKey: apiKeyString,
-        expiresAt: addToDate({ hours: 23 }),
+        expiresAt,
         user: {
           id: user.id,
           name: user.name,

@@ -15056,7 +15056,7 @@ export namespace Prisma {
     id: string
     userId: string
     phoneNumberId: string
-    templateId: string
+    templateId: string | null
     name: string
     language: string
     bodyParameters: string[]
@@ -15099,7 +15099,7 @@ export namespace Prisma {
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     phoneNumber?: boolean | PhoneNumberDefaultArgs<ExtArgs>
-    template?: boolean | WabaTemplateDefaultArgs<ExtArgs>
+    template?: boolean | WhatsAppCampaign$templateArgs<ExtArgs>
     recipients?: boolean | WhatsAppCampaign$recipientsArgs<ExtArgs>
     _count?: boolean | WhatsAppCampaignCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["whatsAppCampaign"]>
@@ -15119,7 +15119,7 @@ export namespace Prisma {
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     phoneNumber?: boolean | PhoneNumberDefaultArgs<ExtArgs>
-    template?: boolean | WabaTemplateDefaultArgs<ExtArgs>
+    template?: boolean | WhatsAppCampaign$templateArgs<ExtArgs>
   }, ExtArgs["result"]["whatsAppCampaign"]>
 
   export type WhatsAppCampaignSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -15137,7 +15137,7 @@ export namespace Prisma {
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     phoneNumber?: boolean | PhoneNumberDefaultArgs<ExtArgs>
-    template?: boolean | WabaTemplateDefaultArgs<ExtArgs>
+    template?: boolean | WhatsAppCampaign$templateArgs<ExtArgs>
   }, ExtArgs["result"]["whatsAppCampaign"]>
 
   export type WhatsAppCampaignSelectScalar = {
@@ -15159,19 +15159,19 @@ export namespace Prisma {
   export type WhatsAppCampaignInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     phoneNumber?: boolean | PhoneNumberDefaultArgs<ExtArgs>
-    template?: boolean | WabaTemplateDefaultArgs<ExtArgs>
+    template?: boolean | WhatsAppCampaign$templateArgs<ExtArgs>
     recipients?: boolean | WhatsAppCampaign$recipientsArgs<ExtArgs>
     _count?: boolean | WhatsAppCampaignCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type WhatsAppCampaignIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     phoneNumber?: boolean | PhoneNumberDefaultArgs<ExtArgs>
-    template?: boolean | WabaTemplateDefaultArgs<ExtArgs>
+    template?: boolean | WhatsAppCampaign$templateArgs<ExtArgs>
   }
   export type WhatsAppCampaignIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     phoneNumber?: boolean | PhoneNumberDefaultArgs<ExtArgs>
-    template?: boolean | WabaTemplateDefaultArgs<ExtArgs>
+    template?: boolean | WhatsAppCampaign$templateArgs<ExtArgs>
   }
 
   export type $WhatsAppCampaignPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -15179,14 +15179,14 @@ export namespace Prisma {
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
       phoneNumber: Prisma.$PhoneNumberPayload<ExtArgs>
-      template: Prisma.$WabaTemplatePayload<ExtArgs>
+      template: Prisma.$WabaTemplatePayload<ExtArgs> | null
       recipients: Prisma.$WhatsAppCampaignRecipientPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
       phoneNumberId: string
-      templateId: string
+      templateId: string | null
       name: string
       language: string
       bodyParameters: string[]
@@ -15591,7 +15591,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     phoneNumber<T extends PhoneNumberDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PhoneNumberDefaultArgs<ExtArgs>>): Prisma__PhoneNumberClient<$Result.GetResult<Prisma.$PhoneNumberPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    template<T extends WabaTemplateDefaultArgs<ExtArgs> = {}>(args?: Subset<T, WabaTemplateDefaultArgs<ExtArgs>>): Prisma__WabaTemplateClient<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    template<T extends WhatsAppCampaign$templateArgs<ExtArgs> = {}>(args?: Subset<T, WhatsAppCampaign$templateArgs<ExtArgs>>): Prisma__WabaTemplateClient<$Result.GetResult<Prisma.$WabaTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     recipients<T extends WhatsAppCampaign$recipientsArgs<ExtArgs> = {}>(args?: Subset<T, WhatsAppCampaign$recipientsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WhatsAppCampaignRecipientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -16032,6 +16032,25 @@ export namespace Prisma {
      * Limit how many WhatsAppCampaigns to delete.
      */
     limit?: number
+  }
+
+  /**
+   * WhatsAppCampaign.template
+   */
+  export type WhatsAppCampaign$templateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WabaTemplate
+     */
+    select?: WabaTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WabaTemplate
+     */
+    omit?: WabaTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WabaTemplateInclude<ExtArgs> | null
+    where?: WabaTemplateWhereInput
   }
 
   /**
@@ -47597,7 +47616,7 @@ export namespace Prisma {
     id?: StringFilter<"WhatsAppCampaign"> | string
     userId?: StringFilter<"WhatsAppCampaign"> | string
     phoneNumberId?: StringFilter<"WhatsAppCampaign"> | string
-    templateId?: StringFilter<"WhatsAppCampaign"> | string
+    templateId?: StringNullableFilter<"WhatsAppCampaign"> | string | null
     name?: StringFilter<"WhatsAppCampaign"> | string
     language?: StringFilter<"WhatsAppCampaign"> | string
     bodyParameters?: StringNullableListFilter<"WhatsAppCampaign">
@@ -47608,7 +47627,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"WhatsAppCampaign"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     phoneNumber?: XOR<PhoneNumberScalarRelationFilter, PhoneNumberWhereInput>
-    template?: XOR<WabaTemplateScalarRelationFilter, WabaTemplateWhereInput>
+    template?: XOR<WabaTemplateNullableScalarRelationFilter, WabaTemplateWhereInput> | null
     recipients?: WhatsAppCampaignRecipientListRelationFilter
   }
 
@@ -47616,7 +47635,7 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     phoneNumberId?: SortOrder
-    templateId?: SortOrder
+    templateId?: SortOrderInput | SortOrder
     name?: SortOrder
     language?: SortOrder
     bodyParameters?: SortOrder
@@ -47638,7 +47657,7 @@ export namespace Prisma {
     NOT?: WhatsAppCampaignWhereInput | WhatsAppCampaignWhereInput[]
     userId?: StringFilter<"WhatsAppCampaign"> | string
     phoneNumberId?: StringFilter<"WhatsAppCampaign"> | string
-    templateId?: StringFilter<"WhatsAppCampaign"> | string
+    templateId?: StringNullableFilter<"WhatsAppCampaign"> | string | null
     name?: StringFilter<"WhatsAppCampaign"> | string
     language?: StringFilter<"WhatsAppCampaign"> | string
     bodyParameters?: StringNullableListFilter<"WhatsAppCampaign">
@@ -47649,7 +47668,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"WhatsAppCampaign"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     phoneNumber?: XOR<PhoneNumberScalarRelationFilter, PhoneNumberWhereInput>
-    template?: XOR<WabaTemplateScalarRelationFilter, WabaTemplateWhereInput>
+    template?: XOR<WabaTemplateNullableScalarRelationFilter, WabaTemplateWhereInput> | null
     recipients?: WhatsAppCampaignRecipientListRelationFilter
   }, "id">
 
@@ -47657,7 +47676,7 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     phoneNumberId?: SortOrder
-    templateId?: SortOrder
+    templateId?: SortOrderInput | SortOrder
     name?: SortOrder
     language?: SortOrder
     bodyParameters?: SortOrder
@@ -47678,7 +47697,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"WhatsAppCampaign"> | string
     userId?: StringWithAggregatesFilter<"WhatsAppCampaign"> | string
     phoneNumberId?: StringWithAggregatesFilter<"WhatsAppCampaign"> | string
-    templateId?: StringWithAggregatesFilter<"WhatsAppCampaign"> | string
+    templateId?: StringNullableWithAggregatesFilter<"WhatsAppCampaign"> | string | null
     name?: StringWithAggregatesFilter<"WhatsAppCampaign"> | string
     language?: StringWithAggregatesFilter<"WhatsAppCampaign"> | string
     bodyParameters?: StringNullableListFilter<"WhatsAppCampaign">
@@ -50798,7 +50817,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutWhatsappCampaignsInput
     phoneNumber: PhoneNumberCreateNestedOneWithoutWhatsappCampaignsInput
-    template: WabaTemplateCreateNestedOneWithoutCampaignsInput
+    template?: WabaTemplateCreateNestedOneWithoutCampaignsInput
     recipients?: WhatsAppCampaignRecipientCreateNestedManyWithoutCampaignInput
   }
 
@@ -50806,7 +50825,7 @@ export namespace Prisma {
     id?: string
     userId: string
     phoneNumberId: string
-    templateId: string
+    templateId?: string | null
     name: string
     language?: string
     bodyParameters?: WhatsAppCampaignCreatebodyParametersInput | string[]
@@ -50830,7 +50849,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutWhatsappCampaignsNestedInput
     phoneNumber?: PhoneNumberUpdateOneRequiredWithoutWhatsappCampaignsNestedInput
-    template?: WabaTemplateUpdateOneRequiredWithoutCampaignsNestedInput
+    template?: WabaTemplateUpdateOneWithoutCampaignsNestedInput
     recipients?: WhatsAppCampaignRecipientUpdateManyWithoutCampaignNestedInput
   }
 
@@ -50838,7 +50857,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
-    templateId?: StringFieldUpdateOperationsInput | string
+    templateId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     language?: StringFieldUpdateOperationsInput | string
     bodyParameters?: WhatsAppCampaignUpdatebodyParametersInput | string[]
@@ -50854,7 +50873,7 @@ export namespace Prisma {
     id?: string
     userId: string
     phoneNumberId: string
-    templateId: string
+    templateId?: string | null
     name: string
     language?: string
     bodyParameters?: WhatsAppCampaignCreatebodyParametersInput | string[]
@@ -50881,7 +50900,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
-    templateId?: StringFieldUpdateOperationsInput | string
+    templateId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     language?: StringFieldUpdateOperationsInput | string
     bodyParameters?: WhatsAppCampaignUpdatebodyParametersInput | string[]
@@ -54418,9 +54437,9 @@ export namespace Prisma {
     isNot?: PhoneNumberWhereInput
   }
 
-  export type WabaTemplateScalarRelationFilter = {
-    is?: WabaTemplateWhereInput
-    isNot?: WabaTemplateWhereInput
+  export type WabaTemplateNullableScalarRelationFilter = {
+    is?: WabaTemplateWhereInput | null
+    isNot?: WabaTemplateWhereInput | null
   }
 
   export type WhatsAppCampaignRecipientListRelationFilter = {
@@ -57345,10 +57364,12 @@ export namespace Prisma {
     update?: XOR<XOR<PhoneNumberUpdateToOneWithWhereWithoutWhatsappCampaignsInput, PhoneNumberUpdateWithoutWhatsappCampaignsInput>, PhoneNumberUncheckedUpdateWithoutWhatsappCampaignsInput>
   }
 
-  export type WabaTemplateUpdateOneRequiredWithoutCampaignsNestedInput = {
+  export type WabaTemplateUpdateOneWithoutCampaignsNestedInput = {
     create?: XOR<WabaTemplateCreateWithoutCampaignsInput, WabaTemplateUncheckedCreateWithoutCampaignsInput>
     connectOrCreate?: WabaTemplateCreateOrConnectWithoutCampaignsInput
     upsert?: WabaTemplateUpsertWithoutCampaignsInput
+    disconnect?: WabaTemplateWhereInput | boolean
+    delete?: WabaTemplateWhereInput | boolean
     connect?: WabaTemplateWhereUniqueInput
     update?: XOR<XOR<WabaTemplateUpdateToOneWithWhereWithoutCampaignsInput, WabaTemplateUpdateWithoutCampaignsInput>, WabaTemplateUncheckedUpdateWithoutCampaignsInput>
   }
@@ -60242,14 +60263,14 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     phoneNumber: PhoneNumberCreateNestedOneWithoutWhatsappCampaignsInput
-    template: WabaTemplateCreateNestedOneWithoutCampaignsInput
+    template?: WabaTemplateCreateNestedOneWithoutCampaignsInput
     recipients?: WhatsAppCampaignRecipientCreateNestedManyWithoutCampaignInput
   }
 
   export type WhatsAppCampaignUncheckedCreateWithoutUserInput = {
     id?: string
     phoneNumberId: string
-    templateId: string
+    templateId?: string | null
     name: string
     language?: string
     bodyParameters?: WhatsAppCampaignCreatebodyParametersInput | string[]
@@ -60818,7 +60839,7 @@ export namespace Prisma {
     id?: StringFilter<"WhatsAppCampaign"> | string
     userId?: StringFilter<"WhatsAppCampaign"> | string
     phoneNumberId?: StringFilter<"WhatsAppCampaign"> | string
-    templateId?: StringFilter<"WhatsAppCampaign"> | string
+    templateId?: StringNullableFilter<"WhatsAppCampaign"> | string | null
     name?: StringFilter<"WhatsAppCampaign"> | string
     language?: StringFilter<"WhatsAppCampaign"> | string
     bodyParameters?: StringNullableListFilter<"WhatsAppCampaign">
@@ -62514,14 +62535,14 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutWhatsappCampaignsInput
     phoneNumber: PhoneNumberCreateNestedOneWithoutWhatsappCampaignsInput
-    template: WabaTemplateCreateNestedOneWithoutCampaignsInput
+    template?: WabaTemplateCreateNestedOneWithoutCampaignsInput
   }
 
   export type WhatsAppCampaignUncheckedCreateWithoutRecipientsInput = {
     id?: string
     userId: string
     phoneNumberId: string
-    templateId: string
+    templateId?: string | null
     name: string
     language?: string
     bodyParameters?: WhatsAppCampaignCreatebodyParametersInput | string[]
@@ -62601,14 +62622,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutWhatsappCampaignsNestedInput
     phoneNumber?: PhoneNumberUpdateOneRequiredWithoutWhatsappCampaignsNestedInput
-    template?: WabaTemplateUpdateOneRequiredWithoutCampaignsNestedInput
+    template?: WabaTemplateUpdateOneWithoutCampaignsNestedInput
   }
 
   export type WhatsAppCampaignUncheckedUpdateWithoutRecipientsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
-    templateId?: StringFieldUpdateOperationsInput | string
+    templateId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     language?: StringFieldUpdateOperationsInput | string
     bodyParameters?: WhatsAppCampaignUpdatebodyParametersInput | string[]
@@ -63059,14 +63080,14 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutWhatsappCampaignsInput
-    template: WabaTemplateCreateNestedOneWithoutCampaignsInput
+    template?: WabaTemplateCreateNestedOneWithoutCampaignsInput
     recipients?: WhatsAppCampaignRecipientCreateNestedManyWithoutCampaignInput
   }
 
   export type WhatsAppCampaignUncheckedCreateWithoutPhoneNumberInput = {
     id?: string
     userId: string
-    templateId: string
+    templateId?: string | null
     name: string
     language?: string
     bodyParameters?: WhatsAppCampaignCreatebodyParametersInput | string[]
@@ -67931,7 +67952,7 @@ export namespace Prisma {
   export type WhatsAppCampaignCreateManyUserInput = {
     id?: string
     phoneNumberId: string
-    templateId: string
+    templateId?: string | null
     name: string
     language?: string
     bodyParameters?: WhatsAppCampaignCreatebodyParametersInput | string[]
@@ -68503,14 +68524,14 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phoneNumber?: PhoneNumberUpdateOneRequiredWithoutWhatsappCampaignsNestedInput
-    template?: WabaTemplateUpdateOneRequiredWithoutCampaignsNestedInput
+    template?: WabaTemplateUpdateOneWithoutCampaignsNestedInput
     recipients?: WhatsAppCampaignRecipientUpdateManyWithoutCampaignNestedInput
   }
 
   export type WhatsAppCampaignUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
-    templateId?: StringFieldUpdateOperationsInput | string
+    templateId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     language?: StringFieldUpdateOperationsInput | string
     bodyParameters?: WhatsAppCampaignUpdatebodyParametersInput | string[]
@@ -68525,7 +68546,7 @@ export namespace Prisma {
   export type WhatsAppCampaignUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     phoneNumberId?: StringFieldUpdateOperationsInput | string
-    templateId?: StringFieldUpdateOperationsInput | string
+    templateId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     language?: StringFieldUpdateOperationsInput | string
     bodyParameters?: WhatsAppCampaignUpdatebodyParametersInput | string[]
@@ -69048,7 +69069,7 @@ export namespace Prisma {
   export type WhatsAppCampaignCreateManyPhoneNumberInput = {
     id?: string
     userId: string
-    templateId: string
+    templateId?: string | null
     name: string
     language?: string
     bodyParameters?: WhatsAppCampaignCreatebodyParametersInput | string[]
@@ -69173,14 +69194,14 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutWhatsappCampaignsNestedInput
-    template?: WabaTemplateUpdateOneRequiredWithoutCampaignsNestedInput
+    template?: WabaTemplateUpdateOneWithoutCampaignsNestedInput
     recipients?: WhatsAppCampaignRecipientUpdateManyWithoutCampaignNestedInput
   }
 
   export type WhatsAppCampaignUncheckedUpdateWithoutPhoneNumberInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    templateId?: StringFieldUpdateOperationsInput | string
+    templateId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     language?: StringFieldUpdateOperationsInput | string
     bodyParameters?: WhatsAppCampaignUpdatebodyParametersInput | string[]
@@ -69195,7 +69216,7 @@ export namespace Prisma {
   export type WhatsAppCampaignUncheckedUpdateManyWithoutPhoneNumberInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    templateId?: StringFieldUpdateOperationsInput | string
+    templateId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     language?: StringFieldUpdateOperationsInput | string
     bodyParameters?: WhatsAppCampaignUpdatebodyParametersInput | string[]

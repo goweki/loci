@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Building2Icon, Phone } from "lucide-react";
+import { Building2Icon, Phone, Trash2Icon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import WabaEmbeddedSignup from "@/components/ui/waba-embedded-signup";
 import { Button } from "@/components/ui/button";
@@ -14,13 +14,15 @@ import { UserWithRelations } from "@/services/user/user.dto";
 import { getStatusBadge } from "../utilities";
 import { TemplatesClient } from "./waba-templates";
 import { getUserSubscription } from "@/actions/subscription.actions";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import Loader from "@/components/ui/loaders";
 import { SubscriptionStatusCheck } from "@/types";
 import { AssistantConfig } from "./assistant-config";
+import { deleteWhatsAppPhoneNumberAction } from "@/actions/waba.actions";
+import { useRouter } from "next/navigation";
 
 type Waba = NonNullable<UserWithRelations["waba"]>;
 
@@ -35,6 +37,8 @@ export default function TabWhatsApp({
   const [subCheck, setSubCheck] = useState<SubscriptionStatusCheck | undefined>(
     undefined,
   );
+  const [isRemovingNumber, startRemoveTransition] = useTransition();
+  const router = useRouter();
   const { language } = useI18n();
 
   useEffect(() => {
@@ -62,6 +66,19 @@ export default function TabWhatsApp({
       setLoading(false);
     }
   }, []);
+
+  const removePhoneNumber = (phoneNumberId: string, phoneNumber: string) => {
+    if (!window.confirm(`Deregister ${phoneNumber} from Meta and remove it from Loci? Its Loci message history, assistant settings, and campaigns will also be deleted.`)) return;
+    startRemoveTransition(async () => {
+      const result = await deleteWhatsAppPhoneNumberAction(phoneNumberId);
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("WhatsApp number deregistered and removed.");
+      router.refresh();
+    });
+  };
 
   return isLoading || !subCheck ? (
     <Loader />
@@ -154,6 +171,15 @@ export default function TabWhatsApp({
                               label="Finish registration"
                             />
                           )}
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            aria-label={`Remove ${phone.phoneNumber}`}
+                            disabled={isRemovingNumber}
+                            onClick={() => removePhoneNumber(phone.id, phone.phoneNumber)}
+                          >
+                            <Trash2Icon className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     ))}

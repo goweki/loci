@@ -14,9 +14,15 @@ export function getCurrentCycleBounds(
   now = new Date(),
 ): { cycleStart: Date; cycleEnd: Date } {
   if (interval === PlanInterval.MONTHLY) {
+    const cycleStart = new Date(periodStart);
+    let cycleEnd = addCalendarMonthClamped(cycleStart);
+    while (now >= cycleEnd) {
+      cycleStart.setTime(cycleEnd.getTime());
+      cycleEnd = addCalendarMonthClamped(cycleStart);
+    }
     return {
-      cycleStart: periodStart,
-      cycleEnd: new Date(periodStart.getTime() + 30 * 24 * 60 * 60 * 1000), // or exact billing end date
+      cycleStart,
+      cycleEnd,
     };
   }
 
@@ -25,8 +31,7 @@ export function getCurrentCycleBounds(
   let cycleStart = new Date(start);
 
   while (true) {
-    const nextMonth = new Date(cycleStart);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    const nextMonth = addCalendarMonthClamped(cycleStart);
 
     if (now >= cycleStart && now < nextMonth) {
       return {
@@ -53,6 +58,16 @@ export type MessageLimitResponse = {
   limit?: number;
   used?: number;
 };
+
+function addCalendarMonthClamped(date: Date): Date {
+  const result = new Date(date);
+  const dayOfMonth = result.getDate();
+  result.setDate(1);
+  result.setMonth(result.getMonth() + 1);
+  const lastDay = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+  result.setDate(Math.min(dayOfMonth, lastDay));
+  return result;
+}
 
 export async function checkMessageLimits(
   userId: string,

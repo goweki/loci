@@ -28,11 +28,11 @@ export const getUserApiKeys = async (): Promise<ApiKey[]> => {
 };
 
 export const generateUserApiKey = async (
-  userId: string,
   description: string,
 ): Promise<string> => {
+  const actor = await requireUser();
   const newKey = await createApiKey({
-    userId,
+    userId: actor.id,
     description,
     expiresAt: addToDate({ days: 1 }),
   });
@@ -45,24 +45,15 @@ export const revokeApiKey = async (
   const actor = await requireUser();
 
   try {
-    if (actor.role !== UserRole.ADMIN) {
-      const token = await prisma.token.findUniqueOrThrow({
-        where: {
-          type_userId: {
-            type: TokenType.API_KEY,
-            userId: actor.id,
-          },
-        },
-      });
-      if (token.userId !== actor.id) {
-        throw "NOT ALLOWED";
-      }
-    }
-
-    !!(await prisma.token.update({
-      where: { id: keyId },
+    const result = await prisma.token.updateMany({
+      where: {
+        id: keyId,
+        type: TokenType.API_KEY,
+        ...(actor.role === UserRole.ADMIN ? {} : { userId: actor.id }),
+      },
       data: { isActive: false },
-    }));
+    });
+    if (result.count !== 1) throw new Error("API key not found or access denied.");
 
     return { ok: true, data: undefined };
   } catch (error) {

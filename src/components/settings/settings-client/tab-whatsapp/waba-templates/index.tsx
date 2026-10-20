@@ -27,6 +27,7 @@ import { TemplateLibraryEntry } from "@/lib/prisma/generated";
 import { DEFAULT_TEMPLATE_LIBRARY } from "@/lib/whatsapp/template-library/default-templates";
 import {
   createTemplateFromLibraryAction,
+  deleteWabaTemplateAction,
   getTemplateLibraryForUserAction,
 } from "@/actions/template-library.actions";
 import Loader from "@/components/ui/loaders";
@@ -122,6 +123,19 @@ export function TemplatesClient({
     });
   };
 
+  const removeTemplate = (templateId: string, templateName: string) => {
+    if (!window.confirm(`Delete “${templateName}” from Meta and Loci? Scheduled campaigns using it will be cancelled.`)) return;
+    startTransition(async () => {
+      try {
+        await deleteWabaTemplateAction(templateId);
+        toast.success("Template deleted from Meta and Loci.");
+        await refresh();
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Unable to delete template.");
+      }
+    });
+  };
+
   const atLimit = Boolean(data && data.currentCount >= data.maxTemplates);
   const entries: TemplateChoice[] = [
     ...DEFAULT_TEMPLATE_LIBRARY.map((entry) => ({
@@ -175,6 +189,14 @@ export function TemplatesClient({
                     >
                       {template.status}
                     </Badge>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      disabled={isPending}
+                      onClick={() => removeTemplate(template.id, template.name)}
+                    >
+                      Delete
+                    </Button>
                   </div>
                 ))}
               </div>
