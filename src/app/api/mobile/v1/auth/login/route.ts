@@ -17,7 +17,18 @@ export async function POST(request: NextRequest) {
       { error: "Username and password are required" },
       { status: 400 },
     );
-  const user = await UserService.getUserByKey(parsed.data.username);
+
+  let user: Record<string, any> | null = null;
+
+  try {
+    user = await UserService.getUserByKey(parsed.data.username);
+  } catch (error) {
+    return NextResponse.json(
+      { error: (error as any).message || "error fetching user" },
+      { status: 400 },
+    );
+  }
+
   if (
     !user ||
     !user.password ||
