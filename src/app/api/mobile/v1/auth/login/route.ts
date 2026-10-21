@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   const parsed = schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success)
     return NextResponse.json(
-      { error: "Username and password are required" },
+      { error: "username & password are required" },
       { status: 400 },
     );
 
