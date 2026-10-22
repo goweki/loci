@@ -12,9 +12,13 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { CalendarIcon, CheckCircle2Icon } from "lucide-react";
 import { getStatusBadge } from "./utilities";
-import { UserWithRelations } from "@/services/user/user.dto";
+import type { UserWithRelations } from "@/services/user/user.dto";
 
-export default function TabProfile({ user }: { user: UserWithRelations }) {
+export default function TabProfile({
+  user,
+}: {
+  user: Omit<UserWithRelations, "password">;
+}) {
   return (
     <>
       <Card>

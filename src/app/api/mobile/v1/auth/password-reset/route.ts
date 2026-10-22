@@ -22,10 +22,10 @@ export async function POST(request: NextRequest) {
     );
   }
   const body = await request.json().catch(() => null);
-  const parsed =
-    request.nextUrl.searchParams.get("action") === "complete"
-      ? completeSchema.safeParse(body)
-      : requestSchema.safeParse(body);
+  const isComplete = request.nextUrl.searchParams.get("action") === "complete";
+  const parsed = isComplete
+    ? completeSchema.safeParse(body)
+    : requestSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Invalid password reset request" },
@@ -34,10 +34,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    if ("password" in parsed.data) {
+    if (isComplete) {
+      // The runtime branch selects completeSchema; TS does not correlate the
+      // separately stored boolean with the conditional schema parse above.
+      const data = parsed.data as z.infer<typeof completeSchema>;
       const result = await UserService.verifyToken({
-        username: parsed.data.username,
-        token: parsed.data.token,
+        username: data.username,
+        token: data.token,
         type: TokenType.RESET,
       });
       if (
@@ -52,7 +55,7 @@ export async function POST(request: NextRequest) {
       const { bcryptCompare, bcryptHash } = await import("@/lib/utils/authHandlers");
       const prisma = (await import("@/lib/prisma")).default;
       const now = new Date();
-      const password = await bcryptHash(parsed.data.password);
+      const password = await bcryptHash(data.password);
       const consumed = await prisma.$transaction(async (tx) => {
         const currentToken = await tx.token.findUnique({
           where: { id: result.tokenId! },
@@ -62,7 +65,7 @@ export async function POST(request: NextRequest) {
           !currentToken.isActive ||
           currentToken.expiresAt <= now ||
           currentToken.channel !== result.verifiedChannel ||
-          !(await bcryptCompare(parsed.data.token, currentToken.hashedToken))
+          !(await bcryptCompare(data.token, currentToken.hashedToken))
         ) {
           return false;
         }
@@ -101,7 +104,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true });
     }
 
-    await UserService.sendResetLink({ username: parsed.data.username, sendTo: parsed.data.channel });
+    const data = parsed.data as z.infer<typeof requestSchema>;
+    await UserService.sendResetLink({ username: data.username, sendTo: data.channel });
     return NextResponse.json({ success: true, message: "If the account exists, reset instructions have been sent." });
   } catch {
     // Avoid revealing whether an account exists.
