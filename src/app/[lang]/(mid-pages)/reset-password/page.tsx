@@ -1,7 +1,4 @@
-import AuthLayout, { AuthLayoutCopy } from "@/components/layouts/authLayout";
-import { SignInForm } from "@/components/forms/auth/signin-form";
 import { Language } from "@/lib/i18n";
-import { getDictionary } from "@/lib/i18n";
 import { ForgotPasswordForm } from "@/components/forms/auth/forgot-password";
 import CenteredLayout from "@/components/layouts/centeredLayout";
 
