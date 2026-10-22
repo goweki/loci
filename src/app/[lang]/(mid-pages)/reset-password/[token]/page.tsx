@@ -3,6 +3,7 @@ import { Language } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n";
 import SetPasswordForm from "@/components/forms/auth/set-password-form";
 import { redirect } from "next/navigation";
+import CenteredLayout from "@/components/layouts/centeredLayout";
 
 const translations = {
   en: {
@@ -31,13 +32,13 @@ export default async function SetPasswordPage({
   }
 
   return (
-    <AuthLayout
+    <CenteredLayout
       copy={{
         title: dict.title,
         subtitle: dict.subtitle,
       }}
     >
       <SetPasswordForm token={token} username={username} />
-    </AuthLayout>
+    </CenteredLayout>
   );
 }

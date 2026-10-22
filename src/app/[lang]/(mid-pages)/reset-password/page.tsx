@@ -3,6 +3,7 @@ import { SignInForm } from "@/components/forms/auth/signin-form";
 import { Language } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n";
 import { ForgotPasswordForm } from "@/components/forms/auth/forgot-password";
+import CenteredLayout from "@/components/layouts/centeredLayout";
 
 const translations = {
   en: {
@@ -25,13 +26,13 @@ export default async function ForgotPasswordPage({
   const dict = translations[lang];
 
   return (
-    <AuthLayout
+    <CenteredLayout
       copy={{
         title: dict.title,
         subtitle: dict.subtitle,
       }}
     >
       <ForgotPasswordForm />
-    </AuthLayout>
+    </CenteredLayout>
   );
 }
