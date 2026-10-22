@@ -1,4 +1,4 @@
-"use-client";
+"use client";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,27 +17,43 @@ import {
   CheckIcon,
   CopyIcon,
   KeyIcon,
-  MailIcon,
-  MessageSquareIcon,
-  PhoneIcon,
   PlusIcon,
-  Trash2Icon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
-import { dateLong, datetimeStamp } from "@/lib/utils/dateHandlers";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { datetimeStamp } from "@/lib/utils/dateHandlers";
 import { ApiKey } from "@/actions/api-key.actions/api-key.actions.dto";
 import {
   generateUserApiKey,
   getUserApiKeys,
   revokeApiKey,
 } from "@/actions/api-key.actions";
+import { sendCurrentUserPasswordSetupLink } from "@/actions/user.actions";
+import { useI18n } from "@/lib/i18n";
 
-export function TabSecurity() {
+export function TabSecurity({ hasPassword }: { hasPassword: boolean }) {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>();
+  const [sendingPasswordLink, setSendingPasswordLink] = useState(false);
   const { data: session } = useSession();
+  const { language } = useI18n();
+
+  const requestPasswordLink = async () => {
+    setSendingPasswordLink(true);
+    try {
+      const result = await sendCurrentUserPasswordSetupLink(language);
+      if (!result.ok) throw new Error(result.error);
+      toast.success("Password link sent. Check your account email.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Could not send password link.",
+      );
+    } finally {
+      setSendingPasswordLink(false);
+    }
+  };
 
   const fetchApiKeys = useCallback(async () => {
     if (!session?.user.id) return;
@@ -53,17 +69,37 @@ export function TabSecurity() {
 
   return (
     <>
-      {/* <Card>
+      <Card>
         <CardHeader>
-          <CardTitle>Set New Password</CardTitle>
+          <CardTitle>
+            {hasPassword ? "Change password" : "Set a password"}
+          </CardTitle>
           <CardDescription>
-            Choose how you&apos;d like to receive your password reset link
+            We&apos;ll email a secure, one-time link to{" "}
+            {session?.user.email || "your account email"}. You can open it even
+            if you have signed out.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <RequestPasswordReset />
+        <CardContent>
+          <Button
+            onClick={requestPasswordLink}
+            disabled={sendingPasswordLink || !session?.user.email}
+          >
+            {sendingPasswordLink ? (
+              <Loader />
+            ) : hasPassword ? (
+              "Send password change link"
+            ) : (
+              "Set password"
+            )}
+          </Button>
+          {!session?.user.email && (
+            <p className="mt-2 text-sm text-destructive">
+              Add an email address to your account before setting a password.
+            </p>
+          )}
         </CardContent>
-      </Card> */}
+      </Card>
 
       <Card>
         <CardHeader>
@@ -107,88 +143,6 @@ export function TabSecurity() {
       </Card>
     </>
   );
-
-  function RequestPasswordReset() {
-    const [method, setMethod] = useState("email");
-
-    return (
-      <div className="space-y-3">
-        {/* Compact Method Selection */}
-        <div className="flex flex-col gap-2">
-          <Label className="text-xs text-muted-foreground uppercase tracking-wider">
-            Reset Method
-          </Label>
-          <RadioGroup
-            defaultValue="email"
-            onValueChange={setMethod}
-            className="flex p-1 bg-muted rounded-lg max-w-md"
-          >
-            {[
-              { id: "email", label: "Email", icon: MailIcon },
-              { id: "sms", label: "SMS", icon: PhoneIcon },
-              { id: "whatsapp", label: "WhatsApp", icon: MessageSquareIcon },
-            ].map((item) => (
-              <div key={item.id} className="flex-1">
-                <RadioGroupItem
-                  value={item.id}
-                  id={item.id}
-                  className="sr-only"
-                />
-                <Label
-                  htmlFor={item.id}
-                  className={`flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
-                    method === item.id
-                      ? "bg-background shadow-sm text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <item.icon className="h-3.5 w-3.5" />
-                  {item.label}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
-        </div>
-
-        <div className="max-w-md">
-          <div className="grid gri-col-1 md:grid-cols-3 space-x-4">
-            {/* Inline Input with Icon */}
-            <div className="space-y-2 col-span-1 md:col-span-2">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-muted-foreground">
-                  {method === "email" ? (
-                    <MailIcon className="h-4 w-4" />
-                  ) : (
-                    <PhoneIcon className="h-4 w-4" />
-                  )}
-                </div>
-                <Input
-                  id="identifier"
-                  type={method === "email" ? "email" : "tel"}
-                  placeholder={
-                    method === "email"
-                      ? "Enter your email"
-                      : "Enter phone number"
-                  }
-                  className="pl-9"
-                />
-              </div>
-              <p className="text-[10px] text-muted-foreground px-1">
-                Secure link will be sent via{" "}
-                <span className="capitalize font-medium text-foreground">
-                  {method}
-                </span>
-                .
-              </p>
-            </div>
-            <Button disabled onClick={() => {}}>
-              Send Reset Link
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   function ApiKeySection({
     existingKeys,

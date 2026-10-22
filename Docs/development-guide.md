@@ -18,6 +18,14 @@ Inventory quantity is stored in `Product.stockQty`. Dashboard QR adjustments use
 
 Outbound WhatsApp sends reserve a `MessageQuota` for the user's active subscription billing period before calling Meta. This enforces `Plan.maxMessagesPerMonth` across assistant replies, manual replies, and scheduled template campaigns.
 
+## Account password setup and recovery
+
+Google sign-in accounts may have no local password (`User.password` is nullable). In Settings → Security, users can request a password setup or change link. That authenticated action takes the recipient from the current account and sends the link to its email; it does not accept a client-selected address. The public `/{lang}/reset-password` request remains available for account recovery, and `/{lang}/reset-password/{token}` is intentionally accessible while signed in or signed out so the emailed link works in either state.
+
+Reset tokens are generated with cryptographic randomness, stored as bcrypt hashes, expire after one hour, record the verification channel, and are consumed in the same transaction as the password update. Public recovery requests use a generic confirmation to avoid disclosing whether an account exists. Password setup requires 8–16 characters, matching the mobile password-reset endpoint. Reset links preserve English or Swahili and the token page sends `Referrer-Policy: no-referrer`.
+
+Password-reset actions apply best-effort in-memory throttles (per account for the web actions and per IP for the mobile route). These counters are local to a running server process and are not shared across instances or restarts, so configure a persistent shared limiter before treating account recovery as launch-hardened. Generic responses also do not fully prevent response-timing inference; an asynchronous delivery queue would reduce that signal.
+
 ## Configuration
 
 Use `.env.template` for names and do not copy values into docs. Relevant variables include `DATABASE_URL`, auth/Google credentials, `NEXT_PUBLIC_ENABLE_WHATSAPP_UI`, `NEXT_PUBLIC_META_APP_ID`, `NEXT_PUBLIC_WABA_EMBEDDED_CONFIG_ID`, `META_APP_SECRET`, `META_API_VERSION`, `META_BUSINESS_ID`, `WABA_ID`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WEBHOOK_VERIFY_TOKEN`, and `WHATSAPP_ACCESS_TOKEN`. The global WhatsApp token is still required by current environment validation and serves as a legacy fallback/integration credential; connected-account messaging prefers the per-WABA token encrypted with `WHATSAPP_TOKEN_ENCRYPTION_KEY` (32-byte base64 or 64-character hex). AI replies use Meta Model API (`MODEL_API_KEY`, or the accepted `META_AI_API_KEY` alias; default model `muse-wonder-1.0`) with `ANTHROPIC_API_KEY` as fallback; keep both server-side. Paystack variables, `CRON_SECRET`, and `PAYSTACK_MARKETPLACE_PAYOUTS_ENABLED` are also used by the optional payment and scheduled job paths.

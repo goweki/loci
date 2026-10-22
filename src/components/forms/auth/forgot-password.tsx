@@ -3,18 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import {
-  Mail,
-  Phone,
-  ArrowRight,
-  Check,
-  MessageSquare,
-  ChevronLeft,
-} from "lucide-react";
+import { Mail, Phone, ArrowRight, Check, MessageSquare } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +29,6 @@ import { removePlus } from "@/lib/utils/telHandlers";
 import { sendResetLinkAction } from "@/actions/user.actions";
 
 export function ForgotPasswordForm() {
-  const router = useRouter();
   const { language } = useI18n();
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -78,6 +69,7 @@ export function ForgotPasswordForm() {
         const resReset = await sendResetLinkAction({
           username: values.email || removePlus(values.phoneNumber),
           sendTo: values.notificationChannel,
+          language,
         });
 
         // console.log("reset response:", res);
@@ -86,26 +78,17 @@ export function ForgotPasswordForm() {
           throw new Error(resReset.error || "Unknown error");
         }
 
-        const res = resReset.data;
-
-        const messages: Record<string, string> = {
-          EMAIL: `Password reset link sent to ${values.notificationChannel}`,
-          WHATSAPP: `Password reset link sent to ${values.notificationChannel}`,
-          SMS: `Your reset link will be sent via sms shortly.`,
-        };
-
-        const message = messages[res.sentTo];
-        toast.success(message);
+        toast.success(
+          "If an account matches those details, a recovery link will be sent.",
+        );
         setDone(true);
-
-        router.push(`/${language}/`);
       } catch (error: any) {
         toast.error(error.message || "Failed to request reset");
       } finally {
         setLoading(false);
       }
     },
-    [language, router],
+    [language],
   );
 
   return (
@@ -253,7 +236,7 @@ export function ForgotPasswordForm() {
               <Loader />
             ) : done ? (
               <>
-                <Check className="h-4 w-4" /> Reset Link Sent
+                <Check className="h-4 w-4" /> Request Received
               </>
             ) : (
               <>

@@ -6,6 +6,7 @@ import { resetPasswordEmail, welcomeEmail } from "@/lib/mail/email-render";
 import prisma from "@/lib/prisma";
 import {
   NotificationChannel,
+  CommunicationChannel,
   Prisma,
   TemplateLanguage,
   TokenType,
@@ -17,6 +18,7 @@ import { BANNER_IMAGE_URL, BASE_URL } from "@/lib/utils/getUrl";
 import { bcryptCompare } from "@/lib/utils/authHandlers";
 import { buildResetUrlTail, generateResetToken } from "@/lib/utils/resetToken";
 import { Message } from "@/lib/validations";
+import type { Language } from "@/lib/i18n/i18n-settings";
 import whatsapp from "@/lib/whatsapp";
 
 export type UserServiceContext = {
@@ -235,7 +237,7 @@ export class UserService {
     }
 
     const tokenObj = await generateResetToken();
-    const resetLinkTail = await buildResetUrlTail(tokenObj.plain, username);
+    const resetLinkTail = await buildResetUrlTail(tokenObj.plain, username, "en");
     const resetLink = `${BASE_URL}/${resetLinkTail}`;
 
     await prisma.token.upsert({
@@ -248,6 +250,7 @@ export class UserService {
       update: {
         hashedToken: tokenObj.hashed,
         expiresAt: tokenObj.expiry,
+        channel: this.toNotificationChannel(preferredCommunicationChannel),
         isActive: true,
         lastUsedAt: null,
       },
@@ -256,6 +259,7 @@ export class UserService {
         type: TokenType.RESET,
         hashedToken: tokenObj.hashed,
         expiresAt: tokenObj.expiry,
+        channel: this.toNotificationChannel(preferredCommunicationChannel),
         description: "Password reset token",
       },
     });
@@ -337,6 +341,7 @@ export class UserService {
   static async sendResetLink(data: {
     username: string;
     sendTo?: NotificationChannel;
+    language?: Language;
   }): Promise<{
     username: string;
     sentTo: NotificationChannel;
@@ -350,7 +355,15 @@ export class UserService {
     const user_ = await UserService.getUserByKey(username);
     const usernameAttribute = user_.email === username ? "email" : "tel";
     const tokenObj = await generateResetToken();
-    const resetLinkTail = await buildResetUrlTail(tokenObj.plain, username);
+    const deliveryChannel =
+      usernameAttribute === "email"
+        ? NotificationChannel.EMAIL
+        : verificationMethod ?? NotificationChannel.SMS;
+    const resetLinkTail = await buildResetUrlTail(
+      tokenObj.plain,
+      username,
+      data.language ?? "en",
+    );
     const resetLink = `${BASE_URL}/${resetLinkTail}`;
 
     await prisma.token.upsert({
@@ -363,6 +376,7 @@ export class UserService {
       update: {
         hashedToken: tokenObj.hashed,
         expiresAt: tokenObj.expiry,
+        channel: deliveryChannel,
         isActive: true,
         lastUsedAt: null,
       },
@@ -371,6 +385,7 @@ export class UserService {
         type: TokenType.RESET,
         hashedToken: tokenObj.hashed,
         expiresAt: tokenObj.expiry,
+        channel: deliveryChannel,
         description: "Password reset token",
       },
     });
@@ -449,6 +464,21 @@ export class UserService {
     return { username, sentTo: sentTo_ };
   }
 
+  private static toNotificationChannel(
+    channel: CommunicationChannel,
+  ): NotificationChannel {
+    switch (channel) {
+      case CommunicationChannel.EMAIL:
+        return NotificationChannel.EMAIL;
+      case CommunicationChannel.SMS:
+        return NotificationChannel.SMS;
+      case CommunicationChannel.WHATSAPP:
+        return NotificationChannel.WHATSAPP;
+      default:
+        return NotificationChannel.EMAIL;
+    }
+  }
+
   /**
    * 🔑 Verify token validity
    */
@@ -459,6 +489,7 @@ export class UserService {
   }): Promise<{
     verification: boolean;
     message: string;
+    tokenId?: string;
     user?: Pick<User, "id" | "name" | "email" | "tel">;
     verifiedChannel?: NotificationChannel;
   }> {
@@ -487,7 +518,13 @@ export class UserService {
 
     return {
       verification: true,
-      user,
+      tokenId: resetToken.id,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        tel: user.tel,
+      },
       message: "Valid token.",
       verifiedChannel: resetToken.channel || undefined,
     };

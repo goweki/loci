@@ -12,7 +12,7 @@ Import [`postman/Loci-Mobile-v1.postman_collection.json`](../postman/Loci-Mobile
 - `POST /api/mobile/v1/auth/password-reset` — unauthenticated `{ "username": "...", "channel": "EMAIL|WHATSAPP|SMS" }`.
 - `POST /api/mobile/v1/auth/password-reset?action=complete` — `{ "username": "...", "token": "...", "password": "..." }`.
 
-Use `Authorization: Bearer <accessToken>` on protected requests. Password reset requests return a generic response to avoid account enumeration. Pagination endpoints accept `page` and `limit` (maximum 100) and return `items` plus pagination metadata.
+Use `Authorization: Bearer <accessToken>` on protected requests. Password reset requests return a generic response to avoid account enumeration. Reset tokens expire after one hour and can be used once; completion passwords must be 8–16 characters. The reset route currently throttles to 10 requests per IP per 15 minutes using process-local memory, so limits are not shared across instances or restarts. Pagination endpoints accept `page` and `limit` (maximum 100) and return `items` plus pagination metadata.
 
 ## App data and actions
 

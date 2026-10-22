@@ -3,6 +3,10 @@ import SetPasswordForm from "@/components/forms/auth/set-password-form";
 import { redirect } from "next/navigation";
 import CenteredLayout from "@/components/layouts/centeredLayout";
 
+export const metadata = {
+  referrer: "no-referrer",
+};
+
 const translations = {
   en: {
     title: "New Password",

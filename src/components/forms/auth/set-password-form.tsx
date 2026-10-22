@@ -75,11 +75,7 @@ export default function SetPasswordForm({
           return;
         }
 
-        console.log("TOKEN VERIFICATION:", isValid);
         setIsTokenValid(isValid.verification);
-        if (isValid.verification) {
-          toast.success("Token validated");
-        }
       } catch {
         setIsTokenValid(false);
       } finally {
@@ -93,7 +89,6 @@ export default function SetPasswordForm({
   // 2. Form Submission
   const onSubmit = useCallback(
     async (values: z.infer<typeof setPasswordSchema>) => {
-      console.log("Submitting");
       setIsUpdating(true);
       try {
         const setNewPassDTO = {
@@ -111,6 +106,7 @@ export default function SetPasswordForm({
         toast.error(res_.error || "Failed to update password");
       } catch (error: any) {
         toast.error(error.message);
+      } finally {
         setIsUpdating(false);
       }
     },
