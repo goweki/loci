@@ -143,7 +143,6 @@ export default function SettingsClient({
         <TabSecurity
           hasPassword={hasPassword}
           accountEmail={user.email}
-          accountPhone={user.tel}
         />
       </TabsContent>
     </Tabs>

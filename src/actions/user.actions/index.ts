@@ -26,6 +26,8 @@ import { requireUser } from "@/lib/auth";
 import type { Language } from "@/lib/i18n/i18n-settings";
 import { setPasswordSchema } from "@/lib/validations";
 import { rateLimitKey } from "@/lib/rate-limit";
+import { sendMail } from "@/lib/mail";
+import z from "zod";
 
 // ======================================================
 // USER ACTIONS
@@ -213,6 +215,91 @@ export async function sendCurrentUserPasswordSetupLink(
     return {
       ok: false,
       error: getFriendlyErrorMessage(error),
+    };
+  }
+}
+
+export async function requestCurrentUserAccountDeletion(
+  confirmedEmail: string,
+): Promise<ActionResult<{ requested: true }>> {
+  const emailValidation = z
+    .email()
+    .safeParse(typeof confirmedEmail === "string" ? confirmedEmail.trim() : "");
+  if (!emailValidation.success) {
+    return { ok: false, error: "Enter a valid email address." };
+  }
+
+  const user = await requireUser();
+  try {
+    const account = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { id: true, email: true, tel: true },
+    });
+    if (!account?.email) {
+      return {
+        ok: false,
+        error: "Your account does not have an email address to verify.",
+      };
+    }
+
+    if (
+      emailValidation.data.trim().toLowerCase() !==
+      account.email.trim().toLowerCase()
+    ) {
+      return {
+        ok: false,
+        error: "The email address does not match your account.",
+      };
+    }
+
+    if (!rateLimitKey(`account-deletion:${user.id}`, 3, 60 * 60 * 1000)) {
+      return {
+        ok: false,
+        error: "Please wait before submitting another deletion request.",
+      };
+    }
+
+    const escapeHtml = (value: string) =>
+      value.replace(/[&<>"']/g, (character) => {
+        const entities: Record<string, string> = {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        };
+        return entities[character];
+      });
+    const phone = account.tel || "Not provided";
+    const subject = "Loci account deletion request";
+    const text = [
+      "A user has requested deletion of their Loci account.",
+      "",
+      `Account ID: ${account.id}`,
+      `Account email: ${account.email}`,
+      `Account phone: ${phone}`,
+    ].join("\n");
+
+    const result = await sendMail({
+      to: "loci@goweki.com",
+      subject,
+      text,
+      html: `<p>A user has requested deletion of their Loci account.</p>
+        <p>Account ID: ${escapeHtml(account.id)}<br>
+        Account email: ${escapeHtml(account.email)}<br>
+        Account phone: ${escapeHtml(phone)}</p>`,
+    });
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    return { ok: true, data: { requested: true } };
+  } catch (error) {
+    console.error("Failed to send account deletion request", error);
+    return {
+      ok: false,
+      error:
+        "Could not send your account deletion request. Please try again later.",
     };
   }
 }

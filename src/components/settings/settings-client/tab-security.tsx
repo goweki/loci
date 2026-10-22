@@ -14,6 +14,14 @@ import { Label } from "@/components/ui/label";
 import Loader from "@/components/ui/loaders";
 import { Separator } from "@/components/ui/separator";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   CheckIcon,
   CopyIcon,
   KeyIcon,
@@ -29,31 +37,26 @@ import {
   getUserApiKeys,
   revokeApiKey,
 } from "@/actions/api-key.actions";
-import { sendCurrentUserPasswordSetupLink } from "@/actions/user.actions";
+import {
+  requestCurrentUserAccountDeletion,
+  sendCurrentUserPasswordSetupLink,
+} from "@/actions/user.actions";
 import { useI18n } from "@/lib/i18n";
 
 export function TabSecurity({
   hasPassword,
   accountEmail,
-  accountPhone,
 }: {
   hasPassword: boolean;
   accountEmail: string | null;
-  accountPhone: string | null;
 }) {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>();
   const [sendingPasswordLink, setSendingPasswordLink] = useState(false);
+  const [deletionDialogOpen, setDeletionDialogOpen] = useState(false);
+  const [deletionEmail, setDeletionEmail] = useState("");
+  const [sendingDeletionRequest, setSendingDeletionRequest] = useState(false);
   const { data: session } = useSession();
   const { language } = useI18n();
-  const deletionSubject =
-    language === "sw"
-      ? "Ombi la kufuta akaunti ya Loci"
-      : "Loci account deletion request";
-  const deletionBody =
-    language === "sw"
-      ? `Tafadhali futa akaunti yangu ya Loci na data inayohusishwa nayo.\n\nBarua pepe ya akaunti: ${accountEmail || "Haipo"}\nNambari ya simu ya akaunti: ${accountPhone || "Haipo"}`
-      : `Please delete my Loci account and its associated data.\n\nAccount email: ${accountEmail || "Not provided"}\nAccount phone: ${accountPhone || "Not provided"}`;
-  const deletionRequestHref = `mailto:privacy@goweki.com?subject=${encodeURIComponent(deletionSubject)}&body=${encodeURIComponent(deletionBody)}`;
 
   const requestPasswordLink = async () => {
     setSendingPasswordLink(true);
@@ -69,6 +72,33 @@ export function TabSecurity({
       );
     } finally {
       setSendingPasswordLink(false);
+    }
+  };
+
+  const submitDeletionRequest = async () => {
+    setSendingDeletionRequest(true);
+    try {
+      const result = await requestCurrentUserAccountDeletion(deletionEmail);
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success(
+        language === "sw"
+          ? "Ombi la kufuta akaunti limetumwa."
+          : "Your account deletion request has been sent.",
+      );
+      setDeletionEmail("");
+      setDeletionDialogOpen(false);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Could not send your account deletion request.",
+      );
+    } finally {
+      setSendingDeletionRequest(false);
     }
   };
 
@@ -155,20 +185,88 @@ export function TabSecurity({
         <CardContent className="space-y-6">
           <Separator />
 
-          <Button asChild variant="destructive">
-            <a href={deletionRequestHref}>
-              {language === "sw"
-                ? "Omba kufutwa kwa akaunti"
-                : "Request account deletion"}
-            </a>
+          <Button
+            variant="destructive"
+            onClick={() => setDeletionDialogOpen(true)}
+          >
+            {language === "sw"
+              ? "Omba kufutwa kwa akaunti"
+              : "Request account deletion"}
           </Button>
           <p className="text-sm text-muted-foreground">
             {language === "sw"
-              ? "Kitufe hiki kitafungua programu yako ya barua pepe na kuandaa ombi. Tuma barua pepe ili ombi lifike kwetu; akaunti haitafutwa hadi ombi lithibitishwe na kushughulikiwa."
-              : "This opens your email app with a request prepared. Send the email for us to receive it; your account is not deleted until the request is verified and processed."}
+              ? "Thibitisha barua pepe ya akaunti yako ili utume ombi. Tutathibitisha umiliki na kushughulikia ombi lako ndani ya siku 30."
+              : "Confirm your account email to send a request. We will verify account ownership and process your request within 30 days."}
           </p>
         </CardContent>
       </Card>
+
+      <Dialog
+        open={deletionDialogOpen}
+        onOpenChange={(open) => {
+          if (sendingDeletionRequest) return;
+          setDeletionDialogOpen(open);
+          if (!open) setDeletionEmail("");
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {language === "sw"
+                ? "Thibitisha ombi la kufuta akaunti"
+                : "Confirm account deletion request"}
+            </DialogTitle>
+            <DialogDescription>
+              {language === "sw"
+                ? `Weka barua pepe ya akaunti yako${accountEmail ? ` (${accountEmail})` : ""} ili kutuma ombi lako kwa timu yetu. Akaunti yako haitafutwa mara moja.`
+                : `Enter your account email${accountEmail ? ` (${accountEmail})` : ""} to send your request to our team. Your account will not be deleted immediately.`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="deletion-confirmation-email">
+              {language === "sw" ? "Barua pepe ya akaunti" : "Account email"}
+            </Label>
+            <Input
+              id="deletion-confirmation-email"
+              type="email"
+              autoComplete="email"
+              value={deletionEmail}
+              onChange={(event) => setDeletionEmail(event.target.value)}
+              placeholder={accountEmail || "name@example.com"}
+              disabled={sendingDeletionRequest}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeletionDialogOpen(false)}
+              disabled={sendingDeletionRequest}
+            >
+              {language === "sw" ? "Ghairi" : "Cancel"}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={submitDeletionRequest}
+              disabled={
+                sendingDeletionRequest ||
+                !accountEmail ||
+                deletionEmail.trim().toLowerCase() !==
+                  accountEmail.trim().toLowerCase()
+              }
+            >
+              {sendingDeletionRequest
+                ? language === "sw"
+                  ? "Inatuma..."
+                  : "Sending..."
+                : language === "sw"
+                  ? "Tuma ombi"
+                  : "Send request"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 
