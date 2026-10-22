@@ -44,7 +44,6 @@ export default function SettingsNavbar() {
       logo={logo}
       logoHref={`/${language}/dashboard`}
       navigationLinks={navigationLinks}
-      authenticated
     />
   );
 }

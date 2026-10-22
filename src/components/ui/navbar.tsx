@@ -19,6 +19,9 @@ import {
   NavigationMenuTrigger,
 } from "./navigation-menu";
 import LanguageToggle from "./language-toggle";
+import { useSession } from "next-auth/react";
+import { useI18n } from "@/lib/i18n";
+import Loader from "./loaders";
 
 export type RichNavItem = {
   title: string;
@@ -265,8 +268,6 @@ export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
   logo?: React.ReactNode;
   logoHref?: string;
   navigationLinks: RichNavMenuProps["navigation"];
-  authenticated?: boolean;
-  ctaHref?: string;
 }
 
 export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
@@ -283,14 +284,13 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       ),
       logoHref = "/",
       navigationLinks,
-      ctaHref = "/sign-in",
-      authenticated = false,
       ...props
     },
     ref,
   ) => {
     const [isVisible, setIsVisible] = React.useState(true);
-
+    const { data: session, status } = useSession();
+    const { language } = useI18n();
     const containerRef = React.useRef<HTMLElement | null>(null);
 
     // Expose internal ref to parent safely (fixes TS read-only ref.current issue)
@@ -357,12 +357,12 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
 
             <ThemeToggle variant="outline" />
 
-            {authenticated ? (
+            {status === "loading" ? null : session?.user ? (
               <UserMenu />
             ) : (
               <>
                 <Link
-                  href={ctaHref}
+                  href={`${language}/sign-in`}
                   className={cn(buttonVariants({ variant: "outline" }))}
                 >
                   Sign In

@@ -62,7 +62,7 @@ export const setPasswordSchema = z
       .min(6, { message: "Token must be at least 6 characters" }),
     password: z
       .string()
-      .min(5, { message: "Password must be at least 5 characters" })
+      .min(8, { message: "Password must be at least 8 characters" })
       .max(16, { message: "Password must be less than 16 characters" }),
     confirmPassword: z.string(),
   })

@@ -12,6 +12,7 @@ import sendSms, { ATRecipient } from "@/lib/sms";
 import { addToDate } from "@/lib/utils/dateHandlers";
 import { getFriendlyErrorMessage } from "@/lib/utils/errorHandlers";
 import {
+  bcryptCompare,
   bcryptHash,
   generateRandom,
   hashSha256,
@@ -19,8 +20,14 @@ import {
 import { generateUniqueUsernameFromSeed } from "@/lib/utils/username";
 import whatsapp from "@/lib/whatsapp";
 import { UserService } from "@/services/user/user.service";
-import { ActionResult } from "@/types";
+import type { ActionResult } from "@/types";
 import { SendOtpProps } from "./user.actions.dto";
+import { requireUser } from "@/lib/auth";
+import type { Language } from "@/lib/i18n/i18n-settings";
+import { setPasswordSchema } from "@/lib/validations";
+import { rateLimitKey } from "@/lib/rate-limit";
+import { sendMail } from "@/lib/mail";
+import z from "zod";
 
 // ======================================================
 // USER ACTIONS
@@ -146,20 +153,153 @@ export async function getUserStatsAction(): Promise<
 export async function sendResetLinkAction(params: {
   username: string;
   sendTo?: NotificationChannel;
+  language?: Language;
 }): Promise<
-  ActionResult<Awaited<ReturnType<typeof UserService.sendResetLink>>>
+  ActionResult<{ requested: true }>
 > {
+  const requestedUsername =
+    typeof params?.username === "string" ? params.username : "";
+  const key = hashSha256(
+    `password-reset:${requestedUsername.trim().toLowerCase()}`,
+  );
+  if (!rateLimitKey(key, 5, 15 * 60 * 1000)) {
+    return { ok: true, data: { requested: true } };
+  }
+
   try {
-    const res = await UserService.sendResetLink(params);
+    await UserService.sendResetLink(params);
 
     return {
       ok: true,
-      data: res,
+      data: { requested: true },
     };
+  } catch {
+    // Public recovery requests must not reveal whether an account exists or
+    // whether delivery succeeded. The same confirmation is shown in either case.
+    return {
+      ok: true,
+      data: { requested: true },
+    };
+  }
+}
+
+export async function sendCurrentUserPasswordSetupLink(
+  language: Language,
+): Promise<ActionResult<{ requested: true }>> {
+  try {
+    const user = await requireUser();
+    if (!rateLimitKey(`password-setup:${user.id}`, 3, 15 * 60 * 1000)) {
+      return {
+        ok: false,
+        error: "Please wait before requesting another password link.",
+      };
+    }
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { email: true },
+    });
+
+    if (!dbUser?.email) {
+      return { ok: false, error: "Add an email address to your account first." };
+    }
+
+    await UserService.sendResetLink({
+      username: dbUser.email,
+      sendTo: NotificationChannel.EMAIL,
+      language,
+    });
+
+    return { ok: true, data: { requested: true } };
   } catch (error) {
+    console.error("Authenticated password setup request failed", error);
     return {
       ok: false,
       error: getFriendlyErrorMessage(error),
+    };
+  }
+}
+
+export async function requestCurrentUserAccountDeletion(
+  confirmedEmail: string,
+): Promise<ActionResult<{ requested: true }>> {
+  const emailValidation = z
+    .email()
+    .safeParse(typeof confirmedEmail === "string" ? confirmedEmail.trim() : "");
+  if (!emailValidation.success) {
+    return { ok: false, error: "Enter a valid email address." };
+  }
+
+  const user = await requireUser();
+  try {
+    const account = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { id: true, email: true, tel: true },
+    });
+    if (!account?.email) {
+      return {
+        ok: false,
+        error: "Your account does not have an email address to verify.",
+      };
+    }
+
+    if (
+      emailValidation.data.trim().toLowerCase() !==
+      account.email.trim().toLowerCase()
+    ) {
+      return {
+        ok: false,
+        error: "The email address does not match your account.",
+      };
+    }
+
+    if (!rateLimitKey(`account-deletion:${user.id}`, 3, 60 * 60 * 1000)) {
+      return {
+        ok: false,
+        error: "Please wait before submitting another deletion request.",
+      };
+    }
+
+    const escapeHtml = (value: string) =>
+      value.replace(/[&<>"']/g, (character) => {
+        const entities: Record<string, string> = {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        };
+        return entities[character];
+      });
+    const phone = account.tel || "Not provided";
+    const subject = "Loci account deletion request";
+    const text = [
+      "A user has requested deletion of their Loci account.",
+      "",
+      `Account ID: ${account.id}`,
+      `Account email: ${account.email}`,
+      `Account phone: ${phone}`,
+    ].join("\n");
+
+    const result = await sendMail({
+      to: "loci@goweki.com",
+      subject,
+      text,
+      html: `<p>A user has requested deletion of their Loci account.</p>
+        <p>Account ID: ${escapeHtml(account.id)}<br>
+        Account email: ${escapeHtml(account.email)}<br>
+        Account phone: ${escapeHtml(phone)}</p>`,
+    });
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    return { ok: true, data: { requested: true } };
+  } catch (error) {
+    console.error("Failed to send account deletion request", error);
+    return {
+      ok: false,
+      error:
+        "Could not send your account deletion request. Please try again later.",
     };
   }
 }
@@ -168,6 +308,20 @@ export async function verifyResetTokenAction(params: {
   username: string;
   token: string;
 }): Promise<ActionResult<Awaited<ReturnType<typeof UserService.verifyToken>>>> {
+  const username = typeof params?.username === "string" ? params.username : "";
+  if (
+    !rateLimitKey(
+      hashSha256(`reset-verify:${username.trim().toLowerCase()}`),
+      10,
+      15 * 60 * 1000,
+    )
+  ) {
+    return {
+      ok: false,
+      error: "Too many attempts. Please request a new link later.",
+    };
+  }
+
   try {
     const result = await UserService.verifyToken({
       username: params.username,
@@ -287,8 +441,31 @@ interface SetPasswordProps {
 export async function setNewPassword(
   props: SetPasswordProps,
 ): Promise<ActionResult<{ success: true }>> {
+  const username = typeof props?.username === "string" ? props.username : "";
+  if (
+    !rateLimitKey(
+      hashSha256(`reset-complete:${username.trim().toLowerCase()}`),
+      5,
+      15 * 60 * 1000,
+    )
+  ) {
+    return {
+      ok: false,
+      error: "Too many attempts. Please request a new link later.",
+    };
+  }
   try {
-    const { username, token, password } = props;
+    const parsed = setPasswordSchema.safeParse({
+      ...props,
+      confirmPassword: props.password,
+    });
+    if (!parsed.success) {
+      return {
+        ok: false,
+        error: parsed.error.issues[0]?.message ?? "Invalid password",
+      };
+    }
+    const { username, token, password } = parsed.data;
 
     const user = await UserService.getUserByKey(username);
 
@@ -312,34 +489,61 @@ export async function setNewPassword(
       };
     }
 
-    console.log(
-      `[TOKEN VALIDATED]: ${tokenValidation.message} - user-${user.username}`,
-    );
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        password: await bcryptHash(password),
-        ...(tokenValidation.verifiedChannel === NotificationChannel.EMAIL
-          ? {
-              emailVerified: new Date(),
-            }
-          : tokenValidation.verifiedChannel === NotificationChannel.WHATSAPP ||
-              tokenValidation.verifiedChannel === NotificationChannel.SMS
-            ? { telVerified: new Date() }
-            : {}),
-      },
-    });
-
-    await prisma.token.update({
-      where: { type_userId: { userId: user.id, type: TokenType.RESET } },
-      data: { isActive: false },
-    });
-
-    if (!tokenValidation.verifiedChannel) {
+    if (!tokenValidation.verifiedChannel || !tokenValidation.tokenId) {
       return {
         ok: false,
         error: tokenValidation.message,
+      };
+    }
+
+    const now = new Date();
+    const hashedPassword = await bcryptHash(password);
+    const consumed = await prisma.$transaction(async (tx) => {
+      const currentToken = tokenValidation.tokenId
+        ? await tx.token.findUnique({ where: { id: tokenValidation.tokenId } })
+        : null;
+      if (
+        !currentToken ||
+        !currentToken.isActive ||
+        currentToken.expiresAt <= now ||
+        currentToken.channel !== tokenValidation.verifiedChannel ||
+        !(await bcryptCompare(token, currentToken.hashedToken))
+      ) {
+        return false;
+      }
+
+      const tokenUpdate = await tx.token.updateMany({
+        where: {
+          id: tokenValidation.tokenId,
+          hashedToken: currentToken.hashedToken,
+          userId: user.id,
+          type: TokenType.RESET,
+          isActive: true,
+          expiresAt: { gt: now },
+          channel: tokenValidation.verifiedChannel,
+        },
+        data: { isActive: false, lastUsedAt: now },
+      });
+
+      if (tokenUpdate.count !== 1) return false;
+
+      await tx.user.update({
+        where: { id: user.id },
+        data: {
+          password: hashedPassword,
+          ...(tokenValidation.verifiedChannel === NotificationChannel.EMAIL
+            ? { emailVerified: now }
+            : { telVerified: now }),
+        },
+      });
+
+      return true;
+    });
+
+    if (!consumed) {
+      return {
+        ok: false,
+        error: "This reset link has already been used or expired.",
       };
     }
 

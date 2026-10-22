@@ -3,7 +3,8 @@
 Loci's primary product is a business AI assistant connected to WhatsApp Business Platform. It helps businesses supercharge customer engagement through conversations, support, and consent-based template notifications. Commerce tools support engagement where useful; marketplace payments remain optional and may not be pursued.
 
 - [Product and assistant](product-and-assistant.md): product boundary and current WhatsApp/assistant behavior.
-- [Development guide](development-guide.md): repository structure, data ownership, setup and validation commands.
+- [Development guide](development-guide.md): repository structure, data ownership, account password setup and recovery, setup and validation commands.
+- [Expo mobile integration guide](expo-mobile-integration.md): product direction, screen/navigation guidance, current mobile API contract, security, and deployment workflow expectations for a separate React Native app.
 - [QR inventory](qr-inventory.md): product QR labels and stock adjustment workflow.
 - [Optional payments](optional-payments.md): existing marketplace payment implementation and its constraints.
 - [Launch readiness plan](launch-readiness-plan.md): critical journey coverage, gaps, AI provider plan, and pre-launch gates.

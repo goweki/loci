@@ -45,7 +45,7 @@ The app is under active development. WhatsApp onboarding and messaging still nee
 | `npm run test:ci`                      | Run Vitest tests.                                                                                                           |
 | `npx tsc --noEmit --incremental false` | Type-check without writing the TypeScript incremental cache.                                                                |
 | `npm run lint:check`                   | Run ESLint without automatic fixes.                                                                                         |
-| `npm run build`                        | Build the Next.js app. Check the `postbuild` script first: it runs `prisma migrate deploy` against the configured database. |
+| `npm run build`                        | Build the Next.js app. The current package has no `postbuild` migration hook; deploy migrations separately with `npm run db:deploy` against the intended database. |
 | `npx prisma migrate status`            | Check migrations for the datasource in the active environment.                                                              |
 
 ## Current Product Scope
@@ -65,4 +65,4 @@ The app is under active development. WhatsApp onboarding and messaging still nee
 
 ## Documentation
 
-Start at [Docs/README.md](Docs/README.md) for product behavior, development guidance, optional marketplace payments, and launch readiness.
+Start at [Docs/README.md](Docs/README.md) for product behavior, development guidance, Expo mobile integration, optional marketplace payments, and launch readiness.

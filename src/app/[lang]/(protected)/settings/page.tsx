@@ -62,6 +62,8 @@ export default async function SettingsPage({
   }
 
   const user = resUser.data;
+  const { password, ...settingsUser } = user;
+  const hasPassword = Boolean(password);
 
   return user ? (
     <div className="max-w-7xl mx-auto space-y-6 py-6">
@@ -69,7 +71,8 @@ export default async function SettingsPage({
 
       <Suspense fallback={<TemplatesSkeleton />}>
         <SettingsClient
-          user={user}
+          user={settingsUser}
+          hasPassword={hasPassword}
           hasWhatsAppCredential={Boolean(wabaCredential?.accessTokenEncrypted)}
         />
       </Suspense>

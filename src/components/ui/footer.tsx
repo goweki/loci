@@ -12,6 +12,10 @@ const Footer = () => {
       title: "Privacy policy",
       href: `/${language}/privacy-policy`,
     },
+    {
+      title: language === "sw" ? "Futa akaunti" : "Delete account",
+      href: `/${language}/delete-account`,
+    },
   ];
 
   return (

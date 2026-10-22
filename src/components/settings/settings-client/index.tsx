@@ -17,15 +17,17 @@ import TabSubscription from "./subscription";
 import TabAutoreplyRules from "./tab-autoReply";
 import { strPascalCase } from "@/lib/utils/stringHandlers";
 import { TabSecurity } from "./tab-security";
-import { UserWithRelations } from "@/services/user/user.dto";
+import type { UserWithRelations } from "@/services/user/user.dto";
 
 const isWhatsAppEnabled = process.env.NEXT_PUBLIC_ENABLE_WHATSAPP_UI === "true";
 
 export default function SettingsClient({
   user,
+  hasPassword,
   hasWhatsAppCredential,
 }: {
-  user: UserWithRelations;
+  user: Omit<UserWithRelations, "password">;
+  hasPassword: boolean;
   hasWhatsAppCredential: boolean;
 }) {
   const searchParams = useSearchParams();
@@ -138,7 +140,10 @@ export default function SettingsClient({
 
       {/* Security Tab */}
       <TabsContent value="security" className="space-y-6">
-        <TabSecurity />
+        <TabSecurity
+          hasPassword={hasPassword}
+          accountEmail={user.email}
+        />
       </TabsContent>
     </Tabs>
   );

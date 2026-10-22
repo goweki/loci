@@ -57,14 +57,9 @@ const translations = {
   },
 };
 
-export default function DashboardNavbar({
-  user,
-}: {
-  user: { id: string; role: UserRole };
-}) {
+export default function DashboardNavbar() {
   const { language } = useI18n();
   const t = translations[language];
-  const role: UserRole = user.role;
 
   const navByRole: Record<UserRole, RichNavMenuProps["navigation"]> = {
     USER: [
@@ -173,5 +168,5 @@ export default function DashboardNavbar({
   };
   const navigationLinks_: RichNavMenuProps["navigation"] = navByRole["USER"];
 
-  return <Navbar navigationLinks={navigationLinks_} authenticated={!!user} />;
+  return <Navbar navigationLinks={navigationLinks_} />;
 }
