@@ -1,6 +1,6 @@
 # Launch readiness: core customer paths
 
-This is a proposed work plan based on the implementation reviewed when the document was last updated, not a claim that the flows are already production verified. Re-run the listed checks against the target commit and deployment before release; this document does not establish that the current build or test suite passes. Source code and schema remain authoritative. See [Product and assistant](product-and-assistant.md) and [Development guide](development-guide.md) for current behavior and operational setup.
+This plan records known launch gaps and point-in-time local validation; passing local checks do not establish that production flows are verified. Re-run the listed checks against the target commit and deployment before release. Source code and schema remain authoritative. See [Product and assistant](product-and-assistant.md) and [Development guide](development-guide.md) for current behavior and operational setup.
 
 ## Launch status: not yet launch-ready
 
@@ -11,6 +11,12 @@ The core user journey is not fully covered or verified against live providers. D
 - Verify the Meta Developer app, Embedded Signup permissions, webhook subscriptions, number deregistration, template lifecycle, and real inbound/outbound messages using a staging WABA.
 - Verify Paystack subscription checkout and signed webhook activation in staging, including duplicate and amount/reference mismatch cases.
 - Set `MODEL_API_KEY` (or the accepted `META_AI_API_KEY` alias), `ANTHROPIC_API_KEY`, `CRON_SECRET`, and the required Meta/Paystack production settings in deployment secret management. Confirm scheduled WhatsApp jobs run and failures are monitored.
+
+## Latest local verification
+
+On 2026-10-22, the current `staging` checkout passed `npm run test:ci` (60 tests across 15 files), `npm run lint:check`, `npm run type-check`, and `npm run build`. These checks validate the local source only; they do not verify production provider configuration or database state. `npx prisma migrate status --schema src/lib/prisma/schema.prisma` could not connect to PostgreSQL at `localhost:5432`, so migration status remains unverified and no migration was applied during this check.
+
+The account deletion request is available in the web settings Security tab and on the public localized web page. The settings action opens a prefilled email; a user must send that email, and support must complete the request. Confirm the support inbox is monitored and that the stated 30-day processing and 90-day backup periods match operations. This repository contains the web/backend API, not the separate Expo app described in [the mobile integration guide](expo-mobile-integration.md); verify the Google Play app itself exposes its own in-app deletion path before submitting it.
 
 ## Current coverage and gaps
 
@@ -50,4 +56,4 @@ The agent runtime now uses Meta Model API through its Anthropic-compatible Messa
 - **Resolved:** Meta Model API on dev.meta.ai, Muse Wonder (`muse-wonder-1.0`) default, Anthropic fallback; Muse Spark 1.3 (`muse-spark-1.3`) is a potential later optimization.
 - **Resolved:** number removal deregisters through Meta Cloud API and deletes the local Loci/server record only after Meta confirms success. Template create/delete also persist locally only after Meta confirms success.
 - **Resolved:** “generate token” means the user's one-day Loci API token under `/en/settings?tab=security`; it is separate from the server-managed Meta WhatsApp access token.
-- **Resolved:** launch signup tests cover email/password account creation with email, WhatsApp, or SMS verification and Google OAuth. OTP sign-in is partial and is not included in the launch critical path.
+- **Still open:** add launch signup tests for email/password account creation with email, WhatsApp, or SMS verification and Google OAuth. OTP sign-in is partial and is not included in the launch critical path.
