@@ -1,13 +1,9 @@
 import { SideBanner } from "../forms/auth/_banner";
 import { BrandSymbol } from "@/components/ui/brand";
-import { headers } from "next/headers";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { House } from "lucide-react";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
 
 export interface CenteredLayoutCopy {
   title: string;
