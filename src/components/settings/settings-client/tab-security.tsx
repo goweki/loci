@@ -32,11 +32,28 @@ import {
 import { sendCurrentUserPasswordSetupLink } from "@/actions/user.actions";
 import { useI18n } from "@/lib/i18n";
 
-export function TabSecurity({ hasPassword }: { hasPassword: boolean }) {
+export function TabSecurity({
+  hasPassword,
+  accountEmail,
+  accountPhone,
+}: {
+  hasPassword: boolean;
+  accountEmail: string | null;
+  accountPhone: string | null;
+}) {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>();
   const [sendingPasswordLink, setSendingPasswordLink] = useState(false);
   const { data: session } = useSession();
   const { language } = useI18n();
+  const deletionSubject =
+    language === "sw"
+      ? "Ombi la kufuta akaunti ya Loci"
+      : "Loci account deletion request";
+  const deletionBody =
+    language === "sw"
+      ? `Tafadhali futa akaunti yangu ya Loci na data inayohusishwa nayo.\n\nBarua pepe ya akaunti: ${accountEmail || "Haipo"}\nNambari ya simu ya akaunti: ${accountPhone || "Haipo"}`
+      : `Please delete my Loci account and its associated data.\n\nAccount email: ${accountEmail || "Not provided"}\nAccount phone: ${accountPhone || "Not provided"}`;
+  const deletionRequestHref = `mailto:privacy@goweki.com?subject=${encodeURIComponent(deletionSubject)}&body=${encodeURIComponent(deletionBody)}`;
 
   const requestPasswordLink = async () => {
     setSendingPasswordLink(true);
@@ -130,15 +147,26 @@ export function TabSecurity({ hasPassword }: { hasPassword: boolean }) {
         <CardHeader>
           <CardTitle className="text-destructive">Danger Zone</CardTitle>
           <CardDescription>
-            Permanently delete your account and all associated data
+            {language === "sw"
+              ? "Omba kufutwa kwa akaunti yako ya Loci na data inayohusishwa nayo. Tutathibitisha umiliki na kushughulikia ombi lako ndani ya siku 30."
+              : "Request deletion of your Loci account and associated data. We will verify account ownership and process your request within 30 days."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <Separator />
 
-          <Button disabled={true} variant="destructive">
-            Delete Account
+          <Button asChild variant="destructive">
+            <a href={deletionRequestHref}>
+              {language === "sw"
+                ? "Omba kufutwa kwa akaunti"
+                : "Request account deletion"}
+            </a>
           </Button>
+          <p className="text-sm text-muted-foreground">
+            {language === "sw"
+              ? "Kitufe hiki kitafungua programu yako ya barua pepe na kuandaa ombi. Tuma barua pepe ili ombi lifike kwetu; akaunti haitafutwa hadi ombi lithibitishwe na kushughulikiwa."
+              : "This opens your email app with a request prepared. Send the email for us to receive it; your account is not deleted until the request is verified and processed."}
+          </p>
         </CardContent>
       </Card>
     </>

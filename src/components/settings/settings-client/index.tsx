@@ -140,7 +140,11 @@ export default function SettingsClient({
 
       {/* Security Tab */}
       <TabsContent value="security" className="space-y-6">
-        <TabSecurity hasPassword={hasPassword} />
+        <TabSecurity
+          hasPassword={hasPassword}
+          accountEmail={user.email}
+          accountPhone={user.tel}
+        />
       </TabsContent>
     </Tabs>
   );
