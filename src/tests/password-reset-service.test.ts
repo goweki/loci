@@ -39,7 +39,7 @@ vi.mock("@/lib/utils/resetToken", () => ({
   generateResetToken: mocks.generateResetToken,
 }));
 
-import { NotificationChannel } from "@/lib/prisma/generated";
+import { NotificationChannel, TokenType } from "@/lib/prisma/generated";
 import { UserService } from "@/services/user/user.service";
 
 describe("password reset service", () => {
@@ -124,5 +124,153 @@ describe("password reset service", () => {
       }),
     );
     expect(mocks.sendSms).toHaveBeenCalledOnce();
+  });
+
+  it("records the WhatsApp channel and sends its template link", async () => {
+    mocks.prisma.user.findFirst.mockResolvedValue({
+      id: "user-7",
+      name: "Account Owner",
+      username: "owner",
+      email: null,
+      tel: "254700000000",
+    });
+
+    const result = await UserService.sendResetLink({
+      username: "254700000000",
+      sendTo: NotificationChannel.WHATSAPP,
+    });
+
+    expect(result.sentTo).toBe(NotificationChannel.WHATSAPP);
+    expect(mocks.prisma.token.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        update: expect.objectContaining({ channel: NotificationChannel.WHATSAPP }),
+        create: expect.objectContaining({ channel: NotificationChannel.WHATSAPP }),
+      }),
+    );
+    expect(mocks.sendTemplate).toHaveBeenCalledOnce();
+  });
+
+  it("returns only safe account fields after a valid token check", async () => {
+    const expiresAt = new Date(Date.now() + 60_000);
+    mocks.prisma.user.findFirst.mockResolvedValue({
+      id: "user-7",
+      name: "Account Owner",
+      email: "owner@example.com",
+      tel: "254700000000",
+      password: "password-hash-must-not-leak",
+      tokens: [
+        {
+          id: "token-9",
+          type: "RESET",
+          isActive: true,
+          expiresAt,
+          hashedToken: "secret-token-hash-must-not-leak",
+          channel: NotificationChannel.EMAIL,
+        },
+      ],
+    });
+    mocks.bcryptCompare.mockResolvedValue(true);
+
+    await expect(
+      UserService.verifyToken({
+        username: "owner@example.com",
+        token: "presented-token",
+        type: TokenType.RESET,
+      }),
+    ).resolves.toEqual({
+      verification: true,
+      tokenId: "token-9",
+      user: {
+        id: "user-7",
+        name: "Account Owner",
+        email: "owner@example.com",
+        tel: "254700000000",
+      },
+      message: "Valid token.",
+      verifiedChannel: NotificationChannel.EMAIL,
+    });
+    expect(mocks.bcryptCompare).toHaveBeenCalledWith(
+      "presented-token",
+      "secret-token-hash-must-not-leak",
+    );
+  });
+
+  it("rejects an invalid reset token", async () => {
+    mocks.prisma.user.findFirst.mockResolvedValue({
+      id: "user-7",
+      tokens: [
+        {
+          id: "token-9",
+          type: "RESET",
+          isActive: true,
+          expiresAt: new Date(Date.now() + 60_000),
+          hashedToken: "stored-hash",
+          channel: NotificationChannel.EMAIL,
+        },
+      ],
+    });
+    mocks.bcryptCompare.mockResolvedValue(false);
+
+    await expect(
+      UserService.verifyToken({
+        username: "owner@example.com",
+        token: "wrong-token",
+        type: TokenType.RESET,
+      }),
+    ).resolves.toMatchObject({ verification: false, message: "Invalid token." });
+  });
+
+  it("rejects an expired reset token without comparing the token", async () => {
+    mocks.prisma.user.findFirst.mockResolvedValue({
+      id: "user-7",
+      tokens: [
+        {
+          id: "token-9",
+          type: "RESET",
+          isActive: true,
+          expiresAt: new Date(Date.now() - 1_000),
+          hashedToken: "stored-hash",
+          channel: NotificationChannel.EMAIL,
+        },
+      ],
+    });
+    mocks.bcryptCompare.mockResolvedValue(true);
+
+    await expect(
+      UserService.verifyToken({
+        username: "owner@example.com",
+        token: "expired-token",
+        type: TokenType.RESET,
+      }),
+    ).resolves.toMatchObject({ verification: false, message: "Expired token." });
+    expect(mocks.bcryptCompare).not.toHaveBeenCalled();
+  });
+
+  it("rejects inactive reset tokens", async () => {
+    mocks.prisma.user.findFirst.mockResolvedValue({
+      id: "user-7",
+      tokens: [
+        {
+          id: "token-9",
+          type: "RESET",
+          isActive: false,
+          expiresAt: new Date(Date.now() + 60_000),
+          hashedToken: "stored-hash",
+          channel: NotificationChannel.EMAIL,
+        },
+      ],
+    });
+
+    await expect(
+      UserService.verifyToken({
+        username: "owner@example.com",
+        token: "inactive-token",
+        type: TokenType.RESET,
+      }),
+    ).resolves.toMatchObject({
+      verification: false,
+      message: "Invalid link or token expired.",
+    });
+    expect(mocks.bcryptCompare).not.toHaveBeenCalled();
   });
 });

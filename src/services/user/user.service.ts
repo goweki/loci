@@ -508,12 +508,12 @@ export class UserService {
       return { verification: false, message: "Invalid link or token expired." };
     }
 
-    if (!(await bcryptCompare(token, resetToken.hashedToken))) {
-      return { verification: false, message: "Invalid token." };
-    }
-
     if (resetToken.expiresAt < new Date()) {
       return { verification: false, message: "Expired token." };
+    }
+
+    if (!(await bcryptCompare(token, resetToken.hashedToken))) {
+      return { verification: false, message: "Invalid token." };
     }
 
     return {

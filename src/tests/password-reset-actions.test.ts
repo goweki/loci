@@ -86,6 +86,15 @@ describe("password reset server actions", () => {
     ).resolves.toEqual({ ok: true, data: { requested: true } });
   });
 
+  it("keeps the same generic recovery result when the request is throttled", async () => {
+    mocks.rateLimitKey.mockReturnValue(false);
+
+    await expect(
+      sendResetLinkAction({ username: "owner@example.com" }),
+    ).resolves.toEqual({ ok: true, data: { requested: true } });
+    expect(mocks.sendResetLink).not.toHaveBeenCalled();
+  });
+
   it("uses the signed-in account email for the Settings password link", async () => {
     mocks.requireUser.mockResolvedValue({ id: "user-7", role: "USER" });
     mocks.prisma.user.findUnique.mockResolvedValue({ email: "owner@example.com" });
@@ -115,6 +124,16 @@ describe("password reset server actions", () => {
       ok: false,
       error: expect.stringContaining("email address"),
     });
+    expect(mocks.sendResetLink).not.toHaveBeenCalled();
+  });
+
+  it("does not send a Settings link when there is no authenticated user", async () => {
+    mocks.requireUser.mockRejectedValue(new Error("Sign in required"));
+
+    await expect(sendCurrentUserPasswordSetupLink("en")).resolves.toMatchObject({
+      ok: false,
+    });
+    expect(mocks.prisma.user.findUnique).not.toHaveBeenCalled();
     expect(mocks.sendResetLink).not.toHaveBeenCalled();
   });
 

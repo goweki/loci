@@ -145,6 +145,36 @@ describe("mobile password reset endpoint", () => {
     expect(mocks.tx.user.update).not.toHaveBeenCalled();
   });
 
+  it("does not change the password when the presented token does not match", async () => {
+    mocks.verifyToken.mockResolvedValue({
+      verification: true,
+      tokenId: "token-9",
+      verifiedChannel: NotificationChannel.EMAIL,
+      user: { id: "user-7", name: "Owner", email: "owner@example.com", tel: null },
+      message: "Valid token.",
+    });
+    mocks.tx.token.findUnique.mockResolvedValue({
+      id: "token-9",
+      isActive: true,
+      expiresAt: new Date(Date.now() + 60_000),
+      channel: NotificationChannel.EMAIL,
+      hashedToken: "token-hash",
+    });
+    mocks.bcryptCompare.mockResolvedValue(false);
+
+    const response = await POST(
+      request("complete", {
+        username: "owner@example.com",
+        token: "wrong-token",
+        password: "newPassword123",
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    expect(mocks.tx.token.updateMany).not.toHaveBeenCalled();
+    expect(mocks.tx.user.update).not.toHaveBeenCalled();
+  });
+
   it("rejects passwords shorter than eight characters", async () => {
     const response = await POST(
       request("complete", {
