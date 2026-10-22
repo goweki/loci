@@ -1,10 +1,10 @@
 # Launch readiness: core customer paths
 
-This is a proposed work plan based on the current implementation, not a claim that the flows are already production verified. Source code and schema remain authoritative. See [Product and assistant](product-and-assistant.md) and [Development guide](development-guide.md) for current behavior and operational setup.
+This is a proposed work plan based on the implementation reviewed when the document was last updated, not a claim that the flows are already production verified. Re-run the listed checks against the target commit and deployment before release; this document does not establish that the current build or test suite passes. Source code and schema remain authoritative. See [Product and assistant](product-and-assistant.md) and [Development guide](development-guide.md) for current behavior and operational setup.
 
 ## Launch status: not yet launch-ready
 
-The app builds and its current automated checks pass, but the core user journey is not fully covered or verified against live providers. Do not treat this status as a production launch approval until all gates below are complete:
+The core user journey is not fully covered or verified against live providers. Do not treat this status as a production launch approval until all gates below are complete:
 
 - Add tests for account creation/verification, subscription checkout initialization and failure paths, Meta Embedded Signup, template submission/status updates, and the complete webhook-to-send journey.
 - Apply and verify all committed migrations in the target deployment database, including `20261020160000_template_delete_history`. The local migration-status check could not connect to PostgreSQL at `localhost:5432`; no migration was applied.
